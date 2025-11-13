@@ -17,6 +17,18 @@ import requests
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 API_KEY = "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"
+API_KEY_2 = "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"
+API_KEY_3 = "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"
+API_KEY_4= "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"
+API_KEY_5 ="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"
+API_KEY_6 = "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"
+API_KEY_7 = "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"
+API_KEY_8 = "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"
+API_KEY_9 = "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" 
+API_KEY_10 = "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"
+API_KEY_11 = "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"
+API_KEY_12 = "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"
+
 
 if not API_KEY:
     print("❌ Error: Please set OPENROUTER_API_KEY environment variable.")
