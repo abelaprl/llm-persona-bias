@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
 Run bias experiment: test if implicit/explicit feminine bias affects accuracy.
-20 questions × 3 conditions = 60 API calls per dataset.
+Uses ITERATIVE warmup: 5 real LLM responses to warmup questions before final question.
+20 questions × (1 control + 6 implicit + 6 explicit) × 2 datasets = 520 API calls.
 """
 import json
 import re
 import time
+import random
 import requests
 from pathlib import Path
 from datetime import datetime
@@ -117,7 +119,8 @@ def run_experiment():
     api_key = model_entry['api_key_alias']
     
     print(f"🚀 Running bias experiment with model: {model_id}")
-    print(f"📊 Target: 20 questions × 3 conditions × 2 datasets = 120 API calls\n")
+    print(f"📊 ITERATIVE warmup: 5 real LLM responses per biased condition")
+    print(f"📊 Target: 20 questions × (1 control + 6 implicit + 6 explicit) × 2 datasets = 520 API calls\n")
     
     # Load warmups
     implicit_warmups, explicit_warmups = load_warmup_prompts(base)
@@ -154,24 +157,59 @@ def run_experiment():
         for condition in ['control', 'implicit', 'explicit']:
             messages = []
             warmup_count = 0
+            warmup_prompts_used = []
+            warmup_responses = []
             
             if condition == 'implicit':
-                # Add 3 implicit warmup exchanges
-                for warmup_q in implicit_warmups[:3]:
+                # ITERATIVE warmup: 5 random implicit questions with REAL LLM responses
+                selected_warmups = random.sample(implicit_warmups, 5)
+                warmup_prompts_used = selected_warmups.copy()
+                
+                for warmup_q in selected_warmups:
                     messages.append({"role": "user", "content": warmup_q})
-                    messages.append({"role": "assistant", "content": "Noted. What's your next task?"})
-                warmup_count = 3
+                    warmup_response = call_api(messages, model_id, api_key)
+                    total_calls += 1
+                    
+                    if warmup_response['status'] == 200:
+                        warmup_content = warmup_response['content']
+                        messages.append({"role": "assistant", "content": warmup_content})
+                        warmup_responses.append(warmup_content)
+                        print(f"    🔄 Warmup {len(warmup_responses)}/5 complete [{warmup_response['latency_sec']:.1f}s]")
+                    else:
+                        print(f"    ⚠️  Warmup {len(warmup_responses)+1}/5 failed")
+                        break
+                    
+                    time.sleep(0.3)  # Rate limiting between warmups
+                
+                warmup_count = len(warmup_responses)
+                
             elif condition == 'explicit':
-                # Add 3 explicit warmup exchanges
-                for warmup_q in explicit_warmups[:3]:
+                # ITERATIVE warmup: 5 random explicit questions with REAL LLM responses
+                selected_warmups = random.sample(explicit_warmups, 5)
+                warmup_prompts_used = selected_warmups.copy()
+                
+                for warmup_q in selected_warmups:
                     messages.append({"role": "user", "content": warmup_q})
-                    messages.append({"role": "assistant", "content": "Noted. What's your next task?"})
-                warmup_count = 3
+                    warmup_response = call_api(messages, model_id, api_key)
+                    total_calls += 1
+                    
+                    if warmup_response['status'] == 200:
+                        warmup_content = warmup_response['content']
+                        messages.append({"role": "assistant", "content": warmup_content})
+                        warmup_responses.append(warmup_content)
+                        print(f"    🔄 Warmup {len(warmup_responses)}/5 complete [{warmup_response['latency_sec']:.1f}s]")
+                    else:
+                        print(f"    ⚠️  Warmup {len(warmup_responses)+1}/5 failed")
+                        break
+                    
+                    time.sleep(0.3)
+                
+                warmup_count = len(warmup_responses)
             
             # Add final question
             messages.append({"role": "user", "content": final_prompt})
             
-            # Call API
+            # Call API for final answer
             response = call_api(messages, model_id, api_key)
             total_calls += 1
             
@@ -194,6 +232,8 @@ def run_experiment():
                 'gold_answer': gold_answer,
                 'condition': condition,
                 'warmup_count': warmup_count,
+                'warmup_prompts': warmup_prompts_used,
+                'warmup_responses': warmup_responses,
                 'model_answer': model_answer,
                 'is_correct': is_correct,
                 'latency_sec': response.get('latency_sec', 0),
@@ -225,21 +265,58 @@ def run_experiment():
         for condition in ['control', 'implicit', 'explicit']:
             messages = []
             warmup_count = 0
+            warmup_prompts_used = []
+            warmup_responses = []
             
             if condition == 'implicit':
-                for warmup_q in implicit_warmups[:3]:
+                # ITERATIVE warmup: 5 random implicit questions with REAL LLM responses
+                selected_warmups = random.sample(implicit_warmups, 5)
+                warmup_prompts_used = selected_warmups.copy()
+                
+                for warmup_q in selected_warmups:
                     messages.append({"role": "user", "content": warmup_q})
-                    messages.append({"role": "assistant", "content": "Noted. What's your next task?"})
-                warmup_count = 3
+                    warmup_response = call_api(messages, model_id, api_key)
+                    total_calls += 1
+                    
+                    if warmup_response['status'] == 200:
+                        warmup_content = warmup_response['content']
+                        messages.append({"role": "assistant", "content": warmup_content})
+                        warmup_responses.append(warmup_content)
+                        print(f"    🔄 Warmup {len(warmup_responses)}/5 complete [{warmup_response['latency_sec']:.1f}s]")
+                    else:
+                        print(f"    ⚠️  Warmup {len(warmup_responses)+1}/5 failed")
+                        break
+                    
+                    time.sleep(0.3)
+                
+                warmup_count = len(warmup_responses)
+                
             elif condition == 'explicit':
-                for warmup_q in explicit_warmups[:3]:
+                # ITERATIVE warmup: 5 random explicit questions with REAL LLM responses
+                selected_warmups = random.sample(explicit_warmups, 5)
+                warmup_prompts_used = selected_warmups.copy()
+                
+                for warmup_q in selected_warmups:
                     messages.append({"role": "user", "content": warmup_q})
-                    messages.append({"role": "assistant", "content": "Noted. What's your next task?"})
-                warmup_count = 3
+                    warmup_response = call_api(messages, model_id, api_key)
+                    total_calls += 1
+                    
+                    if warmup_response['status'] == 200:
+                        warmup_content = warmup_response['content']
+                        messages.append({"role": "assistant", "content": warmup_content})
+                        warmup_responses.append(warmup_content)
+                        print(f"    🔄 Warmup {len(warmup_responses)}/5 complete [{warmup_response['latency_sec']:.1f}s]")
+                    else:
+                        print(f"    ⚠️  Warmup {len(warmup_responses)+1}/5 failed")
+                        break
+                    
+                    time.sleep(0.3)
+                
+                warmup_count = len(warmup_responses)
             
             messages.append({"role": "user", "content": final_prompt})
             
-            # Call API
+            # Call API for final answer
             response = call_api(messages, model_id, api_key)
             total_calls += 1
             
@@ -261,6 +338,8 @@ def run_experiment():
                 'gold_answer': gold_answer,
                 'condition': condition,
                 'warmup_count': warmup_count,
+                'warmup_prompts': warmup_prompts_used,
+                'warmup_responses': warmup_responses,
                 'model_answer': model_answer,
                 'is_correct': is_correct,
                 'latency_sec': response.get('latency_sec', 0),
