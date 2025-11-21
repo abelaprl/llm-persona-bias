@@ -28,6 +28,7 @@ TARGET_ORDER = os.environ.get("TARGET_ORDER")
 REQUEST_DELAY = float(os.environ.get("REQUEST_DELAY", "3.0"))
 MAX_RETRIES = int(os.environ.get("MAX_RETRIES", "5"))
 BACKOFF_BASE = float(os.environ.get("BACKOFF_BASE", "1.0"))
+ENABLE_REASONING = os.environ.get("ENABLE_REASONING", "0") == "1"
 
 
 def call_openrouter(model, api_key, messages):
@@ -42,6 +43,9 @@ def call_openrouter(model, api_key, messages):
         "top_p": 1.0,
         "max_tokens": 1500,
     }
+    # Optionally enable reasoning / chain-of-thought if requested
+    if ENABLE_REASONING:
+        payload["reasoning"] = "chain_of_thought"
 
     try:
         start = time.time()
@@ -60,6 +64,9 @@ def call_openrouter(model, api_key, messages):
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     model_configs = json.load(f)
 
+print('DEBUG: TARGET_MODEL_ID=', TARGET_MODEL_ID, 'TARGET_ORDER=', TARGET_ORDER)
+print('DEBUG: loaded model_configs count=', len(model_configs))
+
 for model in model_configs:
     order = model["order"]
     api_key = model["api_key_alias"]
@@ -68,7 +75,10 @@ for model in model_configs:
     # Apply optional filters
     if TARGET_MODEL_ID and model_id != TARGET_MODEL_ID:
         continue
-    if TARGET_ORDER:
+    # If TARGET_ORDER is set but TARGET_MODEL_ID is also set, we allow
+    # running the specific model against a different order's inputs. Only
+    # filter by order when TARGET_MODEL_ID is not provided.
+    if TARGET_ORDER and not TARGET_MODEL_ID:
         try:
             if int(TARGET_ORDER) != int(order):
                 continue
@@ -79,8 +89,18 @@ for model in model_configs:
     if model_id.startswith("groq/"):
         print(f"⏭ Skipping model {model_id} (served by Groq, not OpenRouter)")
         continue
+    # Allow TARGET_ORDER to override which input folder to use (useful when
+    # running a model against inputs from a different order)
+    use_order = None
+    if TARGET_ORDER:
+        try:
+            use_order = int(TARGET_ORDER)
+        except Exception:
+            use_order = None
+    if use_order is None:
+        use_order = int(order)
 
-    input_dir = os.path.join(INPUTS_ROOT, f"{order:02d}")
+    input_dir = os.path.join(INPUTS_ROOT, f"{use_order:02d}")
     if not os.path.isdir(input_dir):
         print(f"⚠️  No input dir for model {order:02d} ({model_id}) at {input_dir}, skipping.")
         continue
