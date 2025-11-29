@@ -4,6 +4,7 @@ import csv
 import json
 import re
 from pathlib import Path
+import argparse
 from typing import Any, Dict, List, Optional
 
 
@@ -42,16 +43,41 @@ def normalize_answer(ans: str) -> str:
     return ans.strip().replace(",", "").lower()
 
 
+def try_write_xlsx(rows, out_xlsx: Path) -> None:
+    try:
+        import pandas as pd  # type: ignore
+    except Exception:
+        print(f"Pandas not available; skipping XLSX: {out_xlsx}")
+        return
+    df = pd.DataFrame(rows)
+    out_xlsx.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        df.to_excel(out_xlsx, index=False)
+        print(f"XLSX written to: {out_xlsx}")
+    except Exception as e:
+        print(f"Failed to write XLSX: {e}")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Parse GSM8K raw outputs to CSV/XLSX")
+    parser.add_argument("--raw-dir", default="results/woman_implicits/gsm8k_raw", help="Directory containing per-question JSON files")
+    parser.add_argument("--out-csv", default="results/woman_implicits/gsm8k_results.csv", help="Path for output CSV")
+    parser.add_argument("--out-xlsx", default="results/woman_implicits/gsm8k_results.xlsx", help="Path for output XLSX")
+    return parser.parse_args()
+
+
 def main():
-    raw_dir = Path("results/gsm8k_raw")
-    output_csv = Path("results/gsm8k_results.csv")
+    args = parse_args()
+    raw_dir = Path(args.raw_dir)
+    output_csv = Path(args.out_csv)
+    output_xlsx = Path(args.out_xlsx)
     
     if not raw_dir.exists():
         print(f"Error: {raw_dir} does not exist. Run batch script first.")
         return
     
     # Collect all question JSON files (skip summary/warmup/echo)
-    files = sorted([f for f in raw_dir.glob("gsm8k_*.json")])
+    files = sorted([f for f in raw_dir.glob("*.json") if f.name not in {"run_summary.json", "persona_warmup.json", "persona_echo.json"}])
     
     if not files:
         print(f"No gsm8k_*.json files found in {raw_dir}")
@@ -122,6 +148,8 @@ def main():
     print(f"\nDone: {len(files)} questions parsed")
     print(f"Parse errors: {parse_errors}")
     print(f"CSV written to: {output_csv}")
+    # Try XLSX
+    try_write_xlsx(rows, output_xlsx)
     
     # Summary stats
     correct = sum(r["is_correct"] for r in rows)
