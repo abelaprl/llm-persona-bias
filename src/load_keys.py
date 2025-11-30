@@ -61,8 +61,13 @@ def find_model_by_order(models: List[Dict[str, Any]], order: int) -> Optional[Di
 
 
 def find_model_by_name(models: List[Dict[str, Any]], name: str) -> Optional[Dict[str, Any]]:
+    # First try exact match on 'name'
     for m in models:
         if m.get("name") == name:
+            return m
+    # Fallback: try match on 'model_id'
+    for m in models:
+        if m.get("model_id") == name:
             return m
     return None
 
