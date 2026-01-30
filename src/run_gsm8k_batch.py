@@ -244,6 +244,8 @@ def main():
             "output_path": str(out_path),
             "latency_sec": round(latency, 3)
         })
+        # Wait 3 seconds to avoid rate limit
+        time.sleep(3)
 
     elapsed = time.time() - start_total
     print(f"Done: {len(subset)} questions, successes={successes}, failures={failures}, total_time={round(elapsed, 2)}s")
