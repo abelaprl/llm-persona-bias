@@ -14,8 +14,8 @@ from datetime import datetime
 GROQ_API_KEY = "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"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL_ID = "llama-3.1-8b-instant"
-DELAY_SECONDS = 5  # Fast delay
-MAX_RETRIES = 3
+DELAY_SECONDS = 3  # Faster delay to avoid rate limit
+MAX_RETRIES = 5    # More retries for fallback
 
 # Paths
 MAN_IMPLICIT_PROMPTS_PATH = "inputs/implicits_man_prompts.json"
@@ -143,40 +143,39 @@ def create_structured_output(question_data, persona_data, question_id, api_respo
     }
 
 def run_warmup(woman_persona_data, gsm8k_data):
-    """Run 3 warmup questions with woman implicit persona"""
-    print("🔥 WARMUP: Running 3 questions with woman implicit persona...")
+    """Run 1 warmup question with woman implicit persona"""
+    print("🔥 WARMUP: Running 1 question with woman implicit persona...")
     
     warmup_dir = os.path.join(OUTPUT_DIR, "warmup")
     os.makedirs(warmup_dir, exist_ok=True)
     
-    for i in range(3):
-        question_id = i + 1
-        print(f"  🔥 Warmup {question_id}/3...")
-        
-        question_data = gsm8k_data[i]
-        
-        messages = [
-            {"role": "system", "content": woman_persona_data["prompt"]},
-            {"role": "user", "content": question_data["question"]}
-        ]
-        
-        api_response = call_groq_api(messages)
-        
-        # Save warmup result
-        warmup_output = create_structured_output(
-            question_data, woman_persona_data, question_id, api_response, "woman_implicit_warmup"
-        )
-        
-        warmup_file = os.path.join(warmup_dir, f"warmup_{question_id:03d}.json")
-        with open(warmup_file, "w", encoding="utf-8") as f:
-            json.dump(warmup_output, f, indent=2, ensure_ascii=False)
-        
-        if api_response["success"]:
-            print(f"  🔥 Warmup {question_id}/3: ✅ Success ({api_response['latency_sec']:.2f}s)")
-        else:
-            print(f"  🔥 Warmup {question_id}/3: ❌ {api_response['error']}")
-        
-        time.sleep(2)  # Short delay between warmup
+    question_id = 1
+    print(f"  🔥 Warmup 1/1...")
+    
+    question_data = gsm8k_data[0]
+    
+    messages = [
+        {"role": "system", "content": woman_persona_data["prompt"]},
+        {"role": "user", "content": question_data["question"]}
+    ]
+    
+    api_response = call_groq_api(messages)
+    
+    # Save warmup result
+    warmup_output = create_structured_output(
+        question_data, woman_persona_data, question_id, api_response, "woman_implicit_warmup"
+    )
+    
+    warmup_file = os.path.join(warmup_dir, f"warmup_{question_id:03d}.json")
+    with open(warmup_file, "w", encoding="utf-8") as f:
+        json.dump(warmup_output, f, indent=2, ensure_ascii=False)
+    
+    if api_response["success"]:
+        print(f"  🔥 Warmup 1/1: ✅ Success ({api_response['latency_sec']:.2f}s)")
+    else:
+        print(f"  🔥 Warmup 1/1: ❌ {api_response['error']}")
+    
+    time.sleep(2)  # Short delay after warmup
     
     print("🔥 Warmup completed! Starting main experiment...\n")
 
@@ -184,7 +183,7 @@ def main():
     """Main function for man implicits with warmup"""
     print("🚀 GROQ LLAMA EXPERIMENT - MAN IMPLICITS (1-400) WITH WARMUP")
     print("=" * 70)
-    print(f"🔥 Warmup: 3 questions with woman implicit persona ID 1")
+    print(f"🔥 Warmup: 1 question with woman implicit persona ID 1")
     print(f"🎯 Main: 400 questions with man implicit persona ID 1")
     print(f"⏳ Delay: {DELAY_SECONDS}s between requests")
     print()
