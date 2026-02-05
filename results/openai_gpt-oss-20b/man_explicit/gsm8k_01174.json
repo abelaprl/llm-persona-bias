@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_man_explicit_001_01174",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T23:16:51.491297",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1174,
+    "dataset": "gsm8k_test",
+    "question": "A regular box of 100 dishwasher pods costs $12. There's currently a special size box for the same price that has 20% more pods. How many dishwashing cycles with the new box can you run for $1 if you use 1 pod per cycle?",
+    "ground_truth": "If the regular box has 100 pods and the special one has 20% more, then the new box has 100 * 20% = 20 more pods\nIf the new one has 20 more pods than the regular one, the new box has a total of 20+100 = <<20+100=120>>120 pods\nIf the cost of the regular box ($12) is the same as the new box, then the new box also costs $12\nIf the new box has 120 pods and the price for the box is $12, then each pod costs $12/120 = $<<12/120=0.10>>0.10\nIf 1 pod costs $0.10 and is used in 1 cycle, then each cycle costs = $<<1*0.10=0.10>>0.10\nIf 1 cycle costs $0.10, then for $1 I could run $1/$0.1 = 10 cycles\n#### 10",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "A regular box of 100 dishwasher pods costs $12. There's currently a special size box for the same price that has 20% more pods. How many dishwashing cycles with the new box can you run for $1 if you use 1 pod per cycle?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First, find the price per pod in each box.\n\n| Box | Pods | Price | Price per pod |\n|-----|------|-------|---------------|\n| Regular | 100 | $12 | $12 ÷ 100 = **$0.12** |\n| Special | 100 × 1.20 = **120** | $12 | $12 ÷ 120 = **$0.10** |\n\nThe special box gives you 120 pods for the same $12, so each pod costs $0.10.\n\nNow, how many pods (and thus cycles) can you get for $1?\n\n\\[\n\\frac{\\$1}{\\$0.10 \\text{ per pod}} = 10 \\text{ pods}\n\\]\n\nSince you use one pod per cycle, you can run **10 dishwashing cycles** with the special box for $1.",
+    "raw_api_response": {
+      "id": "gen-1770221809-bT2vYKju5QJCAZaZSp7V",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770221809,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "First, find the price per pod in each box.\n\n| Box | Pods | Price | Price per pod |\n|-----|------|-------|---------------|\n| Regular | 100 | $12 | $12 ÷ 100 = **$0.12** |\n| Special | 100 × 1.20 = **120** | $12 | $12 ÷ 120 = **$0.10** |\n\nThe special box gives you 120 pods for the same $12, so each pod costs $0.10.\n\nNow, how many pods (and thus cycles) can you get for $1?\n\n\\[\n\\frac{\\$1}{\\$0.10 \\text{ per pod}} = 10 \\text{ pods}\n\\]\n\nSince you use one pod per cycle, you can run **10 dishwashing cycles** with the special box for $1.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Regular box: 100 pods for $12. So price per pod = 12/100 = $0.12 per pod. Special size box: same price $12 but 20% more pods. So 20% more than 100 = 120 pods. So 120 pods for $12. So price per pod = 12/120 = $0.10 per pod. The question: \"How many dishwashing cycles with the new box can you run for $1 if you use 1 pod per cycle?\" So we want number of cycles per $1. Since price per pod is $0.10, so $1 can buy 10 pods. So answer: 10 cycles. But maybe they want to consider that the special box is $12 for 120 pods, so $1 is 1/12 of the box, so 120/12 = 10 pods. So answer: 10 cycles. Let's double-check: 20% more pods: 100 * 1.2 = 120. Yes. So answer: 10 cycles. Provide explanation.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Regular box: 100 pods for $12. So price per pod = 12/100 = $0.12 per pod. Special size box: same price $12 but 20% more pods. So 20% more than 100 = 120 pods. So 120 pods for $12. So price per pod = 12/120 = $0.10 per pod. The question: \"How many dishwashing cycles with the new box can you run for $1 if you use 1 pod per cycle?\" So we want number of cycles per $1. Since price per pod is $0.10, so $1 can buy 10 pods. So answer: 10 cycles. But maybe they want to consider that the special box is $12 for 120 pods, so $1 is 1/12 of the box, so 120/12 = 10 pods. So answer: 10 cycles. Let's double-check: 20% more pods: 100 * 1.2 = 120. Yes. So answer: 10 cycles. Provide explanation."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 134,
+        "completion_tokens": 420,
+        "total_tokens": 554,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 78,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00011438,
+          "upstream_inference_prompt_cost": 9.38e-06,
+          "upstream_inference_completions_cost": 0.000105
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 179,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 2.27677059173584,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 134,
+        "prompt_time": 0,
+        "completion_tokens": 420,
+        "completion_time": 0,
+        "total_tokens": 554,
+        "total_time": 0,
+        "reasoning_tokens": 179
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

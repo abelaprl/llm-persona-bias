@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "run_id": "qwen_qwen3_next_80b_a3b_instruct_man_explicit_001_01031",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T23:09:37.165032",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "qwen/qwen3-next-80b-a3b-instruct",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1031,
+    "dataset": "gsm8k_test",
+    "question": "Marcus is trying to decide whether he really needs to do his homework. There's a 50% chance that tomorrow he'll have a substitute teacher who won't collect the homework. Even if the normal teacher comes in, there's a 40% chance she'll give everyone an extension. Even if the whole class doesn't get an extension, there's a 20% chance Marcus can convince the teacher his dog ate his assignment and get a personal extension. What is the percentage chance that Marcus will actually have to turn in his homework tomorrow?",
+    "ground_truth": "First find the chance that the normal teacher comes in by subtracting the odds she doesn't from 100%: 100% - 50% = 50%\nThen find the chance the teacher doesn't grant the whole class an extension by subtracting the chance she does from 100%: 100% - 40% = 60%\nThen find the chance that Marcus can't get a personal extension by subtracting the chance he does from 100%: 100% - 20% = 80%\nNow find the chance the teacher comes in AND doesn't grant the whole class an extension by multiplying the two independent probabilities: .6 * .5 = <<.6*.5=.3>>.3\nNow multiply that probability by the probability Marcus can't get a personal extension to find the probability he actually has to turn in his homework: .3 * .8 = <<.3*.8=.24>>.24\nFinally, multiply the decimal probability by 100 to express it as a percentage: .24 * 100% = <<.24*100=24>>24%\n#### 24",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "Marcus is trying to decide whether he really needs to do his homework. There's a 50% chance that tomorrow he'll have a substitute teacher who won't collect the homework. Even if the normal teacher comes in, there's a 40% chance she'll give everyone an extension. Even if the whole class doesn't get an extension, there's a 20% chance Marcus can convince the teacher his dog ate his assignment and get a personal extension. What is the percentage chance that Marcus will actually have to turn in his homework tomorrow?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 512,
+      "model": "qwen/qwen3-next-80b-a3b-instruct"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "We are given a scenario with multiple possible outcomes that could **exempt** Marcus from turning in his homework. We need to find the **probability that Marcus will actually have to turn in his homework**, i.e., **none** of the exemptions apply.\n\nLet’s break it down step by step.\n\n---\n\n### Step 1: Define the events\n\nLet’s define the events that **prevent** Marcus from having to turn in his homework:\n\n1. **S**: Substitute teacher comes → **no homework collected**  \n   - P(S) = 50% = 0.5\n\n2. **E**: Normal teacher comes, but gives **class extension**  \n   - This only happens if **not** S → P(not S) = 0.5  \n   - Given normal teacher, P(E | not S) = 40% = 0.4  \n   - So, P(E) = P(not S) × P(E | not S) = 0.5 × 0.4 = 0.2\n\n3. **D**: Normal teacher comes, **no class extension**, but Marcus gets a **personal extension** because his dog ate it  \n   - This requires:  \n     - Not S (normal teacher): prob = 0.5  \n     - No class extension: prob = 1 - 0.4 = 0.6  \n     - Then Marcus convinces teacher: prob = 20% = 0.2  \n   - So, P(D) = 0.5 × 0.6 × 0.2 = 0.06\n\n---\n\n### Step 2: Total probability that Marcus **does NOT** have to turn in homework\n\nThese three events are **mutually exclusive**:\n\n- Either substitute comes (S),  \n- Or normal teacher comes and gives class extension (E),  \n- Or normal teacher comes, no class extension, but Marcus gets personal extension (D)\n\nSo total probability Marcus **doesn’t** have to turn in homework:\n\n> P(no turn-in) = P(S) + P(E) + P(D)  \n> = 0.5 + 0.2 + 0.06 = **0.76**\n\n---\n\n### Step 3: Probability Marcus **does** have to turn in homework\n\nThat’s the complement:\n\n> P(turn in) = 1 - P(no turn-in) = 1 - 0.76 = **0.24**\n\n---\n\n",
+    "raw_api_response": {
+      "id": "gen-1770221374-RzfvU4Odll1Z1nBiWout",
+      "provider": "Google",
+      "model": "qwen/qwen3-next-80b-a3b-instruct",
+      "object": "chat.completion",
+      "created": 1770221374,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "length",
+          "native_finish_reason": "length",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "We are given a scenario with multiple possible outcomes that could **exempt** Marcus from turning in his homework. We need to find the **probability that Marcus will actually have to turn in his homework**, i.e., **none** of the exemptions apply.\n\nLet’s break it down step by step.\n\n---\n\n### Step 1: Define the events\n\nLet’s define the events that **prevent** Marcus from having to turn in his homework:\n\n1. **S**: Substitute teacher comes → **no homework collected**  \n   - P(S) = 50% = 0.5\n\n2. **E**: Normal teacher comes, but gives **class extension**  \n   - This only happens if **not** S → P(not S) = 0.5  \n   - Given normal teacher, P(E | not S) = 40% = 0.4  \n   - So, P(E) = P(not S) × P(E | not S) = 0.5 × 0.4 = 0.2\n\n3. **D**: Normal teacher comes, **no class extension**, but Marcus gets a **personal extension** because his dog ate it  \n   - This requires:  \n     - Not S (normal teacher): prob = 0.5  \n     - No class extension: prob = 1 - 0.4 = 0.6  \n     - Then Marcus convinces teacher: prob = 20% = 0.2  \n   - So, P(D) = 0.5 × 0.6 × 0.2 = 0.06\n\n---\n\n### Step 2: Total probability that Marcus **does NOT** have to turn in homework\n\nThese three events are **mutually exclusive**:\n\n- Either substitute comes (S),  \n- Or normal teacher comes and gives class extension (E),  \n- Or normal teacher comes, no class extension, but Marcus gets personal extension (D)\n\nSo total probability Marcus **doesn’t** have to turn in homework:\n\n> P(no turn-in) = P(S) + P(E) + P(D)  \n> = 0.5 + 0.2 + 0.06 = **0.76**\n\n---\n\n### Step 3: Probability Marcus **does** have to turn in homework\n\nThat’s the complement:\n\n> P(turn in) = 1 - P(no turn-in) = 1 - 0.76 = **0.24**\n\n---\n\n",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 131,
+        "completion_tokens": 512,
+        "total_tokens": 643,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00063405,
+          "upstream_inference_prompt_cost": 1.965e-05,
+          "upstream_inference_completions_cost": 0.0006144
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 2.8836801052093506,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 131,
+        "prompt_time": 0,
+        "completion_tokens": 512,
+        "completion_time": 0,
+        "total_tokens": 643,
+        "total_time": 0,
+        "reasoning_tokens": 0
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

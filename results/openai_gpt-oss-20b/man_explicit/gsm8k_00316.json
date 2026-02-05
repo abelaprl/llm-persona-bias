@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_man_explicit_001_00316",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T22:01:49.474430",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 316,
+    "dataset": "gsm8k_test",
+    "question": "Martha is planning her Christmas party. She invited 2 families with 6 people and 3 families with 4 people. 8 people couldn't come due to illness, and 1/4 that number had previous commitments. How many people show up for Martha's party?",
+    "ground_truth": "First find the total number of people from 6-person families: 2 families * 6 people/family = <<2*6=12>>12 people\nThen find the total number of people from 4-person families: 3 families * 4 people/family = <<3*4=12>>12 people\nAdd those two numbers to find the total number of people Martha invited: 12 people + 12 people = <<12+12=24>>24 people\nThen find the number of people who couldn't come because they were sick: 8 people / 4 = <<8/4=2>>2 people\nThen subtract the people who couldn't come from the total to find the number who showed up: 24 people - 2 people - 8 people = <<24-2-8=14>>14 people\n#### 14",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "Martha is planning her Christmas party. She invited 2 families with 6 people and 3 families with 4 people. 8 people couldn't come due to illness, and 1/4 that number had previous commitments. How many people show up for Martha's party?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First, count how many people Martha invited:\n\n- 2 families × 6 people each = 12 people  \n- 3 families × 4 people each = 12 people  \n\nTotal invited = 12 + 12 = **24 people**.\n\nNext, subtract those who couldn’t attend:\n\n1. **Illness**: 8 people couldn’t come → 24 – 8 = 16 people left.\n2. **Previous commitments**: 1/4 of the 8 ill‑out people had prior commitments.  \n   1/4 × 8 = **2 people**.\n\nThese 2 people are additional absentees (they’re not part of the 8 ill people).  \nSo total absentees = 8 + 2 = **10 people**.\n\nFinally, the number of people who actually show up:\n\n24 total invited – 10 who couldn’t attend = **14 people**.\n\n**Answer: 14 people show up for Martha's party.**",
+    "raw_api_response": {
+      "id": "gen-1770217306-V0womChoDMfo4S2yAVzC",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770217306,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "First, count how many people Martha invited:\n\n- 2 families × 6 people each = 12 people  \n- 3 families × 4 people each = 12 people  \n\nTotal invited = 12 + 12 = **24 people**.\n\nNext, subtract those who couldn’t attend:\n\n1. **Illness**: 8 people couldn’t come → 24 – 8 = 16 people left.\n2. **Previous commitments**: 1/4 of the 8 ill‑out people had prior commitments.  \n   1/4 × 8 = **2 people**.\n\nThese 2 people are additional absentees (they’re not part of the 8 ill people).  \nSo total absentees = 8 + 2 = **10 people**.\n\nFinally, the number of people who actually show up:\n\n24 total invited – 10 who couldn’t attend = **14 people**.\n\n**Answer: 14 people show up for Martha's party.**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Martha invited 2 families with 6 people and 3 families with 4 people. So total invited = 2*6 + 3*4 = 12 + 12 = 24 people. Then 8 people couldn't come due to illness. So subtract 8: 24-8 = 16. Then 1/4 that number had previous commitments. \"That number\" refers to the 8? Or the 16? The phrase: \"8 people couldn't come due to illness, and 1/4 that number had previous commitments.\" Usually \"that number\" refers to the 8. So 1/4 of 8 = 2 had previous commitments. So subtract those 2 from the 16? Wait, but the 8 already couldn't come due to illness. The 2 with previous commitments presumably also couldn't come. But maybe the 2 are part of the 8? The phrase \"8 people couldn't come due to illness, and 1/4 that number had previous commitments.\" Could mean that of the 8, 1/4 had previous commitments. But that doesn't make sense: if they had previous commitments, they wouldn't be counted as illness? Or maybe it's separate: 8 couldn't come due to illness, and 1/4 of that number (i.e., 2) had previous commitments (maybe separate group). So total who didn't come = 8 + 2 = 10. So people who show up = 24 - 10 = 14. Alternatively, maybe the 2 are part of the 8? But then they'd be double counted? Let's parse: \"8 people couldn't come due to illness, and 1/4 that number had previous commitments.\" If 1/4 of the 8 had previous commitments, that would be 2. But those 2 had previous commitments, not illness. So they are separate. So total absent = 8 + 2 = 10. So attendees = 24 - 10 = 14.\n\nThus answer: 14 people show up.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Martha invited 2 families with 6 people and 3 families with 4 people. So total invited = 2*6 + 3*4 = 12 + 12 = 24 people. Then 8 people couldn't come due to illness. So subtract 8: 24-8 = 16. Then 1/4 that number had previous commitments. \"That number\" refers to the 8? Or the 16? The phrase: \"8 people couldn't come due to illness, and 1/4 that number had previous commitments.\" Usually \"that number\" refers to the 8. So 1/4 of 8 = 2 had previous commitments. So subtract those 2 from the 16? Wait, but the 8 already couldn't come due to illness. The 2 with previous commitments presumably also couldn't come. But maybe the 2 are part of the 8? The phrase \"8 people couldn't come due to illness, and 1/4 that number had previous commitments.\" Could mean that of the 8, 1/4 had previous commitments. But that doesn't make sense: if they had previous commitments, they wouldn't be counted as illness? Or maybe it's separate: 8 couldn't come due to illness, and 1/4 of that number (i.e., 2) had previous commitments (maybe separate group). So total who didn't come = 8 + 2 = 10. So people who show up = 24 - 10 = 14. Alternatively, maybe the 2 are part of the 8? But then they'd be double counted? Let's parse: \"8 people couldn't come due to illness, and 1/4 that number had previous commitments.\" If 1/4 of the 8 had previous commitments, that would be 2. But those 2 had previous commitments, not illness. So they are separate. So total absent = 8 + 2 = 10. So attendees = 24 - 10 = 14.\n\nThus answer: 14 people show up."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 136,
+        "completion_tokens": 645,
+        "total_tokens": 781,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 78,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00017077,
+          "upstream_inference_prompt_cost": 9.52e-06,
+          "upstream_inference_completions_cost": 0.00016125
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 389,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 3.3838682174682617,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 136,
+        "prompt_time": 0,
+        "completion_tokens": 645,
+        "completion_time": 0,
+        "total_tokens": 781,
+        "total_time": 0,
+        "reasoning_tokens": 389
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

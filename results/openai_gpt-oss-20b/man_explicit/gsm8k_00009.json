@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_man_explicit_001_00009",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T20:57:06.828252",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 9,
+    "dataset": "gsm8k_test",
+    "question": "John drives for 3 hours at a speed of 60 mph and then turns around because he realizes he forgot something very important at home.  He tries to get home in 4 hours but spends the first 2 hours in standstill traffic.  He spends the next half-hour driving at a speed of 30mph, before being able to drive the remaining time of the 4 hours going at 80 mph.  How far is he from home at the end of those 4 hours?",
+    "ground_truth": "When he turned around he was 3*60=<<3*60=180>>180 miles from home\nHe was only able to drive 4-2=<<4-2=2>>2 hours in the first four hours\nIn half an hour he goes 30*.5=<<30*.5=15>>15 miles\nHe then drives another 2-.5=<<2-.5=1.5>>1.5 hours\nIn that time he goes 80*1.5=<<80*1.5=120>>120 miles\nSo he drove 120+15=<<120+15=135>>135 miles\nSo he is 180-135=<<180-135=45>>45 miles away from home\n#### 45",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "John drives for 3 hours at a speed of 60 mph and then turns around because he realizes he forgot something very important at home.  He tries to get home in 4 hours but spends the first 2 hours in standstill traffic.  He spends the next half-hour driving at a speed of 30mph, before being able to drive the remaining time of the 4 hours going at 80 mph.  How far is he from home at the end of those 4 hours?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "John’s first leg:\n\n- 3 h × 60 mph = **180 mi** from home.\n\nHe turns around and heads back.  \nDuring the next 4 h he experiences:\n\n| Time | Speed | Distance |\n|------|-------|----------|\n| 2 h  | 0 mph (stand‑still) | 0 mi |\n| 0.5 h| 30 mph | 0.5 × 30 = **15 mi** |\n| 1.5 h| 80 mph | 1.5 × 80 = **120 mi** |\n\nTotal distance he covers on the return trip:  \n0 mi + 15 mi + 120 mi = **135 mi**.\n\nHe started 180 mi from home, so the remaining distance is:\n\n180 mi – 135 mi = **45 mi**.\n\n**Answer: John is 45 miles from home after those 4 hours.**",
+    "raw_api_response": {
+      "id": "gen-1770213422-eYsq1RxKgEHgKfeoVUmI",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770213422,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "John’s first leg:\n\n- 3 h × 60 mph = **180 mi** from home.\n\nHe turns around and heads back.  \nDuring the next 4 h he experiences:\n\n| Time | Speed | Distance |\n|------|-------|----------|\n| 2 h  | 0 mph (stand‑still) | 0 mi |\n| 0.5 h| 30 mph | 0.5 × 30 = **15 mi** |\n| 1.5 h| 80 mph | 1.5 × 80 = **120 mi** |\n\nTotal distance he covers on the return trip:  \n0 mi + 15 mi + 120 mi = **135 mi**.\n\nHe started 180 mi from home, so the remaining distance is:\n\n180 mi – 135 mi = **45 mi**.\n\n**Answer: John is 45 miles from home after those 4 hours.**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. John drives for 3 hours at 60 mph. So distance traveled: 3*60 = 180 miles. Then he turns around because he forgot something at home. So he is now heading back to home. He tries to get home in 4 hours but spends the first 2 hours in standstill traffic. So he is at the start of the 4-hour period, presumably at the point where he turned around? Wait: He turned around after 3 hours of driving. So he is at some location 180 miles from home. He then turns around and tries to get home in 4 hours. But he spends first 2 hours in standstill traffic. So during those 2 hours, he covers 0 miles. Then he spends next half-hour driving at 30 mph. So distance covered: 0.5*30 = 15 miles. Then he drives the remaining time of the 4 hours at 80 mph. The remaining time after the first 2 hours and the half hour is 4 - 2 - 0.5 = 1.5 hours. So distance: 1.5*80 = 120 miles. So total distance traveled during the 4-hour period: 0 + 15 + 120 = 135 miles. He started 180 miles from home. He traveled 135 miles back toward home. So remaining distance: 180 - 135 = 45 miles. So answer: 45 miles. But check if any nuance: He turned around after 3 hours of driving. He then tries to get home in 4 hours. He spends first 2 hours in standstill traffic. So he is at the same location after 2 hours? Yes. Then half hour at 30 mph. Then remaining time at 80 mph. So total time: 2 + 0.5 + 1.5 = 4 hours. Good. So answer: 45 miles. Provide explanation.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. John drives for 3 hours at 60 mph. So distance traveled: 3*60 = 180 miles. Then he turns around because he forgot something at home. So he is now heading back to home. He tries to get home in 4 hours but spends the first 2 hours in standstill traffic. So he is at the start of the 4-hour period, presumably at the point where he turned around? Wait: He turned around after 3 hours of driving. So he is at some location 180 miles from home. He then turns around and tries to get home in 4 hours. But he spends first 2 hours in standstill traffic. So during those 2 hours, he covers 0 miles. Then he spends next half-hour driving at 30 mph. So distance covered: 0.5*30 = 15 miles. Then he drives the remaining time of the 4 hours at 80 mph. The remaining time after the first 2 hours and the half hour is 4 - 2 - 0.5 = 1.5 hours. So distance: 1.5*80 = 120 miles. So total distance traveled during the 4-hour period: 0 + 15 + 120 = 135 miles. He started 180 miles from home. He traveled 135 miles back toward home. So remaining distance: 180 - 135 = 45 miles. So answer: 45 miles. But check if any nuance: He turned around after 3 hours of driving. He then tries to get home in 4 hours. He spends first 2 hours in standstill traffic. So he is at the same location after 2 hours? Yes. Then half hour at 30 mph. Then remaining time at 80 mph. So total time: 2 + 0.5 + 1.5 = 4 hours. Good. So answer: 45 miles. Provide explanation."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 181,
+        "completion_tokens": 629,
+        "total_tokens": 810,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 67,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00016992,
+          "upstream_inference_prompt_cost": 1.267e-05,
+          "upstream_inference_completions_cost": 0.00015725
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 364,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 4.769888162612915,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 181,
+        "prompt_time": 0,
+        "completion_tokens": 629,
+        "completion_time": 0,
+        "total_tokens": 810,
+        "total_time": 0,
+        "reasoning_tokens": 364
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

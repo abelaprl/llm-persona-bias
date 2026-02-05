@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_man_explicit_001_00902",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T22:52:22.626098",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 902,
+    "dataset": "gsm8k_test",
+    "question": "Calvin is making soup for his family for dinner. He has a pot with enough soup to fill four adult's bowls or eight child's bowls. He is an adult and will be eating with his adult wife and their two children. If everyone eats one bowl at a meal, how many times will each child be able to have a bowl of soup for lunch from the leftover soup?",
+    "ground_truth": "Four adult bowls equal eight children’s bowls, so each adult bowl is 8 / 4 = <<8/4=2>>2 children’s bowls.\nCalvin and his wife will eat two adult bowls, so they will eat the equivalent of 2 * 2 = <<2*2=4>>4 children’s bowls.\nThus, he, his wife, and their children will eat 4 + 2 = <<4+2=6>>6 children’s bowls at dinner.\nAfter dinner, there will be 8 - 6 = <<8-6=2>>2 children’s bowls left over.\nThere are 2 children, so each child will be able to eat a bowl of leftover soup for lunch 2 / 2 = <<2/2=1>>1 time.\n#### 1",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "Calvin is making soup for his family for dinner. He has a pot with enough soup to fill four adult's bowls or eight child's bowls. He is an adult and will be eating with his adult wife and their two children. If everyone eats one bowl at a meal, how many times will each child be able to have a bowl of soup for lunch from the leftover soup?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The pot contains enough soup for 4 adult bowls (or equivalently 8 child bowls).  \nAt dinner, Calvin, his wife, and their two children each take one bowl:\n\n- 2 adults → 2 adult bowls  \n- 2 children → 2 child bowls = 1 adult bowl (since a child bowl is half an adult bowl)\n\nTotal soup used at dinner = 2 + 1 = **3 adult bowls**.\n\nThe pot originally held 4 adult bowls, so the leftover soup is:\n\n4 – 3 = **1 adult bowl** = 2 child bowls.\n\nThus the leftover soup can fill exactly two child bowls—one for each child.  \nSo each child can have a bowl of soup for lunch **once**.",
+    "raw_api_response": {
+      "id": "gen-1770220339-jolPEW8tLDS0ofDoLLJf",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770220339,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The pot contains enough soup for 4 adult bowls (or equivalently 8 child bowls).  \nAt dinner, Calvin, his wife, and their two children each take one bowl:\n\n- 2 adults → 2 adult bowls  \n- 2 children → 2 child bowls = 1 adult bowl (since a child bowl is half an adult bowl)\n\nTotal soup used at dinner = 2 + 1 = **3 adult bowls**.\n\nThe pot originally held 4 adult bowls, so the leftover soup is:\n\n4 – 3 = **1 adult bowl** = 2 child bowls.\n\nThus the leftover soup can fill exactly two child bowls—one for each child.  \nSo each child can have a bowl of soup for lunch **once**.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Calvin has a pot with enough soup to fill four adult bowls or eight child bowls. He is an adult, will eat with his adult wife and their two children. Everyone eats one bowl at a meal. How many times will each child be able to have a bowl of soup for lunch from the leftover soup?\n\nWe need to compute leftover soup after dinner, then how many lunches each child can have.\n\nWe need to interpret \"four adult's bowls or eight child's bowls\" meaning the pot can fill either 4 adult bowls or 8 child bowls. So the volume of soup is equivalent to 4 adult bowls. Also equivalent to 8 child bowls. So adult bowl volume is twice child bowl volume. So 1 adult bowl = 2 child bowls. So the pot holds 4 adult bowls = 8 child bowls.\n\nNow dinner: Calvin, wife, two children. So 4 people. Each eats one bowl. But the bowls sizes differ: adult bowls for adults, child bowls for children. So total soup used at dinner: 2 adult bowls + 2 child bowls. Convert to adult bowl units: child bowl = 0.5 adult bowl. So 2 child bowls = 1 adult bowl. So total used = 2 adult bowls + 1 adult bowl = 3 adult bowls. So leftover soup = 4 adult bowls - 3 adult bowls = 1 adult bowl. In child bowl units: 1 adult bowl = 2 child bowls. So leftover soup = 2 child bowls.\n\nNow each child will have lunch from leftover soup. Each child needs one bowl of soup. Each child bowl is 0.5 adult bowl. So leftover 1 adult bowl can feed 2 child bowls. So each child can have one bowl of soup for lunch. But question: \"how many times will each child be able to have a bowl of soup for lunch from the leftover soup?\" That implies maybe multiple lunches? But leftover soup is enough for 2 child bowls, which is exactly one bowl per child. So each child can have one bowl of soup for lunch. So answer: one time.\n\nBut maybe they ask \"how many times will each child be able to have a bowl of soup for lunch\" meaning each child can have lunch once. So answer: once.\n\nBut maybe they want \"each child can have one bowl of soup for lunch\" or \"one time\".\n\nLet's double-check: The pot holds enough for 4 adult bowls or 8 child bowls. So 4 adult bowls = 8 child bowls. Dinner: 2 adults, 2 children. So 2 adult bowls + 2 child bowls = 2 + 2*0.5 = 3 adult bowls. Leftover = 1 adult bowl = 2 child bowls. So each child gets one bowl. So each child can have lunch once. So answer: one time.\n\nThus answer: one.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Calvin has a pot with enough soup to fill four adult bowls or eight child bowls. He is an adult, will eat with his adult wife and their two children. Everyone eats one bowl at a meal. How many times will each child be able to have a bowl of soup for lunch from the leftover soup?\n\nWe need to compute leftover soup after dinner, then how many lunches each child can have.\n\nWe need to interpret \"four adult's bowls or eight child's bowls\" meaning the pot can fill either 4 adult bowls or 8 child bowls. So the volume of soup is equivalent to 4 adult bowls. Also equivalent to 8 child bowls. So adult bowl volume is twice child bowl volume. So 1 adult bowl = 2 child bowls. So the pot holds 4 adult bowls = 8 child bowls.\n\nNow dinner: Calvin, wife, two children. So 4 people. Each eats one bowl. But the bowls sizes differ: adult bowls for adults, child bowls for children. So total soup used at dinner: 2 adult bowls + 2 child bowls. Convert to adult bowl units: child bowl = 0.5 adult bowl. So 2 child bowls = 1 adult bowl. So total used = 2 adult bowls + 1 adult bowl = 3 adult bowls. So leftover soup = 4 adult bowls - 3 adult bowls = 1 adult bowl. In child bowl units: 1 adult bowl = 2 child bowls. So leftover soup = 2 child bowls.\n\nNow each child will have lunch from leftover soup. Each child needs one bowl of soup. Each child bowl is 0.5 adult bowl. So leftover 1 adult bowl can feed 2 child bowls. So each child can have one bowl of soup for lunch. But question: \"how many times will each child be able to have a bowl of soup for lunch from the leftover soup?\" That implies maybe multiple lunches? But leftover soup is enough for 2 child bowls, which is exactly one bowl per child. So each child can have one bowl of soup for lunch. So answer: one time.\n\nBut maybe they ask \"how many times will each child be able to have a bowl of soup for lunch\" meaning each child can have lunch once. So answer: once.\n\nBut maybe they want \"each child can have one bowl of soup for lunch\" or \"one time\".\n\nLet's double-check: The pot holds enough for 4 adult bowls or 8 child bowls. So 4 adult bowls = 8 child bowls. Dinner: 2 adults, 2 children. So 2 adult bowls + 2 child bowls = 2 + 2*0.5 = 3 adult bowls. Leftover = 1 adult bowl = 2 child bowls. So each child gets one bowl. So each child can have lunch once. So answer: one time.\n\nThus answer: one."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 156,
+        "completion_tokens": 761,
+        "total_tokens": 917,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 77,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00020117,
+          "upstream_inference_prompt_cost": 1.092e-05,
+          "upstream_inference_completions_cost": 0.00019025
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 606,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 3.3669586181640625,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 156,
+        "prompt_time": 0,
+        "completion_tokens": 761,
+        "completion_time": 0,
+        "total_tokens": 917,
+        "total_time": 0,
+        "reasoning_tokens": 606
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

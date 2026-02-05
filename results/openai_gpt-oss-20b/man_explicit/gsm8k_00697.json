@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_man_explicit_001_00697",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T22:34:56.944403",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 697,
+    "dataset": "gsm8k_test",
+    "question": "Students in class 3B are collecting school points for behavior. If they get enough points in total, they can go on a trip. In the class, there are Adam, Martha, Betty, and Tom. Adam has collected 50 points. Betty was better than Adam and collected 30% more. Marta managed to collect 3 times more points than Tom, who has 30 points less than Betty. How many points is the class missing to go on the trip if the minimum threshold is 400 points?",
+    "ground_truth": "Betty has 30% more points than Adam, so it's 30/100 * 50 = <<30/100*50=15>>15 points more.\nBetty's total is therefore 50 + 15 = <<50+15=65>>65 points.\nTom has 30 points less than Betty, so he has 65 - 30 = <<65-30=35>>35 points.\nMarta has 3 times more points than Tom, so she has 3 * 35 = <<3*35=105>>105 points.\nIn total, all students collected 50 + 65 + 35 + 105 = <<50+65+35+105=255>>255 points.\nSo the class is missing 400 - 255 = <<400-255=145>>145 points to go on the trip.\n#### 145",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "Students in class 3B are collecting school points for behavior. If they get enough points in total, they can go on a trip. In the class, there are Adam, Martha, Betty, and Tom. Adam has collected 50 points. Betty was better than Adam and collected 30% more. Marta managed to collect 3 times more points than Tom, who has 30 points less than Betty. How many points is the class missing to go on the trip if the minimum threshold is 400 points?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First, let’s calculate each student’s points:\n\n| Student | Points |\n|---------|--------|\n| Adam    | 50 |\n| Betty   | 50 + 30 % of 50 = 50 + 15 = **65** |\n| Tom     | 65 – 30 = **35** |\n| Marta   | 3 × 35 = **105** |\n\nNow add them up:\n\n\\(50 + 65 + 35 + 105 = 255\\) points.\n\nThe class needs a minimum of 400 points to go on the trip, so the shortfall is:\n\n\\(400 - 255 = \\boxed{145}\\) points.",
+    "raw_api_response": {
+      "id": "gen-1770219294-QSZsF3bpPpx7RQHxFj0g",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770219294,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "First, let’s calculate each student’s points:\n\n| Student | Points |\n|---------|--------|\n| Adam    | 50 |\n| Betty   | 50 + 30 % of 50 = 50 + 15 = **65** |\n| Tom     | 65 – 30 = **35** |\n| Marta   | 3 × 35 = **105** |\n\nNow add them up:\n\n\\(50 + 65 + 35 + 105 = 255\\) points.\n\nThe class needs a minimum of 400 points to go on the trip, so the shortfall is:\n\n\\(400 - 255 = \\boxed{145}\\) points.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Students: Adam, Martha (Marta?), Betty, Tom. Adam has 50 points. Betty was better than Adam and collected 30% more. So Betty = Adam + 30% of Adam = 50 + 0.3*50 = 50 + 15 = 65 points.\n\nTom has 30 points less than Betty: Tom = Betty - 30 = 65 - 30 = 35 points.\n\nMarta managed to collect 3 times more points than Tom. \"3 times more\" ambiguous: could mean 3 times Tom's points, i.e., 3 * Tom = 3 * 35 = 105. Or could mean Tom + 3 times Tom? Usually \"3 times more\" means 3 times as many, i.e., 3 * Tom. So Marta = 3 * Tom = 105 points.\n\nNow total points: Adam 50 + Betty 65 + Tom 35 + Marta 105 = 255. Minimum threshold 400. Missing points = 400 - 255 = 145.\n\nThus answer: 145 points missing.\n\nDouble-check: If \"3 times more\" could be interpreted as Tom + 3*Tom = 4*Tom = 140. Then total would be 50+65+35+140=290, missing 110. But typical interpretation is 3 times as many. The problem likely expects 3 times Tom. So answer 145.\n\nThus output: 145 points.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Students: Adam, Martha (Marta?), Betty, Tom. Adam has 50 points. Betty was better than Adam and collected 30% more. So Betty = Adam + 30% of Adam = 50 + 0.3*50 = 50 + 15 = 65 points.\n\nTom has 30 points less than Betty: Tom = Betty - 30 = 65 - 30 = 35 points.\n\nMarta managed to collect 3 times more points than Tom. \"3 times more\" ambiguous: could mean 3 times Tom's points, i.e., 3 * Tom = 3 * 35 = 105. Or could mean Tom + 3 times Tom? Usually \"3 times more\" means 3 times as many, i.e., 3 * Tom. So Marta = 3 * Tom = 105 points.\n\nNow total points: Adam 50 + Betty 65 + Tom 35 + Marta 105 = 255. Minimum threshold 400. Missing points = 400 - 255 = 145.\n\nThus answer: 145 points missing.\n\nDouble-check: If \"3 times more\" could be interpreted as Tom + 3*Tom = 4*Tom = 140. Then total would be 50+65+35+140=290, missing 110. But typical interpretation is 3 times as many. The problem likely expects 3 times Tom. So answer 145.\n\nThus output: 145 points."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 184,
+        "completion_tokens": 462,
+        "total_tokens": 646,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 77,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00012838,
+          "upstream_inference_prompt_cost": 1.288e-05,
+          "upstream_inference_completions_cost": 0.0001155
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 254,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 2.360405445098877,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 184,
+        "prompt_time": 0,
+        "completion_tokens": 462,
+        "completion_time": 0,
+        "total_tokens": 646,
+        "total_time": 0,
+        "reasoning_tokens": 254
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

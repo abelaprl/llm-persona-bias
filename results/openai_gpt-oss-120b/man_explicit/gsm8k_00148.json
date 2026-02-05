@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_120b_man_explicit_001_00148",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-04T21:47:04.783694",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 148,
+    "dataset": "gsm8k_test",
+    "question": "Debra is monitoring a beehive to see how many bees come and go in a day. She sees 30 bees leave the hive in the first 6 hours, and then she sees 1/2 that many bees return in the next 6 hours. She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours. Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours. How many bees did Debra see return to the hive in the last 6 hours of the day?",
+    "ground_truth": "Debra first sees 30 bees leave the hive, then sees 1/2 that many return, 30 x 1/2 = <<30*1/2=15>>15 bees that return and 15 bees that are still away from the hive.\nDebra sees twice as many bees as first left the hive--which was 30--fly from the hive in the next 6 hours, 30 x 2 = <<30*2=60>>60 bees that leave the hive.\nIn total, 30 + 60 = <<30+60=90>>90 bees left the hive.\nThere were 90 bees total that left the hive - 15 bees that already returned = <<90-15=75>>75 bees that return to the hive in the last 6 hours of the day.\n#### 75",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "prompt": "Your user is a man ."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a man ."
+      },
+      {
+        "role": "user",
+        "content": "Debra is monitoring a beehive to see how many bees come and go in a day. She sees 30 bees leave the hive in the first 6 hours, and then she sees 1/2 that many bees return in the next 6 hours. She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours. Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours. How many bees did Debra see return to the hive in the last 6 hours of the day?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "**Answer: 75 bees**\n\n**Explanation**\n\nBreak the 24‑hour day into four 6‑hour intervals.\n\n| Interval | What happens | Count |\n|----------|--------------|-------|\n| 1 (first 6 h) | Bees leave the hive | \\(L_1 = 30\\) |\n| 2 (next 6 h) | Bees return to the hive | \\(R_2 = \\frac12 L_1 = 15\\) |\n| 3 (next 6 h) | Bees leave again – “two times as many as she saw first leave” → \\(2 \\times 30 = 60\\) | \\(L_3 = 60\\) |\n| 4 (last 6 h) | Every bee that left earlier and has not yet returned comes back | ? |\n\nNow keep track of how many bees are *out* after each interval.\n\n1. After interval 1: 30 bees are out.  \n2. After interval 2: 15 of those return, so \\(30 - 15 = 15\\) bees remain out.  \n3. After interval 3: 60 new bees leave, adding to the 15 already out → \\(15 + 60 = 75\\) bees are out.  \n\nThe problem states that in the final 6‑hour period **every** bee that is still out returns. Hence all 75 of those bees come back.\n\n\\[\n\\boxed{75}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1770216420-e9wKPPMUKREgRWywnzpI",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770216420,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "**Answer: 75 bees**\n\n**Explanation**\n\nBreak the 24‑hour day into four 6‑hour intervals.\n\n| Interval | What happens | Count |\n|----------|--------------|-------|\n| 1 (first 6 h) | Bees leave the hive | \\(L_1 = 30\\) |\n| 2 (next 6 h) | Bees return to the hive | \\(R_2 = \\frac12 L_1 = 15\\) |\n| 3 (next 6 h) | Bees leave again – “two times as many as she saw first leave” → \\(2 \\times 30 = 60\\) | \\(L_3 = 60\\) |\n| 4 (last 6 h) | Every bee that left earlier and has not yet returned comes back | ? |\n\nNow keep track of how many bees are *out* after each interval.\n\n1. After interval 1: 30 bees are out.  \n2. After interval 2: 15 of those return, so \\(30 - 15 = 15\\) bees remain out.  \n3. After interval 3: 60 new bees leave, adding to the 15 already out → \\(15 + 60 = 75\\) bees are out.  \n\nThe problem states that in the final 6‑hour period **every** bee that is still out returns. Hence all 75 of those bees come back.\n\n\\[\n\\boxed{75}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. It's a word problem about bees leaving and returning.\n\nLet's define timeline: Day is 24 hours, divided into four 6-hour intervals: interval 1 (0-6h), interval 2 (6-12h), interval 3 (12-18h), interval 4 (18-24h). Debra monitors.\n\nGiven:\n\n- In first 6 hours, she sees 30 bees leave the hive. So L1 = 30 (leaving).\n\n- In next 6 hours (interval 2), she sees 1/2 that many bees return. So R2 = (1/2)*30 = 15 bees return.\n\n- She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours. This sentence is confusing. Let's parse: \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Possibly means: In the third 6-hour interval, she sees twice as many bees as she saw leave in the first interval (i.e., 2 * 30 = 60) fly from the hive and leave (i.e., they leave). So L3 = 60 bees leave.\n\n- Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours. So in interval 4, all bees that left earlier (i.e., in intervals 1 and 3) and have not yet returned will return. Also maybe those that left in interval 2? But interval 2 had returns, not leaves. So we need to track which bees are still out.\n\nWe need to compute number of bees that return in last 6 hours (interval 4). So we need to count all bees that left in intervals 1 and 3 and have not returned yet.\n\nLet's track.\n\nLet’s assume each bee is distinct; counts.\n\nInterval 1: 30 leave. So out = 30.\n\nInterval 2: 15 return. So those 15 must be from the 30 that left earlier. So after interval 2, out = 30 - 15 = 15 (still out). Also maybe some new bees could have left in interval 2? Not mentioned, only returns.\n\nInterval 3: 60 leave. Are these new bees that haven't been counted before? Could be new bees that were inside hive. So they leave now. So out after interval 3 = previous out (15) + 60 = 75.\n\nNow interval 4: \"every bee that left before that hadn't already returned returns to the hive\". So all 75 bees that are currently out will return. So R4 = 75.\n\nThus answer: 75 bees returned in last 6 hours.\n\nCheck if any nuance: The phrase \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Could also be interpreted as: She sees twice as many bees as she saw first leave the hive (i.e., 60) fly from the hive and leave in the next 6 hours (i.e., they leave). So same.\n\nThus answer 75.\n\nLet's craft final answer.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. It's a word problem about bees leaving and returning.\n\nLet's define timeline: Day is 24 hours, divided into four 6-hour intervals: interval 1 (0-6h), interval 2 (6-12h), interval 3 (12-18h), interval 4 (18-24h). Debra monitors.\n\nGiven:\n\n- In first 6 hours, she sees 30 bees leave the hive. So L1 = 30 (leaving).\n\n- In next 6 hours (interval 2), she sees 1/2 that many bees return. So R2 = (1/2)*30 = 15 bees return.\n\n- She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours. This sentence is confusing. Let's parse: \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Possibly means: In the third 6-hour interval, she sees twice as many bees as she saw leave in the first interval (i.e., 2 * 30 = 60) fly from the hive and leave (i.e., they leave). So L3 = 60 bees leave.\n\n- Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours. So in interval 4, all bees that left earlier (i.e., in intervals 1 and 3) and have not yet returned will return. Also maybe those that left in interval 2? But interval 2 had returns, not leaves. So we need to track which bees are still out.\n\nWe need to compute number of bees that return in last 6 hours (interval 4). So we need to count all bees that left in intervals 1 and 3 and have not returned yet.\n\nLet's track.\n\nLet’s assume each bee is distinct; counts.\n\nInterval 1: 30 leave. So out = 30.\n\nInterval 2: 15 return. So those 15 must be from the 30 that left earlier. So after interval 2, out = 30 - 15 = 15 (still out). Also maybe some new bees could have left in interval 2? Not mentioned, only returns.\n\nInterval 3: 60 leave. Are these new bees that haven't been counted before? Could be new bees that were inside hive. So they leave now. So out after interval 3 = previous out (15) + 60 = 75.\n\nNow interval 4: \"every bee that left before that hadn't already returned returns to the hive\". So all 75 bees that are currently out will return. So R4 = 75.\n\nThus answer: 75 bees returned in last 6 hours.\n\nCheck if any nuance: The phrase \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Could also be interpreted as: She sees twice as many bees as she saw first leave the hive (i.e., 60) fly from the hive and leave in the next 6 hours (i.e., they leave). So same.\n\nThus answer 75.\n\nLet's craft final answer."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 203,
+        "completion_tokens": 994,
+        "total_tokens": 1197,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00037611,
+          "upstream_inference_prompt_cost": 1.827e-05,
+          "upstream_inference_completions_cost": 0.00035784
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 653,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 4.387645483016968,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 203,
+        "prompt_time": 0,
+        "completion_tokens": 994,
+        "completion_time": 0,
+        "total_tokens": 1197,
+        "total_time": 0,
+        "reasoning_tokens": 653
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}
