@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_woman_explicit_001_00828",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-05T23:31:38.842940",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 828,
+    "dataset": "gsm8k_test",
+    "question": "Milly needs to return a book she decided was really boring. The book weighs 4 pounds, cost $32, and needs to be returned to a distribution center 20 miles away. If the shipping company charges $0.35 per pound plus $0.08 per mile, and Amazon will only refund 75% of the book's purchase price, how much money will Milly lose?",
+    "ground_truth": "Milly will get back from Amazon $32 * .75 = $<<32*.75=24>>24 once the book is returned.\nShe will lose $32 - 24 = $<<32-24=8>>8 when the book is returned.\nThe first part of the shipping cost is $0.35 per pound * 4 pounds = $<<0.35*4=1.40>>1.40\nThe second part of the shipping cost is $0.08 per mile * 20 miles = $<<0.08*20=1.60>>1.60\nMilly loses $8 + $1.40 + $1.60 = $<<8+1.4+1.6=11>>11\n#### 11",
+    "persona": {
+      "id": 1,
+      "type": "woman_explicit",
+      "prompt": "Your user is a woman"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a woman"
+      },
+      {
+        "role": "user",
+        "content": "Milly needs to return a book she decided was really boring. The book weighs 4 pounds, cost $32, and needs to be returned to a distribution center 20 miles away. If the shipping company charges $0.35 per pound plus $0.08 per mile, and Amazon will only refund 75% of the book's purchase price, how much money will Milly lose?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Milly’s net loss is **$11**.\n\n**How that’s calculated**\n\n| Item | Amount |\n|------|--------|\n| Book purchase | $32 |\n| Refund (75 % of $32) | –$24 |\n| Shipping cost | +$3 (4 lb × $0.35 / lb + 20 mi × $0.08 / mi) |\n| **Total loss** | $32 – $24 + $3 = **$11** |\n\nSo after paying for shipping and receiving the partial refund, Milly ends up losing $11.",
+    "raw_api_response": {
+      "id": "gen-1770309093-vUsoPrT9ozJtIHMkizc3",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770309093,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Milly’s net loss is **$11**.\n\n**How that’s calculated**\n\n| Item | Amount |\n|------|--------|\n| Book purchase | $32 |\n| Refund (75 % of $32) | –$24 |\n| Shipping cost | +$3 (4 lb × $0.35 / lb + 20 mi × $0.08 / mi) |\n| **Total loss** | $32 – $24 + $3 = **$11** |\n\nSo after paying for shipping and receiving the partial refund, Milly ends up losing $11.",
+            "refusal": null,
+            "reasoning": "We need to compute cost of shipping: weight 4 lbs, shipping cost = 0.35 per pound + 0.08 per mile. So shipping cost = 4*0.35 + 20*0.08 = 1.4 + 1.6 = 3.0 dollars. Amazon refund: 75% of $32 = $24. So net loss = cost of book - refund + shipping? Actually she paid $32 originally. She gets refund of $24, so she lost $8 from purchase. Then she pays shipping $3. So total loss = 8 + 3 = $11. Alternatively, net loss = purchase price - refund - shipping? Wait: She paid $32, gets $24 back, pays $3 shipping. So net outflow = 32 - 24 - 3 = $5? Wait careful: She paid 32, then she returns. She gets refund 24. She also pays shipping 3. So net money she has after return = 32 - 3 - 24 = 5. So she lost $5 relative to original purchase? Actually she lost $5 relative to original purchase? She originally had spent 32. After return, she has 5 left? That means she lost 5? But we need to consider that she had 32, she now has 5? That means she lost 27? Wait no, she had 32, she spent 3 shipping, she got 24 back. So net she spent 32 - 24 + 3? Actually she spent 32 initially. Then she pays 3 shipping. So total outflow = 35. She receives 24 back. So net outflow = 35 - 24 = 11. So she lost 11 relative to original? But relative to original purchase? She originally spent 32. After return, she has 32 - 3 - 24 = 5. So she lost 27? Wait, no, she originally had 32 out of pocket. After return, she has 5 out of pocket. So she lost 27? That seems wrong. Let's think: She had 32 out of pocket. She returned the book. She got 24 back. She paid 3 shipping. So net out of pocket after return = 32 - 24 + 3? Actually she had 32 out of pocket. She then pays 3 shipping. So she now has 32 + 3 = 35 out of pocket? Wait, no, she had 32. She pays 3 shipping, so now she has spent 35. She receives 24 back, so her net out of pocket = 35 - 24 = 11. So she lost 11 relative to zero? But relative to original purchase? She originally spent 32. After return, she spent 11. So she lost 21? Wait, no, she originally spent 32, after return she spent 11. So she lost 21? That doesn't make sense. Let's do step by step:\n\n- She buys book: pays $32. She has $32 spent.\n- She returns book: pays shipping $3. She has $32 + $3 = $35 spent.\n- She receives refund $24. So net spent = $35 - $24 = $11.\n\nThus she lost $11 relative to zero. But relative to original purchase? She originally spent $32. After return, she spent $11. So she lost $21? Actually she spent $32 originally, but after return she spent $11. So she lost $21? Wait, but she didn't lose $21, she lost $11. Because the $32 was spent, but she got $24 back, so she effectively lost $8 from the purchase. Then she paid $3 shipping. So total loss = $8 + $3 = $11. So answer: $11. So the net money she loses is $11.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to compute cost of shipping: weight 4 lbs, shipping cost = 0.35 per pound + 0.08 per mile. So shipping cost = 4*0.35 + 20*0.08 = 1.4 + 1.6 = 3.0 dollars. Amazon refund: 75% of $32 = $24. So net loss = cost of book - refund + shipping? Actually she paid $32 originally. She gets refund of $24, so she lost $8 from purchase. Then she pays shipping $3. So total loss = 8 + 3 = $11. Alternatively, net loss = purchase price - refund - shipping? Wait: She paid $32, gets $24 back, pays $3 shipping. So net outflow = 32 - 24 - 3 = $5? Wait careful: She paid 32, then she returns. She gets refund 24. She also pays shipping 3. So net money she has after return = 32 - 3 - 24 = 5. So she lost $5 relative to original purchase? Actually she lost $5 relative to original purchase? She originally had spent 32. After return, she has 5 left? That means she lost 5? But we need to consider that she had 32, she now has 5? That means she lost 27? Wait no, she had 32, she spent 3 shipping, she got 24 back. So net she spent 32 - 24 + 3? Actually she spent 32 initially. Then she pays 3 shipping. So total outflow = 35. She receives 24 back. So net outflow = 35 - 24 = 11. So she lost 11 relative to original? But relative to original purchase? She originally spent 32. After return, she has 32 - 3 - 24 = 5. So she lost 27? Wait, no, she originally had 32 out of pocket. After return, she has 5 out of pocket. So she lost 27? That seems wrong. Let's think: She had 32 out of pocket. She returned the book. She got 24 back. She paid 3 shipping. So net out of pocket after return = 32 - 24 + 3? Actually she had 32 out of pocket. She then pays 3 shipping. So she now has 32 + 3 = 35 out of pocket? Wait, no, she had 32. She pays 3 shipping, so now she has spent 35. She receives 24 back, so her net out of pocket = 35 - 24 = 11. So she lost 11 relative to zero? But relative to original purchase? She originally spent 32. After return, she spent 11. So she lost 21? Wait, no, she originally spent 32, after return she spent 11. So she lost 21? That doesn't make sense. Let's do step by step:\n\n- She buys book: pays $32. She has $32 spent.\n- She returns book: pays shipping $3. She has $32 + $3 = $35 spent.\n- She receives refund $24. So net spent = $35 - $24 = $11.\n\nThus she lost $11 relative to zero. But relative to original purchase? She originally spent $32. After return, she spent $11. So she lost $21? Actually she spent $32 originally, but after return she spent $11. So she lost $21? Wait, but she didn't lose $21, she lost $11. Because the $32 was spent, but she got $24 back, so she effectively lost $8 from the purchase. Then she paid $3 shipping. So total loss = $8 + $3 = $11. So answer: $11. So the net money she loses is $11."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 160,
+        "completion_tokens": 959,
+        "total_tokens": 1119,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 78,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00025095,
+          "upstream_inference_prompt_cost": 1.12e-05,
+          "upstream_inference_completions_cost": 0.00023975
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 688,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 5.677799701690674,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 160,
+        "prompt_time": 0,
+        "completion_tokens": 959,
+        "completion_time": 0,
+        "total_tokens": 1119,
+        "total_time": 0,
+        "reasoning_tokens": 688
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}

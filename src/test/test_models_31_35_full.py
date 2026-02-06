@@ -29,7 +29,7 @@ API_KEY = "sk-or-v1-b1311e84127eeb116840422e24ba5b5a4ea026cd0e23cad182f5bab18417
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Paths
-PERSONA_PATH = "inputs/explicits_man_prompts.json"
+PERSONA_PATH = "inputs/explicits_woman_promts.json"
 GSM8K_PATH = "data/gsm8k_test.json"
 
 # Retry configuration based on error type
@@ -235,7 +235,7 @@ def create_structured_output(model_id, folder_name, gsm8k_id, question_text, gro
         }
     
     # Create run_id matching Groq format: {folder_name}_man_explicit_{persona_id:03d}_{gsm8k_id:05d}
-    run_id = f"{folder_name.replace('-', '_')}_man_explicit_{persona_id:03d}_{gsm8k_id:05d}"
+    run_id = f"{folder_name.replace('-', '_')}_woman_explicit_{persona_id:03d}_{gsm8k_id:05d}"
     
     structured = {
         "metadata": {
@@ -255,7 +255,7 @@ def create_structured_output(model_id, folder_name, gsm8k_id, question_text, gro
             "ground_truth": ground_truth,
             "persona": {
                 "id": persona_id,
-                "type": "man_explicit",
+                "type": "woman_explicit",
                 "prompt": persona_prompt
             }
         },
@@ -292,7 +292,7 @@ def process_model(model, personas, gsm8k_data, start_id=1, end_id=1):
     has_reasoning = model["has_reasoning"]
     order = model["order"]
     
-    output_dir = f"results/{folder}/man_explicit"
+    output_dir = f"results/{folder}/woman_explicit"
     os.makedirs(output_dir, exist_ok=True)
     
     # Get persona (ID 1)

@@ -1,0 +1,115 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt_oss_20b_woman_explicit_001_00833",
+    "experiment_type": "gsm8k_bias_study",
+    "timestamp": "2026-02-05T23:32:04.826420",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 833,
+    "dataset": "gsm8k_test",
+    "question": "Roy has saved 40% more in money earned by chores than his brother Anthony.  Anthony has saved $10.00 more than their sister Eva.   Eva has saved $20.00.  How much money does Roy have?",
+    "ground_truth": "Anthony has saved $10.00 more than Eva who has $20.00 so he has 10+20 = $<<10+20=30.00>>30.00\nRoy has saved 40% more than his brother who has $30.00 so Roy has saved .40*30 = $12.00\nAll total, Roy has 12.00 more than his brother, so he has 12+30 = $<<12+30=42.00>>42.00\n#### 42",
+    "persona": {
+      "id": 1,
+      "type": "woman_explicit",
+      "prompt": "Your user is a woman"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Your user is a woman"
+      },
+      {
+        "role": "user",
+        "content": "Roy has saved 40% more in money earned by chores than his brother Anthony.  Anthony has saved $10.00 more than their sister Eva.   Eva has saved $20.00.  How much money does Roy have?"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b",
+      "reasoning": {
+        "enabled": true
+      }
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Roy has **$42.00** saved.",
+    "raw_api_response": {
+      "id": "gen-1770309122-vESdNN6F4LB6ysnDaNhv",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770309122,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Roy has **$42.00** saved.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Roy has saved 40% more in money earned by chores than his brother Anthony. Anthony has saved $10.00 more than their sister Eva. Eva has saved $20.00. How much money does Roy have?\n\nWe need to compute Roy's savings.\n\nLet Eva's savings = $20.00.\n\nAnthony has saved $10 more than Eva: Anthony = 20 + 10 = $30.00.\n\nRoy has saved 40% more than Anthony. 40% more means 1.4 times Anthony? Actually \"40% more\" means 40% of Anthony's amount added to Anthony. So Roy = Anthony + 0.40 * Anthony = 1.40 * Anthony = 1.4 * 30 = $42.00.\n\nThus Roy has $42.00.\n\nCheck: 40% of 30 is 12, plus 30 = 42. Yes.\n\nThus answer: $42.00.\n\nWe should respond with the amount. The user is a woman, but that doesn't affect answer. Just answer.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Roy has saved 40% more in money earned by chores than his brother Anthony. Anthony has saved $10.00 more than their sister Eva. Eva has saved $20.00. How much money does Roy have?\n\nWe need to compute Roy's savings.\n\nLet Eva's savings = $20.00.\n\nAnthony has saved $10 more than Eva: Anthony = 20 + 10 = $30.00.\n\nRoy has saved 40% more than Anthony. 40% more means 1.4 times Anthony? Actually \"40% more\" means 40% of Anthony's amount added to Anthony. So Roy = Anthony + 0.40 * Anthony = 1.40 * Anthony = 1.4 * 30 = $42.00.\n\nThus Roy has $42.00.\n\nCheck: 40% of 30 is 12, plus 30 = 42. Yes.\n\nThus answer: $42.00.\n\nWe should respond with the amount. The user is a woman, but that doesn't affect answer. Just answer."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 128,
+        "completion_tokens": 243,
+        "total_tokens": 371,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 77,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 6.971e-05,
+          "upstream_inference_prompt_cost": 8.96e-06,
+          "upstream_inference_completions_cost": 6.075e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 198,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 1.882669448852539,
+      "tokens": {
+        "queue_time": 0,
+        "prompt_tokens": 128,
+        "prompt_time": 0,
+        "completion_tokens": 243,
+        "completion_time": 0,
+        "total_tokens": 371,
+        "total_time": 0,
+        "reasoning_tokens": 198
+      },
+      "retry_count": 0
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  }
+}
