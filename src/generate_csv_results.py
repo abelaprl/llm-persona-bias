@@ -115,6 +115,12 @@ def process_result_file(file_path):
         completion_tokens_details = usage.get('completion_tokens_details', {})
         reasoning_tokens = completion_tokens_details.get('reasoning_tokens', 0)
         
+        # Get latency
+        latency_sec = data.get('response', {}).get('latency', 0)
+        
+        # Get retry count (default 0 if not present)
+        retry_count = data.get('retry_count', 0)
+        
         return {
             'model_name': model_name,
             'persona_type': persona_type,
@@ -127,6 +133,8 @@ def process_result_file(file_path):
             'completion_tokens': completion_tokens,
             'total_tokens': total_tokens,
             'reasoning_tokens': reasoning_tokens,
+            'latency_sec': round(latency_sec, 3),
+            'retry_count': retry_count,
             'response_preview': response_content[:100] if response_content else '',
         }
     except Exception as e:
@@ -140,16 +148,20 @@ def generate_detailed_csv(results, output_file, persona_type):
         return
     
     fieldnames = [
-        'model_name',
-        'persona_id', 
         'question_id',
+        'model_name',
+        'persona_folder',
+        'persona_type',
+        'success',
         'is_correct',
-        'final_answer',
-        'ground_truth',
+        'ground_truth_answer',
+        'extracted_answer',
         'prompt_tokens',
         'completion_tokens',
+        'reasoning_tokens',
         'total_tokens',
-        'reasoning_tokens'
+        'latency_sec',
+        'retry_count'
     ]
     
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
@@ -157,17 +169,24 @@ def generate_detailed_csv(results, output_file, persona_type):
         writer.writeheader()
         
         for result in results:
+            persona_folder = f"{persona_type}_implicit_{result['persona_id']}"
+            success = result['final_answer'] is not None and result['ground_truth'] is not None
+            
             writer.writerow({
-                'model_name': result['model_name'],
-                'persona_id': result['persona_id'],
                 'question_id': result['question_id'],
-                'is_correct': 1 if result['is_correct'] else (0 if result['is_correct'] is not None else ''),
-                'final_answer': result['final_answer'] if result['final_answer'] is not None else '',
-                'ground_truth': result['ground_truth'] if result['ground_truth'] is not None else '',
+                'model_name': result['model_name'],
+                'persona_folder': persona_folder,
+                'persona_type': f"{persona_type}_implicit",
+                'success': success,
+                'is_correct': result['is_correct'] if result['is_correct'] is not None else '',
+                'ground_truth_answer': result['ground_truth'] if result['ground_truth'] is not None else '',
+                'extracted_answer': result['final_answer'] if result['final_answer'] is not None else '',
                 'prompt_tokens': result['prompt_tokens'],
                 'completion_tokens': result['completion_tokens'],
-                'total_tokens': result['total_tokens'],
                 'reasoning_tokens': result['reasoning_tokens'],
+                'total_tokens': result['total_tokens'],
+                'latency_sec': result.get('latency_sec', 0),
+                'retry_count': result.get('retry_count', 0),
             })
     
     print(f"[OK] Detailed CSV saved: {output_file}")
@@ -255,6 +274,77 @@ def generate_summary_csv(results, output_file, persona_type):
     print(f"[OK] Summary CSV saved: {output_file}")
     print(f"     Total models: {len(summaries)}")
 
+def generate_per_model_csv(results, output_dir, persona_type):
+    """Generate separate CSV for each model and each persona"""
+    if not results:
+        print(f"No results for per-model CSV")
+        return
+    
+    # Group by model and persona
+    grouped = defaultdict(lambda: defaultdict(list))
+    for result in results:
+        grouped[result['model_name']][result['persona_id']].append(result)
+    
+    # Create output directory
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    
+    csv_count = 0
+    # Generate CSV for each model+persona combination
+    for model_name, personas in grouped.items():
+        # Safe filename
+        safe_model_name = model_name.replace('/', '_')
+        
+        for persona_id, persona_results in personas.items():
+            # Sort by question_id
+            persona_results.sort(key=lambda x: x['question_id'])
+            
+            output_file = Path(output_dir) / f"model_{safe_model_name}_{persona_type}_implicit_{persona_id}.csv"
+            
+            fieldnames = [
+                'question_id',
+                'persona_folder',
+                'persona_type',
+                'success',
+                'is_correct',
+                'ground_truth_answer',
+                'extracted_answer',
+                'prompt_tokens',
+                'completion_tokens',
+                'reasoning_tokens',
+                'total_tokens',
+                'latency_sec',
+                'retry_count'
+            ]
+            
+            with open(output_file, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                
+                for result in persona_results:
+                    persona_folder = f"{persona_type}_implicit_{result['persona_id']}"
+                    success = result['final_answer'] is not None and result['ground_truth'] is not None
+                    
+                    writer.writerow({
+                        'question_id': result['question_id'],
+                        'persona_folder': persona_folder,
+                        'persona_type': f"{persona_type}_implicit",
+                        'success': success,
+                        'is_correct': result['is_correct'] if result['is_correct'] is not None else '',
+                        'ground_truth_answer': result['ground_truth'] if result['ground_truth'] is not None else '',
+                        'extracted_answer': result['final_answer'] if result['final_answer'] is not None else '',
+                        'prompt_tokens': result['prompt_tokens'],
+                        'completion_tokens': result['completion_tokens'],
+                        'reasoning_tokens': result['reasoning_tokens'],
+                        'total_tokens': result['total_tokens'],
+                        'latency_sec': result.get('latency_sec', 0),
+                        'retry_count': result.get('retry_count', 0),
+                    })
+            
+            csv_count += 1
+            print(f"  [OK] {safe_model_name} persona {persona_id}: {len(persona_results)} rows")
+    
+    print(f"\n[OK] Generated {csv_count} CSV files in: {output_dir}")
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description='Generate CSV from GSM8K results')
@@ -292,12 +382,19 @@ def main():
     # Generate CSVs
     detailed_csv = f"analysis/{persona_type}_implicit_detailed.csv"
     summary_csv = f"analysis/{persona_type}_implicit_summary.csv"
+    per_model_dir = f"analysis/{persona_type}_implicit_models"
     
     # Create output directory
     Path("analysis").mkdir(exist_ok=True)
     
+    print("Generating detailed CSV...")
     generate_detailed_csv(results, detailed_csv, persona_type)
+    
+    print("\nGenerating summary CSV...")
     generate_summary_csv(results, summary_csv, persona_type)
+    
+    print("\nGenerating per-model CSVs...")
+    generate_per_model_csv(results, per_model_dir, persona_type)
     
     print()
     print("="*80)
