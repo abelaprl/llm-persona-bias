@@ -179,6 +179,21 @@ def main():
             print(f"\n  [{current_task}/{total_tasks}] Processing prompt ID {prompt_data['id']}...")
             print(f"    Prompt preview: {prompt_data['prompt'][:80]}...")
             
+            # Check if file already exists (skip logic)
+            model_name = sanitize_model_name(model['model_id'])
+            file_path = Path(f"result/{model_name}/woman_implicit_{prompt_data['id']}/warmup/persona_warmup.json")
+            
+            if file_path.exists():
+                print(f"    [SKIP] File already exists - {file_path}")
+                results_summary.append({
+                    "model_order": model['order'],
+                    "model_name": model['name'],
+                    "prompt_id": prompt_data['id'],
+                    "status": "SKIPPED",
+                    "file_path": str(file_path)
+                })
+                continue
+            
             # Call API
             api_result = call_openrouter_api(model, prompt_data['prompt'], prompt_data['id'])
             
@@ -235,10 +250,12 @@ def main():
     print("="*80)
     
     success_count = sum(1 for r in results_summary if r['status'] == 'SUCCESS')
+    skipped_count = sum(1 for r in results_summary if r['status'] == 'SKIPPED')
     failed_count = sum(1 for r in results_summary if r['status'] in ['FAILED', 'ERROR'])
     
-    print(f"\n✓ SUCCESS: {success_count}/{total_tasks} tasks")
-    print(f"✗ FAILED:  {failed_count}/{total_tasks} tasks")
+    print(f"\n✓ SUCCESS:  {success_count}/{total_tasks} tasks")
+    print(f"⊘ SKIPPED:  {skipped_count}/{total_tasks} tasks")
+    print(f"✗ FAILED:   {failed_count}/{total_tasks} tasks")
     
     if failed_count > 0:
         print("\nFailed tasks:")
