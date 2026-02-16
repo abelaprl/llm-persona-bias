@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T13:58:21.378344",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Jon runs a triathlon.  It takes him 40 minutes for the swim, an hour and 20 minutes for the bike ride and 50 minutes for the run.  Compared to Jon, James finishes the swim 10% faster but takes 5 minutes longer on the bike.  If Jon won by 10 minutes, how long did it take James to do the run?",
+    "ground_truth": "Jon did the bike ride in 60+20=<<60+20=80>>80 minutes\nSo his total time was 40+80+50=<<40+80+50=170>>170 minutes\nJames finished the swim 40*.1=<<40*.1=4>>4 minutes faster\nSo he finished the swim in 40-4=<<40-4=36>>36 minutes\nHe finished the bike ride in 80+5=<<80+5=85>>85 minutes\nJames' total time was 170+10=<<170+10=180>>180\nSo it took him 180-85-36=<<180-85-36=59>>59 minutes to do the run\n#### 59",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Jon runs a triathlon.  It takes him 40 minutes for the swim, an hour and 20 minutes for the bike ride and 50 minutes for the run.  Compared to Jon, James finishes the swim 10% faster but takes 5 minutes longer on the bike.  If Jon won by 10 minutes, how long did it take James to do the run?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Jon’s total time  \n\\[\n40\\text{ min (swim)} + 80\\text{ min (bike)} + 50\\text{ min (run)} = 170\\text{ min}.\n\\]\n\nJames swims 10 % faster, so his swim time is  \n\\[\n40 \\times 0.9 = 36\\text{ min}.\n\\]\n\nHe bikes 5 min longer than Jon, so his bike time is  \n\\[\n80 + 5 = 85\\text{ min}.\n\\]\n\nLet \\(r\\) be James’s run time.  \nSince Jon won by 10 minutes, James’s total time is 10 minutes more than Jon’s:\n\n\\[\n36 + 85 + r = 170 + 10.\n\\]\n\n\\[\n121 + r = 180 \\quad\\Longrightarrow\\quad r = 59\\text{ minutes}.\n\\]\n\n\\[\n\\boxed{59\\text{ minutes}}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1770965898-8yjoeiozVMUVx5CqDeDw",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770965898,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Jon’s total time  \n\\[\n40\\text{ min (swim)} + 80\\text{ min (bike)} + 50\\text{ min (run)} = 170\\text{ min}.\n\\]\n\nJames swims 10 % faster, so his swim time is  \n\\[\n40 \\times 0.9 = 36\\text{ min}.\n\\]\n\nHe bikes 5 min longer than Jon, so his bike time is  \n\\[\n80 + 5 = 85\\text{ min}.\n\\]\n\nLet \\(r\\) be James’s run time.  \nSince Jon won by 10 minutes, James’s total time is 10 minutes more than Jon’s:\n\n\\[\n36 + 85 + r = 170 + 10.\n\\]\n\n\\[\n121 + r = 180 \\quad\\Longrightarrow\\quad r = 59\\text{ minutes}.\n\\]\n\n\\[\n\\boxed{59\\text{ minutes}}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse problem. Jon times: swim 40 min, bike 1h20 = 80 min, run 50 min. Total Jon = 40+80+50 = 170 minutes.\n\nJames: swim 10% faster than Jon. So his swim time = Jon's swim time * (1 - 0.10) = 40 * 0.9 = 36 minutes.\n\nBike: takes 5 minutes longer than Jon: Jon bike 80, so James bike = 85 minutes.\n\nRun unknown: let r minutes.\n\nTotal James = 36 + 85 + r = 121 + r.\n\nJon won by 10 minutes, meaning Jon's total time is 10 minutes less than James? Usually \"won by 10 minutes\" means Jon finished 10 minutes before James, so Jon's time is 10 minutes less. So James total = Jon total + 10 = 170 + 10 = 180 minutes.\n\nThus 121 + r = 180 => r = 59 minutes.\n\nAnswer: 59 minutes.\n\nCheck: James total 36+85+59=180, Jon 170, difference 10. Good.\n\nThus answer: 59 minutes.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse problem. Jon times: swim 40 min, bike 1h20 = 80 min, run 50 min. Total Jon = 40+80+50 = 170 minutes.\n\nJames: swim 10% faster than Jon. So his swim time = Jon's swim time * (1 - 0.10) = 40 * 0.9 = 36 minutes.\n\nBike: takes 5 minutes longer than Jon: Jon bike 80, so James bike = 85 minutes.\n\nRun unknown: let r minutes.\n\nTotal James = 36 + 85 + r = 121 + r.\n\nJon won by 10 minutes, meaning Jon's total time is 10 minutes less than James? Usually \"won by 10 minutes\" means Jon finished 10 minutes before James, so Jon's time is 10 minutes less. So James total = Jon total + 10 = 170 + 10 = 180 minutes.\n\nThus 121 + r = 180 => r = 59 minutes.\n\nAnswer: 59 minutes.\n\nCheck: James total 36+85+59=180, Jon 170, difference 10. Good.\n\nThus answer: 59 minutes."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 171,
+        "completion_tokens": 460,
+        "total_tokens": 631,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00018099,
+          "upstream_inference_prompt_cost": 1.539e-05,
+          "upstream_inference_completions_cost": 0.0001656
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 205,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.267731189727783
+  },
+  "retry_count": 0
+}

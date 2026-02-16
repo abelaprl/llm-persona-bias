@@ -10,63 +10,183 @@ import json
 import csv
 from pathlib import Path
 import re
+import sys
+import argparse
 
 def extract_final_answer(response_content):
-    """Extract final answer dari response (angka saja)"""
+    """Extract final answer dari response - improved multi-priority extraction"""
     if not response_content:
         return None
     
-    # Clean up the text - normalize whitespace
     text = response_content.strip()
     
-    # Patterns dari yang paling spesifik ke yang lebih umum
-    patterns = [
-        # LaTeX boxed patterns
-        r'\\boxed\{([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\}',  # \boxed{18}
-        r'\$\\boxed\{([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\}\$',  # $\boxed{18}$
-        r'boxed\{([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\}',  # boxed{18} tanpa backslash
-        
-        # #### patterns (GSM8K standard)
-        r'####\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',  # #### 18 atau #### $18
-        
-        # Answer patterns
-        r'[Aa]nswer[:\s]+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',  # Answer: 18
-        r'[Aa]nswer\s+is[:\s]+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',  # Answer is 18
-        r'[Ff]inal\s+[Aa]nswer[:\s]+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',  # Final Answer: 18
-        r'[Tt]he\s+answer\s+is[:\s]+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',  # The answer is 18
-        r'[Tt]herefore[,\s]+(?:the\s+)?(?:answer\s+is\s+)?(?:x\s*=\s*)?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',  # Therefore, x = 5
-        
-        # Bold/markdown patterns
-        r'\*\*\$([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*\*',  # **$18**
-        r'\*\*([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*\*(?:\s*(?:dollars?|eggs?|tomatoes?|cars?|minutes?|hours?|\$|\.)?)?$',  # **18** at end
-        
-        # Equals pattern at end
-        r'=\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:dollars?|tomatoes?|cars?)?\.?\s*$',  # = 18 at end
-        
-        # So/Thus conclusion patterns
-        r'[Ss]o[,\s]+(?:the\s+)?(?:answer\s+is\s+)?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:dollars?|\.)?\.?\s*$',
-        r'[Tt]hus[,\s]+(?:the\s+)?(?:answer\s+is\s+)?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)',
-    ]
-    
-    for pattern in patterns:
-        match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
-        if match:
-            # Remove commas and convert to number
-            ans = match.group(1).replace(',', '').strip()
-            try:
-                return float(ans)
-            except:
-                continue
-    
-    # Fallback: ambil angka terakhir di text (hanya angka standalone, bukan dalam kata)
-    # Cari pattern angka yang lebih strict - harus diikuti/didahului spasi/punctuation
-    numbers = re.findall(r'(?:^|[\s=:$])([+-]?\d+(?:,\d{3})*(?:\.\d+)?)(?:[\s\.$,;:!?]|$)', text)
-    if numbers:
-        last_num = numbers[-1].replace(',', '').strip()
+    # Priority 1: boxed pattern - handle with/without %, \text{}, etc., take LAST match
+    boxed_matches = list(re.finditer(r'\\boxed\{([+-]?\d+(?:,\d{3})*(?:\.\d+)?)[^}]*\}', text))
+    if boxed_matches:
+        ans = boxed_matches[-1].group(1).replace(',', '')
         try:
-            return float(last_num)
+            return float(ans)
         except:
             pass
+    
+    # Priority 2: #### pattern - take LAST match
+    hash_matches = list(re.finditer(r'####\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', text))
+    if hash_matches:
+        ans = hash_matches[-1].group(1).replace(',', '')
+        try:
+            return float(ans)
+        except:
+            pass
+    
+    # Priority 3: Look for "Answer" line and extract carefully
+    lines = text.strip().split('\n')
+    last_lines = lines[-15:] if len(lines) >= 15 else lines
+    
+    for line in reversed(last_lines):
+        line_stripped = line.strip()
+        
+        # Check if this is an Answer line
+        if re.search(r'^\*?\*?[Aa]nswer', line_stripped) or re.search(r'\*\*[Aa]nswer', line_stripped):
+            # Pattern 1: "Answer: $NUMBER" or "**Answer: $NUMBER**"
+            match = re.search(r'[Aa]nswer[:\s\*]*\$([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line_stripped)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 2: "Answer: NUMBER" directly after colon  
+            match = re.search(r'[Aa]nswer[:\s\*]+([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line_stripped)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 3: "have NUMBER unit" in answer line
+            match = re.search(r'\bhave\s+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:sheep|miles?|dollars?|eggs?|items?|points?|downloads?|pages?|books?|apples?)\b', line_stripped, re.IGNORECASE)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 4: "is NUMBER unit" - get NUMBER before unit  
+            match = re.search(r'\bis\s+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:miles?|dollars?|eggs?|vacuum\s*cleaners?|glasses?|items?|people|students?|apples?|books?|pages?|points?|pieces?|downloads?|minutes?|sheep)\b', line_stripped, re.IGNORECASE)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 5: "pay $NUMBER"
+            match = re.search(r'\bpay\s+\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line_stripped, re.IGNORECASE)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 6: Bold number **NUMBER** in answer line (any position)
+            bold_matches = re.findall(r'\*\*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*\*', line_stripped)
+            if bold_matches:
+                return float(bold_matches[-1].replace(',', ''))
+            
+            # Pattern 7: "give (her chickens)? NUMBER cups/unit" - for chicken feed problem
+            match = re.search(r'\bgive\s+(?:her\s+)?(?:chickens?\s+)?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:cups?|bolts?|items?|pieces?|dollars?)\b', line_stripped, re.IGNORECASE)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 8: "needs to give NUMBER" 
+            match = re.search(r'\bneeds?\s+to\s+give\s+(?:her\s+)?(?:chickens?\s+)?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:cups?|bolts?|items?|pieces?)\b', line_stripped, re.IGNORECASE)
+            if match:
+                return float(match.group(1).replace(',', ''))
+            
+            # Pattern 9: Generic - find LAST "NUMBER unit" in Answer line (fallback)
+            all_unit_matches = re.findall(r'([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:cups?|items?|dollars?|miles?|eggs?|pieces?|minutes?|hours?|days?|years?|meters?|bolts?|sheep|glasses?|vacuum\s*cleaners?|downloads?|pages?|books?|people|students?)\b', line_stripped, re.IGNORECASE)
+            if all_unit_matches:
+                return float(all_unit_matches[-1].replace(',', ''))
+    
+    # Priority 4: Look for "The answer is NUMBER"
+    for line in reversed(last_lines):
+        match = re.search(r'[Tt]he\s+answer\s+is[:\s]*\*?\*?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 5: Bold number **NUMBER unit** anywhere in last 5 lines
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\*\*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:cups?|sheep|miles?(?:\s+per\s+hour)?|dollars?|minutes?|downloads?|eggs?|pages?|books?|items?|pieces?|hours?|days?|meters?|dozens?|years?|bolts?|%|percent)?\*\*', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 6: "makes/made/profit of $NUMBER" / "speed of NUMBER" patterns
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\b(?:makes?|made|profit\s+of|speed\s+of)\s+\*?\*?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 7: "needs NUMBER" / "have NUMBER" / "takes NUMBER" patterns 
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\b(?:needs?|have|has|gets?|total\s+of|runs?\s+a\s+total\s+of|run|eats?|will\s+eat|takes?|pay\s+a\s+total\s+of|it\s+takes)\s+\*?\*?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*?\*?\s*(?:cups?|sheep|miles?|dollars?|minutes?|downloads?|eggs?|pages?|books?|items?|pieces?|meters?|dozens?|bolts?|years?)?\b', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 8: "is NUMBER unit" with extended units
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\bis\s+\*?\*?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*?\*?\s*(?:cups?|sheep|miles?(?:\s+per\s+hour)?|dollars?|minutes?|downloads?|eggs?|pages?|books?|items?|pieces?|glasses?|points?|people|students?|meters?|dozens?)\b', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 9: = NUMBER unit (not just at end)
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'=\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:dollars?|downloads?|sheep|meters?|cups?|bolts?|minutes?|years?)', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 10: = NUMBER at end of line  
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'=\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*$', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 11: "give NUMBER" pattern
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\bgive\s+(?:her\s+)?(?:chickens?\s+)?\*?\*?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*?\*?\s*(?:cups?|bolts?|items?|pieces?)\b', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 12: "distance/salary/profit/earnings is/are $NUMBER" patterns
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'(?:distance|salary|profit|earnings?|would\s+be)\s+(?:is|are|of)?\s*\*?\*?\\?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 13: "covers NUMBER miles/distance" pattern
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\bcovers?\s+(?:a\s+)?(?:total\s+)?(?:distance\s+of\s+)?\*?\*?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*?\*?\s*(?:miles?|meters?|km)\b', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 14: "NUMBER%" pattern for percentages 
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\b([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*%', line)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 15: "Answer: \(NUMBER\)" LaTeX inline math
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'[Aa]nswer[:\s]*\\\(([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\\\)', line)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 16: "= NUMBER m." or "= NUMBER m" at end of line
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'=\s*([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:m|meters?)\.?\s*\*?\*?\s*$', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 17: "NUMBER\ \text{min}" LaTeX format
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*\\?\s*\\text\{', line)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 18: escaped dollar \$NUMBER pattern
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'\\?\$([+-]?\d+(?:,\d{3})*(?:\.\d+)?)[.\s]*(?:$|[^0-9])', line)
+        if match:
+            return float(match.group(1).replace(',', ''))
+    
+    # Priority 19: "began with **NUMBER" pattern
+    for line in reversed(last_lines[-5:]):
+        match = re.search(r'began\s+with\s+\*?\*?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line, re.IGNORECASE)
+        if match:
+            return float(match.group(1).replace(',', ''))
     
     return None
 
@@ -237,65 +357,89 @@ def generate_csv_for_model_persona(model_folder, persona_folder, output_path):
     
     return len(results)
 
+
 def main():
-    print("="*80)
-    print("GENERATING REPORTS BY MODEL AND PERSONA")
-    print("="*80)
-    print()
+    parser = argparse.ArgumentParser(description='Generate CSV reports by model and persona')
+    parser.add_argument('--model', type=int, help='Model index (1-based). Run without args to see list.')
+    parser.add_argument('--list', action='store_true', help='List all available models')
+    args = parser.parse_args()
     
     # Base directories
     result_dir = Path("result")
     reports_dir = result_dir / "reports"
     
     # Get all model folders (exclude testing and reports)
-    model_folders = [f for f in result_dir.iterdir() 
-                     if f.is_dir() and f.name not in ['testing', 'reports']]
+    model_folders = sorted([f for f in result_dir.iterdir() 
+                     if f.is_dir() and f.name not in ['testing', 'reports']])
     
     if not model_folders:
-        print("No model folders found in result/")
+        print("No model folders found in result/", flush=True)
         return
     
-    print(f"Found {len(model_folders)} model folders")
-    print()
+    # Show list of models
+    if args.list or args.model is None:
+        print("="*80, flush=True)
+        print("AVAILABLE MODELS", flush=True)
+        print("="*80, flush=True)
+        for i, folder in enumerate(model_folders, 1):
+            print(f"  {i:2d}. {folder.name}", flush=True)
+        print()
+        print("Usage: python script.py --model <number>", flush=True)
+        print("Example: python script.py --model 1", flush=True)
+        print("="*80, flush=True)
+        return
+    
+    # Validate model index
+    model_idx = args.model
+    if model_idx < 1 or model_idx > len(model_folders):
+        print(f"Error: Model index must be between 1 and {len(model_folders)}", flush=True)
+        return
+    
+    # Process single model
+    model_folder = model_folders[model_idx - 1]
+    model_name = model_folder.name
+    
+    print("="*80, flush=True)
+    print(f"PROCESSING MODEL {model_idx}: {model_name}", flush=True)
+    print("="*80, flush=True)
+    print(flush=True)
     
     total_csv_count = 0
     total_questions = 0
     
-    # Process each model
-    for model_folder in sorted(model_folders):
-        model_name = model_folder.name
-        print(f"Processing model: {model_name}")
+    # Get all persona folders in this model (implicit AND explicit)
+    persona_folders = [f for f in model_folder.iterdir() 
+                      if f.is_dir() and ('implicit' in f.name or 'explicit' in f.name)]
+    
+    if not persona_folders:
+        print(f"[SKIP] No persona folders found", flush=True)
+        return
+    
+    # Process each persona
+    for persona_folder in sorted(persona_folders):
+        persona_name = persona_folder.name
         
-        # Get all persona folders in this model (only implicit ones)
-        persona_folders = [f for f in model_folder.iterdir() 
-                          if f.is_dir() and 'implicit' in f.name]
+        # Output path: result/reports/model_name/persona_name/results.csv
+        output_path = reports_dir / model_name / persona_name / "results.csv"
         
-        if not persona_folders:
-            print(f"  [SKIP] No persona folders found")
+        # Skip if already exists
+        if output_path.exists():
+            print(f"  [SKIP] {persona_name}: already exists", flush=True)
             continue
         
-        # Process each persona
-        for persona_folder in sorted(persona_folders):
-            persona_name = persona_folder.name
-            
-            # Output path: result/reports/model_name/persona_name/results.csv
-            output_path = reports_dir / model_name / persona_name / "results.csv"
-            
-            # Generate CSV
-            count = generate_csv_for_model_persona(model_folder, persona_folder, output_path)
-            
-            if count > 0:
-                print(f"  [OK] {persona_name}: {count} questions -> {output_path}")
-                total_csv_count += 1
-                total_questions += count
-            
-        print()
+        # Generate CSV
+        count = generate_csv_for_model_persona(model_folder, persona_folder, output_path)
+        
+        if count > 0:
+            print(f"  [OK] {persona_name}: {count} questions -> {output_path}", flush=True)
+            total_csv_count += 1
+            total_questions += count
     
-    print("="*80)
-    print(f"DONE! Generated {total_csv_count} CSV files")
-    print(f"Total questions processed: {total_questions}")
-    print(f"Output directory: {reports_dir.absolute()}")
-    print("="*80)
+    print(flush=True)
+    print("="*80, flush=True)
+    print(f"DONE! Model {model_idx} ({model_name})", flush=True)
+    print(f"Generated {total_csv_count} CSV files, {total_questions} questions", flush=True)
+    print("="*80, flush=True)
 
 if __name__ == "__main__":
     main()

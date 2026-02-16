@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T13:38:45.659342",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "John runs 60 miles a week. He runs 3 days a week.  He runs 3 hours the first day and half as much the other two days he runs.  How fast does he run?",
+    "ground_truth": "He has 7-1=<<7-1=6>>6 possible running days.\nHe runs half of those so he runs 6/2=<<6/2=3>>3 days.\nSo for two days, he runs 3/2=<<3/2=1.5>>1.5 hours.\nSo in total, he runs 3+1.5+1.5=<<3+1.5+1.5=6>>6 hours.\nSo he runs 60/6=<<60/6=10>>10 mph.\n#### 10",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: John runs 60 miles a week. He runs 3 days a week.  He runs 3 hours the first day and half as much the other two days he runs.  How fast does he run?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "John’s total weekly distance is 60 miles and he runs for 3 days.\n\n- First day: 3 hours  \n- Other two days: “half as much” of the first day’s time → \\(3/2 = 1.5\\) hours each\n\nTotal running time per week  \n\\[\n3 + 1.5 + 1.5 = 6\\text{ hours}\n\\]\n\nAverage speed  \n\\[\n\\text{speed} = \\frac{\\text{total distance}}{\\text{total time}}\n              = \\frac{60\\text{ miles}}{6\\text{ hours}}\n              = 10\\text{ miles per hour}\n\\]\n\n**Answer: 10 mph**",
+    "raw_api_response": {
+      "id": "gen-1770964723-pIJE1Hb9f4ehZsfBV8bv",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770964723,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "John’s total weekly distance is 60 miles and he runs for 3 days.\n\n- First day: 3 hours  \n- Other two days: “half as much” of the first day’s time → \\(3/2 = 1.5\\) hours each\n\nTotal running time per week  \n\\[\n3 + 1.5 + 1.5 = 6\\text{ hours}\n\\]\n\nAverage speed  \n\\[\n\\text{speed} = \\frac{\\text{total distance}}{\\text{total time}}\n              = \\frac{60\\text{ miles}}{6\\text{ hours}}\n              = 10\\text{ miles per hour}\n\\]\n\n**Answer: 10 mph**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. John runs 60 miles a week. He runs 3 days a week. He runs 3 hours the first day and half as much the other two days he runs. How fast does he run? So we need to find his average speed (miles per hour). He runs 3 hours first day, and half as much the other two days. \"Half as much\" likely refers to time: half as much time as the first day? Or half as much distance? The phrase \"half as much the other two days he runs\" ambiguous. Usually, \"half as much\" refers to the same quantity: if first day he runs 3 hours, other two days he runs half as much time: 1.5 hours each. But we need to check if that yields total distance 60 miles. Let's compute: total time = 3 + 1.5 + 1.5 = 6 hours. If he runs 60 miles in 6 hours, speed = 10 mph. That seems plausible. But we should verify if the problem intends that. Alternatively, \"half as much\" could refer to distance: first day he runs some distance, other two days he runs half as much distance each. But we don't know first day's distance. But we know total distance 60 miles. Let x be distance first day, then other two days each run x/2. So total distance = x + x/2 + x/2 = 2x. So x = 30 miles. So first day distance 30 miles. He runs 3 hours first day, so speed first day = 10 mph. Other two days each run 15 miles in 1.5 hours? Wait we don't know time for other days. But if we assume he runs at same speed each day, then time for other days = distance / speed = 15 / 10 = 1.5 hours. That matches earlier assumption. So both interpretations lead to same speed 10 mph. So answer: 10 mph.\n\nBut maybe they want mph. So answer: 10 mph. Let's produce final answer.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. John runs 60 miles a week. He runs 3 days a week. He runs 3 hours the first day and half as much the other two days he runs. How fast does he run? So we need to find his average speed (miles per hour). He runs 3 hours first day, and half as much the other two days. \"Half as much\" likely refers to time: half as much time as the first day? Or half as much distance? The phrase \"half as much the other two days he runs\" ambiguous. Usually, \"half as much\" refers to the same quantity: if first day he runs 3 hours, other two days he runs half as much time: 1.5 hours each. But we need to check if that yields total distance 60 miles. Let's compute: total time = 3 + 1.5 + 1.5 = 6 hours. If he runs 60 miles in 6 hours, speed = 10 mph. That seems plausible. But we should verify if the problem intends that. Alternatively, \"half as much\" could refer to distance: first day he runs some distance, other two days he runs half as much distance each. But we don't know first day's distance. But we know total distance 60 miles. Let x be distance first day, then other two days each run x/2. So total distance = x + x/2 + x/2 = 2x. So x = 30 miles. So first day distance 30 miles. He runs 3 hours first day, so speed first day = 10 mph. Other two days each run 15 miles in 1.5 hours? Wait we don't know time for other days. But if we assume he runs at same speed each day, then time for other days = distance / speed = 15 / 10 = 1.5 hours. That matches earlier assumption. So both interpretations lead to same speed 10 mph. So answer: 10 mph.\n\nBut maybe they want mph. So answer: 10 mph. Let's produce final answer."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 136,
+        "completion_tokens": 602,
+        "total_tokens": 738,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 89,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00016002,
+          "upstream_inference_prompt_cost": 9.52e-06,
+          "upstream_inference_completions_cost": 0.0001505
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 411,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.023135185241699
+  },
+  "retry_count": 0
+}

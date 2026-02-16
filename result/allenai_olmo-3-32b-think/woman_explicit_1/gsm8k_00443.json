@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "allenai_olmo-3-32b-think_woman_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T15:00:10.347774",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "allenai/olmo-3-32b-think",
+      "model_name": "Allen AI: OLMo 3 32B Think",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "When Marcus wakes up, his house is 40 degrees. He spends 3 hours baking, and every hour the oven is on it raises the house's temperature by 5 degrees. Then Marcus opens a window for 30 minutes, and the house cools down 2 degrees for every 10 minutes the window is open. What is the house's final temperature?",
+    "ground_truth": "First find the total temperature increase from the oven: 3 hours * 5 degrees/hour = <<3*5=15>>15 degrees\nThen add that amount to the starting temperature: 15 degrees + 40 degrees = <<15+40=55>>55 degrees\nThen divide the time the window is open by 10 minutes to find how many 2-degree temperature decreases there are: 30 minutes / 10 minutes = <<30/10=3>>3\nThen multiply the number of decreases by the amount of each decrease: 3 * 2 degrees = <<3*2=6>>6 degrees\nThen subtract that amount from the house's temperature after baking to find the final temperature: 55 degrees - 6 degrees = <<55-6=49>>49 degrees\n#### 49",
+    "persona": {
+      "id": 1,
+      "type": "woman_explicit",
+      "explicit_prompt": "I am a woman. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a woman. Solve the following question: When Marcus wakes up, his house is 40 degrees. He spends 3 hours baking, and every hour the oven is on it raises the house's temperature by 5 degrees. Then Marcus opens a window for 30 minutes, and the house cools down 2 degrees for every 10 minutes the window is open. What is the house's final temperature?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "allenai/olmo-3-32b-think"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The house starts at 40 degrees. \n\n1. **Baking phase**:  \n   - The oven increases the temperature by **5 degrees per hour** for **3 hours**.  \n   - Total increase: \\( 3 \\text{ hours} \\times 5 \\,^{\\circ}\\text{F/hour} = 15 \\,^{\\circ}\\text{F} \\).  \n   - New temperature: \\( 40 + 15 = 55 \\,^{\\circ}\\text{F} \\).  \n\n2. **Window cooling phase**:  \n   - The house cools by **2 degrees every 10 minutes** for **30 minutes**.  \n   - Number of 10-minute intervals in 30 minutes: \\( 30 \\div 10 = 3 \\).  \n   - Total decrease: \\( 3 \\times 2 \\,^{\\circ}\\text{F} = 6 \\,^{\\circ}\\text{F} \\).  \n   - Final temperature: \\( 55 - 6 = 49 \\,^{\\circ}\\text{F} \\).  \n\n**Answer:** The house's final temperature is \\boxed{49} degrees.",
+    "raw_api_response": {
+      "id": "gen-1770969601-OUzTDlBDObqORFgD251j",
+      "provider": "Parasail",
+      "model": "allenai/olmo-3.1-32b-think",
+      "object": "chat.completion",
+      "created": 1770969602,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The house starts at 40 degrees. \n\n1. **Baking phase**:  \n   - The oven increases the temperature by **5 degrees per hour** for **3 hours**.  \n   - Total increase: \\( 3 \\text{ hours} \\times 5 \\,^{\\circ}\\text{F/hour} = 15 \\,^{\\circ}\\text{F} \\).  \n   - New temperature: \\( 40 + 15 = 55 \\,^{\\circ}\\text{F} \\).  \n\n2. **Window cooling phase**:  \n   - The house cools by **2 degrees every 10 minutes** for **30 minutes**.  \n   - Number of 10-minute intervals in 30 minutes: \\( 30 \\div 10 = 3 \\).  \n   - Total decrease: \\( 3 \\times 2 \\,^{\\circ}\\text{F} = 6 \\,^{\\circ}\\text{F} \\).  \n   - Final temperature: \\( 55 - 6 = 49 \\,^{\\circ}\\text{F} \\).  \n\n**Answer:** The house's final temperature is \\boxed{49} degrees.",
+            "refusal": null,
+            "reasoning": "Okay, let's see. Marcus wakes up to a house that's 40 degrees. He bakes for 3 hours, and each hour the oven raises the temperature by 5 degrees. Then he opens a window for 30 minutes, and during that time, the house cools down 2 degrees every 10 minutes. I need to figure out the final temperature.\n\nFirst, starting temperature is 40 degrees. The baking part: the oven is on for 3 hours, and each hour it adds 5 degrees. So, per hour increase is 5, so over 3 hours, that's 3 multiplied by 5. Let me calculate that: 3 * 5 = 15 degrees. So the temperature goes up by 15 degrees from the initial 40. So after baking, the temperature would be 40 + 15 = 55 degrees. Wait, is that right? Let me check again. Each hour adds 5, so first hour 40+5=45, second hour 45+5=50, third hour 50+5=55. Yep, that's correct. So after baking, it's 55 degrees.\n\nThen he opens the window for 30 minutes. The cooling rate is 2 degrees every 10 minutes. Hmm, so first, how many 10-minute intervals are in 30 minutes? That's 30 divided by 10, which is 3. So each 10 minutes, it cools 2 degrees, so 3 intervals would be 3 * 2 = 6 degrees total decrease. So subtracting that from the 55 degrees. 55 - 6 = 49 degrees. Wait, but let me make sure I didn't mix up the time. The window is open for 30 minutes total. So every 10 minutes, 2 degrees down. So first 10 minutes: -2, next 10: another -2, and the last 10: another -2. So total of 6 degrees. So yes, 55 -6 is 49. \n\nBut hold on, is there any chance that the cooling happens continuously or in steps? The problem says \"cools down 2 degrees for every 10 minutes the window is open.\" So it's a rate, but phrased as per 10 minutes. So for 30 minutes, it's 3 times that 2 degrees. So yeah, 6 degrees total. So final temp is 55 -6 = 49. \n\nWait, but let me check if the oven is the only source of heat. The problem says \"every hour the oven is on it raises the house's temperature by 5 degrees.\" So during the 3 hours of baking, the oven is on the entire time, right? So each hour, regardless of previous, adds 5. So that part is straightforward. \n\nThen after baking, he opens the window. The problem doesn't mention the oven being off during that time, but since he's done baking, maybe the oven is turned off? But the problem doesn't specify any further temperature changes from the oven after the 3 hours. So we can assume that after the 3 hours of baking, the oven is off, and the only temperature change is from opening the window. So the cooling is only during the 30 minutes the window is open. \n\nTherefore, the calculation should be correct: 40 + (3*5) - (3*2) = 40 +15 -6 = 49. So the final temperature is 49 degrees. \n\nBut let me just go step by step again to be thorough. Starting at 40. \n\nBaking duration: 3 hours. Each hour +5. So 3*5=15. 40+15=55. Correct. \n\nThen window open for 30 minutes. Cooling rate: 2 degrees per 10 minutes. So per minute, that's 2/10 = 0.2 degrees per minute. But since it's given in 10-minute increments, maybe it's better to calculate in chunks. 30 minutes divided by 10 is 3 chunks. Each chunk is -2, so total -6. So 55-6=49. \n\nAlternatively, 30 minutes times (2 degrees /10 minutes) = 30*(2/10)= 6 degrees decrease. Same result. \n\nSo yes, the final temperature should be 49 degrees. I don't see any other factors mentioned. The problem doesn't say anything about the oven continuing to heat after baking, or other sources of heat or cooling. So I think that's the answer.\n",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "Okay, let's see. Marcus wakes up to a house that's 40 degrees. He bakes for 3 hours, and each hour the oven raises the temperature by 5 degrees. Then he opens a window for 30 minutes, and during that time, the house cools down 2 degrees every 10 minutes. I need to figure out the final temperature.\n\nFirst, starting temperature is 40 degrees. The baking part: the oven is on for 3 hours, and each hour it adds 5 degrees. So, per hour increase is 5, so over 3 hours, that's 3 multiplied by 5. Let me calculate that: 3 * 5 = 15 degrees. So the temperature goes up by 15 degrees from the initial 40. So after baking, the temperature would be 40 + 15 = 55 degrees. Wait, is that right? Let me check again. Each hour adds 5, so first hour 40+5=45, second hour 45+5=50, third hour 50+5=55. Yep, that's correct. So after baking, it's 55 degrees.\n\nThen he opens the window for 30 minutes. The cooling rate is 2 degrees every 10 minutes. Hmm, so first, how many 10-minute intervals are in 30 minutes? That's 30 divided by 10, which is 3. So each 10 minutes, it cools 2 degrees, so 3 intervals would be 3 * 2 = 6 degrees total decrease. So subtracting that from the 55 degrees. 55 - 6 = 49 degrees. Wait, but let me make sure I didn't mix up the time. The window is open for 30 minutes total. So every 10 minutes, 2 degrees down. So first 10 minutes: -2, next 10: another -2, and the last 10: another -2. So total of 6 degrees. So yes, 55 -6 is 49. \n\nBut hold on, is there any chance that the cooling happens continuously or in steps? The problem says \"cools down 2 degrees for every 10 minutes the window is open.\" So it's a rate, but phrased as per 10 minutes. So for 30 minutes, it's 3 times that 2 degrees. So yeah, 6 degrees total. So final temp is 55 -6 = 49. \n\nWait, but let me check if the oven is the only source of heat. The problem says \"every hour the oven is on it raises the house's temperature by 5 degrees.\" So during the 3 hours of baking, the oven is on the entire time, right? So each hour, regardless of previous, adds 5. So that part is straightforward. \n\nThen after baking, he opens the window. The problem doesn't mention the oven being off during that time, but since he's done baking, maybe the oven is turned off? But the problem doesn't specify any further temperature changes from the oven after the 3 hours. So we can assume that after the 3 hours of baking, the oven is off, and the only temperature change is from opening the window. So the cooling is only during the 30 minutes the window is open. \n\nTherefore, the calculation should be correct: 40 + (3*5) - (3*2) = 40 +15 -6 = 49. So the final temperature is 49 degrees. \n\nBut let me just go step by step again to be thorough. Starting at 40. \n\nBaking duration: 3 hours. Each hour +5. So 3*5=15. 40+15=55. Correct. \n\nThen window open for 30 minutes. Cooling rate: 2 degrees per 10 minutes. So per minute, that's 2/10 = 0.2 degrees per minute. But since it's given in 10-minute increments, maybe it's better to calculate in chunks. 30 minutes divided by 10 is 3 chunks. Each chunk is -2, so total -6. So 55-6=49. \n\nAlternatively, 30 minutes times (2 degrees /10 minutes) = 30*(2/10)= 6 degrees decrease. Same result. \n\nSo yes, the final temperature should be 49 degrees. I don't see any other factors mentioned. The problem doesn't say anything about the oven continuing to heat after baking, or other sources of heat or cooling. So I think that's the answer.\n"
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 124,
+        "completion_tokens": 1207,
+        "total_tokens": 1331,
+        "cost": 0.0006221,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0006221,
+          "upstream_inference_prompt_cost": 1.86e-05,
+          "upstream_inference_completions_cost": 0.0006035
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 876,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 8.038280010223389
+  },
+  "retry_count": 0
+}

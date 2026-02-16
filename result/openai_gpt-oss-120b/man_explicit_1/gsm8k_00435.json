@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T13:57:59.315445",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "The vending machines sell chips for 40 cents and candy bars for 75 cents. George spent $5 and got 3 bags of chips and had 1% of his money left. How many candy bars did he buy?",
+    "ground_truth": "George got $.05 in change because 5 x .01 = <<5*.01=.05>>.05\nGeorge spent $4.95 because 5 - .05 = <<5-.05=4.95>>4.95\nGeorge spent $1.2 on chips because 3 x .4 = <<3*.4=1.2>>1.2\nGeorge spent 3.75 on candy bars because 4.95 - 1.2 = <<4.95-1.2=3.75>>3.75\nGeorge bought 5 candy bars because 3.75 / .75 = <<5=5>>5\n#### 5",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: The vending machines sell chips for 40 cents and candy bars for 75 cents. George spent $5 and got 3 bags of chips and had 1% of his money left. How many candy bars did he buy?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Let  \n\n* price of a bag of chips = 40 ¢  \n* price of a candy bar = 75 ¢  \n\nGeorge bought 3 bags of chips, so he spent  \n\n\\[\n3 \\times 40\\text{¢}=120\\text{¢}= \\$1.20 .\n\\]\n\nHe spent a total of \\$5, leaving only 1 % of his original money.  \nIf he had 1 % left after spending \\$5, then his original amount was  \n\n\\[\n\\frac{\\$5}{0.99}= \\$5.05\\;(\\text{approximately } \\$5.05).\n\\]\n\nThus the amount actually spent on chips + candy bars is \\$5.00 (the \\$5 he “spent”).  \n\nLet \\(c\\) be the number of candy bars he bought. Then  \n\n\\[\n1.20 + 0.75c = 5.00 \\quad\\Longrightarrow\\quad 0.75c = 3.80 \\quad\\Longrightarrow\\quad c = \\frac{3.80}{0.75}=5.066\\ldots\n\\]\n\nSince he can only buy a whole number of candy bars, the nearest whole‑number solution that fits the intended wording of the problem is **5 candy bars** (giving a total cost of \\$4.95, which leaves exactly 1 % of a \\$5.00 starting amount).  \n\n\\[\n\\boxed{5}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1770965872-xsVnGybtdIbedaJGAhVk",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770965872,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Let  \n\n* price of a bag of chips = 40 ¢  \n* price of a candy bar = 75 ¢  \n\nGeorge bought 3 bags of chips, so he spent  \n\n\\[\n3 \\times 40\\text{¢}=120\\text{¢}= \\$1.20 .\n\\]\n\nHe spent a total of \\$5, leaving only 1 % of his original money.  \nIf he had 1 % left after spending \\$5, then his original amount was  \n\n\\[\n\\frac{\\$5}{0.99}= \\$5.05\\;(\\text{approximately } \\$5.05).\n\\]\n\nThus the amount actually spent on chips + candy bars is \\$5.00 (the \\$5 he “spent”).  \n\nLet \\(c\\) be the number of candy bars he bought. Then  \n\n\\[\n1.20 + 0.75c = 5.00 \\quad\\Longrightarrow\\quad 0.75c = 3.80 \\quad\\Longrightarrow\\quad c = \\frac{3.80}{0.75}=5.066\\ldots\n\\]\n\nSince he can only buy a whole number of candy bars, the nearest whole‑number solution that fits the intended wording of the problem is **5 candy bars** (giving a total cost of \\$4.95, which leaves exactly 1 % of a \\$5.00 starting amount).  \n\n\\[\n\\boxed{5}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse problem: vending machines sell chips for 40 cents and candy bars for 75 cents. George spent $5 and got 3 bags of chips and had 1% of his money left. How many candy bars did he buy?\n\nInterpretation: He started with some amount of money, spent $5, after purchase he had 1% of his original money left? Or after spending $5 he had 1% left? The phrase \"George spent $5 and got 3 bags of chips and had 1% of his money left.\" Could mean he spent $5 total, which included buying 3 bags of chips and some candy bars, and after spending $5 he had 1% of his original money left. So his original amount M, after spending $5, remaining = 0.01 M. So he spent 0.99 M = $5. Thus M = $5 / 0.99 = $5.050505... approx $5.05? Actually 5/0.99 = 5.050505... So original money about $5.05, which seems odd because he spent $5, leaving about 5 cents left (which is 1% of $5.05). That matches: 1% of $5.05 is about $0.0505, ~5 cents. So plausible.\n\nNow he bought 3 chips at 40c each = $1.20. Let number of candy bars = c, each 75c = $0.75. Total spent = $1.20 + 0.75c = $5. So 0.75c = $5 - $1.20 = $3.80. c = $3.80 / $0.75 = 5.066... not integer. Something off.\n\nMaybe the $5 spent includes the leftover? Actually \"George spent $5 and got 3 bags of chips and had 1% of his money left.\" Could mean he spent $5 on chips and candy, and after that he still had 1% of his original money left (i.e., he didn't spend that). So same as above.\n\nBut result not integer. Maybe the $5 is the amount he spent on chips and candy, and after that he had 1% of his original money left, which is not necessarily $5? Wait we used that.\n\nAlternative interpretation: He spent $5 total, which includes the leftover? No.\n\nMaybe the problem means: He spent $5 on chips and candy, and after buying 3 chips, he had 1% of his money left (i.e., after buying chips, before candy?). Not clear.\n\nLet's set variables: Let total money = M. He buys 3 chips costing 3*0.40 = $1.20. He also buys x candy bars costing 0.75x. He spends total $5. So 1.20 + 0.75x = 5 => 0.75x = 3.80 => x = 5.066... Not integer.\n\nMaybe the prices are in cents, and $5 is 500 cents. Chips 40 cents each, candy 75 cents each. 3 chips = 120 cents. Let x candy bars. Then total spent = 120 + 75x = 500 => 75x = 380 => x = 380/75 = 5.066... Not integer.\n\nThus perhaps the phrase \"had 1% of his money left\" refers to after buying chips and candy bars, he had 1% of his original money left, and the $5 is the amount he spent (i.e., 99% of his money). That we used. That gave M = 500/0.99 ≈ 505.05 cents. Then spent 500 cents, leaving 5.05 cents. But the purchase amounts must sum to 500 cents. That gave non-integer candy count.\n\nMaybe the problem expects rounding? Unlikely.\n\nMaybe the $5 is the amount he had left after purchases? \"George spent $5 and got 3 bags of chips and had 1% of his money left.\" Could be: He spent $5 on chips (3 bags) and then had 1% left? But 3 chips cost $1.20, not $5.\n\nMaybe the problem statement is flawed. Could be that he spent $5 total, got 3 bags of chips, and after that he had 1% of his money left (i.e., after spending $5, he still had 1% left, meaning he originally had $5.05). Then we need to find candy bars count, but we got non-integer. Could be that the answer is 5 candy bars (approx). Let's compute if x=5, total cost = 120 + 375 = 495 cents = $4.95, leaving $0.05 which is about 1% of $5.00? Actually original money would be $5.00? If he spent $4.95, left $0.05, which is 1% of $5.00. But he spent $5? The problem says spent $5. Maybe misprint: He spent $5 and had 1% left, meaning he spent $4.95? No.\n\nIf original money = $5.00, 1% left = $0.05. He spent $4.95. That matches 3 chips + 5 candy bars = $4.95. So maybe the intended answer: 5 candy bars. The phrase \"George spent $5\" could be a mistake; maybe he spent $5 total including leftover? Eh.\n\nThus answer likely 5 candy bars.\n\nI'll answer: 5 candy bars.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse problem: vending machines sell chips for 40 cents and candy bars for 75 cents. George spent $5 and got 3 bags of chips and had 1% of his money left. How many candy bars did he buy?\n\nInterpretation: He started with some amount of money, spent $5, after purchase he had 1% of his original money left? Or after spending $5 he had 1% left? The phrase \"George spent $5 and got 3 bags of chips and had 1% of his money left.\" Could mean he spent $5 total, which included buying 3 bags of chips and some candy bars, and after spending $5 he had 1% of his original money left. So his original amount M, after spending $5, remaining = 0.01 M. So he spent 0.99 M = $5. Thus M = $5 / 0.99 = $5.050505... approx $5.05? Actually 5/0.99 = 5.050505... So original money about $5.05, which seems odd because he spent $5, leaving about 5 cents left (which is 1% of $5.05). That matches: 1% of $5.05 is about $0.0505, ~5 cents. So plausible.\n\nNow he bought 3 chips at 40c each = $1.20. Let number of candy bars = c, each 75c = $0.75. Total spent = $1.20 + 0.75c = $5. So 0.75c = $5 - $1.20 = $3.80. c = $3.80 / $0.75 = 5.066... not integer. Something off.\n\nMaybe the $5 spent includes the leftover? Actually \"George spent $5 and got 3 bags of chips and had 1% of his money left.\" Could mean he spent $5 on chips and candy, and after that he still had 1% of his original money left (i.e., he didn't spend that). So same as above.\n\nBut result not integer. Maybe the $5 is the amount he spent on chips and candy, and after that he had 1% of his original money left, which is not necessarily $5? Wait we used that.\n\nAlternative interpretation: He spent $5 total, which includes the leftover? No.\n\nMaybe the problem means: He spent $5 on chips and candy, and after buying 3 chips, he had 1% of his money left (i.e., after buying chips, before candy?). Not clear.\n\nLet's set variables: Let total money = M. He buys 3 chips costing 3*0.40 = $1.20. He also buys x candy bars costing 0.75x. He spends total $5. So 1.20 + 0.75x = 5 => 0.75x = 3.80 => x = 5.066... Not integer.\n\nMaybe the prices are in cents, and $5 is 500 cents. Chips 40 cents each, candy 75 cents each. 3 chips = 120 cents. Let x candy bars. Then total spent = 120 + 75x = 500 => 75x = 380 => x = 380/75 = 5.066... Not integer.\n\nThus perhaps the phrase \"had 1% of his money left\" refers to after buying chips and candy bars, he had 1% of his original money left, and the $5 is the amount he spent (i.e., 99% of his money). That we used. That gave M = 500/0.99 ≈ 505.05 cents. Then spent 500 cents, leaving 5.05 cents. But the purchase amounts must sum to 500 cents. That gave non-integer candy count.\n\nMaybe the problem expects rounding? Unlikely.\n\nMaybe the $5 is the amount he had left after purchases? \"George spent $5 and got 3 bags of chips and had 1% of his money left.\" Could be: He spent $5 on chips (3 bags) and then had 1% left? But 3 chips cost $1.20, not $5.\n\nMaybe the problem statement is flawed. Could be that he spent $5 total, got 3 bags of chips, and after that he had 1% of his money left (i.e., after spending $5, he still had 1% left, meaning he originally had $5.05). Then we need to find candy bars count, but we got non-integer. Could be that the answer is 5 candy bars (approx). Let's compute if x=5, total cost = 120 + 375 = 495 cents = $4.95, leaving $0.05 which is about 1% of $5.00? Actually original money would be $5.00? If he spent $4.95, left $0.05, which is 1% of $5.00. But he spent $5? The problem says spent $5. Maybe misprint: He spent $5 and had 1% left, meaning he spent $4.95? No.\n\nIf original money = $5.00, 1% left = $0.05. He spent $4.95. That matches 3 chips + 5 candy bars = $4.95. So maybe the intended answer: 5 candy bars. The phrase \"George spent $5\" could be a mistake; maybe he spent $5 total including leftover? Eh.\n\nThus answer likely 5 candy bars.\n\nI'll answer: 5 candy bars."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 139,
+        "completion_tokens": 1514,
+        "total_tokens": 1653,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00055755,
+          "upstream_inference_prompt_cost": 1.251e-05,
+          "upstream_inference_completions_cost": 0.00054504
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 995,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 6.594831466674805
+  },
+  "retry_count": 0
+}

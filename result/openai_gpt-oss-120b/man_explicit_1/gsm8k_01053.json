@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:24:54.316025",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Romeo boards a train with 120 people. At the first stop, 20 more people board the train. At the second stop, 50 people descended from the train while twice that number boarded the train. If 80 more people descended at the third station, calculate the total number of people on the train at the final stop.",
+    "ground_truth": "After the first stop, 120+20 = <<120+20=140>>140 were on the train.\nAt the second stop, 140 - 50 = <<140-50=90>>90 people remain when 50 descended.\nHowever, 50*2 = <<50*2=100>>100 more people boarded the train.\nAfter the second stop, the total number of people was 90+100 =<<90+100=190>>190\nAt the third stop, the number of people on the train decreased to 190-80 = <<190-80=110>>110 who reached the final stop.\n#### 110",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Romeo boards a train with 120 people. At the first stop, 20 more people board the train. At the second stop, 50 people descended from the train while twice that number boarded the train. If 80 more people descended at the third station, calculate the total number of people on the train at the final stop.\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The train ends up with **110 people** on board at the final stop.",
+    "raw_api_response": {
+      "id": "gen-1770967490-Vtx9miP1JJZbNLqOORUy",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770967490,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The train ends up with **110 people** on board at the final stop.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Initially Romeo boards a train with 120 people. So total initial = 120? Actually \"Romeo boards a train with 120 people.\" Means there are 120 people on the train when Romeo boards? Or including Romeo? Usually \"with 120 people\" means there are 120 people already on board, then Romeo boards making 121? But ambiguous. Let's assume total initial = 120 (including Romeo). The phrase \"Romeo boards a train with 120 people.\" Could be interpreted as the train already has 120 people, and Romeo boards, making 121. But typical word problems: \"Romeo boards a train with 120 people.\" Means there are 120 people on the train, including Romeo? Actually \"with 120 people\" could be \"the train has 120 people on it\". Then Romeo boards, making 121. However, they might intend that the initial count is 120 (including Romeo). Let's test both.\n\nStep 1: initial = 120 (including Romeo). At first stop, 20 more board: total = 140.\n\nSecond stop: 50 descend, then twice that number (100) board. So net change = -50 + 100 = +50. So total = 140 + 50 = 190.\n\nThird stop: 80 descend. So total = 190 - 80 = 110.\n\nAnswer = 110.\n\nIf initial = 120 not including Romeo, then initial after Romeo boards = 121. Then first stop: +20 = 141. Second stop: -50 +100 = +50 => 191. Third stop: -80 => 111. Answer = 111.\n\nWhich is more likely? Many such problems treat the initial number as the total on board, not counting the person boarding. But phrase \"Romeo boards a train with 120 people\" suggests there are 120 people on the train when he boards, so after he boards there are 121. However typical math problems often ignore that nuance and just treat initial as 120 total. I'd answer 110, but could note both possibilities.\n\nI'll give answer 110.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Initially Romeo boards a train with 120 people. So total initial = 120? Actually \"Romeo boards a train with 120 people.\" Means there are 120 people on the train when Romeo boards? Or including Romeo? Usually \"with 120 people\" means there are 120 people already on board, then Romeo boards making 121? But ambiguous. Let's assume total initial = 120 (including Romeo). The phrase \"Romeo boards a train with 120 people.\" Could be interpreted as the train already has 120 people, and Romeo boards, making 121. But typical word problems: \"Romeo boards a train with 120 people.\" Means there are 120 people on the train, including Romeo? Actually \"with 120 people\" could be \"the train has 120 people on it\". Then Romeo boards, making 121. However, they might intend that the initial count is 120 (including Romeo). Let's test both.\n\nStep 1: initial = 120 (including Romeo). At first stop, 20 more board: total = 140.\n\nSecond stop: 50 descend, then twice that number (100) board. So net change = -50 + 100 = +50. So total = 140 + 50 = 190.\n\nThird stop: 80 descend. So total = 190 - 80 = 110.\n\nAnswer = 110.\n\nIf initial = 120 not including Romeo, then initial after Romeo boards = 121. Then first stop: +20 = 141. Second stop: -50 +100 = +50 => 191. Third stop: -80 => 111. Answer = 111.\n\nWhich is more likely? Many such problems treat the initial number as the total on board, not counting the person boarding. But phrase \"Romeo boards a train with 120 people\" suggests there are 120 people on the train when he boards, so after he boards there are 121. However typical math problems often ignore that nuance and just treat initial as 120 total. I'd answer 110, but could note both possibilities.\n\nI'll give answer 110."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 160,
+        "completion_tokens": 466,
+        "total_tokens": 626,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00018216,
+          "upstream_inference_prompt_cost": 1.44e-05,
+          "upstream_inference_completions_cost": 0.00016776
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 446,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 3.3168444633483887
+  },
+  "retry_count": 0
+}

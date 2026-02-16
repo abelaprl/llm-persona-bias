@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:01:02.109443",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Steve is 60 years old. His wife is 4 years older than him. Their son is currently half as old as his mom and their son's wife is 3 years younger than her husband. How old is Steve's son's wife?",
+    "ground_truth": "Steve's wife is 60+4=<<60+4=64>>64 years old.\nSteve's son is 64/2=<<64/2=32>>32 years old.\nHis wife is 32-3=<<32-3=29>>29 years old.\n#### 29",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Steve is 60 years old. His wife is 4 years older than him. Their son is currently half as old as his mom and their son's wife is 3 years younger than her husband. How old is Steve's son's wife?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Steve’s son is 32 years old (half of his mom’s 64 years).  \nThe son’s wife is 3 years younger than her husband, so she is 32 – 3 = **29 years old**.",
+    "raw_api_response": {
+      "id": "gen-1770966060-TNVicGZfi4jv7EGnXXQX",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770966060,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Steve’s son is 32 years old (half of his mom’s 64 years).  \nThe son’s wife is 3 years younger than her husband, so she is 32 – 3 = **29 years old**.",
+            "refusal": null,
+            "reasoning": "We need to parse the puzzle. Steve is 60. Wife is 4 years older than him, so wife is 64. Their son is currently half as old as his mom. Mom is 64, half is 32. So son is 32. Son's wife is 3 years younger than her husband. Husband is son, 32. So wife is 29. So answer: 29. But check: \"their son's wife\" refers to son's wife. So answer: 29. Provide answer.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the puzzle. Steve is 60. Wife is 4 years older than him, so wife is 64. Their son is currently half as old as his mom. Mom is 64, half is 32. So son is 32. Son's wife is 3 years younger than her husband. Husband is son, 32. So wife is 29. So answer: 29. But check: \"their son's wife\" refers to son's wife. So answer: 29. Provide answer."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 141,
+        "completion_tokens": 171,
+        "total_tokens": 312,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 88,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 5.262e-05,
+          "upstream_inference_prompt_cost": 9.87e-06,
+          "upstream_inference_completions_cost": 4.275e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 89,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 1.2813632488250732
+  },
+  "retry_count": 0
+}

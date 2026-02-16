@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T13:48:26.869377",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Brinley is in Mr. Bert's math class. Mr. Bert gives six tests each semester. He allows the students to remove the lowest score from the average each semester. If Brinley has scores of 89, 71, 92, 100 and 86 on the first five tests, what score does she need on the sixth test to get an average of 93?",
+    "ground_truth": "First, identify the lowest score, which is 71, and remove it.\nSince Brinley wants a score of 93, we know her total score needs to be 93 (average) * 5 (tests) = <<93*5=465>>465 points\nSo far, Brinley has earned 89 + 92 +100 + 86 = <<89+92+100+86=367>>367 points\nThe final test must be 465 - 367 = <<465-367=98>>98 points.\n#### 98",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Brinley is in Mr. Bert's math class. Mr. Bert gives six tests each semester. He allows the students to remove the lowest score from the average each semester. If Brinley has scores of 89, 71, 92, 100 and 86 on the first five tests, what score does she need on the sixth test to get an average of 93?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "To get a 93 average after dropping the lowest score, the sum of the five highest scores must be  \n\n\\[\n5 \\times 93 = 465 .\n\\]\n\nLet the sixth test score be \\(x\\).  \nThe six scores are \\(89, 71, 92, 100, 86,\\) and \\(x\\).\n\nThe total of all six scores is  \n\n\\[\n89 + 71 + 92 + 100 + 86 + x = 438 + x .\n\\]\n\nThe lowest score will be 71 unless \\(x\\) is lower than 71.  \nIf \\(x \\ge 71\\), the lowest score is 71, so\n\n\\[\n(438 + x) - 71 = 465 \\quad\\Longrightarrow\\quad x = 98 .\n\\]\n\nIf \\(x < 71\\), the lowest score would be \\(x\\) itself, giving  \n\n\\[\n(438 + x) - x = 438 \\neq 465,\n\\]\n\nwhich cannot satisfy the required average.\n\nThus the only feasible value is  \n\n\\[\n\\boxed{98}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1770965303-FcvMiBKKpR8azHhM5eLd",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770965303,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "To get a 93 average after dropping the lowest score, the sum of the five highest scores must be  \n\n\\[\n5 \\times 93 = 465 .\n\\]\n\nLet the sixth test score be \\(x\\).  \nThe six scores are \\(89, 71, 92, 100, 86,\\) and \\(x\\).\n\nThe total of all six scores is  \n\n\\[\n89 + 71 + 92 + 100 + 86 + x = 438 + x .\n\\]\n\nThe lowest score will be 71 unless \\(x\\) is lower than 71.  \nIf \\(x \\ge 71\\), the lowest score is 71, so\n\n\\[\n(438 + x) - 71 = 465 \\quad\\Longrightarrow\\quad x = 98 .\n\\]\n\nIf \\(x < 71\\), the lowest score would be \\(x\\) itself, giving  \n\n\\[\n(438 + x) - x = 438 \\neq 465,\n\\]\n\nwhich cannot satisfy the required average.\n\nThus the only feasible value is  \n\n\\[\n\\boxed{98}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to compute needed sixth test score such that after dropping lowest score, average of remaining five scores is 93. There are six tests total. He allows to remove the lowest score from the average each semester. So we drop the lowest of the six scores, then average the remaining five. Brinley's first five scores: 89,71,92,100,86. Let sixth be x. Then we have six scores: 89,71,92,100,86,x. Drop the lowest. The lowest among these could be 71 unless x is lower. We need to consider that the lowest will be min(71, x). To achieve average 93 of the remaining five scores, sum of the five highest scores must be 5*93 = 465. So sum of all six scores minus the lowest = 465. Let total sum = 89+71+92+100+86 + x = (89+71=160; +92=252; +100=352; +86=438) + x = 438 + x. Then subtract lowest L = min(71, x). So (438 + x) - L = 465. So 438 + x - L = 465 => x - L = 27. So we need x - L = 27.\n\nCase 1: If x >=71, then L=71. Then x - 71 =27 => x = 98. Since 98 >=71, consistent. So x=98 works.\n\nCase 2: If x <71, then L = x. Then x - x =0, not 27, impossible. So x must be >=71. So answer: 98.\n\nThus she needs 98 on sixth test.\n\nAnswer: 98.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to compute needed sixth test score such that after dropping lowest score, average of remaining five scores is 93. There are six tests total. He allows to remove the lowest score from the average each semester. So we drop the lowest of the six scores, then average the remaining five. Brinley's first five scores: 89,71,92,100,86. Let sixth be x. Then we have six scores: 89,71,92,100,86,x. Drop the lowest. The lowest among these could be 71 unless x is lower. We need to consider that the lowest will be min(71, x). To achieve average 93 of the remaining five scores, sum of the five highest scores must be 5*93 = 465. So sum of all six scores minus the lowest = 465. Let total sum = 89+71+92+100+86 + x = (89+71=160; +92=252; +100=352; +86=438) + x = 438 + x. Then subtract lowest L = min(71, x). So (438 + x) - L = 465. So 438 + x - L = 465 => x - L = 27. So we need x - L = 27.\n\nCase 1: If x >=71, then L=71. Then x - 71 =27 => x = 98. Since 98 >=71, consistent. So x=98 works.\n\nCase 2: If x <71, then L = x. Then x - x =0, not 27, impossible. So x must be >=71. So answer: 98.\n\nThus she needs 98 on sixth test.\n\nAnswer: 98."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 173,
+        "completion_tokens": 606,
+        "total_tokens": 779,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00023373,
+          "upstream_inference_prompt_cost": 1.557e-05,
+          "upstream_inference_completions_cost": 0.00021816
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 290,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.480574131011963
+  },
+  "retry_count": 0
+}

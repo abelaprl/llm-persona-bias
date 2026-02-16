@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T13:58:18.594046",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "When Marcus wakes up, his house is 40 degrees. He spends 3 hours baking, and every hour the oven is on it raises the house's temperature by 5 degrees. Then Marcus opens a window for 30 minutes, and the house cools down 2 degrees for every 10 minutes the window is open. What is the house's final temperature?",
+    "ground_truth": "First find the total temperature increase from the oven: 3 hours * 5 degrees/hour = <<3*5=15>>15 degrees\nThen add that amount to the starting temperature: 15 degrees + 40 degrees = <<15+40=55>>55 degrees\nThen divide the time the window is open by 10 minutes to find how many 2-degree temperature decreases there are: 30 minutes / 10 minutes = <<30/10=3>>3\nThen multiply the number of decreases by the amount of each decrease: 3 * 2 degrees = <<3*2=6>>6 degrees\nThen subtract that amount from the house's temperature after baking to find the final temperature: 55 degrees - 6 degrees = <<55-6=49>>49 degrees\n#### 49",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: When Marcus wakes up, his house is 40 degrees. He spends 3 hours baking, and every hour the oven is on it raises the house's temperature by 5 degrees. Then Marcus opens a window for 30 minutes, and the house cools down 2 degrees for every 10 minutes the window is open. What is the house's final temperature?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The house starts at \\(40^\\circ\\).\n\n- Baking for 3 hours raises the temperature by \\(3 \\times 5 = 15^\\circ\\).  \n  \\(40^\\circ + 15^\\circ = 55^\\circ\\).\n\n- Opening the window for 30 minutes (three 10‑minute intervals) cools it by \\(3 \\times 2 = 6^\\circ\\).  \n  \\(55^\\circ - 6^\\circ = 49^\\circ\\).\n\n**Final temperature: 49 degrees.**",
+    "raw_api_response": {
+      "id": "gen-1770965896-MvPlcJx0fyT5UMb2DRGY",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770965896,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The house starts at \\(40^\\circ\\).\n\n- Baking for 3 hours raises the temperature by \\(3 \\times 5 = 15^\\circ\\).  \n  \\(40^\\circ + 15^\\circ = 55^\\circ\\).\n\n- Opening the window for 30 minutes (three 10‑minute intervals) cools it by \\(3 \\times 2 = 6^\\circ\\).  \n  \\(55^\\circ - 6^\\circ = 49^\\circ\\).\n\n**Final temperature: 49 degrees.**",
+            "refusal": null,
+            "reasoning": "We need to compute final temperature. Starting at 40 degrees. He spends 3 hours baking, each hour raises by 5 degrees, so increase = 3*5 = 15 degrees. So after baking: 40+15 = 55 degrees.\n\nThen opens window for 30 minutes. Cooling rate: 2 degrees per 10 minutes. 30 minutes = 3 * 10 minutes, so cooling = 3*2 = 6 degrees. So final temperature = 55 - 6 = 49 degrees.\n\nThus answer: 49 degrees.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to compute final temperature. Starting at 40 degrees. He spends 3 hours baking, each hour raises by 5 degrees, so increase = 3*5 = 15 degrees. So after baking: 40+15 = 55 degrees.\n\nThen opens window for 30 minutes. Cooling rate: 2 degrees per 10 minutes. 30 minutes = 3 * 10 minutes, so cooling = 3*2 = 6 degrees. So final temperature = 55 - 6 = 49 degrees.\n\nThus answer: 49 degrees."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 167,
+        "completion_tokens": 240,
+        "total_tokens": 407,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00010143,
+          "upstream_inference_prompt_cost": 1.503e-05,
+          "upstream_inference_completions_cost": 8.64e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 101,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 1.462348222732544
+  },
+  "retry_count": 0
+}

@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:26:47.385507",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Mary and John got married last weekend.  There were 20 private cars and 12 buses parked outside the church.  After the ceremony, each bus carried 35 people and each car carried 3 people. How many people were inside the church?",
+    "ground_truth": "There were 20 private cars * 3 people = <<20*3=60>>60 people.\nThere were 12 buses * 35 people = <<12*35=420>>420 people.\nTotal inside the church was 60 people + 420 people = <<60+420=480>>480 people.\n#### 480",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Mary and John got married last weekend.  There were 20 private cars and 12 buses parked outside the church.  After the ceremony, each bus carried 35 people and each car carried 3 people. How many people were inside the church?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The total number of people who left the church in the vehicles is the sum of the people in all the buses plus the people in all the cars.\n\n- Buses: \\(12 \\text{ buses} \\times 35 \\text{ people per bus} = 420\\) people  \n- Cars: \\(20 \\text{ cars} \\times 3 \\text{ people per car} = 60\\) people  \n\nAdding them together:\n\n\\[\n420 + 60 = 480\n\\]\n\nSo there were **480 people** inside the church.",
+    "raw_api_response": {
+      "id": "gen-1770967604-N4fTn5FgTCbI1fhMSojU",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770967604,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The total number of people who left the church in the vehicles is the sum of the people in all the buses plus the people in all the cars.\n\n- Buses: \\(12 \\text{ buses} \\times 35 \\text{ people per bus} = 420\\) people  \n- Cars: \\(20 \\text{ cars} \\times 3 \\text{ people per car} = 60\\) people  \n\nAdding them together:\n\n\\[\n420 + 60 = 480\n\\]\n\nSo there were **480 people** inside the church.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Mary and John got married. There were 20 private cars and 12 buses parked outside the church. After the ceremony, each bus carried 35 people and each car carried 3 people. How many people were inside the church? So total people = people in cars + people in buses? Actually after ceremony, each bus carried 35 people and each car carried 3 people. That suggests that after ceremony, people left the church and got into vehicles. So the number of people inside the church before they left equals total capacity of vehicles? Or maybe the vehicles were used to transport guests after ceremony, so the total number of guests equals number of people in vehicles. So compute: 12 buses * 35 = 420. 20 cars * 3 = 60. Total = 480. So answer: 480 people were inside the church.\n\nCheck if any nuance: Could there be Mary and John themselves? They are also inside church. But they would be counted among the guests? Usually they'd be included. The problem likely expects 480.\n\nThus answer: 480.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Mary and John got married. There were 20 private cars and 12 buses parked outside the church. After the ceremony, each bus carried 35 people and each car carried 3 people. How many people were inside the church? So total people = people in cars + people in buses? Actually after ceremony, each bus carried 35 people and each car carried 3 people. That suggests that after ceremony, people left the church and got into vehicles. So the number of people inside the church before they left equals total capacity of vehicles? Or maybe the vehicles were used to transport guests after ceremony, so the total number of guests equals number of people in vehicles. So compute: 12 buses * 35 = 420. 20 cars * 3 = 60. Total = 480. So answer: 480 people were inside the church.\n\nCheck if any nuance: Could there be Mary and John themselves? They are also inside church. But they would be counted among the guests? Usually they'd be included. The problem likely expects 480.\n\nThus answer: 480."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 144,
+        "completion_tokens": 350,
+        "total_tokens": 494,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00013896,
+          "upstream_inference_prompt_cost": 1.296e-05,
+          "upstream_inference_completions_cost": 0.000126
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 256,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.0057804584503174
+  },
+  "retry_count": 0
+}

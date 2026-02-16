@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "allenai_olmo-3-32b-think_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T16:49:02.124767",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "allenai/olmo-3-32b-think",
+      "model_name": "Allen AI: OLMo 3 32B Think",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Charlie is a tennis pro.  He spends most of the day teaching others lessons on how to improve their game.  His standard fee is $80 per hour for lessons, but he reduces his rate by 25% when he is giving lessons to a veteran.   If today Charlie has 4 1-hour lessons at his standard rate and 2 1-hour lessons with a veteran, what is the total amount of money he will make for the day, in dollars?",
+    "ground_truth": "4 1-hour lessons at his standard rate cost 4*$80=$<<4*80=320>>320.\nReducing the rate by 25% for veterans means he takes $80/4=$<<80/4=20>>20 off his standard fee.\nThus, for veterans, he charges the reduced rate of $80-$20=$<<80-20=60>>60 per hour,\nThus, 2 1-hour lessons with veterans cost 2*$60=$<<2*60=120>>120.\nAll together, Charlie will make $320+$120=$<<320+120=440>>440 for the day.\n#### 440",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Charlie is a tennis pro.  He spends most of the day teaching others lessons on how to improve their game.  His standard fee is $80 per hour for lessons, but he reduces his rate by 25% when he is giving lessons to a veteran.   If today Charlie has 4 1-hour lessons at his standard rate and 2 1-hour lessons with a veteran, what is the total amount of money he will make for the day, in dollars?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "allenai/olmo-3-32b-think"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Charlie earns $80 per hour for standard lessons and a discounted rate for veterans. The veteran rate is 75% of $80, calculated as:  \n$80 × 0.75 = $60 per hour.  \n\nFor 4 standard lessons:  \n4 hours × $80/hour = $320.  \n\nFor 2 veteran lessons:  \n2 hours × $60/hour = $120.  \n\nTotal earnings:  \n$320 + $120 = **$440**.  \n\n\\boxed{440}",
+    "raw_api_response": {
+      "id": "gen-1770976135-vty85ZE92eqqBKSMQRy8",
+      "provider": "Parasail",
+      "model": "allenai/olmo-3.1-32b-think",
+      "object": "chat.completion",
+      "created": 1770976136,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Charlie earns $80 per hour for standard lessons and a discounted rate for veterans. The veteran rate is 75% of $80, calculated as:  \n$80 × 0.75 = $60 per hour.  \n\nFor 4 standard lessons:  \n4 hours × $80/hour = $320.  \n\nFor 2 veteran lessons:  \n2 hours × $60/hour = $120.  \n\nTotal earnings:  \n$320 + $120 = **$440**.  \n\n\\boxed{440}",
+            "refusal": null,
+            "reasoning": "Okay, so Charlie is a tennis pro, right? The problem is asking how much money he makes in a day when he gives 4 regular lessons and 2 veteran lessons. Let me break this down step by step.\n\nFirst, his standard rate is $80 per hour. But for veterans, he reduces the rate by 25%. Hmm, reducing by 25% means the veteran rate is 75% of the standard rate, right? Because 100% minus 25% is 75%. So I need to calculate the discounted rate for veterans first.\n\nLet me compute the veteran rate. 25% of $80 is... well, 25% is a quarter, so a quarter of 80 is 20. So subtracting that from 80 gives 60. So the veteran rate is $60 per hour. Alternatively, 80 multiplied by 0.75 (since 75% is 0.75 in decimal) would be 80 * 0.75. Let me check that: 80 times 0.75. 80 times 0.7 is 56, and 80 times 0.05 is 4, so 56 + 4 = 60. Yep, same result. So that's correct.\n\nNow, he has 4 standard lessons. Each is $80, so 4 times 80. Let me calculate that. 4 times 80 is 320. So $320 from the regular lessons.\n\nThen he has 2 veteran lessons at $60 each. So 2 multiplied by 60 is 120. So $120 from the veterans.\n\nTo find the total, I need to add those two amounts together. 320 plus 120. That should be 440. Wait, 320 + 100 is 420, then plus 20 more is 440. So total is $440.\n\nLet me just make sure I didn't make any mistakes here. Let's verify each part again. \n\nStandard rate: $80. 4 hours: 4*80. 80*4 is indeed 320. Correct.\n\nVeteran discount: 25% off. So 80 - (25% of 80) = 80 - 20 = 60. So each veteran lesson is $60. 2 lessons would be 2*60 = 120. That's right.\n\nAdding them: 320 + 120. 300 + 100 is 400, and 20 + 20 is 40, so total 440. Yep. \n\nWait, is there any chance the question is trying to trick me? Like, maybe the 25% reduction is applied differently? For example, sometimes people get confused whether it's 25% off the total or per hour. But the problem says \"reduces his rate by 25%\", so that's per hour rate. So each veteran lesson is 75% of the standard rate, which we calculated correctly. \n\nAlso, the problem states he has 4 lessons at standard rate and 2 at veteran rate, all 1-hour. So no different durations. So the calculation seems straightforward. \n\nI think that's all. So the total should be $440. I don't see any other factors mentioned, like taxes or expenses, but the question is just asking for the total amount he will make, so gross amount. So yeah, the answer is 440 dollars.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "Okay, so Charlie is a tennis pro, right? The problem is asking how much money he makes in a day when he gives 4 regular lessons and 2 veteran lessons. Let me break this down step by step.\n\nFirst, his standard rate is $80 per hour. But for veterans, he reduces the rate by 25%. Hmm, reducing by 25% means the veteran rate is 75% of the standard rate, right? Because 100% minus 25% is 75%. So I need to calculate the discounted rate for veterans first.\n\nLet me compute the veteran rate. 25% of $80 is... well, 25% is a quarter, so a quarter of 80 is 20. So subtracting that from 80 gives 60. So the veteran rate is $60 per hour. Alternatively, 80 multiplied by 0.75 (since 75% is 0.75 in decimal) would be 80 * 0.75. Let me check that: 80 times 0.75. 80 times 0.7 is 56, and 80 times 0.05 is 4, so 56 + 4 = 60. Yep, same result. So that's correct.\n\nNow, he has 4 standard lessons. Each is $80, so 4 times 80. Let me calculate that. 4 times 80 is 320. So $320 from the regular lessons.\n\nThen he has 2 veteran lessons at $60 each. So 2 multiplied by 60 is 120. So $120 from the veterans.\n\nTo find the total, I need to add those two amounts together. 320 plus 120. That should be 440. Wait, 320 + 100 is 420, then plus 20 more is 440. So total is $440.\n\nLet me just make sure I didn't make any mistakes here. Let's verify each part again. \n\nStandard rate: $80. 4 hours: 4*80. 80*4 is indeed 320. Correct.\n\nVeteran discount: 25% off. So 80 - (25% of 80) = 80 - 20 = 60. So each veteran lesson is $60. 2 lessons would be 2*60 = 120. That's right.\n\nAdding them: 320 + 120. 300 + 100 is 400, and 20 + 20 is 40, so total 440. Yep. \n\nWait, is there any chance the question is trying to trick me? Like, maybe the 25% reduction is applied differently? For example, sometimes people get confused whether it's 25% off the total or per hour. But the problem says \"reduces his rate by 25%\", so that's per hour rate. So each veteran lesson is 75% of the standard rate, which we calculated correctly. \n\nAlso, the problem states he has 4 lessons at standard rate and 2 at veteran rate, all 1-hour. So no different durations. So the calculation seems straightforward. \n\nI think that's all. So the total should be $440. I don't see any other factors mentioned, like taxes or expenses, but the question is just asking for the total amount he will make, so gross amount. So yeah, the answer is 440 dollars."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 146,
+        "completion_tokens": 808,
+        "total_tokens": 954,
+        "cost": 0.0004259,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0004259,
+          "upstream_inference_prompt_cost": 2.19e-05,
+          "upstream_inference_completions_cost": 0.000404
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 614,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 5.4600419998168945
+  },
+  "retry_count": 0
+}
