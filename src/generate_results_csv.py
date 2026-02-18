@@ -76,17 +76,67 @@ def extract_final_answer(text: str) -> Optional[float]:
                 return float(val)
             except:
                 pass
-    return None
-
-
-def extract_gold_answer(gold_text: str) -> Optional[float]:
-    """Extract gold answer from GSM8K format (#### X)."""
-    if not gold_text:
-        return None
-    
-    match = re.search(r"####\s*([\d,]+(?:\.\d+)?)", gold_text)
-    if match:
+    # Fallback: take last numeric token in the entire text and strip fractional part
+    num_matches = re.findall(r'([+-]?\d{1,3}(?:[,\.\s]\d{3})*(?:\.\d+)?|[+-]?\d+(?:\.\d+)?)', text)
+    if num_matches:
+        s = num_matches[-1]
+        # Normalize by handling thousands separators and decimal/fractional part
         try:
+            if "." in s and "," in s:
+                # assume comma thousands, dot decimal
+                s = s.replace(",", "")
+                s = s.split(".")[0]
+            elif "." in s:
+                s = s.split(".")[0]
+            elif "," in s:
+                # decide if comma is thousands sep or decimal sep
+                parts = s.split(",")
+                if len(parts[-1]) == 3:
+                    # likely thousands separator
+                    s = s.replace(",", "")
+                else:
+                    # likely decimal separator - drop fractional part
+                    s = ",".join(parts[:-1]) if len(parts) > 1 else parts[0]
+                    s = s.replace(",", "")
+
+            s = re.sub(r"[^0-9+-]", "", s)
+            return float(s)
+        except:
+            return None
+    return None
+    
+        # Prefer last "= NUMBER" occurrence in whole text (handles lines like "... = 160 minutes")
+        eq_matches = re.findall(r'=\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', text)
+        if eq_matches:
+            s = eq_matches[-1]
+            # drop fractional part similar to fallback
+            if "." in s and "," in s:
+                s = s.replace(',', '')
+                s = s.split('.')[0]
+            elif "." in s:
+            # Prefer last "= NUMBER" occurrence in whole text (handles lines like "... = 160 minutes")
+            eq_matches = re.findall(r'=\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', text)
+            if eq_matches:
+                s = eq_matches[-1]
+                # drop fractional part similar to fallback
+                if "." in s and "," in s:
+                    s = s.replace(',', '')
+                    s = s.split('.')[0]
+                elif "." in s:
+                    s = s.split('.')[0]
+                elif "," in s:
+                    parts = s.split(',')
+                    if len(parts[-1]) == 3:
+                        s = s.replace(',', '')
+                    else:
+                        s = ','.join(parts[:-1]) if len(parts) > 1 else parts[0]
+                        s = s.replace(',', '')
+
+                s = re.sub(r'[^0-9+-]', '', s)
+                try:
+                    return float(s)
+                except:
+                    pass
             return float(match.group(1).replace(",", ""))
         except:
             pass
@@ -154,6 +204,7 @@ def process_model_persona(model_key: str, persona: str) -> List[Dict]:
             "question_id": question_id,
             "question_index": question_index,
             "question": input_data.get("question", "")[:100],  # truncate for CSV
+            "response_text": response_text,
             "gold_answer": gold_answer,
             "model_answer": model_answer,
             "is_correct": 1 if is_correct else 0,
@@ -196,7 +247,7 @@ def generate_model_csv(model_key: str, model_info: Dict):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     fieldnames = ["model", "persona", "question_id", "question_index", "question",
-                  "gold_answer", "model_answer", "is_correct",
+                  "gold_answer", "model_answer", "response_text", "is_correct",
                   "prompt_tokens", "completion_tokens", "total_tokens", "reasoning_tokens",
                   "latency_sec", "response_length"]
     

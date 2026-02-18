@@ -9,24 +9,39 @@ def extract_final_answer(response_content):
         return None
     
     text = response_content.strip()
-    
-    # Priority 1: boxed pattern
-    boxed_matches = list(re.finditer(r'\\boxed\{([+-]?\d+(?:,\d{3})*(?:\.\d+)?)[^}]*\}', text))
-    if boxed_matches:
-        ans = boxed_matches[-1].group(1).replace(',', '')
+    # normalize unicode narrow/no-break spaces to normal spaces
+    text = text.replace('\u2009', ' ').replace('\u202f', ' ').replace('\xa0', ' ')
+
+    # helper to parse a numeric token (allow $ and grouping commas/spaces)
+    def parse_number_token(s):
+        if not s:
+            return None
+        s = s.replace('\u2009', '').replace('\u202f', '').replace('\xa0', '')
+        s = s.replace(',', '').replace(' ', '')
+        s = s.replace('$', '')
         try:
-            return float(ans)
+            return float(s)
         except:
-            pass
+            return None
+
+    # Priority 1: boxed pattern (allow \boxed{...} inside [] or ())
+    boxed_any = re.findall(r'\\boxed\{([^}]+)\}', text)
+    if boxed_any:
+        # prefer last boxed numeric inside boxed text
+        for content in reversed(boxed_any):
+            m = re.search(r'([+-]?\$?\s*[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)', content)
+            if m:
+                val = parse_number_token(m.group(1))
+                if val is not None:
+                    return val
     
     # Priority 2: #### pattern
-    hash_matches = list(re.finditer(r'####\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', text))
+    hash_matches = list(re.finditer(r'####\s*\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)', text))
     if hash_matches:
-        ans = hash_matches[-1].group(1).replace(',', '')
-        try:
-            return float(ans)
-        except:
-            pass
+        ans = hash_matches[-1].group(1)
+        val = parse_number_token(ans)
+        if val is not None:
+            return val
     
     # Priority 3: Look for "Answer" line
     lines = text.strip().split('\n')
@@ -36,41 +51,71 @@ def extract_final_answer(response_content):
         line_stripped = line.strip()
         
         if re.search(r'^\*?\*?[Aa]nswer', line_stripped) or re.search(r'\*\*[Aa]nswer', line_stripped):
-            match = re.search(r'[Aa]nswer[:\s\*]*\$([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line_stripped)
+            match = re.search(r'[Aa]nswer[:\s\*]*\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)', line_stripped)
             if match:
-                return float(match.group(1).replace(',', ''))
+                val = parse_number_token(match.group(1))
+                if val is not None:
+                    return val
             
-            match = re.search(r'[Aa]nswer[:\s\*]+([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line_stripped)
+            match = re.search(r'[Aa]nswer[:\s\*]+([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)', line_stripped)
             if match:
-                return float(match.group(1).replace(',', ''))
+                val = parse_number_token(match.group(1))
+                if val is not None:
+                    return val
             
-            bold_matches = re.findall(r'\*\*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*\*', line_stripped)
+            bold_matches = re.findall(r'\*\*\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)\*\*', line_stripped)
             if bold_matches:
-                return float(bold_matches[-1].replace(',', ''))
+                val = parse_number_token(bold_matches[-1])
+                if val is not None:
+                    return val
     
     # Priority 4: "The answer is NUMBER"
     for line in reversed(last_lines):
-        match = re.search(r'[Tt]he\s+answer\s+is[:\s]*\*?\*?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)', line)
+        match = re.search(r'[Tt]he\s+answer\s+is[:\s]*\*?\*?\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)', line)
         if match:
-            return float(match.group(1).replace(',', ''))
+            val = parse_number_token(match.group(1))
+            if val is not None:
+                return val
     
     # Priority 5: Bold number **NUMBER**
     for line in reversed(last_lines[-5:]):
-        match = re.search(r'\*\*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*(?:cups?|sheep|miles?|dollars?|minutes?|hours?|downloads?|eggs?|pages?|books?|items?|pieces?|days?|meters?|dozens?|years?|bolts?|feet|foot|centimeters?|cm|inches?|%|percent)?\*\*', line, re.IGNORECASE)
+        match = re.search(r'\*\*\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)\s*(?:cups?|sheep|miles?|dollars?|minutes?|hours?|downloads?|eggs?|pages?|books?|items?|pieces?|days?|meters?|dozens?|years?|bolts?|feet|foot|centimeters?|cm|inches?|%|percent)?\*\*', line, re.IGNORECASE)
         if match:
-            return float(match.group(1).replace(',', ''))
+            val = parse_number_token(match.group(1))
+            if val is not None:
+                return val
     
     # Priority 6: "is/are NUMBER unit"
     for line in reversed(last_lines[-5:]):
-        match = re.search(r'\b(?:is|are)\s+\*?\*?\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\*?\*?\s*(?:cups?|sheep|miles?|dollars?|minutes?|hours?|downloads?|eggs?|pages?|books?|items?|pieces?|glasses?|points?|people|students?|meters?|dozens?|yards?|burritos?|pounds?|lb|leftover)\b', line, re.IGNORECASE)
+        match = re.search(r'\b(?:is|are)\s+\*?\*?\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)\*?\*?\s*(?:cups?|sheep|miles?|dollars?|minutes?|hours?|downloads?|eggs?|pages?|books?|items?|pieces?|glasses?|points?|people|students?|meters?|dozens?|yards?|burritos?|pounds?|lb|leftover)\b', line, re.IGNORECASE)
         if match:
-            return float(match.group(1).replace(',', ''))
+            val = parse_number_token(match.group(1))
+            if val is not None:
+                return val
     
     # Priority 7: = NUMBER at end
     for line in reversed(last_lines[-5:]):
-        match = re.search(r'=\s*\$?([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*$', line, re.IGNORECASE)
+        match = re.search(r'=\s*\$?([+-]?[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)\s*$', line, re.IGNORECASE)
         if match:
-            return float(match.group(1).replace(',', ''))
+            val = parse_number_token(match.group(1))
+            if val is not None:
+                return val
+
+    # Final fallback: last numeric token in the final lines, but avoid obvious intermediate tokens
+    final_candidates = []
+    for line in reversed(last_lines):
+        for m in re.finditer(r'([+-]?\$?\s*[0-9][0-9,\s\u2009\u202f]*\.?[0-9]*)', line):
+            token = m.group(1)
+            # skip if preceding context suggests unit/subtotal/intermediate
+            pre = line[:m.start()].lower()
+            bad_context = any(w in pre for w in ['per', 'each', 'price', 'cost', 'subtotal', 'per day', 'per week', 'per month', 'rate', 'unit', 'hour', 'minute', 'pair', 'apiece', 'each.'])
+            if not bad_context:
+                val = parse_number_token(token)
+                if val is not None:
+                    final_candidates.append((val, token, line))
+    if final_candidates:
+        # choose last reasonable candidate
+        return final_candidates[0][0]
     
     return None
 

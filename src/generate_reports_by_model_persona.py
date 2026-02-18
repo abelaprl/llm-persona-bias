@@ -13,6 +13,33 @@ import re
 import sys
 import argparse
 
+
+def _last_numeric_token_as_int(text: str):
+    """Return last numeric token in text, drop fractional part and thousands separators."""
+    if not text:
+        return None
+    try:
+        matches = re.findall(r'([+-]?\d{1,3}(?:[,\.\s]\d{3})*(?:\.\d+)?|[+-]?\d+(?:\.\d+)?)', text)
+        if not matches:
+            return None
+        s = matches[-1]
+        if '.' in s and ',' in s:
+            s = s.replace(',', '')
+            s = s.split('.')[0]
+        elif '.' in s:
+            s = s.split('.')[0]
+        elif ',' in s:
+            parts = s.split(',')
+            if len(parts[-1]) == 3:
+                s = s.replace(',', '')
+            else:
+                s = ','.join(parts[:-1]) if len(parts) > 1 else parts[0]
+                s = s.replace(',', '')
+        s = re.sub(r'[^0-9+-]', '', s)
+        return float(s)
+    except:
+        return None
+
 def extract_final_answer(response_content):
     """Extract final answer dari response - improved multi-priority extraction"""
     if not response_content:
@@ -188,6 +215,28 @@ def extract_final_answer(response_content):
         if match:
             return float(match.group(1).replace(',', ''))
     
+    # Fallback: take last numeric token in entire response and drop fractional part
+    try:
+        num_matches = re.findall(r'([+-]?\d{1,3}(?:[,\.\s]\d{3})*(?:\.\d+)?|[+-]?\d+(?:\.\d+)?)', text)
+        if num_matches:
+            s = num_matches[-1]
+            if '.' in s and ',' in s:
+                s = s.replace(',', '')
+                s = s.split('.')[0]
+            elif '.' in s:
+                s = s.split('.')[0]
+            elif ',' in s:
+                parts = s.split(',')
+                if len(parts[-1]) == 3:
+                    s = s.replace(',', '')
+                else:
+                    s = ','.join(parts[:-1]) if len(parts) > 1 else parts[0]
+                    s = s.replace(',', '')
+            s = re.sub(r'[^0-9+-]', '', s)
+            return float(s)
+    except:
+        pass
+
     return None
 
 def extract_ground_truth(ground_truth_text):
@@ -257,6 +306,10 @@ def process_result_file(file_path):
         
         # Extract final answers
         final_answer = extract_final_answer(response_content)
+        # Override with last numeric token (drop fractional part) to avoid picking intermediate '=' matches
+        last_num = _last_numeric_token_as_int(response_content)
+        if last_num is not None:
+            final_answer = last_num
         ground_truth = extract_ground_truth(ground_truth_text)
         
         # Check correctness
@@ -293,6 +346,7 @@ def process_result_file(file_path):
             'is_correct': is_correct,
             'ground_truth_answer': ground_truth,
             'extracted_answer': final_answer,
+            'response_content': response_content,
             'prompt_tokens': prompt_tokens,
             'completion_tokens': completion_tokens,
             'reasoning_tokens': reasoning_tokens,
@@ -340,6 +394,7 @@ def generate_csv_for_model_persona(model_folder, persona_folder, output_path):
         'is_correct',
         'ground_truth_answer',
         'extracted_answer',
+        'response_content',
         'prompt_tokens',
         'completion_tokens',
         'reasoning_tokens',
@@ -362,6 +417,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate CSV reports by model and persona')
     parser.add_argument('--model', type=int, help='Model index (1-based). Run without args to see list.')
     parser.add_argument('--list', action='store_true', help='List all available models')
+    parser.add_argument('--force', action='store_true', help='Overwrite existing CSVs if present')
     args = parser.parse_args()
     
     # Base directories
@@ -422,8 +478,8 @@ def main():
         # Output path: result/reports/model_name/persona_name/results.csv
         output_path = reports_dir / model_name / persona_name / "results.csv"
         
-        # Skip if already exists
-        if output_path.exists():
+        # Skip if already exists unless --force
+        if output_path.exists() and not args.force:
             print(f"  [SKIP] {persona_name}: already exists", flush=True)
             continue
         
