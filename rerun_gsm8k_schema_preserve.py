@@ -130,9 +130,18 @@ def main():
     # For each row in CSV
     for _, row in df.iterrows():
         qid = int(row["question_id"])
-        persona_type = row["persona_type"]
-        persona_id = int(row["persona_id"])
-        # Locate original JSON file
+        # Flexible: support persona_type/persona_id or persona
+        if "persona_type" in row and "persona_id" in row:
+            persona_type = row["persona_type"]
+            persona_id = int(row["persona_id"])
+        elif "persona" in row and isinstance(row["persona"], str) and "_" in row["persona"]:
+            # Example: woman_implicit_3
+            persona_parts = row["persona"].rsplit("_", 1)
+            persona_type = persona_parts[0]
+            persona_id = int(persona_parts[1])
+        else:
+            print(f"Could not parse persona_type/persona_id for row: {row}")
+            continue
         persona_dir = f"{persona_type}_{persona_id}"
         json_path = os.path.join(args.json_root_dir, persona_dir, f"gsm8k_{qid:05d}.json")
         if not os.path.exists(json_path):
