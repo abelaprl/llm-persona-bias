@@ -30,6 +30,12 @@ def get_response_text(resp):
             val = msg.get(key, None)
             if isinstance(val, str) and val.strip():
                 return val.strip()
+        # d. reasoning_details fallback (list of dicts with text)
+        reasoning_details = msg.get('reasoning_details', None)
+        if isinstance(reasoning_details, list):
+            parts = [item['text'] for item in reasoning_details if isinstance(item, dict) and isinstance(item.get('text', None), str) and item['text'].strip()]
+            if parts:
+                return '\n'.join(parts).strip()
     # 2b. Try choices[0]["text"] (sometimes used by some APIs)
     if choices and isinstance(choices, list):
         text_field = choices[0].get('text', None)
@@ -343,11 +349,22 @@ def main():
                 if (ctok is not None and str(ctok).isdigit() and int(ctok) > 0) and (not content or not content.strip()):
                     # Log warning and snapshot keys for debugging
                     keys_top = list(resp.keys())
-                    choices = resp.get('raw_api_response', {}).get('choices', [{}])
+                    raw_api = resp.get('raw_api_response', {})
+                    keys_raw_api = list(raw_api.keys()) if isinstance(raw_api, dict) else []
+                    choices = raw_api.get('choices', [{}]) if isinstance(raw_api, dict) else [{}]
                     keys_choices = list(choices[0].keys()) if choices and isinstance(choices, list) and len(choices) > 0 and isinstance(choices[0], dict) else []
+                    msg = choices[0].get('message', {}) if choices and isinstance(choices[0], dict) else {}
+                    keys_msg = list(msg.keys()) if isinstance(msg, dict) else []
+                    reasoning_details = msg.get('reasoning_details', None)
                     print(f"WARNING: completion_tokens={ctok} but response_content_full is empty for {persona}/{fname}", file=sys.stderr)
                     print(f"  resp keys: {keys_top}", file=sys.stderr)
+                    print(f"  raw_api_response keys: {keys_raw_api}", file=sys.stderr)
                     print(f"  choices[0] keys: {keys_choices}", file=sys.stderr)
+                    print(f"  message keys: {keys_msg}", file=sys.stderr)
+                    if isinstance(reasoning_details, list):
+                        print(f"  reasoning_details present, len={len(reasoning_details)}", file=sys.stderr)
+                    else:
+                        print(f"  reasoning_details not present", file=sys.stderr)
             except Exception:
                 pass
             extracted, extraction_reason = extract_final_answer(content)
