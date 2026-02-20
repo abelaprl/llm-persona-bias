@@ -30,6 +30,43 @@ def get_response_text(resp):
             val = msg.get(key, None)
             if isinstance(val, str) and val.strip():
                 return val.strip()
+    # 2b. Try choices[0]["text"] (sometimes used by some APIs)
+    if choices and isinstance(choices, list):
+        text_field = choices[0].get('text', None)
+        if isinstance(text_field, str) and text_field.strip():
+            return text_field.strip()
+    # 2c. Try raw_api_response["output"][0]["content"] (list/dict)
+    output = resp.get('raw_api_response', {}).get('output', None)
+    if isinstance(output, list) and output:
+        out0 = output[0]
+        if isinstance(out0, dict):
+            c = out0.get('content', None)
+            if isinstance(c, str) and c.strip():
+                return c.strip()
+            if isinstance(c, list):
+                parts = []
+                for part in c:
+                    if isinstance(part, dict) and 'text' in part:
+                        parts.append(str(part['text']))
+                    elif isinstance(part, str):
+                        parts.append(part)
+                if parts:
+                    return '\n'.join(parts).strip()
+    # 2d. Try raw_api_response["message"]["content"]
+    msg2 = resp.get('raw_api_response', {}).get('message', {})
+    if isinstance(msg2, dict):
+        c = msg2.get('content', None)
+        if isinstance(c, str) and c.strip():
+            return c.strip()
+        if isinstance(c, list):
+            parts = []
+            for part in c:
+                if isinstance(part, dict) and 'text' in part:
+                    parts.append(str(part['text']))
+                elif isinstance(part, str):
+                    parts.append(part)
+            if parts:
+                return '\n'.join(parts).strip()
     # 3. Try output_text, response, completion, generated_text, result
     for key in ['output_text', 'response', 'completion', 'generated_text', 'result']:
         val = resp.get(key, None)
@@ -54,6 +91,11 @@ def get_response_text(resp):
                 return get_response_text(loaded)
         except Exception:
             pass
+    # 6. Fallback: reasoning/thinking/analysis at top level
+    for key in ['reasoning', 'thinking', 'analysis']:
+        val = resp.get(key, None)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
     return ''
 
 # --- NEW IMPLEMENTATION BELOW ---
@@ -161,39 +203,109 @@ def fallback_scoring(text):
     scores.sort(reverse=True)  # highest score, then last
     return scores[0][2], 'score_fallback'
 
-def extract_answer(text):
-    # 1. Boxed
-    num, boxed = extract_boxed(text)
-    if boxed:
-        return num, 'boxed'
-    # 2. Hashes
-    num, hashes = extract_hashes(text)
-    if hashes:
-        return num, 'hashes'
-    # 3. Marker
-    num, marker = extract_marker(text)
-    if marker:
-        return num, marker
-    # 4. Fallback
-    num, reason = fallback_scoring(text)
-    if num is not None:
-        return num, reason
+
+# --- Improved extraction logic ---
+def extract_final_answer(text):
+    """Extract final answer with robust priority and fallback."""
+    if not text or not isinstance(text, str):
+        return None, 'none'
+    tail = text[-1200:] if len(text) > 1200 else text
+    lines = tail.splitlines()[-15:]  # last 15 lines
+    # 1. #### <number> in tail
+    m = re.search(r'####\s*(-?[$]?[\d,]+(?:\.\d+)?)', tail)
+    if m:
+        num = normalize_number(m.group(1))
+        if num is not None:
+            return num, 'hashes'
+    # 2. \boxed{...} in tail
+    boxed = re.findall(r'\\boxed\{([^}]*)\}|\\boxed\s*\{([^}]*)\}|\$\\boxed\{([^}]*)\}\$', tail)
+    boxed_flat = [val for group in boxed[::-1] for val in group if val]
+    for val in boxed_flat:
+        num = normalize_number(val)
+        if num is not None:
+            return num, 'boxed'
+    # 3. Final marker lines (Answer:, Final:, etc) in last lines
+    for line in reversed(lines):
+        if re.search(r'(Final Answer|Answer|So the answer is|Therefore|Thus|Hence)', line, re.I):
+            nums = list(re.finditer(r'(-?[$]?[\d,]+(?:\.\d+)?)', line))
+            if nums:
+                # Take last number on the line
+                num = normalize_number(nums[-1].group(1))
+                if num is not None:
+                    return num, 'final_marker'
+    # 4. Bold or currency in last lines
+    for line in reversed(lines):
+        m = re.search(r'\*\*\s*(-?[$]?[\d,]+(?:\.\d+)?)\s*\*\*', line)
+        if m:
+            num = normalize_number(m.group(1))
+            if num is not None:
+                return num, 'bold_final'
+        m = re.search(r'[$]([\d,]+(?:\.\d+)?)', line)
+        if m:
+            num = normalize_number(m.group(1))
+            if num is not None:
+                return num, 'currency_final'
+    # 5. Fallback: last number in output, skip percent/ratio/enumeration/if/note
+    all_lines = text.splitlines()
+    for idx in range(len(all_lines)-1, -1, -1):
+        line = all_lines[idx].strip()
+        if not line:
+            continue
+        # Skip lines that are clearly not answer
+        if re.match(r'^(Step \d+|\d+[).:]|[-•])', line):
+            continue
+        if re.match(r'^(If|Assumption|Note)', line, re.I):
+            continue
+        nums = list(re.finditer(r'(-?[$]?[\d,]+(?:\.\d+)?)', line))
+        # Skip percent/ratio
+        nums = [m for m in nums if not (m.end() < len(line) and (line[m.end():m.end()+2].startswith('%') or line[m.end():m.end()+2].startswith('/')))]
+        if nums:
+            num = normalize_number(nums[-1].group(1))
+            if num is not None:
+                return num, 'last_number_fallback'
     return None, 'none'
 
-def is_truncated(resp, content, max_tokens, completion_tokens, finish_reason):
-    if finish_reason == 'length':
+
+# --- Improved truncated detection ---
+def has_final_marker(text):
+    if not text or not isinstance(text, str):
+        return False
+    tail = text[-1200:] if len(text) > 1200 else text
+    if re.search(r'####\s*-?[$]?[\d,]+', tail):
         return True
-    if completion_tokens is not None and max_tokens is not None:
-        try:
-            if int(completion_tokens) >= int(max_tokens) - 5:
-                return True
-        except Exception:
-            pass
-    # Heuristic: abrupt ending
-    if content:
-        last = content.strip()[-50:]
-        if not re.search(r'[.!?}\]\)]$', last) and not re.search(r'(boxed|####|Answer:|Final answer:)', last, re.I):
-            return True
+    if re.search(r'\\boxed\{[^}]+\}', tail):
+        return True
+    if re.search(r'(Answer|Final|Therefore|Thus|Hence|So the answer is)', tail, re.I):
+        # Accept if line with marker has number
+        for line in tail.splitlines()[-15:]:
+            if re.search(r'(Answer|Final|Therefore|Thus|Hence|So the answer is)', line, re.I):
+                if re.search(r'(-?[$]?[\d,]+(?:\.\d+)?)', line):
+                    return True
+    # Bold number in tail
+    if re.search(r'\*\*\s*-?[$]?[\d,]+(?:\.\d+)?\s*\*\*', tail):
+        return True
+    return False
+
+def is_truly_truncated(text, finish_reason, completion_tokens, max_tokens):
+    # If finish_reason != length, not truncated
+    if finish_reason != 'length':
+        return False
+    # If has final marker, not truncated
+    if has_final_marker(text):
+        return False
+    # Check for open sentence/unfinished output
+    if not text or not isinstance(text, str):
+        return True
+    tail = text.strip()[-120:]
+    # Unbalanced brackets
+    if tail.count('{') > tail.count('}') or tail.count('[') > tail.count(']') or tail.count('(') > tail.count(')'):
+        return True
+    # Ends with open math or incomplete
+    if re.search(r'[=:(,\[\{]$|\\\[$', tail):
+        return True
+    # Ends with incomplete word or abrupt stop
+    if not re.search(r'[.!?}\]\)]$', tail):
+        return True
     return False
 
 def main():
@@ -238,10 +350,10 @@ def main():
                     print(f"  choices[0] keys: {keys_choices}", file=sys.stderr)
             except Exception:
                 pass
-            extracted, extraction_reason = extract_answer(content)
+            extracted, extraction_reason = extract_final_answer(content)
             is_correct = (extracted == gt_num) if (extracted is not None and gt_num is not None) else False
-            has_boxed = '\\boxed' in content
-            has_hashes = '####' in content
+            has_boxed = bool(re.search(r'\\boxed\{[^}]+\}', content))
+            has_hashes = bool(re.search(r'####\s*-?[$]?[\d,]+', content))
             boxed_match = has_boxed and (extracted == gt_num) and extraction_reason == 'boxed'
             hashes_match = has_hashes and (extracted == gt_num) and extraction_reason == 'hashes'
             finish_reason = None
@@ -256,28 +368,27 @@ def main():
             prompt_tokens = resp.get('raw_api_response', {}).get('usage', {}).get('prompt_tokens', None)
             total_tokens = resp.get('raw_api_response', {}).get('usage', {}).get('total_tokens', None)
             reasoning_tokens = resp.get('raw_api_response', {}).get('usage', {}).get('reasoning_tokens', None)
-            is_trunc = is_truncated(resp, content, max_tokens, completion_tokens, finish_reason)
+            truncated_by_metadata = (finish_reason == 'length')
+            truncated_by_content = is_truly_truncated(content, finish_reason, completion_tokens, max_tokens)
+            has_final = has_final_marker(content)
+            text_tail = content.strip()[-120:] if content else ''
             extraction_issue = (extracted is None)
-            # Error category
-            if is_trunc:
-                error_category = 'truncated_output'
-            elif extracted is None:
-                error_category = 'no_number_found'
-            elif has_boxed and extraction_reason != 'boxed':
-                error_category = 'picked_intermediate_step_bug'
-            elif not is_correct:
-                error_category = 'other_extraction_error'
-            else:
+            # Error category logic (extraction first, new logic)
+            if extracted is not None:
                 error_category = 'ok'
+            elif truncated_by_content:
+                error_category = 'truncated_output'
+            else:
+                error_category = 'no_number_found'
             error_counter[(persona, error_category)] += 1
             persona_counter[persona] += 1
-            row = [persona, os.path.relpath(fpath, args.input_root), qid, dataset, gt, gt_num, content, extracted, is_correct, has_boxed, has_hashes, boxed_match, hashes_match, extraction_issue, error_category, extraction_reason, finish_reason, prompt_tokens, completion_tokens, reasoning_tokens, total_tokens]
+            row = [persona, os.path.relpath(fpath, args.input_root), qid, dataset, gt, gt_num, content, extracted, is_correct, has_boxed, has_hashes, boxed_match, hashes_match, extraction_issue, error_category, extraction_reason, finish_reason, prompt_tokens, completion_tokens, reasoning_tokens, total_tokens, truncated_by_metadata, truncated_by_content, has_final, text_tail]
             all_rows.append(row)
     # Write results.csv
     out_csv = os.path.join(args.report_dir, 'results.csv')
     with open(out_csv, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f, quoting=csv.QUOTE_ALL, escapechar='\\', doublequote=True)
-        writer.writerow(["persona_folder","file","question_id","dataset","ground_truth","ground_truth_answer","response_content_full","extracted_answer","is_correct","has_boxed","has_hashes","boxed_match","hashes_match","extraction_issue","error_category","extraction_reason","finish_reason","prompt_tokens","completion_tokens","reasoning_tokens","total_tokens"])
+        writer.writerow(["persona_folder","file","question_id","dataset","ground_truth","ground_truth_answer","response_content_full","extracted_answer","is_correct","has_boxed","has_hashes","boxed_match","hashes_match","extraction_issue","error_category","extraction_reason","finish_reason","prompt_tokens","completion_tokens","reasoning_tokens","total_tokens","truncated_by_metadata","truncated_by_content","has_final_marker","text_tail"])
         for row in all_rows:
             writer.writerow(row)
     print(f"Wrote {len(all_rows)} rows to {out_csv}")
