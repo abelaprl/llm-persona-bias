@@ -3,6 +3,8 @@ import logging
 # --- Extraction helpers ---
 def get_response_text(resp):
     """Robustly extract response text from various possible fields and formats."""
+    if resp is None:
+        return ''
     # 1. Direct content field
     content = resp.get('content', None)
     if isinstance(content, str) and content.strip():

@@ -1,9 +1,17 @@
+
 import csv
 import os
+import argparse
 
 def main():
-    # Path to results.csv
-    results_path = os.path.join(os.path.dirname(__file__), '../result/reports/allenai_olmo-3-32b-think/results.csv')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--report_dir', required=False, default=None, help='Directory containing results.csv and to write accuracy.csv')
+    args = parser.parse_args()
+    if args.report_dir:
+        report_dir = args.report_dir
+    else:
+        report_dir = os.path.join(os.path.dirname(__file__), '../result/reports/allenai_olmo-3-32b-think')
+    results_path = os.path.join(report_dir, 'results.csv')
     persona_stats = {}
     total = 0
     correct = 0
@@ -35,7 +43,7 @@ def main():
             sum_reasoning += int(row['reasoning_tokens']) if row['reasoning_tokens'] and row['reasoning_tokens'].isdigit() else 0
             sum_total += int(row['total_tokens']) if row['total_tokens'] and row['total_tokens'].isdigit() else 0
     # Write accuracy.csv
-    out_path = os.path.join(os.path.dirname(__file__), '../result/reports/allenai_olmo-3-32b-think/accuracy.csv')
+    out_path = os.path.join(report_dir, 'accuracy.csv')
     with open(out_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['persona_folder', 'correct', 'total', 'accuracy', 'sum_prompt_tokens', 'sum_completion_tokens', 'sum_reasoning_tokens', 'sum_total_tokens', 'avg_prompt_tokens', 'avg_completion_tokens', 'avg_reasoning_tokens', 'avg_total_tokens'])
