@@ -3,8 +3,8 @@ import sys
 import os
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\qwen_qwen3-235b-a22b-2507\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\qwen_qwen3-235b-a22b-2507'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\google_gemini-2.5-flash\results.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\google_gemini-2.5-flash'
 
 PERSONA_ORDER = [
     'man_explicit_1','man_implicit_1','man_implicit_2','man_implicit_3',
