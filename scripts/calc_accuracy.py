@@ -6,6 +6,9 @@ from collections import defaultdict
 csv_path = r'e:\Tugas Akhir\TugasAkhir\result\google_gemma-3-27b-it\results.csv'
 out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\google_gemma-3-27b-it'
 
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\meta-llama_llama-3.1-8b-instruct\results.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\meta-llama_llama-3.1-8b-instruct'
+
 PERSONA_ORDER = [
     'man_explicit_1','man_implicit_1','man_implicit_2','man_implicit_3',
     'woman_explicit_1','woman_implicit_1','woman_implicit_2','woman_implicit_3'
