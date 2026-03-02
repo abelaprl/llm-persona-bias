@@ -79,7 +79,7 @@ def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
         "model": model_config['model_id'],
         "messages": messages,
         "temperature": 0.2,
-        "max_tokens": 2048
+        "max_tokens": 1024
     }
     
     start_time = time.time()
