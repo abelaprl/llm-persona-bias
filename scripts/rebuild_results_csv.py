@@ -381,11 +381,21 @@ def extract_final_answer(text):
     def _parse_boxed_val(val):
         # First handle LaTeX thousands: {,} → ,
         v = re.sub(r'\{,\}', ',', val)
+        # FIX: before stripping \text{...}, save any numbers embedded inside text blocks
+        # (needed for \boxed{\,\text{The winner runs 80 yards farther.}\,})
+        text_block_nums = []
+        for tb in re.findall(r'\\{1,2}(?:text|mathrm|mbox|rm)\{([^}]*)\}', val):
+            tb_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, tb)]
+            text_block_nums.extend(n for n in tb_nums if n is not None)
         # Handle both single and double-escaped backslash before \text etc.
         # e.g. \text{feet} or \\text{feet} (double-escaped in JSON/CSV)
         v = re.sub(r'\\{1,2}(?:text|mathrm|mbox|rm)\{[^}]*\}', '', v)
-        # Remove remaining LaTeX commands (\frac, \times, etc.)
+        # FIX: Remove degree/angle superscripts: ^\circ, ^{\circ}, ^\text{o}, ^o
+        v = re.sub(r'\^\{?\\?(?:circ|degree)\}?', '', v)
+        # Remove remaining LaTeX commands (\frac, \times, \approx, \displaystyle, etc.)
         v = re.sub(r'\\+[a-zA-Z]+', '', v)
+        # FIX: remove all remaining ^ (from superscripts like ^\circ, ^\text{o} already stripped)
+        v = v.replace('^', '')
         # Remove stray backslashes and braces
         v = re.sub(r'\\+', '', v)
         v = v.replace('{', '').replace('}', '')
@@ -397,7 +407,41 @@ def extract_final_answer(text):
             total_and = sum(n for n in nums_and if n is not None)
             if total_and:
                 return total_and
-        return normalize_number(v.strip())
+        # Try direct parse first (handles simple cases like \boxed{42})
+        direct = normalize_number(v.strip())
+        if direct is not None:
+            return direct
+        # FIX: after stripping, if multiple numbers remain extract via heuristics
+        found_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, v)]
+        found_nums = [n for n in found_nums if n is not None]
+        # If no numbers in stripped val, fall back to numbers found inside \text{...} blocks
+        if not found_nums and text_block_nums:
+            return text_block_nums[-1]
+        if not found_nums:
+            return None
+        # Prefer \approx value (e.g. "\frac{640}{21}\approx 30.5" → 30.5)
+        m_approx = re.search(r'\\+approx\s*(' + NUMBER_RE + r')', val)
+        if m_approx:
+            approx_num = normalize_number(m_approx.group(1))
+            if approx_num is not None:
+                return approx_num
+        # If original has "=" and exactly one number before the first "=", prefer it
+        # (e.g. "160\ \text{min}\;=\;2\ \text{h}\;40\text{min}" → 160)
+        if '=' in val:
+            before_eq = val.split('=')[0]
+            be_clean = re.sub(r'\\{1,2}(?:text|mathrm|mbox|rm)\{[^}]*\}', '', before_eq)
+            be_clean = re.sub(r'\^\{?\\?(?:circ|degree)\}?', '', be_clean)
+            be_clean = re.sub(r'\\+[a-zA-Z]+', '', be_clean)
+            be_clean = re.sub(r'[{}\\^]', '', be_clean).replace('%', '')
+            be_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, be_clean)]
+            be_nums = [n for n in be_nums if n is not None]
+            if len(be_nums) == 1:
+                return be_nums[0]
+        # Single number: return it
+        if len(found_nums) == 1:
+            return found_nums[0]
+        # Multiple numbers: return the last (most likely the final value)
+        return found_nums[-1]
 
     # ── RULE 1: #### marker ──────────────────────────────────────────────────
     m = re.search(r'####\s*(' + NUMBER_RE + r')', text)
@@ -675,8 +719,9 @@ def extract_final_answer(text):
         # Skip pure intermediate-step lines (multiple = signs, no sentence words)
         # 5a: LaTeX line ending with = N \text{unit} or = N\ \text{unit}.
         # Also handles plain arithmetic: "Total teachers present: 69 + 9 = 78."
+        # FIX: also allow \% and bare % after number (e.g. "= 70\%."), and \<space> thin-space
         m_latex_block = re.search(
-            r'=\s*(' + NUMBER_RE + r')\s*(?:\\{1,2}\s*)?(?:\\+[a-zA-Z]+\{[^}]*\})?\.?\s*$',
+            r'=\s*(' + NUMBER_RE + r')\s*(?:\\+[a-zA-Z%]+(?:\{[^}]*\})?|\\{1,2}\s*)*[°%]?\.?\s*$',
             line_s
         )
         if m_latex_block:
@@ -694,8 +739,10 @@ def extract_final_answer(text):
             num = normalize_number(m_inline.group(1))
             if num is not None:
                 return num, 'latex_inline'
-        # FIX (Rule 5b-no-eq): \(N\) or \(N \text{...}\) with no equals — plain number in parens
-        m_inline_plain = re.search(r'\\+\(\s*(' + NUMBER_RE + r')\s*(?:\\+[a-zA-Z]+\{[^}]*\})?\s*\\+\)', line_s)
+        # FIX (Rule 5b-no-eq): \(N\) or \(\displaystyle N\) or \(N \text{...}\) — plain number in parens
+        # Allow optional LaTeX prefix commands (\displaystyle, \textstyle, etc.) before the number
+        # Use (?:[^)\\]|\\[^)]) to avoid consuming the closing \) backslash
+        m_inline_plain = re.search(r'\\+\(\s*(?:\\+[a-zA-Z]+\s*)*(' + NUMBER_RE + r')(?:[^)\\]|\\[^)])*\\+\)', line_s)
         if m_inline_plain:
             num = normalize_number(m_inline_plain.group(1))
             if num is not None:
@@ -1059,6 +1106,43 @@ def run_unit_tests():
         ("gsm8k_01262", "Over 5 weeks: 5 \u00d7 $47.00 = **$235.00**.", 235),
         ("gsm8k_01304", "Since \\(28\\) days is exactly \\(4\\) weeks, it takes Nate **4 weeks** to fill all the holes.", 4),
         ("gsm8k_00010_imp", "**Total earnings for the week:** \\$400 + \\$60 = **\\$460**.", 460),
+        # ── GPT-OSS-120B: boxed degree/text/approx patterns (30 no-extract cases) ──
+        # Case 8,19,26: \boxed{90^\circ}
+        ("box_degree_circ",    "\\boxed{90^\\circ}", 90),
+        # Case 26: \boxed{90^\text{o}} — ^\text{o} form
+        ("box_degree_text_o",  "\\boxed{90^\\text{o}}", 90),
+        # Case 4,9,11,14,17,24,27: \boxed{\text{Peter is 50 years old}}
+        ("box_text_name_num",  "\\boxed{Peter\\text{ is }50\\text{ years old}}", 50),
+        # Case 1: \boxed{160\text{min} = 2\text{h} 40\text{min}} — first number before =
+        ("box_eq_first_num",   "\\boxed{160\\ \\text{minutes} \\;=\\; 2\\ \\text{hours}\\;40\\text{min}}", 160),
+        # Case 2: \boxed{\text{..}2400..\text{..}5760} — last of multiple
+        ("box_multi_last",     "\\boxed{\\text{Rong: }2400\\text{ coins},\\; \\text{Neil: }3360\\text{ coins},\\; \\text{Combined: }5760\\text{ coins}}", 5760),
+        # Case 5,15,29: \boxed{\frac{640}{21}\approx 30.5} — prefer approx value
+        ("box_approx_val",     "\\boxed{\\displaystyle \\frac{640}{21}\\text{ hours}\\;\\approx\\;30.5\\text{ hours per week}}", 30.5),
+        # Case 6: \boxed{36\frac{4}{11}\text{s}\;(about 36.36)} — last number
+        ("box_mixed_approx",   "\\boxed{36\\frac{4}{11}\\text{ seconds}\\;(\\text{about }36.36\\text{ s})}", 36.36),
+        # Case 25: \boxed{\frac{400}{11}\;(\approx 36.36)} — approx wins
+        ("box_frac_approx2",   "\\boxed{\\,\\displaystyle \\frac{400}{11}\\text{ seconds}\\;(\\approx 36.36\\text{ s})\\,}", 36.36),
+        # Case 28: \boxed{14^\circ\text{lower...}} — degree + text suffix
+        ("box_degree_lower",   "\\boxed{14^\\circ\\text{ lower than the starting temperature}}", 14),
+        # Case 10,12: \boxed{\text{Sam is 6 years old now.}} — pure-text box, num in \text{}
+        ("box_text_only_6",    "\\boxed{\\text{Sam is 6 years old now.}}", 6),
+        # Case 12: \boxed{\,\text{The winner runs 80 yards farther.}\,}
+        ("box_text_only_80",   "\\boxed{\\,\\text{The winner runs 80 yards farther than the loser.}\\,}", 80),
+        # Case 22: \boxed{\,\text{...94 %...}\,}
+        ("box_text_pct_94",    "\\boxed{\\,\\text{The power bank was at 94 % charge when Maria went out.}\\,}", 94),
+        # Case 13: \boxed{Lily\;found\;16\;insects} — semicolons between words
+        ("box_semicolons",     "\\boxed{Lily\\;found\\;16\\;insects}", 16),
+        # Case 16: \boxed{Colin\text{ is }20\text{ years old now.}}
+        ("box_text_is_20",     "\\boxed{Colin\\text{ is }20\\text{ years old now.}}", 20),
+        # Case 7: Jeff receives \(\displaystyle 80\) dollars.  — inline \displaystyle
+        ("inline_displaystyle","Jeff receives \\(\\displaystyle 80\\) dollars.", 80),
+        # Case 18: \(-10^\circ\text{F}\) — inline negative with degree
+        ("inline_neg_degree",  "The average highest temperature is \\(-10^\\circ\\text{F}\\).", -10),
+        # Case 3: = 0.70 = 70\%.  — Rule 5a with \%
+        ("rule5a_latex_pct",   "The overall pass rate is 0.70 = 70\\%.", 70),
+        # Case 20: \boxed{90\text{socks}+90\text{dishes}=180\text{items}}
+        ("box_total_items",    "\\boxed{90\\text{ socks} + 90\\text{ dishes} = 180\\text{ items in total}.}", 180),
     ]
     for entry in efa_cases:
         # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries

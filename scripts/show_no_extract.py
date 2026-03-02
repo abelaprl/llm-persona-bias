@@ -1,6 +1,6 @@
 import csv
 
-csv_path = r'E:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b\results.csv'
+csv_path = r'E:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-120b\results.csv'
 
 no_extract = []
 with open(csv_path, encoding='utf-8') as f:
