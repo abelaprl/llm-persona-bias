@@ -3,8 +3,8 @@ import sys
 import os
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\deepseek_deepseek-v3.2\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\deepseek_deepseek-v3.2'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b\results.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b'
 
 PERSONA_ORDER = [
     'man_explicit_1','man_implicit_1','man_implicit_2','man_implicit_3',

@@ -211,12 +211,13 @@ from pathlib import Path
 
 # Matches: plain int, float, thousands with comma/space/LaTeX-brace, currency prefix
 # e.g. 3528, 3,430, 3 430, 3{,}430, $3{,}528, 140{,}000, 85 000, 3.65
-NUMBER_RE = r'(?:\$)?(?:\d{1,3}(?:(?:,|\{,\}|\s)\d{3})+|\d+)(?:\.\d+)?'
+# FIX: also captures optional leading minus (ASCII, unicode en-dash − , en-dash –)
+NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,|\{,\}|\s)\d{3})+|\d+)(?:\.\d+)?'
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_root', default=None)
-    parser.add_argument('--report_dir', default=None)
+    parser.add_argument('--input_root', default=r'E:\Tugas Akhir\TugasAkhir\result\openai_gpt-oss-20b')  # FIX: default path for direct rebuild
+    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b')  # FIX: default output path
     parser.add_argument('--include_personas', default=None)
     parser.add_argument('--exclude_dirs', default='warmup')
     parser.add_argument('--test', action='store_true', help='Run unit tests and exit')
@@ -252,6 +253,8 @@ def normalize_number(raw):
     s = re.sub(r'\{,\}', ',', s)
     # Strip currency and percent
     s = s.replace('$', '').replace('€', '').replace('£', '').replace('%', '').strip()
+    # FIX: normalise unicode minus variants (−, –) and spaced minus ("- 3" → "-3")
+    s = s.replace('\u2212', '-').replace('\u2013', '-').replace('- ', '-')
     # Remove commas (thousands separator)
     s = s.replace(',', '')
     # Remove spaces between digits: 85 000 → 85000
@@ -364,9 +367,9 @@ def extract_final_answer(text):
     # Lines matching this pattern are NEVER used as answer source
     # (assumption/condition/note/if-you lines that appear before or after final answer)
     ASSUMPTION_RE = re.compile(
-        r'^\s*(if\s+(you|we|the|a\s)|assumption[s]?[:\s]|note[:\s]|given\s+that|assuming|suppose|consider|caveat|disclaimer|\*\*?note\*\*?)',
+        r'^\s*(if\s+(you\b|we\b|the\b|a\s)|assumption[s]?[:\s]|note[:\s]|given\s+that|assuming|suppose|consider|caveat|disclaimer|\*\*?note\*\*?)',
         re.I
-    )
+    )  # FIX: use word boundaries on you/we/the to avoid matching "if they", "if there"
     # FIX: detect bold step-label patterns (e.g. "**Step 5: Final answer**") to skip them
     STEP_BOLD_RE = re.compile(r'^\s*step\s*\d+\b', re.I)
 
@@ -434,31 +437,73 @@ def extract_final_answer(text):
             continue
         if not marker_re.search(line):
             continue
-        # RULE 8: prefer first currency amount
-        m_cur = re.search(r'[\$€£]\s*(' + NUMBER_RE + r')', line)
-        if m_cur:
-            num = normalize_number(m_cur.group(1))
-            if num is not None:
-                return num, 'final_marker'
-        # Split on marker, take text after it, grab FIRST number
+        # Split on marker, take text after it
         parts = marker_re.split(line, maxsplit=1)
         search_text = ''.join(parts[2:]) if len(parts) >= 3 else line
+        # FIX: strip leading partial-bold fragment e.g. ":**" from "**Answer:**" split remainder
+        # Strip any leading asterisks, colons, spaces to avoid phantom bold group at start
+        search_text = re.sub(r'^[\*:\s]+', '', search_text)  # FIX: strip leading * : space
         # FIX: skip if the only content is a step label (e.g. "**Step 5: Final answer**")
         if re.search(r'\*\*\s*step\s*\d+\b[^*]*\*\*', search_text, re.I) and \
                 not re.search(r'\d+.*[.!?,]', search_text):
             continue
-        # FIX: prefer bold number in search_text over plain first number (e.g. "**$4 more**" wins over "3 loaves")
-        m_bold_r3 = re.search(r'\*\*\s*(?:[^*\d]*?)(?:[\$€£]\s*)?(' + NUMBER_RE + r')[^*]*\*\*', search_text)
-        if m_bold_r3:
-            raw_r3 = m_bold_r3.group(1)
-            # FIX: strip :HH time suffix (e.g. "2:00 pm" matched as "2" with ":00" after)
-            after_r3 = search_text[m_bold_r3.end(1):]
-            if re.match(r':\d{2}\b', after_r3):
-                m_digits = re.match(r'\d+', raw_r3)
-                raw_r3 = m_digits.group(0) if m_digits else raw_r3
-            num = normalize_number(raw_r3)
+        # FIX (Rule 3 bold extraction): find bold groups in search_text
+        # Use strict approach: only find **...**  where content has no embedded ** 
+        _r3_bold_groups = re.findall(r'\*\*([^*]+)\*\*', search_text)
+        _r3_bold_nums = []
+        for _bg in _r3_bold_groups:
+            _bg_clean = _bg.replace('\\$', '$').replace('\\', '')
+            _bgnums = [normalize_number(t) for t in re.findall(NUMBER_RE, _bg_clean)]
+            _bgnums = [n for n in _bgnums if n is not None]
+            if _bgnums:
+                _r3_bold_nums.append((_bg, _bgnums))
+        if _r3_bold_nums:
+            # If line has "total of/altogether", take last bold number
+            if re.search(r'\b(total\s+of|altogether|in\s+total)\b', search_text, re.I):
+                _bg_last, _bns_last = _r3_bold_nums[-1]
+                num = _bns_last[-1] if '=' in _bg_last else _bns_last[0]
+                if num is not None:
+                    return num, 'final_marker'
+            # Sum parallel bold numbers joined by "and" (e.g. "27 selfies and 18 portraits" → 45)
+            elif re.search(r'\band\b', search_text, re.I) and len(_r3_bold_nums) >= 2:
+                _sum_nums = [_bns[0] for _, _bns in _r3_bold_nums]
+                return sum(_sum_nums), 'final_marker'  # FIX: sum parallel bolds in marker line
+            # single bold OR last bold group (for multi-bold without sum)
+            _bg_last, _bns_last = _r3_bold_nums[-1]
+            _bg_last_clean = _bg_last.replace('\\$', '$').replace('\\', '')
+            if '=' in _bg_last_clean:
+                # after-eq: take last number in this bold group
+                num = _bns_last[-1]
+            else:
+                # FIX: strip :HH time suffix
+                _raw_r3 = re.findall(NUMBER_RE, _bg_last_clean)[0]
+                _after_r3 = _bg_last_clean[_bg_last_clean.find(_raw_r3) + len(_raw_r3):]
+                if re.match(r':\d{2}\b', _after_r3):
+                    _m_digits = re.match(r'\d+', _raw_r3)
+                    _raw_r3 = _m_digits.group(0) if _m_digits else _raw_r3
+                num = normalize_number(_raw_r3)
             if num is not None:
                 return num, 'final_marker'
+        # RULE 8: currency in search_text — skip \$ (LaTeX-escaped) as not real currency  # FIX
+        # Only match real currency symbols (not backslash-escaped $)
+        m_cur = re.search(r'(?<!\\)[\$€£]\s*(' + NUMBER_RE + r')', search_text)
+        if m_cur:
+            if '=' in search_text:
+                after_eq = search_text.rsplit('=', 1)[-1]
+                nums_aeq = [normalize_number(t) for t in re.findall(NUMBER_RE, after_eq)]
+                nums_aeq = [n for n in nums_aeq if n is not None]
+                if nums_aeq:
+                    return nums_aeq[-1], 'final_marker'
+            else:
+                num = normalize_number(m_cur.group(1))
+                if num is not None:
+                    return num, 'final_marker'
+        # FIX (Rule 3 after-equals): if search_text has "=" extract LAST number (the result)
+        if '=' in search_text:
+            nums_eq = [normalize_number(t) for t in re.findall(NUMBER_RE, search_text)]
+            nums_eq = [n for n in nums_eq if n is not None]
+            if nums_eq:
+                return nums_eq[-1], 'final_marker'
         m_num = re.search(NUMBER_RE, search_text)
         if m_num:
             raw_num = m_num.group(0)
@@ -479,46 +524,89 @@ def extract_final_answer(text):
         'sixteen':16,'seventeen':17,'eighteen':18,'nineteen':19,'twenty':20,
     }
 
-    # Bold regex: matches **77**, **€77**, **score of 98**, **Jojo scored 54 points.**
-    # Captures first number inside bold markers, allowing text before/after
-    BOLD_NUM_RE = r'\*\*\s*(?:[^*\d]*?)(?:[\$€£]\s*)?(' + NUMBER_RE + r')[^*]*\*\*'
+    # ── RULE 4 helper: extract answer from bold groups on a line ─────────────
+    # FIX: use BOLD_GROUP_RE (simple [^*]+) to correctly find bold segments without cross-boundary issues
+    BOLD_GROUP_RE = re.compile(r'\*\*([^*]+)\*\*')  # FIX: reliable bold group extraction
+
+    def _extract_from_bold_groups(line, allow_assumption=False):
+        """Extract the answer number from bold groups on this line.
+        Returns (number, label) or (None, None).
+        """
+        if not allow_assumption and ASSUMPTION_RE.match(line):
+            # FIX: even if ASSUMPTION_RE matches, try to extract if there's a bold number (e.g. "Assuming..., X scores **36 points**")
+            if not re.search(r'\*\*[^*]*\d[^*]*\*\*', line):
+                return None, None
+        groups = BOLD_GROUP_RE.findall(line)  # FIX: list of bold text segments
+        if not groups:
+            return None, None
+        # Skip if ALL bold groups are just step labels
+        all_step = all(STEP_BOLD_RE.match(g) for g in groups)
+        if all_step:
+            return None, None
+        # FIX: normalize \$ (escaped dollar in LaTeX) to $ for number matching
+        def clean_bold(g):
+            return g.replace('\\$', '$').replace('\\', '')
+        # Collect bold groups that contain numbers
+        num_groups = []
+        for g in groups:
+            if STEP_BOLD_RE.match(g):
+                continue
+            gc = clean_bold(g)
+            nums = [normalize_number(t) for t in re.findall(NUMBER_RE, gc)]
+            nums = [n for n in nums if n is not None]
+            if nums:
+                num_groups.append((g, gc, nums))
+        if not num_groups:
+            return None, None
+        # FIX: check for inline LaTeX math result on the line — prefer that over bold text label (e.g. "Total = \(40+20+100=160\) min, i.e. **2 hours**")
+        m_inline_r4 = re.search(r'\\+\([^)]*?=\s*(' + NUMBER_RE + r')[^)]*\\+\)', line)
+        if m_inline_r4:
+            # Only prefer inline if the line's bold groups have no '=' (i.e. bolds are labels not equations)
+            all_bold_no_eq = all('=' not in g for g, _, _ in num_groups)
+            if all_bold_no_eq:
+                num = normalize_number(m_inline_r4.group(1))
+                if num is not None:
+                    return num, 'bold_final'  # FIX: inline math result wins over decorative bold
+        # FIX: if line contains "total of/altogether", use last bold number (answer, not addends)
+        # Note: do NOT trigger on bare "combined" since "(a combined N kg)" means N is not bold
+        if re.search(r'\b(total\s+of|altogether|in\s+total)\b', line, re.I):
+            g_last, gc_last, nums_last = num_groups[-1]
+            num = nums_last[-1] if '=' in gc_last else nums_last[0]
+            return num, 'bold_final'  # FIX: removed 'combined' trigger to avoid false positives
+        # FIX (sum-and inside single bold): "**3 onions and 1 potato**" → 3+1=4 ... but wait that's wrong
+        # instead check for "and" WITHIN a single bold AND the bold is the ONLY numeric group
+        if len(num_groups) == 1:
+            g0, gc0, nums0 = num_groups[0]
+            # FIX (after-equals in single bold): "**Total = 84 + 88 = 172**" → 172
+            if '=' in gc0:
+                return nums0[-1], 'bold_final'
+            # FIX (sum-and inside single bold): "**86 glasses and 42 plates**" → 128
+            if re.search(r'\band\b', g0, re.I) and len(nums0) >= 2:
+                return sum(nums0), 'bold_final'
+            return nums0[0], 'bold_final'
+        # Multiple bold groups with numbers
+        # FIX (sum-and across separate bolds): "**27 selfies** and **18 portraits**" → 45
+        # Only sum if "and" appears in line and num_groups ≥ 2 (no "total/altogether" — already handled above)
+        if re.search(r'\band\b', line, re.I) and len(num_groups) >= 2:  # FIX: simplified check
+            # Sum all parallel bold numbers (each group contributes its first number)
+            _sum = sum(nums[0] for _, _, nums in num_groups)
+            return _sum, 'bold_final'  # FIX: sum parallel bolds when "and" found in line
+        # FIX: default — take LAST bold group with a number, use last number if '=' in group
+        g_last, gc_last, nums_last = num_groups[-1]
+        num = nums_last[-1] if '=' in gc_last else nums_last[0]
+        return num, 'bold_final'
 
     # ── RULE 4a: Bold with soft marker word ──────────────────────────────────
+    # FIX: single merged loop — find MOST RECENT line with a bold number (reversed = last first).
+    # Soft marker preference REMOVED to avoid stale intermediate-calculation lines winning.
     for line in reversed(last_lines):
         if '|' in line:
             continue
-        if ASSUMPTION_RE.match(line):
-            continue
-        soft_marker = re.search(
-            r'\b(answer|so|therefore|thus|total|hence|scored|gets?|has|have|left|remaining|result|equal)\b',
-            line, re.I
-        )
-        if soft_marker:
-            m_bold = re.search(BOLD_NUM_RE, line)
-            if m_bold:
-                # FIX: skip bold matches that are just step labels (e.g. "**Step 5: Final answer**")
-                bold_inner = re.search(r'\*\*([^*]+)\*\*', line)
-                if bold_inner and STEP_BOLD_RE.match(bold_inner.group(1)):
-                    continue
-                num = normalize_number(m_bold.group(1))
-                if num is not None:
-                    return num, 'bold_final'
+        num, lbl = _extract_from_bold_groups(line)
+        if num is not None:
+            return num, lbl  # FIX: return immediately from most recent bold line
 
-    # ── RULE 4b: Any bold number in last 20 lines ────────────────────────────
-    for line in reversed(last_lines):
-        if '|' in line:
-            continue
-        if ASSUMPTION_RE.match(line):
-            continue
-        m_bold = re.search(BOLD_NUM_RE, line)
-        if m_bold:
-            # FIX: skip bold matches that are just step labels (e.g. "**Step 5: Final answer**")
-            bold_inner = re.search(r'\*\*([^*]+)\*\*', line)
-            if bold_inner and STEP_BOLD_RE.match(bold_inner.group(1)):
-                continue
-            num = normalize_number(m_bold.group(1))
-            if num is not None:
-                return num, 'bold_final'
+    # ── RULE 4b removed — merged into Rule 4a above ────────────────────────────
 
     # ── RULE 4c: Currency in last 20 lines ───────────────────────────────────
     for line in reversed(last_lines):
@@ -528,9 +616,19 @@ def extract_final_answer(text):
             continue
         m_cur = re.search(r'[\$€£]\s*(' + NUMBER_RE + r')', line)
         if m_cur:
-            num = normalize_number(m_cur.group(1))
-            if num is not None:
-                return num, 'currency_final'
+            # FIX (Rule 4c after-equals): if the line has "=", take the last number after final "=" (result side)
+            if '=' in line:
+                after_eq = line.rsplit('=', 1)[-1]
+                nums_aeq = [normalize_number(t) for t in re.findall(NUMBER_RE, after_eq)]
+                nums_aeq = [n for n in nums_aeq if n is not None]
+                if nums_aeq:
+                    return nums_aeq[-1], 'currency_final'
+            else:
+                # FIX (Rule 4c last-currency no-eq): take LAST currency amount, not first (e.g. "bill is $100, leaves with $25" → 25)
+                all_curs = [normalize_number(t) for t in re.findall(r'(?<=[\$€£])\s*(' + NUMBER_RE + r')', line)]
+                all_curs = [n for n in all_curs if n is not None]
+                if all_curs:
+                    return all_curs[-1], 'currency_final'  # FIX: use last currency value
 
     # ── RULE 4d: Bold label followed by number: **Total items in use:** 56. ──
     for line in reversed(last_lines):
@@ -569,8 +667,11 @@ def extract_final_answer(text):
             continue
         if ASSUMPTION_RE.match(line_s):
             continue
+        # FIX (Rule 5 SKIP bypass): don't skip bullet/numbered lines if they contain = or Total/Answer OR start with negative number
         if SKIP_RE.match(line_s):
-            continue
+            if not (re.search(r'=', line_s) or re.search(r'\b(total|answer)\b', line_s, re.I)
+                    or re.match(r'^-\d', line_s)):  # FIX: allow negative plain number lines
+                continue
         # Skip pure intermediate-step lines (multiple = signs, no sentence words)
         # 5a: LaTeX line ending with = N \text{unit} or = N\ \text{unit}.
         # Also handles plain arithmetic: "Total teachers present: 69 + 9 = 78."
@@ -584,12 +685,19 @@ def extract_final_answer(text):
                 return num, 'latex_result'
 
         # 5b: LaTeX inline math: \(a + b = N\) or \(a = N\)
+        # FIX (Rule 5b relax): allow trailing characters after closing \) (e.g. "= 13 \text{ minutes}\).")
         m_inline = re.search(
-            r'\\+\(\s*[^)]*?=\s*(' + NUMBER_RE + r')\s*\\+\)',
+            r'\\+\(\s*[^)]*?=\s*(' + NUMBER_RE + r')[^)]*\\+\)',
             line_s
         )
         if m_inline:
             num = normalize_number(m_inline.group(1))
+            if num is not None:
+                return num, 'latex_inline'
+        # FIX (Rule 5b-no-eq): \(N\) or \(N \text{...}\) with no equals — plain number in parens
+        m_inline_plain = re.search(r'\\+\(\s*(' + NUMBER_RE + r')\s*(?:\\+[a-zA-Z]+\{[^}]*\})?\s*\\+\)', line_s)
+        if m_inline_plain:
+            num = normalize_number(m_inline_plain.group(1))
             if num is not None:
                 return num, 'latex_inline'
 
@@ -625,7 +733,9 @@ def extract_final_answer(text):
                     return num, 'tail_sentence'
 
         # 5d: Plain number only line
-        m_plain = re.match(r'^(' + NUMBER_RE + r')\s*\.?\s*$', line_s)
+        # FIX: also accept leading negative sign for plain number (e.g. "-3 °C")
+        # FIX: use re.fullmatch-style by allowing optional unit chars and unicode degree symbol
+        m_plain = re.match(r'^((?:[-\u2212\u2013]\s*)?(?:[\$])?(?:\d{1,3}(?:(?:,|\{,\}|\s)\d{3})+|\d+)(?:\.\d+)?)\s*(?:[°\u00b0a-zA-Z\.%]*)?\s*$', line_s)  # FIX: explicit negative prefix
         if m_plain:
             num = normalize_number(m_plain.group(1))
             if num is not None:
@@ -895,11 +1005,71 @@ def run_unit_tests():
         ("Answer: 225 minutes (or 3 hours and 45 minutes)", 225),
         # gsm8k_01223: two boxed with "or" between them — FIX 4 returns FIRST boxed (350)
         ("\\[ \\boxed{350 \\text{ inches}} \\quad \\text{or} \\quad \\boxed{9.72 \\text{ yards}} \\]", 350),
+        # FIX: new dataset cases (3-tuple form: name, text, expected)
+        # OpenAI GPT-OSS No-Extract Cases
+        ("Case_1_0078", "- Total teachers present: 69 + 9 = 78.", 78),
+        ("Case_7_0095", "The average score is \\(95\\).", 95),
+        ("Case_8_minus3", "-3 \u00b0C", -3),
+        ("Case_9_0013", "Total cassette time = \\(5 \\text{ min} + 8 \\text{ min} = 13 \\text{ minutes}\\).", 13),
+        ("Case_12_0060", "- Net snowballs: \\(100 - 40 = 60\\).", 60),
+        # OpenAI GPT-OSS Wrong-Extract Cases
+        ("gsm8k_00001", "**Answer: Janet makes \\$18 every day at the farmers' market.**", 18),
+        ("gsm8k_00008", "Total time = \\(40 + 20 + 100 = 160\\) minutes, i.e. **2 hours 40 minutes**.", 160),
+        ("gsm8k_00063", "- 50 % \u00d7 $50,000 = $25,000.", 25000),
+        ("gsm8k_00103", "Total water glasses in a week: **20 + 6 = 26 glasses**.", 26),
+        ("gsm8k_00116", "**Total cost** = 10 \u00d7 $10 + 5 \u00d7 $16 = $100 + $80 = **$180**\n**Profit** = $270 \u2013 $180 = **$90**.", 90),
+        ("gsm8k_00139", "\\(35 + 70 = 105\\) questions were left incomplete in total.", 105),
+        ("gsm8k_00207", "**Total distance = 500 km + 360 km = 860 km**.", 860),
+        ("gsm8k_00259", "Total amount to pay:\n\\(\\$4.00 + \\$2.00 = \\$6.00\\).", 6),
+        ("gsm8k_00298", "**Sam was 55 crates short of his weekly target.**", 55),
+        ("gsm8k_00334", "**Cost difference:** $3,450 \u2013 $3,350 = **$100** (Furniture United's offer is $100 more expensive).", 100),
+        ("gsm8k_00354", "\\text{Sightseeing time } = 0.40 \\times 20\\text{ h} = 8\\text{ h}\n\\]\n**Answer: 8 hours.**", 8),
+        ("gsm8k_00447", "Number of trays that can be filled = 50 eggs \u00f7 25 eggs/tray = **2 trays**.", 2),
+        ("gsm8k_00467", "Kelly paid \\( \\$9.00 - \\$8.00 = \\$1.00\\) more than Becky.", 1),
+        ("gsm8k_00490", "The average highest temperature is **-10 \u00b0F**.", -10),
+        ("gsm8k_00500", "n = \\frac{200}{20} = 10\n\\]\n**Answer:** 10 guests. At 10 guests, both venues cost \\$250.", 10),
+        ("gsm8k_00510", "Sophia bought **3 onions and 1 potato** \u2013 a total of **4 items**.", 4),
+        ("gsm8k_00521", "Total per grandchild = 2 + 4 + 12 + 1 + 2 = **21 skeins**.\nWith 3 triplets, she needs 21 \u00d7 3 = **63 skeins** of wool.", 63),
+        ("gsm8k_00529", "**Total number of sofas and chairs = 84 + 88 = 172**.", 172),
+        ("gsm8k_00533", "The age difference now is 47 \u2013 22 = **25 years**.", 25),
+        ("gsm8k_00544", "So Jairus gets \\( \\$16 - \\$10 = \\$6\\) more than Jenny.", 6),
+        ("gsm8k_00552", "She pays with a $50 bill, so her change is\n$50 \u2212 $33 = **$17**.", 17),
+        ("gsm8k_00625", "The basketball coach spent \\( \\$112 - \\$27 = \\$85\\) more than the baseball coach.", 85),
+        ("gsm8k_00651", "The difference is **$540 \u2013 $398 = $142**.", 142),
+        ("gsm8k_00660", "**Difference:**\n\\( \\$10 - \\$7 = \\$3 \\)\n\\[\n\\boxed{\\text{It costs \\$3 more for the first mixture.}}\n\\]", 3),
+        ("gsm8k_00667", "If they pool their money and split it evenly, each person would receive **$120**.", 120),
+        ("gsm8k_00691", "So, ten years later, Rong has **2 400 coins** and Neil has **3 360 coins**.", 5760),
+        ("gsm8k_00692", "John's total bill is $100, so he leaves with $25.", 25),
+        ("gsm8k_00711", "**Final bill:** $50.00 \u2013 $5.00 = **$45.00**.", 45),
+        ("gsm8k_00720", "So she gave **75 kg to her cousin** and **100 kg to her brother** (a combined 175 kg).", 175),
+        ("gsm8k_00740", "4. **Add the two totals**\n   - Total spent = \\(50 + 48 = \\$98\\).\nSo Cecelia spent **$98** in total.", 98),
+        ("gsm8k_00802", "**Total trees planted = 1,000 + 240 = 1,240 trees.**", 1240),
+        ("gsm8k_00828", "Adding the shipping cost: \\$8 (book loss) + \\$3 (shipping) = **\\$11**.", 11),
+        ("gsm8k_00899", "50\\ \\text{miles} + 60\\ \\text{miles} = 110\\ \\text{miles}.", 110),
+        ("gsm8k_00904", "**Total material needed = 10 yards + 6 yards = 16 yards**.", 16),
+        ("gsm8k_00937", "**Savings** = 1 600 \u2013 1 350 = **250 pesos**.", 250),
+        ("gsm8k_01018", "**Answer:** Olivia had **27 selfies** and **18 portraits**.", 45),
+        ("gsm8k_01022", "Assuming each question is worth 1 point, Aries is sure to score **36 points**.", 36),
+        ("gsm8k_01097", "People helped = 6 people/day \u00d7 40 days = **240 people**.", 240),
+        ("gsm8k_01114", "The temperature in the morning was **\u20133 \u00b0C**.", -3),
+        ("gsm8k_01139", "470 cows + 230 chickens = **700 animals**.", 700),
+        ("gsm8k_01155", "Total per week: **20 + 10 = 30 carrots**.", 30),
+        ("gsm8k_01167", "So an avocado tree can produce **2 350 fruits** over its first ten years of life.", 2350),
+        ("gsm8k_01197", "So in total she bought **25 + 50 = 75 pens**.\nAssuming Alain has all the pens she bought, he has **75 pens**.", 75),
+        ("gsm8k_01262", "Over 5 weeks: 5 \u00d7 $47.00 = **$235.00**.", 235),
+        ("gsm8k_01304", "Since \\(28\\) days is exactly \\(4\\) weeks, it takes Nate **4 weeks** to fill all the holes.", 4),
+        ("gsm8k_00010_imp", "**Total earnings for the week:** \\$400 + \\$60 = **\\$460**.", 460),
     ]
-    for text, expected in efa_cases:
+    for entry in efa_cases:
+        # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries
+        if len(entry) == 3:
+            name, text, expected = entry
+        else:
+            text, expected = entry
+            name = text[:30]
         got, reason = extract_final_answer(text)
         ok = (got == expected)
-        print(f"  {'OK' if ok else 'FAIL'} [{reason}] extract({text[:50]!r}) -> {got} (expected {expected})")
+        print(f"  {'OK' if ok else 'FAIL'} [{reason}] {name!r} -> {got} (expected {expected})")
         if not ok:
             all_ok = False
 
