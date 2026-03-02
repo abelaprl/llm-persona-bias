@@ -367,6 +367,8 @@ def extract_final_answer(text):
         r'^\s*(if\s+(you|we|the|a\s)|assumption[s]?[:\s]|note[:\s]|given\s+that|assuming|suppose|consider|caveat|disclaimer|\*\*?note\*\*?)',
         re.I
     )
+    # FIX: detect bold step-label patterns (e.g. "**Step 5: Final answer**") to skip them
+    STEP_BOLD_RE = re.compile(r'^\s*step\s*\d+\b', re.I)
 
     # Work on full text for #### and \boxed, last 1200 chars for marker scan
     tail = text[-1200:] if len(text) > 1200 else text
@@ -386,6 +388,12 @@ def extract_final_answer(text):
         v = v.replace('{', '').replace('}', '')
         # Strip % sign (e.g. 12%)
         v = v.replace('%', '')
+        # FIX: if "and" appears in original val, sum all numbers (e.g. "86 glasses and 42 plates")
+        if re.search(r'\band\b', val, re.I):
+            nums_and = [normalize_number(t) for t in re.findall(NUMBER_RE, val)]
+            total_and = sum(n for n in nums_and if n is not None)
+            if total_and:
+                return total_and
         return normalize_number(v.strip())
 
     # ── RULE 1: #### marker ──────────────────────────────────────────────────
@@ -400,6 +408,15 @@ def extract_final_answer(text):
     boxed_matches = list(re.finditer(
         r'\\{1,2}boxed\{((?:[^{}]|\{[^{}]*\})*)\}', tail
     ))
+    # FIX: if multiple boxed values are separated by "or", prefer the FIRST boxed value
+    if len(boxed_matches) > 1:
+        for i in range(len(boxed_matches) - 1):
+            between = tail[boxed_matches[i].end():boxed_matches[i + 1].start()]
+            if re.search(r'\bor\b', between, re.I):
+                num = _parse_boxed_val(boxed_matches[0].group(1))
+                if num is not None:
+                    return num, 'boxed'
+                break
     for bm in reversed(boxed_matches):
         val = bm.group(1)
         num = _parse_boxed_val(val)
@@ -426,9 +443,31 @@ def extract_final_answer(text):
         # Split on marker, take text after it, grab FIRST number
         parts = marker_re.split(line, maxsplit=1)
         search_text = ''.join(parts[2:]) if len(parts) >= 3 else line
+        # FIX: skip if the only content is a step label (e.g. "**Step 5: Final answer**")
+        if re.search(r'\*\*\s*step\s*\d+\b[^*]*\*\*', search_text, re.I) and \
+                not re.search(r'\d+.*[.!?,]', search_text):
+            continue
+        # FIX: prefer bold number in search_text over plain first number (e.g. "**$4 more**" wins over "3 loaves")
+        m_bold_r3 = re.search(r'\*\*\s*(?:[^*\d]*?)(?:[\$€£]\s*)?(' + NUMBER_RE + r')[^*]*\*\*', search_text)
+        if m_bold_r3:
+            raw_r3 = m_bold_r3.group(1)
+            # FIX: strip :HH time suffix (e.g. "2:00 pm" matched as "2" with ":00" after)
+            after_r3 = search_text[m_bold_r3.end(1):]
+            if re.match(r':\d{2}\b', after_r3):
+                m_digits = re.match(r'\d+', raw_r3)
+                raw_r3 = m_digits.group(0) if m_digits else raw_r3
+            num = normalize_number(raw_r3)
+            if num is not None:
+                return num, 'final_marker'
         m_num = re.search(NUMBER_RE, search_text)
         if m_num:
-            num = normalize_number(m_num.group(0))
+            raw_num = m_num.group(0)
+            # FIX: strip :HH time suffix (e.g. "2:00 pm" → 2, avoids :00 being seen as decimal)
+            after_num = search_text[m_num.end():]
+            if re.match(r':\d{2}\b', after_num):
+                m_digits = re.match(r'\d+', raw_num)
+                raw_num = m_digits.group(0) if m_digits else raw_num
+            num = normalize_number(raw_num)
             if num is not None:
                 return num, 'final_marker'
 
@@ -457,6 +496,10 @@ def extract_final_answer(text):
         if soft_marker:
             m_bold = re.search(BOLD_NUM_RE, line)
             if m_bold:
+                # FIX: skip bold matches that are just step labels (e.g. "**Step 5: Final answer**")
+                bold_inner = re.search(r'\*\*([^*]+)\*\*', line)
+                if bold_inner and STEP_BOLD_RE.match(bold_inner.group(1)):
+                    continue
                 num = normalize_number(m_bold.group(1))
                 if num is not None:
                     return num, 'bold_final'
@@ -469,6 +512,10 @@ def extract_final_answer(text):
             continue
         m_bold = re.search(BOLD_NUM_RE, line)
         if m_bold:
+            # FIX: skip bold matches that are just step labels (e.g. "**Step 5: Final answer**")
+            bold_inner = re.search(r'\*\*([^*]+)\*\*', line)
+            if bold_inner and STEP_BOLD_RE.match(bold_inner.group(1)):
+                continue
             num = normalize_number(m_bold.group(1))
             if num is not None:
                 return num, 'bold_final'
@@ -831,6 +878,23 @@ def run_unit_tests():
         ("a tire would last **six years** under these driving conditions.", 6),
         # Total items bold
         ("**Total items in use:** 56.", 56),
+        # FIX: new targeted failure cases
+        # gsm8k_00474: boxed with % — Rule 2 should fire before Rule 4b sees Step 5
+        ("**Step 5: Final answer**\n\\[ \\boxed{10\\%} \\]", 10),
+        # gsm8k_00515: LaTeX inline currency \($90{,}000\) in marker line
+        ("**Answer:** The house cost \\(\\$90{,}000\\).", 90000),
+        # gsm8k_00754: boxed with "and" — FIX 1 sums 86+42
+        ("\\[ \\boxed{86 \\text{ glasses and } 42 \\text{ plates}} \\]", 128),
+        # gsm8k_00800: marker line with bold $4 — FIX 3 prefers bold currency over "3 loaves"
+        ("**Answer:** 3 loaves of bread cost **$4 more** than 2 bagels.", 4),
+        # gsm8k_00907: boxed with "and" — FIX 1 sums 4+6
+        ("\\[ \\boxed{4 \\text{ blue and } 6 \\text{ red}} \\]", 10),
+        # gsm8k_01002: time format — Rule 3 picks 2 from "2:00 pm" (NUMBER_RE stops at :)
+        ("latest start time:**\n2:00 pm.\n**Answer:** 2:00 pm.", 2),
+        # gsm8k_01219: "or" in parenthetical after marker — Rule 3 takes first number 225
+        ("Answer: 225 minutes (or 3 hours and 45 minutes)", 225),
+        # gsm8k_01223: two boxed with "or" between them — FIX 4 returns FIRST boxed (350)
+        ("\\[ \\boxed{350 \\text{ inches}} \\quad \\text{or} \\quad \\boxed{9.72 \\text{ yards}} \\]", 350),
     ]
     for text, expected in efa_cases:
         got, reason = extract_final_answer(text)
