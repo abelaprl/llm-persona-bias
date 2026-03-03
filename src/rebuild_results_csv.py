@@ -257,9 +257,10 @@ def normalize_number(raw):
     s = s.replace('\u2212', '-').replace('\u2013', '-').replace('- ', '-')
     # Remove commas (thousands separator)
     s = s.replace(',', '')
-    # Remove spaces between digits: 85 000 → 85000
+    # Remove spaces between digits used as thousands grouping: 85 000 → 85000
+    # Only remove when exactly 3 digits follow (standard thousands group), not "18 48" etc.
     while True:
-        new_s = re.sub(r'(?<=\d)\s+(?=\d)', '', s)
+        new_s = re.sub(r'(?<=\d)\s+(?=\d{3}(?!\d))', '', s)
         if new_s == s:
             break
         s = new_s
@@ -379,6 +380,14 @@ def extract_final_answer(text):
 
     # Helper: extract number from \boxed{...} content, ignoring \text{...} units
     def _parse_boxed_val(val):
+        # FIX: early detection of hours+minutes (e.g. \boxed{18\text{ hours }48\text{ minutes}} → 1128 min)
+        _hm = re.search(r'(\d[\d,]*)\s*\\+text\{[^}]*hour', val, re.I)
+        _mm_match = re.search(r'(\d[\d,]*)\s*\\+text\{[^}]*min', val, re.I)
+        if _hm and _mm_match:
+            h = normalize_number(_hm.group(1))
+            m_ = normalize_number(_mm_match.group(1))
+            if h is not None and m_ is not None:
+                return int(h) * 60 + int(m_)
         # First handle LaTeX thousands: {,} → ,
         v = re.sub(r'\{,\}', ',', val)
         # FIX: before stripping \text{...}, save any numbers embedded inside text blocks
@@ -487,6 +496,9 @@ def extract_final_answer(text):
         # FIX: strip leading partial-bold fragment e.g. ":**" from "**Answer:**" split remainder
         # Strip any leading asterisks, colons, spaces to avoid phantom bold group at start
         search_text = re.sub(r'^[\*:\s]+', '', search_text)  # FIX: strip leading * : space
+        # FIX: skip setup lines like "Thus for 8 sandwiches:" — after-marker text starts with "for" + ends with ":"
+        if re.match(r'^for\s+', search_text, re.I) and search_text.strip().endswith(':'):
+            continue
         # FIX: skip if the only content is a step label (e.g. "**Step 5: Final answer**")
         if re.search(r'\*\*\s*step\s*\d+\b[^*]*\*\*', search_text, re.I) and \
                 not re.search(r'\d+.*[.!?,]', search_text):
@@ -603,11 +615,14 @@ def extract_final_answer(text):
         if not num_groups:
             return None, None
         # FIX: check for inline LaTeX math result on the line — prefer that over bold text label (e.g. "Total = \(40+20+100=160\) min, i.e. **2 hours**")
-        m_inline_r4 = re.search(r'\\+\([^)]*?=\s*(' + NUMBER_RE + r')[^)]*\\+\)', line)
+        m_inline_r4 = re.search(r'\\+\([^)]*=\s*(' + NUMBER_RE + r')[^)]*\\+\)', line)  # FIX: greedy = last =
         if m_inline_r4:
             # Only prefer inline if the line's bold groups have no '=' (i.e. bolds are labels not equations)
             all_bold_no_eq = all('=' not in g for g, _, _ in num_groups)
-            if all_bold_no_eq:
+            # FIX: skip if inline math is inside a parenthetical aside e.g. "Sam is **6** now. (Ruby would be \(6x6=36\)...)"
+            _r4_before = line[:m_inline_r4.start()]
+            _r4_in_paren = _r4_before.count('(') > _r4_before.count(')')
+            if not _r4_in_paren and all_bold_no_eq:
                 num = normalize_number(m_inline_r4.group(1))
                 if num is not None:
                     return num, 'bold_final'  # FIX: inline math result wins over decorative bold
@@ -627,10 +642,20 @@ def extract_final_answer(text):
             # FIX (sum-and inside single bold): "**86 glasses and 42 plates**" → 128
             if re.search(r'\band\b', g0, re.I) and len(nums0) >= 2:
                 return sum(nums0), 'bold_final'
+            # FIX: single bold with "from now/will be" context → take last number (the answer, not the offset)
+            if len(nums0) >= 2 and re.search(r'\b(from now|will be)\b', g0, re.I):
+                return nums0[-1], 'bold_final'
+            # FIX: single bold ending with currency amount → last number is the cost answer
+            if len(nums0) >= 2 and re.search(r'[\$\u20ac\xa3]\s*' + NUMBER_RE + r'\s*[.,]?\s*$', gc0):
+                return nums0[-1], 'bold_final'
             return nums0[0], 'bold_final'
         # Multiple bold groups with numbers
         # FIX (sum-and across separate bolds): "**27 selfies** and **18 portraits**" → 45
         # Only sum if "and" appears in line and num_groups ≥ 2 (no "total/altogether" — already handled above)
+        # FIX: "which is/that is" unit conversion → keep FIRST bold (original units, e.g. "540 seconds, which is 9 minutes" → 540)
+        if re.search(r'\b(which is|that is)\b', line, re.I) and len(num_groups) >= 2:
+            g_f, gc_f, nums_f = num_groups[0]
+            return nums_f[0], 'bold_final'
         if re.search(r'\band\b', line, re.I) and len(num_groups) >= 2:  # FIX: simplified check
             # Sum all parallel bold numbers (each group contributes its first number)
             _sum = sum(nums[0] for _, _, nums in num_groups)
@@ -649,6 +674,21 @@ def extract_final_answer(text):
         num, lbl = _extract_from_bold_groups(line)
         if num is not None:
             return num, lbl  # FIX: return immediately from most recent bold line
+        # FIX: \mathbf{N} — LaTeX bold math (not ** markdown) on this line
+        _m_mathbf = re.search(r'\\mathbf\{([^}]*)\}', line)
+        if _m_mathbf:
+            _mb_inner = re.sub(r'\\[a-zA-Z]+', ' ', _m_mathbf.group(1))
+            _mb_inner = re.sub(r'[{};\\,]', ' ', _mb_inner)
+            _mb_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, _mb_inner)]
+            _mb_nums = [n for n in _mb_nums if n is not None]
+            if _mb_nums:
+                return _mb_nums[-1], 'bold_final'
+        # FIX: inline math \(... = N\) on a no-bold line — greedy to get value after LAST =
+        _m_im_nb = re.search(r'\\+\(\s*[^)]*=\s*(' + NUMBER_RE + r')[^)]*\\+\)', line)
+        if _m_im_nb:
+            _im_nb_num = normalize_number(_m_im_nb.group(1))
+            if _im_nb_num is not None:
+                return _im_nb_num, 'latex_inline'
 
     # ── RULE 4b removed — merged into Rule 4a above ────────────────────────────
 
@@ -732,7 +772,7 @@ def extract_final_answer(text):
         # 5b: LaTeX inline math: \(a + b = N\) or \(a = N\)
         # FIX (Rule 5b relax): allow trailing characters after closing \) (e.g. "= 13 \text{ minutes}\).")
         m_inline = re.search(
-            r'\\+\(\s*[^)]*?=\s*(' + NUMBER_RE + r')[^)]*\\+\)',
+            r'\\+\(\s*[^)]*=\s*(' + NUMBER_RE + r')[^)]*\\+\)',  # FIX: greedy = last =
             line_s
         )
         if m_inline:
@@ -1143,6 +1183,25 @@ def run_unit_tests():
         ("rule5a_latex_pct",   "The overall pass rate is 0.70 = 70\\%.", 70),
         # Case 20: \boxed{90\text{socks}+90\text{dishes}=180\text{items}}
         ("box_total_items",    "\\boxed{90\\text{ socks} + 90\\text{ dishes} = 180\\text{ items in total}.}", 180),
+        # ── New Bug Fix test cases ──────────────────────────────────────────────
+        # BUG1: \mathbf{4,000 pineapples} → 4000
+        ("mathbf_pineapples",  "1,000 \\text{ per harvest} = \\mathbf{4,000\\ pineapples}.", 4000),
+        # BUG2: inline math on no-bold line → last = value (13)
+        ("inline_nobold",      "Together they have \\(6 + 7 = 13\\) letters.", 13),
+        # BUG3+4: \boxed{18\text{ hours }48\text{ minutes}} → 1128 (18*60+48)
+        ("boxed_hhmm_minutes", "\\boxed{18\\text{ hours }48\\text{ minutes}}", 1128),
+        # BUG5: bold with parenthetical inline aside → return bold (6), not aside (36)
+        ("paren_inline_skip",  "Sam is **6 years old** now. (Ruby would be \\(6 \\times 6 = 36\\) years old)", 6),
+        # BUG6: multi-bold "which is" unit conversion → first bold (540), not last (9)
+        ("which_is_unit_conv", "They are caroling for **540 seconds**, which is **9 minutes**.", 540),
+        # BUG7: single bold with "from now is" → last number (109), not first (10)
+        ("from_now_is",        "**Allen's age 10 years from now is 109 years.**", 109),
+        # BUG8: single bold ending with $N → last number (12), not first (8)
+        ("bold_cost_dollar",   "**The 8-sandwich package will cost \\$12.**", 12),
+        # BUG9: Rule 3 "Thus for N sandwiches:" setup line — should NOT fire; answer is the bold below
+        ("rule3_setup_skip",   "Thus for 8 sandwiches:\n\\[8 \\times \\$1.50 = \\$12\\]\n\n**The 8-sandwich package will cost \\$12.**", 12),
+        # BUG10: chain equation inline → last = (3), not first = (13)
+        ("chain_eq_inline",    "Geb is \\( \\frac{1}{2}\\times 26 - 10 = 13 - 10 = 3 \\) years old.", 3),
     ]
     for entry in efa_cases:
         # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries
