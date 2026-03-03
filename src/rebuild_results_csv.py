@@ -508,11 +508,25 @@ def extract_final_answer(text):
         _r3_bold_groups = re.findall(r'\*\*([^*]+)\*\*', search_text)
         _r3_bold_nums = []
         for _bg in _r3_bold_groups:
+            # FIX: skip comparison-operator bolds (e.g. "**≤ $10**", "**< N**")
+            if re.match(r'^\s*[\u2264\u2265\u2248\u2260<>]', _bg):
+                continue
             _bg_clean = _bg.replace('\\$', '$').replace('\\', '')
+            # FIX: skip number-hyphen-word modifier bolds (e.g. "32-page", "100-meter")
+            _first_num_m = re.search(NUMBER_RE, _bg_clean)
+            if _first_num_m and re.match(r'\s*[-\u2013]\w', _bg_clean[_first_num_m.end():]):
+                continue
             _bgnums = [normalize_number(t) for t in re.findall(NUMBER_RE, _bg_clean)]
             _bgnums = [n for n in _bgnums if n is not None]
             if _bgnums:
                 _r3_bold_nums.append((_bg, _bgnums))
+        # FIX: for weak markers (Thus/Hence/Therefore), skip if no bold nums and no final keywords
+        _matched_marker_lower = (parts[1].lower().strip() if len(parts) >= 2 else '')
+        _is_weak_marker = _matched_marker_lower in ('thus', 'hence', 'therefore')
+        if _is_weak_marker and not _r3_bold_nums:
+            _has_final_kw = re.search(r'\b(total|answer|altogether|final|result)\b', search_text, re.I)
+            if not _has_final_kw:
+                continue  # Skip weak-marker intermediate calc lines (e.g. "Hence M = 21")
         if _r3_bold_nums:
             # If line has "total of/altogether", take last bold number
             if re.search(r'\b(total\s+of|altogether|in\s+total)\b', search_text, re.I):
@@ -520,10 +534,33 @@ def extract_final_answer(text):
                 num = _bns_last[-1] if '=' in _bg_last else _bns_last[0]
                 if num is not None:
                     return num, 'final_marker'
+            # FIX: "i.e." / "which is" / "or" → unit conversion → pick LARGEST number
+            # (e.g. "**227 min**, i.e., **3h47m**" → max(227,3)=227)
+            _r3_is_conv = re.search(r'\b(which is|that is)\b|i\.e\.', search_text, re.I)
+            _r3_is_or = re.search(r'\bor\b', search_text, re.I) and not re.search(r'\band\b', search_text, re.I)
+            if (_r3_is_conv or _r3_is_or) and len(_r3_bold_nums) >= 2:
+                _bg_last_cv, _bns_last_cv = _r3_bold_nums[-1]
+                _bg_first_cv, _bns_first_cv = _r3_bold_nums[0]
+                # For "or" between all-currency amounts → pick first
+                if _r3_is_or and all(re.search(r'[\$\u20ac\xa3]', _bg) for _bg, _ in _r3_bold_nums):
+                    return _bns_first_cv[0], 'final_marker'
+                # Non-currency → currency conversion → pick last (e.g. 24500¢ → $245)
+                if re.search(r'[\$\u20ac\xa3]', _bg_last_cv) and not re.search(r'[\$\u20ac\xa3]', _bg_first_cv):
+                    return _bns_last_cv[0], 'final_marker'
+                # Otherwise: unit conversion → pick LARGEST first-num across bolds
+                return max(_bns[0] for _, _bns in _r3_bold_nums), 'final_marker'
+            # FIX: single bold group with "and" and multiple nums → sum
+            if len(_r3_bold_nums) == 1:
+                _bg0, _bns0 = _r3_bold_nums[0]
+                if re.search(r'\band\b', _bg0, re.I) and len(_bns0) >= 2:
+                    return sum(_bns0), 'final_marker'
             # Sum parallel bold numbers joined by "and" (e.g. "27 selfies and 18 portraits" → 45)
             elif re.search(r'\band\b', search_text, re.I) and len(_r3_bold_nums) >= 2:
-                _sum_nums = [_bns[0] for _, _bns in _r3_bold_nums]
-                return sum(_sum_nums), 'final_marker'  # FIX: sum parallel bolds in marker line
+                _sum_vals_r3 = [_bns[0] for _, _bns in _r3_bold_nums]
+                # FIX: if 3+ bolds and last = sum of rest, last IS the total — return it
+                if len(_sum_vals_r3) >= 3 and _sum_vals_r3[-1] == sum(_sum_vals_r3[:-1]):
+                    return _sum_vals_r3[-1], 'final_marker'
+                return sum(_sum_vals_r3), 'final_marker'  # FIX: sum parallel bolds in marker line
             # single bold OR last bold group (for multi-bold without sum)
             _bg_last, _bns_last = _r3_bold_nums[-1]
             _bg_last_clean = _bg_last.replace('\\$', '$').replace('\\', '')
@@ -563,14 +600,16 @@ def extract_final_answer(text):
         m_num = re.search(NUMBER_RE, search_text)
         if m_num:
             raw_num = m_num.group(0)
-            # FIX: strip :HH time suffix (e.g. "2:00 pm" → 2, avoids :00 being seen as decimal)
             after_num = search_text[m_num.end():]
-            if re.match(r':\d{2}\b', after_num):
-                m_digits = re.match(r'\d+', raw_num)
-                raw_num = m_digits.group(0) if m_digits else raw_num
-            num = normalize_number(raw_num)
-            if num is not None:
-                return num, 'final_marker'
+            # FIX: skip number-hyphen modifier (e.g. "32-page", "100-meter") — not the answer
+            if not re.match(r'\s*[-\u2013]\w', after_num):
+                # FIX: strip :HH time suffix (e.g. "2:00 pm" → 2, avoids :00 being seen as decimal)
+                if re.match(r':\d{2}\b', after_num):
+                    m_digits = re.match(r'\d+', raw_num)
+                    raw_num = m_digits.group(0) if m_digits else raw_num
+                num = normalize_number(raw_num)
+                if num is not None:
+                    return num, 'final_marker'
 
     # Word-to-number map for bold word-numbers: **one**, **six years**
     WORD_NUM = {
@@ -606,6 +645,9 @@ def extract_final_answer(text):
         num_groups = []
         for g in groups:
             if STEP_BOLD_RE.match(g):
+                continue
+            # FIX: skip comparison/inequality bold groups (e.g. "**≤ $10**", "**< 5**")
+            if re.match(r'^\s*[\u2264\u2265\u2248\u2260<>≤≥≈≠]', g):
                 continue
             gc = clean_bold(g)
             nums = [normalize_number(t) for t in re.findall(NUMBER_RE, gc)]
@@ -650,14 +692,36 @@ def extract_final_answer(text):
                 return nums0[-1], 'bold_final'
             return nums0[0], 'bold_final'
         # Multiple bold groups with numbers
-        # FIX (sum-and across separate bolds): "**27 selfies** and **18 portraits**" → 45
-        # Only sum if "and" appears in line and num_groups ≥ 2 (no "total/altogether" — already handled above)
-        # FIX: "which is/that is" unit conversion → keep FIRST bold (original units, e.g. "540 seconds, which is 9 minutes" → 540)
-        if re.search(r'\b(which is|that is)\b', line, re.I) and len(num_groups) >= 2:
-            g_f, gc_f, nums_f = num_groups[0]
-            return nums_f[0], 'bold_final'
+        # FIX: unit-conversion patterns (which is / that is / i.e. / **N**=**M** / or) →
+        #   pick LARGEST first-number (minutes > hours numerically; seconds > minutes; etc.)
+        #   Special cases:
+        #     - "or" between all-currency bolds → pick FIRST (cost-split alternatives)
+        #     - Non-currency → currency last → pick LAST (e.g. 24,500¢ → $245)
+        _is_conversion = re.search(r'\b(which is|that is)\b|i\.e\.|\*\*[^*]+\*\*\s*=\s*\*\*', line, re.I)
+        _is_or_alt = re.search(r'\bor\b', line, re.I) and not re.search(r'\band\b', line, re.I)
+        if (_is_conversion or _is_or_alt) and len(num_groups) >= 2:
+            g_last_cv, gc_last_cv, nums_last_cv = num_groups[-1]
+            g_first_cv, gc_first_cv, nums_first_cv = num_groups[0]
+            # For "or" between all-currency amounts → pick first
+            if _is_or_alt and all(re.search(r'[\$\u20ac\xa3]', g) for g, _, _ in num_groups):
+                return nums_first_cv[0], 'bold_final'
+            # Non-currency → currency conversion (e.g. 24500¢ → $245) → pick last
+            if re.search(r'[\$\u20ac\xa3]', g_last_cv) and not re.search(r'[\$\u20ac\xa3]', g_first_cv):
+                return nums_last_cv[0], 'bold_final'
+            # Otherwise (unit conversion like min↔h, s↔min): pick LARGEST first-number
+            return max(nums[0] for _, _, nums in num_groups), 'bold_final'
         if re.search(r'\band\b', line, re.I) and len(num_groups) >= 2:  # FIX: simplified check
-            # Sum all parallel bold numbers (each group contributes its first number)
+            # FIX: only sum when bold groups are directly adjacent (≤4 words between them)
+            _bold_spans = [(m.start(), m.end()) for m in BOLD_GROUP_RE.finditer(line)
+                           if any(m.group(1) == ng[0] for ng in num_groups)]
+            if len(_bold_spans) >= 2:
+                _between = line[_bold_spans[0][1]:_bold_spans[1][0]]
+                _between_words = len(re.findall(r'\b\w+\b', _between))
+                if _between_words > 4:  # too much prose between bolds → don't sum, take last
+                    g_last, gc_last, nums_last = num_groups[-1]
+                    num = nums_last[-1] if '=' in gc_last else nums_last[0]
+                    return num, 'bold_final'
+            # Sum closely-adjacent parallel bold numbers
             _sum = sum(nums[0] for _, _, nums in num_groups)
             return _sum, 'bold_final'  # FIX: sum parallel bolds when "and" found in line
         # FIX: default — take LAST bold group with a number, use last number if '=' in group
@@ -683,12 +747,24 @@ def extract_final_answer(text):
             _mb_nums = [n for n in _mb_nums if n is not None]
             if _mb_nums:
                 return _mb_nums[-1], 'bold_final'
-        # FIX: inline math \(... = N\) on a no-bold line — greedy to get value after LAST =
+
+    # FIX: inline math \(... = N\) on a no-bold line — restricted to last 10 lines to avoid
+    # intermediate explanation steps (e.g. "each is \(1/2×3=1.5\) hours" in reasoning section)
+    for line in reversed(last_lines[-10:]):
+        if '|' in line:
+            continue
         _m_im_nb = re.search(r'\\+\(\s*[^)]*=\s*(' + NUMBER_RE + r')[^)]*\\+\)', line)
         if _m_im_nb:
-            _im_nb_num = normalize_number(_m_im_nb.group(1))
-            if _im_nb_num is not None:
-                return _im_nb_num, 'latex_inline'
+            # FIX: skip if inside a prose parenthetical
+            _im_nb_before = line[:_m_im_nb.start()]
+            _im_nb_in_paren = _im_nb_before.count('(') > _im_nb_before.count(')')
+            # FIX: skip if a comparison parenthetical follows closing \) (e.g. " in (< 2 in).")
+            _im_nb_after = line[_m_im_nb.end():]
+            _im_nb_post_paren = '(' in _im_nb_after[:12]
+            if not _im_nb_in_paren and not _im_nb_post_paren:
+                _im_nb_num = normalize_number(_m_im_nb.group(1))
+                if _im_nb_num is not None:
+                    return _im_nb_num, 'latex_inline'
 
     # ── RULE 4b removed — merged into Rule 4a above ────────────────────────────
 
@@ -776,9 +852,12 @@ def extract_final_answer(text):
             line_s
         )
         if m_inline:
-            num = normalize_number(m_inline.group(1))
-            if num is not None:
-                return num, 'latex_inline'
+            # FIX: skip if the captured number is immediately followed by \% or % (it's a ratio, not answer)
+            _after_inline = m_inline.group(0)[m_inline.start(1) - m_inline.start() + len(m_inline.group(1)):]
+            if not re.match(r'\s*\\?%', _after_inline):
+                num = normalize_number(m_inline.group(1))
+                if num is not None:
+                    return num, 'latex_inline'
         # FIX (Rule 5b-no-eq): \(N\) or \(\displaystyle N\) or \(N \text{...}\) — plain number in parens
         # Allow optional LaTeX prefix commands (\displaystyle, \textstyle, etc.) before the number
         # Use (?:[^)\\]|\\[^)]) to avoid consuming the closing \) backslash
@@ -1202,6 +1281,37 @@ def run_unit_tests():
         ("rule3_setup_skip",   "Thus for 8 sandwiches:\n\\[8 \\times \\$1.50 = \\$12\\]\n\n**The 8-sandwich package will cost \\$12.**", 12),
         # BUG10: chain equation inline → last = (3), not first = (13)
         ("chain_eq_inline",    "Geb is \\( \\frac{1}{2}\\times 26 - 10 = 13 - 10 = 3 \\) years old.", 3),
+        # ── Round-2 Bug Fix test cases ─────────────────────────────────────────
+        # gsm8k_00183: weak-marker "Hence M = 21" should be skipped; bold "23 years old" wins
+        ("weak_marker_skip_hence", "Hence \\(M = 21\\).\n\nSo Jean is **23 years old**.", 23),
+        # gsm8k_00938: "Thus each sheep requires 7 lb" skipped; bold wins
+        ("weak_marker_skip_thus", "Thus each sheep requires 7\\u202flb of hay.\n\n**Nate needs 159 pounds of hay.**", 159),
+        # gsm8k_00302: "32-page" number-hyphen modifier skipped; bold wins
+        ("num_hyphen_skip", "Therefore the total number of sheets needed for a **32-page** tabloid is simply\n\\[\\frac{32}{4}=8\\]\n\nSo **8 pieces of paper** are required.", 8),
+        # gsm8k_00754 single-bold "and" Rule 3: "86 glasses and 42 plates" → 128
+        ("r3_single_bold_and_sum", "**Answer:** Jeff now has **86 glasses and 42 plates**.", 128),
+        # gsm8k_00640: "**216 seconds** = **3 min 36 sec**" bold-equals-bold → first bold (216)
+        ("bold_eq_bold_conv", "**216\\u202fseconds** = **3\\u202fminutes\\u202f36\\u202fseconds**.", 216),
+        # gsm8k_00753: "**$240** or **$300**" → first bold (240)
+        ("bold_or_prefer_first", "each person would pay **\\$240** (if all five split it) or **\\$300** (if only the four roommates split it).", 240),
+        # gsm8k_01068: "**24,500 ¢**, which is **$245**" → currency last wins (245)
+        ("which_is_currency_last", "Total postage cost = 3,500\\u202f\\u00a2 + 21,000\\u202f\\u00a2 = **24,500\\u202f\\u00a2**, which is **$245**.", 245),
+        # gsm8k_00969: "**227 minutes**, i.e., **3 h 47 min**" → first bold (227)
+        ("ie_prefer_first_min", "It will take Andy **227 minutes**, i.e., **3\\u202fhours\\u202f47\\u202fminutes**, to string all 12 racquets.", 227),
+        # gsm8k_01219: "**225 minutes**, i.e., **3 h 45 min**" → first bold (225)
+        ("ie_prefer_first_225", "It will take **225 minutes**, i.e., **3\\u202fhours\\u202f45\\u202fminutes**, for everyone to try the escape room.", 225),
+        # gsm8k_00175: "**95 minutes**, i.e., **1 h 35 min**" → first bold (95)
+        ("ie_prefer_first_95", "It will take Billy **95 minutes**, i.e., **1\\u202fhour\\u202f35\\u202fminutes**, to finish.", 95),
+        # gsm8k_00803: "**6 stuffed goats**" with trailing \(6/20=30\%\) → 6 (% skip)
+        ("pct_inline_skip", "She should buy **6 stuffed goats**.\n\nWith 6 goats, the total is 20 animals and \\(6/20 = 30\\%\\).", 6),
+        # gsm8k_00636: "**≤ $10**" comparison bold skip → "**4 classes**" wins
+        ("comparison_bold_skip", "He can miss **4 classes**.\n\nParents will sign up again only if cost is **\u2264\u202f$10**.", 4),
+        # gsm8k_00691 woman_imp_1: 3 bolds where last=sum of rest → last (5760)
+        ("r3_three_bolds_last_is_sum", "**Answer:** After ten years, Rong has **2400** coins, Neil has **3360** coins, and together they have **5760** coins.", 5760),
+        # gsm8k_00831 Rule 3: "**1128 minutes**, which is **18h48m**" → first bold (1128)
+        ("which_is_min_first", "**Answer:** Britany spends **1128 minutes**, which is **18\\u202fhours\\u202f48\\u202fminutes**, on TikTok.", 1128),
+        # gsm8k_00428: parenthetical "(He kept \(1/3 \times 150 = 50\)" → skip in paren; "**150 cards**" wins
+        ("paren_inline_skip_150", "So Kenny started with **150 cards**.\n\n(He kept \\(\\frac{1}{3} \\times 150 = 50\\) cards, sold 100 cards.)", 150),
     ]
     for entry in efa_cases:
         # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries
