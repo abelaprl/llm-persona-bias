@@ -1,6 +1,6 @@
 """
 Rerun truncated/no-extract cases from rerun_plan.csv using existing messages.
-Uses model order 31 (openai/gpt-oss-20b) with max_tokens=2048.
+Uses model order 32 (qwen/qwen3-next-80b-a3b-thinking) with max_tokens=4096.
 """
 import json
 import csv
@@ -9,20 +9,20 @@ import requests
 from pathlib import Path
 from datetime import datetime
 
-MAX_TOKENS = 2048
-TARGET_MODEL_ID = "openai/gpt-oss-20b"
+MAX_TOKENS = 4096
+TARGET_MODEL_ID = "qwen/qwen3-next-80b-a3b-thinking"
 RERUN_PLAN = "rerun_plan.csv"
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent.parent.parent
 DELAY_SECONDS = 1.5
 
 
-def load_order31_key():
+def load_order32_key():
     with open(BASE_DIR / "config" / "model_keys.json", encoding="utf-8") as f:
         models = json.load(f)
     for m in models:
-        if m.get("order") == 31:
+        if m.get("order") == 32:
             return m["api_key_alias"]
-    raise ValueError("Order 31 not found in model_keys.json")
+    raise ValueError("Order 32 not found in model_keys.json")
 
 
 def call_api(api_key, messages, max_tokens=MAX_TOKENS, max_retries=3):
@@ -62,7 +62,7 @@ def call_api(api_key, messages, max_tokens=MAX_TOKENS, max_retries=3):
 
 
 def main():
-    api_key = load_order31_key()
+    api_key = load_order32_key()
     print(f"Model : {TARGET_MODEL_ID}")
     print(f"Key   : {api_key[:12]}...")
     print(f"Tokens: {MAX_TOKENS}")

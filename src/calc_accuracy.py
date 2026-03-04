@@ -3,8 +3,8 @@ import sys
 import os
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\qwen_qwen3-235b-a22b-2507\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\qwen_qwen3-235b-a22b-2507'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\qwen_qwen3-next-80b-a3b-thinking\results.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\qwen_qwen3-next-80b-a3b-thinking'
 
 PERSONA_ORDER = [
     'man_explicit_1','man_implicit_1','man_implicit_2','man_implicit_3',
@@ -14,8 +14,25 @@ PERSONA_ORDER = [
 persona_stats = defaultdict(lambda: {'correct': 0, 'total': 0, 'no_extract': 0, 'truncated': 0})
 overall = {'correct': 0, 'total': 0, 'no_extract': 0, 'truncated': 0}
 
+# ── First pass: collect stats and open persona CSV writers ──────────────────
+persona_writers = {}
+persona_files = {}
+fieldnames_global = None
+
 with open(csv_path, encoding='utf-8') as f:
     reader = csv.DictReader(f)
+    fieldnames_global = reader.fieldnames
+    
+    # Open all persona CSV writers upfront
+    for p in PERSONA_ORDER:
+        out_path = os.path.join(out_dir, f'results_{p}.csv')
+        file_obj = open(out_path, 'w', newline='', encoding='utf-8')
+        writer = csv.DictWriter(file_obj, fieldnames=fieldnames_global, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+        persona_writers[p] = writer
+        persona_files[p] = file_obj
+    
+    # Stream through CSV, collecting stats and writing to persona files
     for row in reader:
         persona = row['persona_folder']
         is_correct = row['is_correct'].strip().lower() == 'true'
@@ -31,6 +48,16 @@ with open(csv_path, encoding='utf-8') as f:
         if error_cat == 'truncated_output':
             persona_stats[persona]['truncated'] += 1
             overall['truncated'] += 1
+        
+        # Write row to persona-specific CSV
+        if persona in persona_writers:
+            persona_writers[persona].writerow(row)
+
+# Close all persona file writers
+for p in PERSONA_ORDER:
+    if p in persona_files:
+        persona_files[p].close()
+
 
 # ── Print to console ──────────────────────────────────────────────────────────
 header = f"{'Persona':<22} {'Correct':>7} {'Total':>6} {'Accuracy':>9} {'No-Extract':>11} {'Truncated':>10}"
@@ -61,23 +88,12 @@ with open(acc_csv, 'w', newline='', encoding='utf-8') as f:
                      'no_extract': overall['no_extract'], 'truncated': overall['truncated']})
 print(f"\nWrote {acc_csv}")
 
-# ── Write per-persona result CSVs ─────────────────────────────────────────────
-with open(csv_path, encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    fieldnames = reader.fieldnames
-    persona_rows = defaultdict(list)
-    for row in reader:
-        persona_rows[row['persona_folder']].append(row)
-
+# ── Print per-persona result CSV locations ──────────────────────────────────
 for p in PERSONA_ORDER:
-    rows = persona_rows[p]
-    if not rows:
-        continue
-    out_path = os.path.join(out_dir, f'results_{p}.csv')
-    with open(out_path, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
-        writer.writeheader()
-        writer.writerows(rows)
-    n_correct = sum(1 for r in rows if r['is_correct'].strip().lower() == 'true')
-    n_total   = len(rows)
-    print(f"  Wrote {out_path}  ({n_correct}/{n_total} correct)")
+    s = persona_stats[p]
+    if s['total'] > 0:
+        out_path = os.path.join(out_dir, f'results_{p}.csv')
+        n_correct = s['correct']
+        n_total = s['total']
+        print(f"  Wrote {out_path}  ({n_correct}/{n_total} correct)")
+
