@@ -375,7 +375,10 @@ def extract_final_answer(text):
         re.I
     )  # FIX: use word boundaries on you/we/the to avoid matching "if they", "if there"
     # FIX: detect bold step-label patterns (e.g. "**Step 5: Final answer**") to skip them
-    STEP_BOLD_RE = re.compile(r'^\s*step\s*\d+\b', re.I)
+    STEP_BOLD_RE = re.compile(
+        r'^\s*(?:step\s*\d+|\d+[\).:]|(?:first|second|third|fourth|fifth|final)\s+\d+)\b',
+        re.I
+    )
 
     # Work on full text for #### and \boxed, last 1200 chars for marker scan
     tail = text[-1200:] if len(text) > 1200 else text
@@ -485,6 +488,107 @@ def extract_final_answer(text):
         if num is not None:
             return num, 'boxed'
 
+    # ── Helper: extract answer number from a predicate sentence ─────────────────────────
+    _ANSWER_VERB_RE = re.compile(
+        r'\b(?:'
+        r'will\s+(?:take|cost|last|be|earn|save|spend|make|have|need|weigh|give|receive|pay|create|score)|'
+        r'would\s+(?:take|cost|last|be|earn|save|spend|make|have|need|weigh|pay|create|score)|'
+        r'is|are|was|were|costs?|earns?|saves?|takes?|makes?|needs?|weighs?|spends?|'
+        r'pays?|paid|creates?|created|scores?|scored|spent|'
+        r'remains?|add\s+up\s+to'
+        r')\b', re.I)
+
+    def _extract_answer_number(sentence):
+        """Extract the numeric answer from a natural-language answer sentence.
+        e.g. 'The average weight of the 3 friends is 180 pounds.' -> 180
+             'It will take John 2 weeks to save $80.' -> 2
+             'The factory makes a total of 3000 quarts.' -> 3000
+        """
+        sentence = str(sentence).strip()
+        if not sentence:
+            return None
+        # Priority 0: explicit leading numeric answer in first sentence
+        # e.g. "10 guests. At 10 guests, both venues cost $250." -> 10
+        _first_sent = sentence.split('.', 1)[0].strip()
+        _first_lead_m = re.match(r'^(?:\*\*)?\s*(' + NUMBER_RE + r')\s+\w+', _first_sent)
+        if _first_lead_m and not _ANSWER_VERB_RE.search(_first_sent):
+            _n0 = normalize_number(_first_lead_m.group(1))
+            if _n0 is not None:
+                return _n0
+        # Priority 0b: equations on answer sentence -> take last result number
+        if '=' in sentence:
+            _nums_eq = [normalize_number(t) for t in re.findall(NUMBER_RE, sentence)]
+            _nums_eq = [n for n in _nums_eq if n is not None]
+            if _nums_eq:
+                return _nums_eq[-1]
+        # Priority 0c: copula near end ("... was 95", "... is 14")
+        _cop_matches = list(re.finditer(r'\b(?:is|are|was|were)\b', sentence, re.I))
+        for _cm in reversed(_cop_matches):
+            _aft = sentence[_cm.end():]
+            _nm_cop = re.search(r'(?:[\$\u20ac\xa3])?\s*(' + NUMBER_RE + r')', _aft)
+            if _nm_cop:
+                _n_cop = normalize_number(_nm_cop.group(1))
+                if _n_cop is not None:
+                    return _n_cop
+        # Priority 0d: simple "A or B" numeric conversion in plain text -> choose second value
+        # e.g. "2040 minutes or 34 hours" -> 34
+        if re.search(r'\bor\b', sentence, re.I):
+            _nums_or = [normalize_number(t) for t in re.findall(NUMBER_RE, sentence)]
+            _nums_or = [n for n in _nums_or if n is not None]
+            if len(_nums_or) == 2:
+                return _nums_or[-1]
+        # Priority 1: main predicate verb → first number after it
+        _vm = _ANSWER_VERB_RE.search(sentence)
+        if _vm:
+            _after = sentence[_vm.end():]
+            # Ignore escaped currency markers from LaTeX (\$80), they are often contextual.
+            _after = re.sub(r'\\([$€£])', r'\1', _after)
+            # For "X or Y" conversion after verb: prefer right side if single number,
+            # otherwise keep left side (e.g. "225 min or 3h 45m" -> 225).
+            _or_m = re.search(r'\bor\b', _after, re.I)
+            if _or_m:
+                _left = _after[:_or_m.start()]
+                _right = _after[_or_m.end():]
+                _ln = [normalize_number(t) for t in re.findall(NUMBER_RE, _left)]
+                _rn = [normalize_number(t) for t in re.findall(NUMBER_RE, _right)]
+                _ln = [n for n in _ln if n is not None]
+                _rn = [n for n in _rn if n is not None]
+                if _ln and _rn:
+                    if len(_rn) == 1:
+                        return _rn[0]
+                    return _ln[0]
+            # Duration phrase like "1 hour and 35 minutes" -> 95 (minutes)
+            _hm = re.search(r'(' + NUMBER_RE + r')\s+hours?\b[^\n\r.]*?\band\b[^\n\r.]*?(' + NUMBER_RE + r')\s+minutes?\b', _after, re.I)
+            if _hm:
+                _h = normalize_number(_hm.group(1))
+                _m = normalize_number(_hm.group(2))
+                if _h is not None and _m is not None:
+                    return _h * 60 + _m
+            _nm = re.search(r'(?:[\$\u20ac\xa3])?\s*(' + NUMBER_RE + r')', _after)
+            if _nm:
+                _n = normalize_number(_nm.group(1))
+                if _n is not None:
+                    return _n
+        # Priority 2: "total of N", "in total N", "altogether N"
+        _tm = re.search(
+            r'\b(?:total\s+of|in\s+total|altogether)\b\s*[$\u20ac\xa3]?\s*(' + NUMBER_RE + r')',
+            sentence, re.I)
+        if _tm:
+            _n = normalize_number(_tm.group(1))
+            if _n is not None:
+                return _n
+        # Priority 3: "N [noun] and M [noun]" parallel counting → sum
+        # (e.g. "27 selfies and 18 portraits" → 45, "4 blue and 6 red shoe boxes" → 10)
+        # Only fire when numbers appear in direct "NUM word and NUM" adjacency (same-level quantities)
+        if re.search(r'\band\b', sentence, re.I) and not re.search(r'\bor\b', sentence, re.I):
+            _par_m = re.search(NUMBER_RE + r'\s+\w+\s+and\s+' + NUMBER_RE, sentence)
+            if _par_m:
+                _pair_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, _par_m.group(0))]
+                _pair_nums = [n for n in _pair_nums if n is not None]
+                if len(_pair_nums) == 2:
+                    return sum(_pair_nums)
+        return None
+
     # ── Inline bold-number extractor used in Rule 3 (before full helper defined) ──────────
     def _simple_bold_extract(ln):
         """Simplified early bold extractor for Rule 3 marker/next-line use."""
@@ -509,7 +613,12 @@ def extract_final_answer(text):
         # Single bold with "and" and 2+ distinct nums → sum
         if len(_num_bgs) == 1:
             _b0, _bc0, _ns0 = _num_bgs[0]
-            if re.search(r'\band\b', _b0, re.I) and len(_ns0) >= 2:
+            # FIX: when bold is an "Answer: [sentence]" with multiple numbers, use verb-predicate
+            if re.match(r'(?:Final\s+)?Answer\s*[:\s]', _b0, re.I) and len(_ns0) >= 1:
+                _n_ans = _extract_answer_number(_b0)
+                if _n_ans is not None:
+                    return _n_ans
+            if re.search(r'\band\b', _b0, re.I) and len(_ns0) == 2:
                 if not re.search(r'\b(total|sum|altogether)\b', _b0, re.I):
                     return sum(_ns0)
             return _ns0[-1] if '=' in _bc0 else _ns0[0]
@@ -585,29 +694,47 @@ def extract_final_answer(text):
             _efbg_line_result = _simple_bold_extract(line)
             if _efbg_line_result is not None:
                 return _efbg_line_result, 'final_marker'
+            # FIX: use verb-predicate extraction for plain-text answer sentences
+            # (replaces the unreliable "2-num and → sum" heuristic)
+            if search_text.strip():
+                _n_vp = _extract_answer_number(search_text)
+                if _n_vp is not None:
+                    return _n_vp, 'final_marker'
         # FIX: when strong marker has no number in search_text, look at the next line(s) in text
-        # (rev_lines[i-1] is the line immediately after the marker in original text order)
+        # (rev_lines[i-1] is the line immediately after the marker in canonical text order)
         # Only do this when search_text is truly empty (e.g. "### Final Answer:" with answer on next line)
         if not _r3_bold_nums and _is_strong_marker and i > 0 and not search_text.strip():
-            for _j in range(1, min(4, i + 1)):
+            _nxt_fallback_num = None
+            for _j in range(1, min(8, i + 1)):
                 _nxt = rev_lines[i - _j]
                 if not _nxt.strip():
                     continue  # skip empty lines
+                if re.match(r'^\s*(?:\d+[\).:]|step\s*\d+)\b', _nxt, re.I):
+                    continue  # skip numbered step lines; keep scanning
                 _nxt_efbg = _simple_bold_extract(_nxt)
                 if _nxt_efbg is not None:
                     return _nxt_efbg, 'final_marker'
+                if re.search(r'\b(answer|therefore|thus|so|final|total|result)\b', _nxt, re.I):
+                    _nxt_ans = _extract_answer_number(_nxt)
+                    if _nxt_ans is not None:
+                        return _nxt_ans, 'final_marker'
                 _nxt_num_m = re.search(NUMBER_RE, _nxt)
                 if _nxt_num_m:
                     _nxt_num = normalize_number(_nxt_num_m.group(0))
                     if _nxt_num is not None:
-                        return _nxt_num, 'final_marker'
-                break  # only check first non-empty next line
-        # FIX: if no bold groups but search_text has exactly 2 numbers joined by "and" → sum as components
-        if not _r3_bold_nums and re.search(r'\band\b', search_text, re.I):
-            _plain_and_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, search_text)]
-            _plain_and_nums = [n for n in _plain_and_nums if n is not None]
-            if len(_plain_and_nums) == 2:
-                return sum(_plain_and_nums), 'final_marker'
+                        _nxt_fallback_num = _nxt_num
+            if _nxt_fallback_num is not None:
+                return _nxt_fallback_num, 'final_marker'
+        # FIX: safe plain-text parallel-count sum (no bold groups)
+        # e.g. "27 selfies and 18 portraits" -> 45, "4 blue and 6 red" -> 10
+        if (not _r3_bold_nums and re.search(r'\band\b', search_text, re.I)
+                and not re.search(r'\bor\b', search_text, re.I)):
+            _pm = re.search(NUMBER_RE + r'\s+\w+\s+and\s+' + NUMBER_RE + r'\s+\w+', search_text)
+            if _pm:
+                _pn = [normalize_number(t) for t in re.findall(NUMBER_RE, search_text)]
+                _pn = [n for n in _pn if n is not None]
+                if len(_pn) == 2:
+                    return sum(_pn), 'final_marker'
         if _r3_bold_nums:
             # If line has "total of/altogether", take last bold number
             if re.search(r'\b(total\s+of|altogether|in\s+total)\b', search_text, re.I):
@@ -628,15 +755,23 @@ def extract_final_answer(text):
                 # Non-currency → currency conversion → pick last (e.g. 24500¢ → $245)
                 if re.search(r'[\$\u20ac\xa3]', _bg_last_cv) and not re.search(r'[\$\u20ac\xa3]', _bg_first_cv):
                     return _bns_last_cv[0], 'final_marker'
-                # Otherwise: unit conversion → pick LARGEST first-num across bolds
+                # Otherwise: unit conversion — when all bolds have single nums, last bold is
+                # the target/derived unit (e.g. "**2040 min** or **34 hours**" → 34 hours)
+                _r3_bns_all_single = all(len(_bns) == 1 for _, _bns in _r3_bold_nums)
+                if _r3_bns_all_single:
+                    return _r3_bold_nums[-1][1][0], 'final_marker'
+                # Fallback: pick LARGEST first-num across bolds
                 return max(_bns[0] for _, _bns in _r3_bold_nums), 'final_marker'
             # FIX: single bold group with "and" and multiple nums → sum
             if len(_r3_bold_nums) == 1:
                 _bg0, _bns0 = _r3_bold_nums[0]
-                if re.search(r'\band\b', _bg0, re.I) and len(_bns0) >= 2:
+                if re.search(r'\band\b', _bg0, re.I) and len(_bns0) == 2:
                     return sum(_bns0), 'final_marker'
-            # Sum parallel bold numbers joined by "and" (e.g. "27 selfies and 18 portraits" → 45)
-            elif re.search(r'\band\b', search_text, re.I) and len(_r3_bold_nums) >= 2:
+            # Sum parallel bold numbers only when "and" is BETWEEN bold groups
+            # (prevents false sum on lines like "... **2040 min** or **34 h** ... and ...")
+            elif (len(_r3_bold_nums) >= 2
+                  and not re.search(r'\bor\b', search_text, re.I)
+                  and re.search(r'\*\*[^*]+\*\*\s*(?:,?\s*)and\s*\*\*[^*]+\*\*', search_text, re.I)):
                 _sum_vals_r3 = [_bns[0] for _, _bns in _r3_bold_nums]
                 # FIX: if 3+ bolds and last = sum of rest, last IS the total — return it
                 if len(_sum_vals_r3) >= 3 and _sum_vals_r3[-1] == sum(_sum_vals_r3[:-1]):
@@ -726,6 +861,10 @@ def extract_final_answer(text):
         num_groups = []
         for g in groups:
             if STEP_BOLD_RE.match(g):
+                continue
+            if re.search(r'\b\d{1,2}:\d{2}\b', g) and g.strip().endswith(':'):
+                continue
+            if re.match(r'^\s*(?:first|second|third|fourth|fifth|final)\s+\d+\s+\w+\s*:\s*$', g, re.I):
                 continue
             # FIX: skip comparison/inequality bold groups (e.g. "**≤ $10**", "**< 5**")
             if re.match(r'^\s*[\u2264\u2265\u2248\u2260<>≤≥≈≠]', g):
@@ -1474,6 +1613,31 @@ def run_unit_tests():
         ("answer_and_sum_next_line", "### Final Answer:\nTim has **4 blue** and **6 red** shoe boxes left.\n\n✅ **Answer: 4 blue and 6 red shoe boxes are left.**", 10),
         # gsm8k_01018: selfies/portraits on sep bullet lines → sum = 45
         ("selfies_portraits_sep_lines", "### Final Answer:\n- **Selfies:** 27\n- **Portraits:** 18\n\n✅ **Answer: 27 selfies and 18 portraits.**", 45),
+        # ── Round-5 Bug Fix: verb-predicate answer extraction ──────────────────────────────────
+        # gsm8k_00066: "**Answer:** Jim spends 36 hours on TV and reading in 4 weeks." → 36 (not 40=36+4)
+        ("answer_plain_spends", "**Answer:** Jim spends 36 hours on TV and reading in 4 weeks.", 36),
+        # gsm8k_00196: "**Answer: 8 pens will cost $12.00**" → 12 (not 8)
+        ("answer_bold_pens_cost", "**Answer: 8 pens will cost $12.00**", 12),
+        # gsm8k_00562: "**Answer: The average weight of the 3 friends is 180 pounds.**" → 180 (not 3)
+        ("answer_bold_friends_weight", "**Answer: The average weight of the 3 friends is 180 pounds.**", 180),
+        # gsm8k_00309: "**Answer: You will save $6 if you buy 2 tubs…and 4 packets…**" → 6 (not 12=6+2+4)
+        ("answer_bold_save_6", "**Answer: You will save $6 if you buy 2 tubs of ice cream and 4 packets of milk.**", 6),
+        # gsm8k_00388: "**Answer: 6 erasers and 8 pencils cost $36.**" → 36 (not 50=6+8+36)
+        ("answer_bold_cost_36", "**Answer: 6 erasers and 8 pencils cost $36.**", 36),
+        # gsm8k_00556: "**Answer:** It will take John 2 weeks to save $80." → 2 (not 80)
+        ("answer_plain_will_take", "**Answer:** It will take John 2 weeks to save $80.", 2),
+        # gsm8k_00031: "**Answer:** Allen's age 10 years from now will be 109." → 109 (not 10)
+        ("answer_plain_will_be_109", "**Answer:** Allen's age 10 years from now will be 109.", 109),
+        # gsm8k_00107: "**Answer: The total inner volume of all 3 boxes is 72 cubic inches.**" → 72 (not 3)
+        ("answer_bold_volume_72", "**Answer: The total inner volume of all 3 boxes is 72 cubic inches.**", 72),
+        # gsm8k_00805: "**Answer:** After 2 hours, the cars will be separated by 20 miles." → 20 (not 2)
+        ("answer_plain_separated_20", "**Answer:** After 2 hours, the cars will be separated by 20 miles.", 20),
+        # gsm8k_00710: "**Answer: In 48 hours, the factory would make a total of 3000 quarts of ice cream.**" → 3000
+        ("answer_bold_total_3000", "**Answer: In 48 hours, the factory would make a total of 3000 quarts of ice cream.**", 3000),
+        # gsm8k_01249: "**Answer: Jason would need to make 750 telephone calls to sell 15 cars…**" → 750 (not 765=750+15)
+        ("answer_bold_need_750", "**Answer: Jason would need to make 750 telephone calls to sell 15 cars and earn his bonus.**", 750),
+        # gsm8k_01135: "**Answer:** It will take Jane 7 more weeks to save a total of $60." → 7 (not 60)
+        ("answer_plain_take_7_weeks", "**Answer:** It will take Jane 7 more weeks to save a total of $60.", 7),
     ]
     for entry in efa_cases:
         # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries
