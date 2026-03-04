@@ -704,8 +704,7 @@ def extract_final_answer(text):
         # (rev_lines[i-1] is the line immediately after the marker in canonical text order)
         # Only do this when search_text is truly empty (e.g. "### Final Answer:" with answer on next line)
         if not _r3_bold_nums and _is_strong_marker and i > 0 and not search_text.strip():
-            _nxt_fallback_num = None
-            for _j in range(1, min(8, i + 1)):
+            for _j in range(1, min(4, i + 1)):
                 _nxt = rev_lines[i - _j]
                 if not _nxt.strip():
                     continue  # skip empty lines
@@ -714,17 +713,15 @@ def extract_final_answer(text):
                 _nxt_efbg = _simple_bold_extract(_nxt)
                 if _nxt_efbg is not None:
                     return _nxt_efbg, 'final_marker'
-                if re.search(r'\b(answer|therefore|thus|so|final|total|result)\b', _nxt, re.I):
-                    _nxt_ans = _extract_answer_number(_nxt)
-                    if _nxt_ans is not None:
-                        return _nxt_ans, 'final_marker'
+                _nxt_ans = _extract_answer_number(_nxt)
+                if _nxt_ans is not None:
+                    return _nxt_ans, 'final_marker'
                 _nxt_num_m = re.search(NUMBER_RE, _nxt)
                 if _nxt_num_m:
                     _nxt_num = normalize_number(_nxt_num_m.group(0))
                     if _nxt_num is not None:
-                        _nxt_fallback_num = _nxt_num
-            if _nxt_fallback_num is not None:
-                return _nxt_fallback_num, 'final_marker'
+                        return _nxt_num, 'final_marker'
+                break  # only check first meaningful non-empty next line
         # FIX: safe plain-text parallel-count sum (no bold groups)
         # e.g. "27 selfies and 18 portraits" -> 45, "4 blue and 6 red" -> 10
         if (not _r3_bold_nums and re.search(r'\band\b', search_text, re.I)
@@ -767,11 +764,8 @@ def extract_final_answer(text):
                 _bg0, _bns0 = _r3_bold_nums[0]
                 if re.search(r'\band\b', _bg0, re.I) and len(_bns0) == 2:
                     return sum(_bns0), 'final_marker'
-            # Sum parallel bold numbers only when "and" is BETWEEN bold groups
-            # (prevents false sum on lines like "... **2040 min** or **34 h** ... and ...")
-            elif (len(_r3_bold_nums) >= 2
-                  and not re.search(r'\bor\b', search_text, re.I)
-                  and re.search(r'\*\*[^*]+\*\*\s*(?:,?\s*)and\s*\*\*[^*]+\*\*', search_text, re.I)):
+            # Sum parallel bold numbers joined by "and" (e.g. "27 selfies and 18 portraits" → 45)
+            elif re.search(r'\band\b', search_text, re.I) and len(_r3_bold_nums) >= 2:
                 _sum_vals_r3 = [_bns[0] for _, _bns in _r3_bold_nums]
                 # FIX: if 3+ bolds and last = sum of rest, last IS the total — return it
                 if len(_sum_vals_r3) >= 3 and _sum_vals_r3[-1] == sum(_sum_vals_r3[:-1]):
