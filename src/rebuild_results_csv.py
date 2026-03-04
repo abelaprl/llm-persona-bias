@@ -212,7 +212,8 @@ from pathlib import Path
 # Matches: plain int, float, thousands with comma/space/LaTeX-brace, currency prefix
 # e.g. 3528, 3,430, 3 430, 3{,}430, $3{,}528, 140{,}000, 85 000, 3.65
 # FIX: also captures optional leading minus (ASCII, unicode en-dash − , en-dash –)
-NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,|\{,\}|\s)\d{3})+|\d+)(?:\.\d+)?'
+# FIX: also handle LaTeX thin-space \! in thousands: 224,\!000 → 224000 (need 3 backslashes in raw string)
+NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,\\!|,|\{,\}|\s)\d{3})+|\d+)(?:\.\d+)?'
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -251,6 +252,8 @@ def normalize_number(raw):
     s = s.replace('\u202f', ' ').replace('\u00a0', ' ').replace('\u2009', ' ')
     # LaTeX thousands: 3{,}528 → 3,528
     s = re.sub(r'\{,\}', ',', s)
+    # LaTeX thin-space in thousands: 224,\!000 → 224,000 (remove \!)
+    s = s.replace('\\!', '')
     # Strip currency and percent
     s = s.replace('$', '').replace('€', '').replace('£', '').replace('%', '').strip()
     # FIX: normalise unicode minus variants (−, –) and spaced minus ("- 3" → "-3")
@@ -390,6 +393,8 @@ def extract_final_answer(text):
                 return int(h) * 60 + int(m_)
         # First handle LaTeX thousands: {,} → ,
         v = re.sub(r'\{,\}', ',', val)
+        # FIX: Remove LaTeX thin-space \! before removing all backslashes
+        v = v.replace('\\!', '')
         # FIX: before stripping \text{...}, save any numbers embedded inside text blocks
         # (needed for \boxed{\,\text{The winner runs 80 yards farther.}\,})
         text_block_nums = []
@@ -453,7 +458,8 @@ def extract_final_answer(text):
         return found_nums[-1]
 
     # ── RULE 1: #### marker ──────────────────────────────────────────────────
-    m = re.search(r'####\s*(' + NUMBER_RE + r')', text)
+    # FIX: negative lookahead — skip numbered headings like '#### 1. Flash Sale'
+    m = re.search(r'####\s*(' + NUMBER_RE + r')(?!\s*\.\s+\w)', text)
     if m:
         num = normalize_number(m.group(1))
         if num is not None:
@@ -479,11 +485,44 @@ def extract_final_answer(text):
         if num is not None:
             return num, 'boxed'
 
+    # ── Inline bold-number extractor used in Rule 3 (before full helper defined) ──────────
+    def _simple_bold_extract(ln):
+        """Simplified early bold extractor for Rule 3 marker/next-line use."""
+        _bgs = re.findall(r'\*\*([^*]+)\*\*', ln)
+        if not _bgs:
+            return None
+        _num_bgs = []
+        for _bg in _bgs:
+            if re.match(r'^\s*[\u2264\u2265\u2248\u2260<>]', _bg):
+                continue
+            _bc = _bg.replace('\\$', '$').replace('\\', '')
+            _ns = [normalize_number(t) for t in re.findall(NUMBER_RE, _bc)]
+            _ns = [n for n in _ns if n is not None]
+            if _ns:
+                _num_bgs.append((_bg, _bc, _ns))
+        if not _num_bgs:
+            return None
+        # "(or **X**)" pattern: single-num last → return last; multi-num last → return first
+        if len(_num_bgs) >= 2 and re.search(r'\(or\s+\*\*[^*]+\*\*\)', ln, re.I):
+            _l_ns = _num_bgs[-1][2]
+            return _l_ns[0] if len(_l_ns) == 1 else _num_bgs[0][2][0]
+        # Single bold with "and" and 2+ distinct nums → sum
+        if len(_num_bgs) == 1:
+            _b0, _bc0, _ns0 = _num_bgs[0]
+            if re.search(r'\band\b', _b0, re.I) and len(_ns0) >= 2:
+                if not re.search(r'\b(total|sum|altogether)\b', _b0, re.I):
+                    return sum(_ns0)
+            return _ns0[-1] if '=' in _bc0 else _ns0[0]
+        # Multiple bolds → first bold's first number (safest for next-line peek)
+        return _num_bgs[0][2][0]
+
     # ── RULE 3: Marker line → first number after marker ──────────────────────
     marker_re = re.compile(
-        r'(Final Answer|Answer|So the answer is|Therefore|Thus|Hence)', re.I
+        r'(Final Answer|(?<![a-zA-Z-])Answer|So the answer is|Therefore|Thus|Hence)', re.I
     )
-    for line in reversed(last_lines):
+    rev_lines = list(reversed(last_lines))
+    _seen_strong_marker = False
+    for i, line in enumerate(rev_lines):
         if '|' in line:
             continue
         if ASSUMPTION_RE.match(line):
@@ -495,7 +534,13 @@ def extract_final_answer(text):
         search_text = ''.join(parts[2:]) if len(parts) >= 3 else line
         # FIX: strip leading partial-bold fragment e.g. ":**" from "**Answer:**" split remainder
         # Strip any leading asterisks, colons, spaces to avoid phantom bold group at start
-        search_text = re.sub(r'^[\*:\s]+', '', search_text)  # FIX: strip leading * : space
+        # FIX: smart strip — if ': **' (colon-space-bold-opener) keep the **, else strip * too
+        # ': **86 items**' → keep ** (it's the opener of a bold answer)
+        # ':** prose **2400**' → strip ** (it's leftover closing from **Answer:**)
+        if re.match(r'^:\s+\*\*', search_text):
+            search_text = re.sub(r'^[:\s]+', '', search_text)  # keep leading ** (bold opener)
+        else:
+            search_text = re.sub(r'^[\*:\s]+', '', search_text)  # strip * : space (old behavior)
         # FIX: skip setup lines like "Thus for 8 sandwiches:" — after-marker text starts with "for" + ends with ":"
         if re.match(r'^for\s+', search_text, re.I) and search_text.strip().endswith(':'):
             continue
@@ -520,13 +565,49 @@ def extract_final_answer(text):
             _bgnums = [n for n in _bgnums if n is not None]
             if _bgnums:
                 _r3_bold_nums.append((_bg, _bgnums))
-        # FIX: for weak markers (Thus/Hence/Therefore), skip if no bold nums and no final keywords
+        # FIX: classify marker strength; track if strong marker was seen closer to end
         _matched_marker_lower = (parts[1].lower().strip() if len(parts) >= 2 else '')
         _is_weak_marker = _matched_marker_lower in ('thus', 'hence', 'therefore')
+        _is_strong_marker = not _is_weak_marker
+        if _is_strong_marker:
+            _seen_strong_marker = True
+        # FIX: skip weak markers when a strong marker (Final Answer/Answer) was already seen closer to end
+        if _is_weak_marker and _seen_strong_marker:
+            continue
+        # FIX: for weak markers, skip if no bold nums and no final keywords
         if _is_weak_marker and not _r3_bold_nums:
             _has_final_kw = re.search(r'\b(total|answer|altogether|final|result)\b', search_text, re.I)
             if not _has_final_kw:
                 continue  # Skip weak-marker intermediate calc lines (e.g. "Hence M = 21")
+        # FIX: when bold groups from split are empty but marker line has bolds (e.g. opening ** was split off),
+        # try extracting from the FULL LINE using _simple_bold_extract
+        if not _r3_bold_nums and _is_strong_marker:
+            _efbg_line_result = _simple_bold_extract(line)
+            if _efbg_line_result is not None:
+                return _efbg_line_result, 'final_marker'
+        # FIX: when strong marker has no number in search_text, look at the next line(s) in text
+        # (rev_lines[i-1] is the line immediately after the marker in original text order)
+        # Only do this when search_text is truly empty (e.g. "### Final Answer:" with answer on next line)
+        if not _r3_bold_nums and _is_strong_marker and i > 0 and not search_text.strip():
+            for _j in range(1, min(4, i + 1)):
+                _nxt = rev_lines[i - _j]
+                if not _nxt.strip():
+                    continue  # skip empty lines
+                _nxt_efbg = _simple_bold_extract(_nxt)
+                if _nxt_efbg is not None:
+                    return _nxt_efbg, 'final_marker'
+                _nxt_num_m = re.search(NUMBER_RE, _nxt)
+                if _nxt_num_m:
+                    _nxt_num = normalize_number(_nxt_num_m.group(0))
+                    if _nxt_num is not None:
+                        return _nxt_num, 'final_marker'
+                break  # only check first non-empty next line
+        # FIX: if no bold groups but search_text has exactly 2 numbers joined by "and" → sum as components
+        if not _r3_bold_nums and re.search(r'\band\b', search_text, re.I):
+            _plain_and_nums = [normalize_number(t) for t in re.findall(NUMBER_RE, search_text)]
+            _plain_and_nums = [n for n in _plain_and_nums if n is not None]
+            if len(_plain_and_nums) == 2:
+                return sum(_plain_and_nums), 'final_marker'
         if _r3_bold_nums:
             # If line has "total of/altogether", take last bold number
             if re.search(r'\b(total\s+of|altogether|in\s+total)\b', search_text, re.I):
@@ -692,6 +773,33 @@ def extract_final_answer(text):
                 return nums0[-1], 'bold_final'
             return nums0[0], 'bold_final'
         # Multiple bold groups with numbers
+        # FIX: check for explicit total/sum keywords in nearby text → prefer that bold
+        _has_total_after = re.search(r'\b(total|sum|altogether|in total)\b.*?\*\*', line, re.I)
+        if _has_total_after and len(num_groups) >= 2:
+            # Prefer LAST bold if it appears after total/sum keyword
+            _last_bold_idx = line.rfind('**')
+            _total_kw_idx = line.lower().find('total') if 'total' in line.lower() else \
+                            line.lower().find('sum') if 'sum' in line.lower() else \
+                            line.lower().find('altogether') if 'altogether' in line.lower() else -1
+            if _total_kw_idx >= 0 and _last_bold_idx > _total_kw_idx:
+                g_last, gc_last, nums_last = num_groups[-1]
+                return nums_last[0], 'bold_final'
+        
+        # FIX: "(or X)" pattern — smart selection based on last bold's number count:
+        # - **2040 min** (or **34 h**): last bold has single num → return last (clean converted value)
+        # - **1128 min** (or **18 h 48 m**): last bold has multiple nums → return first (primary value)
+        if len(num_groups) >= 2:
+            _or_paren_match = re.search(r'\(or\s+\*\*[^*]+\*\*\)', line, re.I)
+            if _or_paren_match:
+                g_last, gc_last, nums_last = num_groups[-1]
+                if len(nums_last) == 1:
+                    # Single converted value → prefer it (e.g. "34 hours")
+                    return nums_last[0], 'bold_final'
+                else:
+                    # Multi-component last bold (e.g. "18 hours and 48 minutes") → prefer first bold
+                    g_first_or, gc_first_or, nums_first_or = num_groups[0]
+                    return nums_first_or[0], 'bold_final'
+        
         # FIX: unit-conversion patterns (which is / that is / i.e. / **N**=**M** / or) →
         #   pick LARGEST first-number (minutes > hours numerically; seconds > minutes; etc.)
         #   Special cases:
@@ -710,20 +818,42 @@ def extract_final_answer(text):
                 return nums_last_cv[0], 'bold_final'
             # Otherwise (unit conversion like min↔h, s↔min): pick LARGEST first-number
             return max(nums[0] for _, _, nums in num_groups), 'bold_final'
+        
+        # FIX: "X and Y" pattern with multiple bolds → sum them if seems like components
+        # E.g. "**4 blue** and **6 red**" OR single bold "**86 glasses and 42 plates**"
+        _has_and = re.search(r'\band\b', line, re.I)
+        if _has_and:
+            # Check if it's single bold with multiple numbers (e.g. "**86 glasses and 42 plates**")
+            if len(num_groups) == 1:
+                g0, gc0, nums0 = num_groups[0]
+                if len(nums0) >= 2 and re.search(r'\band\b', g0, re.I):
+                    # But only sum if NOT already a total (no "total" keyword in bold)
+                    if not re.search(r'\b(total|sum|altogether)\b', g0, re.I):
+                        return sum(nums0), 'bold_final'
+            # Multiple bolds with "and" between them → sum if NO "or" present
+            elif len(num_groups) >= 2 and not re.search(r'\bor\b', line, re.I):
+                # Check proximity: bolds should be close (within ~50 chars)
+                _first_bold_end = line.find(num_groups[0][0]) + len(num_groups[0][0])
+                _last_bold_start = line.find(num_groups[-1][0])
+                if 0 < (_last_bold_start - _first_bold_end) < 50:
+                    return sum(nums[0] for _, _, nums in num_groups), 'bold_final'
         if re.search(r'\band\b', line, re.I) and len(num_groups) >= 2:  # FIX: simplified check
-            # FIX: only sum when bold groups are directly adjacent (≤4 words between them)
+            # FIX: only sum when "and" appears BETWEEN the bold groups (not inside one of them)
             _bold_spans = [(m.start(), m.end()) for m in BOLD_GROUP_RE.finditer(line)
                            if any(m.group(1) == ng[0] for ng in num_groups)]
+            _and_between = False
             if len(_bold_spans) >= 2:
                 _between = line[_bold_spans[0][1]:_bold_spans[1][0]]
                 _between_words = len(re.findall(r'\b\w+\b', _between))
-                if _between_words > 4:  # too much prose between bolds → don't sum, take last
+                _and_between = bool(re.search(r'\band\b', _between, re.I))
+                if _between_words > 4 or not _and_between:  # too much prose OR "and" not between bolds
                     g_last, gc_last, nums_last = num_groups[-1]
                     num = nums_last[-1] if '=' in gc_last else nums_last[0]
                     return num, 'bold_final'
-            # Sum closely-adjacent parallel bold numbers
-            _sum = sum(nums[0] for _, _, nums in num_groups)
-            return _sum, 'bold_final'  # FIX: sum parallel bolds when "and" found in line
+            # Sum closely-adjacent parallel bold numbers (only when "and" is between them)
+            if _and_between:
+                _sum = sum(nums[0] for _, _, nums in num_groups)
+                return _sum, 'bold_final'  # FIX: sum parallel bolds when "and" found BETWEEN bolds
         # FIX: default — take LAST bold group with a number, use last number if '=' in group
         g_last, gc_last, nums_last = num_groups[-1]
         num = nums_last[-1] if '=' in gc_last else nums_last[0]
@@ -1312,6 +1442,38 @@ def run_unit_tests():
         ("which_is_min_first", "**Answer:** Britany spends **1128 minutes**, which is **18\\u202fhours\\u202f48\\u202fminutes**, on TikTok.", 1128),
         # gsm8k_00428: parenthetical "(He kept \(1/3 \times 150 = 50\)" → skip in paren; "**150 cards**" wins
         ("paren_inline_skip_150", "So Kenny started with **150 cards**.\n\n(He kept \\(\\frac{1}{3} \\times 150 = 50\\) cards, sold 100 cards.)", 150),
+        # ── New Round 3 Bug Fix test cases (from qwen CSV) ──────────────────
+        # gsm8k_00326: \boxed{224,\!000} with LaTeX thin-space \! → 224000
+        ("boxed_thin_space", "### ✅ Final Answer:\n\n$$\n\\boxed{224,\\!000} \\text{ dollars per month}\n$$", 224000),
+        # gsm8k_00716: \boxed{385,\!000} → 385000
+        ("boxed_thin_space_385k", "### ✅ Final Answer:\n$$\n\\boxed{385,\\!000}\n$$\n\nThe company paid **$385,000** in total.", 385000),
+        # gsm8k_00754: "**86 glasses and 42 plates**" followed by "**128 items**" → 128 (explicit total)
+        ("multi_bold_sum_explicit_total", "Remaining glasses = 96 - 10 = **86 glasses**\nRemaining plates = 48 - 6 = **42 plates**\n\nAll total he has 86 glasses and 42 plates so **86+42 = 128** glasses and plates\n\n✅ Final Answer: **86 glasses and 42 plates**\nOr, in total: **128 items**.", 128),
+        # gsm8k_00907: "**4 blue** and **6 red**" → sum = 10
+        ("multi_bold_and_sum", "**Blue shoe boxes left:** 4\n**Red shoe boxes left:** 6\n\n✅ **Answer: 4 blue and 6 red shoe boxes are left.**", 10),
+        # gsm8k_00980: "Brother: **7**" then "Sum = 43 + 7 = **50**" → prefer 50 (explicit sum)
+        ("prefer_explicit_sum", "> Dad: 43\n> Brother: 7\n> Sum = 43 + 7 = **50**\n\n---\n\n### ✅ Final Answer:\n**50**", 50),
+        # gsm8k_01018: "**Selfies:** 27 **Portraits:** 18" (asked for portraits+selfies) → sum = 45
+        ("selfies_portraits_sum", "- Selfies: $3 \\times 9 = 27$ selfies\n- Portraits: $2 \\times 9 = 18$ portraits\n\n### Final Answer:\n- **Selfies:** 27\n- **Portraits:** 18\n\n✅ **Answer: 27 selfies and 18 portraits.**", 45),
+        # gsm8k_00979: "**red car costs $60**" then "**$160**" → prefer 160 (final answer)
+        ("prefer_final_not_intermediate", "Thus, the **red car costs $60**.\n\n### Step 2: Find the total cost of both cars\n\n$$\n100\\ (\\text{blue}) + 60\\ (\\text{red}) = 160\n$$\n\n### ✅ Final Answer:\n**$160**", 160),
+        # gsm8k_01289: "**2040 minutes** (or **34 hours**)" → prefer 34 (pattern "(or X)" = final/converted)
+        ("or_paren_prefer_second", "Over **4 weeks**:\n- $ 510 \\times 4 = 2040 $ minutes\n\n### 5. **Convert to Hours**\n- $ 2040 \\div 60 = 34 $ hours\n\n---\n\n### ✅ Final Answer:\n**2040 minutes** (or **34 hours**) over 4 weeks.", 34),
+        # gsm8k_00877: "$ 8 $ (MC) + $ 18 $ (T/F) + $ 15 $ (Long) = **41 points**" → 41 (not intermediate 5)
+        ("prefer_sum_result_not_component", "### Step 3: Calculate points from long-answer questions\n- Number correct = 60% of 5 = $ 0.60 \\times 5 = 3 $\n- Each long-answer question is worth 5 points, so:\n  Points = $ 3 \\times 5 = 15 $ points\n\n---\n\n### Step 4: Total points\nAdd all the points:\n$ 8 + 18 + 15 = 41 $ points\n\n---\n\n### ✅ Final Answer:\n**41**", 41),
+        # ── Round-4 Bug Fix test cases ─────────────────────────────────────────
+        # gsm8k_00449: "#### 1. Flash Sale" heading → skip; \boxed{539} wins
+        ("hashes_numbered_heading", "#### 1. Flash Sale on Monday\n17 sneakers at $20 each.\n\n####  2. Rest sold\n\n### ✅ Final Answer:\n$$\n\\boxed{539}\n$$\n\nThe salesman's profit was **$539**.", 539),
+        # gsm8k_00980: Final Answer on own line, answer on next line → 50
+        ("final_answer_next_line", "Dad: 43\nBrother: 7\nSum = 43 + 7 = **50**\n\n---\n\n### ✅ Final Answer:\n**50**", 50),
+        # gsm8k_00831: "(or **18 h 48 m**)" multi-num last bold → prefer first (1128)
+        ("or_paren_multicomp_last_prefer_first", "### ✅ Final Answer:\n**1,128 minutes** (or **18 hours and 48 minutes**) per month.", 1128),
+        # gsm8k_00008: "(or **2 hours and 40 minutes**)" multi-num last → prefer first (160)
+        ("or_paren_multicomp_160", "### ✅ Final Answer:\n\n**160 minutes** (or **2 hours and 40 minutes**)", 160),
+        # gsm8k_00907 all personas: next line after "Final Answer:" has bolds → sum = 10
+        ("answer_and_sum_next_line", "### Final Answer:\nTim has **4 blue** and **6 red** shoe boxes left.\n\n✅ **Answer: 4 blue and 6 red shoe boxes are left.**", 10),
+        # gsm8k_01018: selfies/portraits on sep bullet lines → sum = 45
+        ("selfies_portraits_sep_lines", "### Final Answer:\n- **Selfies:** 27\n- **Portraits:** 18\n\n✅ **Answer: 27 selfies and 18 portraits.**", 45),
     ]
     for entry in efa_cases:
         # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries
