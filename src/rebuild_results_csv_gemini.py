@@ -218,7 +218,7 @@ NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,\\!|,|\{,\}|\s)\d{3
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_root', default=r'E:\Tugas Akhir\TugasAkhir\result\openai_gpt-oss-20b')  # FIX: default path for direct rebuild
-    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b')  # FIX: default output path
+    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-b20b')  # FIX: default output path
     parser.add_argument('--include_personas', default=None)
     parser.add_argument('--exclude_dirs', default='warmup')
     parser.add_argument('--test', action='store_true', help='Run unit tests and exit')
