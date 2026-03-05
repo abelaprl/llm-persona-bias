@@ -217,8 +217,8 @@ NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,\\!|,|\{,\}|\s)\d{3
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_root', default=r'E:\Tugas Akhir\TugasAkhir\result\google_gemma-2-9b-it')  # FIX: default path for direct rebuild
-    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\google_gemma-2-9b-it')  # FIX: default output path
+    parser.add_argument('--input_root', default=r'E:\Tugas Akhir\TugasAkhir\result\meta-llama_llama-3.3-70b-instruct')  # FIX: default path for direct rebuild
+    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct')  # FIX: default output path
     parser.add_argument('--include_personas', default=None)
     parser.add_argument('--exclude_dirs', default='warmup')
     parser.add_argument('--test', action='store_true', help='Run unit tests and exit')
@@ -495,7 +495,12 @@ def extract_final_answer(text):
         r'would\s+(?:take|cost|last|be|earn|save|spend|make|have|need|weigh|pay|create|score)|'
         r'is|are|was|were|costs?|earns?|saves?|takes?|makes?|needs?|weighs?|spends?|'
         r'pays?|paid|creates?|created|scores?|scored|spent|brought|can\s+\w+|'
-        r'remains?|add\s+up\s+to'
+        r'remains?|add\s+up\s+to|'
+        r'has|have|had|earned?|got|gotten|collected?|picked?|won|saved?|bought|ran|walked?|watched?|'
+        r'responds?\s+to|responded?\s+to|finished?|completed?|solved?|reached?|'
+        r'arrived?|found|learns?|learned?|grew|planted?|painted?|wrote|written|drew|'
+        r'sang|cooked?|baked?|cleaned?|fixed?|built|sold|hired?|owned?|holds?|held|'
+        r'planted?|visited?|drove|driven|flew|flown|swam|swum|fell|risen?|rose'
         r')\b', re.I)
 
     def _extract_answer_number(sentence):
@@ -507,14 +512,33 @@ def extract_final_answer(text):
         sentence = str(sentence).strip()
         if not sentence:
             return None
+        # Pre-Priority: duration answer "X will last/run/work for N [time-unit]"
+        # The duration (N days/hours/etc.) is the answer, not the leading measurement quantity
+        # e.g. "720 grams of cat food will last for 2 days." -> 2
+        # FIX: allow 0-3 intervening words between "will last" and "for" (e.g. "will last Imma's cats for 2")
+        _dur_m = re.search(
+            r'\bwill\s+(?:last|run|work|remain|hold)\b[^.]{0,25}?\bfor\s+(' + NUMBER_RE + r')\s+\w|'
+            r'\blasts?\b[^.]{0,20}?\bfor\s+(' + NUMBER_RE + r')\s+\w',
+            sentence, re.I)
+        if _dur_m:
+            _n_dur = normalize_number(_dur_m.group(1) or _dur_m.group(2))
+            if _n_dur is not None:
+                return _n_dur
         # Priority 0: explicit leading numeric answer in first sentence
         # e.g. "10 guests. At 10 guests, both venues cost $250." -> 10
+        # FIX: allow leading number even when a verb is present, as long as the verb comes AFTER
+        # the leading number (i.e. the number is the subject/answer, not an intermediate value)
         _first_sent = sentence.split('.', 1)[0].strip()
         _first_lead_m = re.match(r'^(?:\*\*)?\s*(' + NUMBER_RE + r')\s+\w+', _first_sent)
-        if _first_lead_m and not _ANSWER_VERB_RE.search(_first_sent):
-            _n0 = normalize_number(_first_lead_m.group(1))
-            if _n0 is not None:
-                return _n0
+        if _first_lead_m:
+            _verb_m_p0 = _ANSWER_VERB_RE.search(_first_sent)
+            # Only skip Priority 0 if the verb appears BEFORE the leading number
+            # (verb before number = number is an object of prior action, not the subject answer)
+            _verb_before_num = _verb_m_p0 and _verb_m_p0.start() < _first_lead_m.start(1)
+            if not _verb_before_num:
+                _n0 = normalize_number(_first_lead_m.group(1))
+                if _n0 is not None:
+                    return _n0
         # Priority 0b: equations on answer sentence -> take last result number
         if '=' in sentence:
             _nums_eq = [normalize_number(t) for t in re.findall(NUMBER_RE, sentence)]
@@ -537,24 +561,18 @@ def extract_final_answer(text):
             _nums_or = [n for n in _nums_or if n is not None]
             if len(_nums_or) == 2:
                 return _nums_or[-1]
-        # Priority NEW: "N [noun(s)] and M [noun(s)]" parallel counting → sum (before verb check)
-        # (e.g. "6 red shoeboxes and 4 blue shoeboxes" → 10, "3 cheese pizzas and 3 pepperoni" → 6)
-        # Guard: skip time-unit pairs (hrs+min in P1) OR when sentence has a currency amount
-        # ("6 erasers and 8 pencils cost $36" → skip sum, let P1 pick $36)
-        if re.search(r'\band\b', sentence, re.I) and not re.search(r'\bor\b', sentence, re.I) \
-                and not re.search(r'[\$\u20ac\xa3]\s*\d', sentence):
-            _par_m_pre = re.search(NUMBER_RE + r'(?:\s+\w+){1,3}\s+and\s+' + NUMBER_RE, sentence)
-            if _par_m_pre and not re.search(
-                    r'\b(hours?|minutes?|seconds?|days?|weeks?|months?|years?)\b',
-                    _par_m_pre.group(0), re.I):
-                _pair_nums_pre = [normalize_number(t) for t in re.findall(NUMBER_RE, _par_m_pre.group(0))]
-                _pair_nums_pre = [n for n in _pair_nums_pre if n is not None]
-                if len(_pair_nums_pre) == 2:
-                    return sum(_pair_nums_pre)
-        # Priority 1: main predicate verb → LAST occurrence → first number after it
-        # (last match handles "costs X and costs Y. Together costs Z" → picks Z)
+        # Priority 1: main predicate verb → FIRST non-infinitive verb → first number after it
+        # FIX: moved BEFORE Priority-NEW (parallel sum) so strong verbs take precedence
+        # e.g. "it will take Matthew 4 hours to dig 30 holes and 15 holes" → "will take" → 4 (not 30+15=45)
+        # e.g. "Emma needs to make 18 vlogs to complete goal of 72" → "needs" → 18 (not 72)
         _vm_all = list(_ANSWER_VERB_RE.finditer(sentence))
-        _vm = _vm_all[-1] if _vm_all else None
+        # Filter: exclude verbs immediately preceded by "to" (they are infinitives, not main predicates)
+        def _is_infinitive_vm(vm):
+            _bef = sentence[:vm.start()].rstrip()
+            _bef_words = _bef.split()
+            return bool(_bef_words) and _bef_words[-1].lower() == 'to'
+        _vm_non_inf = [vm for vm in _vm_all if not _is_infinitive_vm(vm)]
+        _vm = _vm_non_inf[0] if _vm_non_inf else (_vm_all[0] if _vm_all else None)
         if _vm:
             _after = sentence[_vm.end():]
             # Ignore escaped currency markers from LaTeX (\$80), they are often contextual.
@@ -581,6 +599,8 @@ def extract_final_answer(text):
                 if _h is not None and _m is not None:
                     return _h * 60 + _m
             # FIX: skip hyphenated modifier numbers (e.g. "400-meter", "10-year") → take next
+            # FIX: skip "for N [time-unit]" trailing context (duration specifiers, not the answer)
+            # e.g. "saves for 5 days" → 5 is NOT the answer; look for pre-verb currency instead
             for _nm in re.finditer(r'(?:[\$\u20ac\xa3])?\s*(' + NUMBER_RE + r')', _after):
                 _n = normalize_number(_nm.group(1))
                 if _n is None:
@@ -588,7 +608,34 @@ def extract_final_answer(text):
                 _after_tok = _after[_nm.end():]
                 if re.match(r'\s*[-\u2013]\w', _after_tok):
                     continue  # hyphenated modifier — not the answer, try next
+                # Skip "for N [time-unit]" trailing context
+                _before_in_aft = _after[:_nm.start()]
+                if re.search(r'\bfor\s*$', _before_in_aft, re.I) and re.match(
+                        r'\s*(?:days?|weeks?|months?|years?|hours?|minutes?|seconds?|times?)\b',
+                        _after_tok, re.I):
+                    # Look for a currency amount before the verb as the real answer
+                    _pre_verb_text = sentence[:_vm.start()]
+                    _cur_prev_m = re.search(r'[\$\u20ac\xa3]\s*(' + NUMBER_RE + r')', _pre_verb_text)
+                    if _cur_prev_m:
+                        _n_cur_prev = normalize_number(_cur_prev_m.group(1))
+                        if _n_cur_prev is not None:
+                            return _n_cur_prev
+                    continue  # no currency before verb; try next number
                 return _n
+        # Priority NEW: "N [noun(s)] and M [noun(s)]" parallel counting → sum
+        # Only fires when no predicate verb matched (Priority 1 failed)
+        # (e.g. "6 red shoeboxes and 4 blue shoeboxes" → 10, "3 cheese pizzas and 3 pepperoni" → 6)
+        # Guard: skip time-unit pairs OR when sentence has a currency amount
+        if re.search(r'\band\b', sentence, re.I) and not re.search(r'\bor\b', sentence, re.I) \
+                and not re.search(r'[\$\u20ac\xa3]\s*\d', sentence):
+            _par_m_pre = re.search(NUMBER_RE + r'(?:\s+\w+){1,3}\s+and\s+' + NUMBER_RE, sentence)
+            if _par_m_pre and not re.search(
+                    r'\b(hours?|minutes?|seconds?|days?|weeks?|months?|years?)\b',
+                    _par_m_pre.group(0), re.I):
+                _pair_nums_pre = [normalize_number(t) for t in re.findall(NUMBER_RE, _par_m_pre.group(0))]
+                _pair_nums_pre = [n for n in _pair_nums_pre if n is not None]
+                if len(_pair_nums_pre) == 2:
+                    return sum(_pair_nums_pre)
         # Priority 2: "total of N", "in total N", "altogether N"
         _tm = re.search(
             r'\b(?:total\s+of|in\s+total|altogether)\b\s*[$\u20ac\xa3]?\s*(' + NUMBER_RE + r')',
@@ -597,6 +644,28 @@ def extract_final_answer(text):
             _n = normalize_number(_tm.group(1))
             if _n is not None:
                 return _n
+        # Priority 2b: catch-all — first non-modifier number in sentence
+        # (handles verbs not in _ANSWER_VERB_RE, e.g. "watched", "responded to", etc.)
+        # Only applied when no higher priority matched; seeks first standalone number.
+        for _nm2b in re.finditer(r'(?:[-\u2212]\s*)?(?:[\$\u20ac\xa3])?(' + NUMBER_RE + r')', sentence):
+            _raw2b = _nm2b.group(0).strip()
+            _n2b = normalize_number(_raw2b)
+            if _n2b is None:
+                continue
+            _after2b = sentence[_nm2b.end():]
+            _before2b = sentence[:_nm2b.start()]
+            # Skip hyphenated modifiers (e.g. "30-minute", "5-day")
+            if re.match(r'\s*[-\u2013]\w', _after2b):
+                continue
+            # Skip numbers inside parenthesized comments
+            if _before2b.count('(') > _before2b.count(')'):
+                continue
+            # Skip if preceded by a preposition suggesting it's a context number
+            # (e.g. "after 10 days" — "after" indicates setup, not answer)
+            _pre_words = _before2b.strip().split()
+            if _pre_words and _pre_words[-1].lower() in ('after', 'before', 'for', 'in', 'over', 'every', 'per', 'from', 'within', 'during', 'at', 'by', 'on', 'each'):
+                continue
+            return _n2b
         return None
 
     # ── Inline bold-number extractor used in Rule 3 (before full helper defined) ──────────
@@ -637,10 +706,11 @@ def extract_final_answer(text):
 
     # ── RULE 3: Marker line → first number after marker ──────────────────────
     marker_re = re.compile(
-        r'(Final Answer|(?<![a-zA-Z-])Answer|So the answer is|Therefore|Thus|Hence)', re.I
+        r'(Final Answer|(?<![a-zA-Z-])Answer|So the answer is|Therefore|Thus|Hence|\bSo\b(?!\s+the\s+answer\s+is))', re.I
     )
     rev_lines = list(reversed(last_lines))
     _seen_strong_marker = False
+    _last_weak_marker_search = None  # tracker for last-resort fallback
     for i, line in enumerate(rev_lines):
         if '|' in line:
             continue
@@ -660,6 +730,8 @@ def extract_final_answer(text):
             search_text = re.sub(r'^[:\s]+', '', search_text)  # keep leading ** (bold opener)
         else:
             search_text = re.sub(r'^[\*:\s]+', '', search_text)  # strip * : space (old behavior)
+        # FIX: also strip leading comma/semicolon (e.g. ", 3 trucks..." from "Therefore, 3 trucks")
+        search_text = re.sub(r'^[,;]\s*', '', search_text)
         # FIX: skip setup lines like "Thus for 8 sandwiches:" — after-marker text starts with "for" + ends with ":"
         if re.match(r'^for\s+', search_text, re.I) and search_text.strip().endswith(':'):
             continue
@@ -686,7 +758,7 @@ def extract_final_answer(text):
                 _r3_bold_nums.append((_bg, _bgnums))
         # FIX: classify marker strength; track if strong marker was seen closer to end
         _matched_marker_lower = (parts[1].lower().strip() if len(parts) >= 2 else '')
-        _is_weak_marker = _matched_marker_lower in ('thus', 'hence', 'therefore')
+        _is_weak_marker = _matched_marker_lower in ('thus', 'hence', 'therefore', 'so')
         _is_strong_marker = not _is_weak_marker
         if _is_strong_marker:
             _seen_strong_marker = True
@@ -695,9 +767,42 @@ def extract_final_answer(text):
             continue
         # FIX: for weak markers, skip if no bold nums and no final keywords
         if _is_weak_marker and not _r3_bold_nums:
-            _has_final_kw = re.search(r'\b(total|answer|altogether|final|result)\b', search_text, re.I)
-            if not _has_final_kw:
+            # FIX: 'So' marker needs stricter logic -- only skip if no final keyword AND no bold
+            # For 'So', also skip if search_text has '=' (calculation line, not conclusion)
+            _has_final_kw = re.search(
+                r'\b(total|answer|altogether|final|result|sum|profit|loss|change|'
+                r'difference|combined|together|overall|remaining|left|'
+                r'in\s+all|in\s+total|for\s+a\s+total)\b',
+                search_text, re.I)
+            # For "So" + total keyword + "=": this is usually an intermediate equation like
+            # "So, total cost = $5 x 10 = $50" -- the '=' indicates a computation, not a conclusion.
+            # In this case, treat as if no final keyword (save and skip).
+            _is_so_marker = (_matched_marker_lower == 'so')
+            _has_eq_so = _is_so_marker and '=' in search_text
+            # FIX: weak-marker line ending with ':' is a setup/intro line, not a conclusion
+            _ends_with_colon = search_text.strip().endswith(':')
+            if not _has_final_kw or _has_eq_so or _ends_with_colon:
+                # Save the FIRST (nearest-to-end) weak marker text for last-resort fallback
+                # after all other rules (4, 5) have also failed.
+                if _last_weak_marker_search is None and search_text.strip():
+                    _last_weak_marker_search = search_text
                 continue  # Skip weak-marker intermediate calc lines (e.g. "Hence M = 21")
+            # _has_final_kw=True: this looks like a conclusion sentence.
+            # Try extracting directly now — prevents Rule 4c from firing on an
+            # incidental currency amount in the sentence (e.g. "to save a total of $60").
+            _n_wk_fkw = _extract_answer_number(search_text)
+            if _n_wk_fkw is not None:
+                return _n_wk_fkw, 'final_marker'
+            # Percentage: "total of 25%" → 25
+            _pct_wk_fkw = re.search(r'\b(\d+(?:\.\d+)?)\s*%', search_text)
+            if _pct_wk_fkw:
+                _n_pct_fkw = normalize_number(_pct_wk_fkw.group(1))
+                if _n_pct_fkw is not None:
+                    return _n_pct_fkw, 'final_marker'
+            # Extraction failed: save for later fallback and skip (don't fall through to Rule 4c)
+            if _last_weak_marker_search is None and search_text.strip():
+                _last_weak_marker_search = search_text
+            continue
         # FIX: when bold groups from split are empty but marker line has bolds (e.g. opening ** was split off),
         # try extracting from the FULL LINE using _simple_bold_extract
         if not _r3_bold_nums and _is_strong_marker:
@@ -1043,6 +1148,35 @@ def extract_final_answer(text):
 
     # ── RULE 4b removed — merged into Rule 4a above ────────────────────────────
 
+    # ── FIX: Weak-marker pre-check (before Rule 4c/5) ────────────────────────
+    # Try to extract from the nearest Therefore/Thus/Hence/So conclusion sentence
+    # BEFORE currency/tail-sentence rules can fire on intermediate calculation lines.
+    # This prevents e.g. "$15x = $165" → 15 winning over "John still has 2 Lego sets."
+    if _last_weak_marker_search is not None:
+        # Negative number check first: "-10°F" → -10  (must come before _extract_answer_number
+        # which would return +10 via copula "is → 10")
+        _neg_wk_pre = re.search(r'(?:^|[\s=,(])[-\u2212]\s*(\d+(?:\.\d+)?)\s*(?:[°\u00b0%\w]*)\s*[.,!]?\s*$',
+                                 _last_weak_marker_search)
+        if _neg_wk_pre:
+            _n_neg_pre = normalize_number(_neg_wk_pre.group(1))
+            if _n_neg_pre is not None:
+                return -_n_neg_pre, 'final_marker'
+        _n_wk_pre = _extract_answer_number(_last_weak_marker_search)
+        if _n_wk_pre is not None:
+            return _n_wk_pre, 'final_marker'
+        # Ordinal fallback: "Finley finished in 6th place" → 6
+        _ord_wk_pre = re.search(r'\b(\d+)(?:st|nd|rd|th)\b', _last_weak_marker_search, re.I)
+        if _ord_wk_pre:
+            _n_ord_pre = normalize_number(_ord_wk_pre.group(1))
+            if _n_ord_pre is not None:
+                return _n_ord_pre, 'final_marker'
+        # Percentage: "33%" → 33
+        _pct_wk_pre = re.search(r'\b(\d+(?:\.\d+)?)\s*%', _last_weak_marker_search)
+        if _pct_wk_pre:
+            _n_pct_pre = normalize_number(_pct_wk_pre.group(1))
+            if _n_pct_pre is not None:
+                return _n_pct_pre, 'final_marker'
+
     # ── RULE 4c: Currency in last 20 lines ───────────────────────────────────
     for line in reversed(last_lines):
         if '|' in line:
@@ -1119,6 +1253,15 @@ def extract_final_answer(text):
             num = normalize_number(m_latex_block.group(1))
             if num is not None:
                 return num, 'latex_result'
+        # 5a-ext: "= N natural_unit" at end of line (e.g. "= 80 yards", "= 22 days")
+        m_eq_natural = re.search(
+            r'=\s*(' + NUMBER_RE + r')\s+\w+s?\s*[.,]?\s*$',
+            line_s
+        )
+        if m_eq_natural:
+            num = normalize_number(m_eq_natural.group(1))
+            if num is not None:
+                return num, 'latex_result'
 
         # 5b: LaTeX inline math: \(a + b = N\) or \(a = N\)
         # FIX (Rule 5b relax): allow trailing characters after closing \) (e.g. "= 13 \text{ minutes}\).")
@@ -1147,9 +1290,10 @@ def extract_final_answer(text):
         # Also: "There are 15 sheep", "Peter has 8 more", "There are 10 more"
         all_nums = re.findall(NUMBER_RE, line_s)
         if len(all_nums) <= 3:
-            # "There are/is N ..." or "X has/have N ..."
+            # "There are/is N ..." or "X is/was/has/have/can/will/... N ..."
+            # FIX: add copula is|are|was|were to m_there verb list
             m_there = re.search(
-                r'(?:There\s+(?:are|is)|\w+\s+(?:has|have|can|will|got|gets?|contains?|holds?|needs?|takes?|makes?|earns?|costs?|weighs?|measures?|equals?|totals?))\s+(' + NUMBER_RE + r')\b',
+                r'(?:There\s+(?:are|is)|\w+\s+(?:is|are|was|were|has|have|can|will|got|gets?|contains?|holds?|needs?|takes?|makes?|earns?|costs?|weighs?|measures?|equals?|totals?))\s+(' + NUMBER_RE + r')\b',
                 line_s, re.I
             )
             if m_there:
@@ -1164,14 +1308,40 @@ def extract_final_answer(text):
                     return num, 'tail_sentence'
 
             # Sentence ending with number + optional words + punctuation
+            # FIX: increase word limit from {0,6} to {0,10} for longer phrases
             m_sent = re.search(
-                r'(' + NUMBER_RE + r')\s+(?:\w+\s+){0,6}(?:\w+)\s*[.!]?\s*$',
+                r'(' + NUMBER_RE + r')\s+(?:\w+\s+){0,10}(?:\w+)\s*[.!]?\s*$',
                 line_s
             )
             if m_sent:
                 num = normalize_number(m_sent.group(1))
                 if num is not None:
                     return num, 'tail_sentence'
+
+        # 5c-pct: Percentage answer: "the chance is 33%" or "rate is 33%"
+        m_pct = re.search(r'\b(?:is|are|was|were|=)\s*(' + NUMBER_RE + r')\s*%', line_s, re.I)
+        if m_pct:
+            num = normalize_number(m_pct.group(1))
+            if num is not None:
+                return num, 'tail_sentence'
+
+        # 5c-neg: Negative number sentence: "...is -10°F" or "= -10"
+        m_neg5c = re.search(
+            r'(?:\bis\b|\bare\b|\bwas\b|\bwere\b|=)\s*([-\u2212]\s*\d+(?:\.\d+)?)\s*(?:[°\u00b0%\w]*)\s*[.!]?\s*$',
+            line_s, re.I
+        )
+        if m_neg5c:
+            _raw_neg = m_neg5c.group(1).replace('\u2212', '-').replace(' ', '')
+            _n_neg = normalize_number(_raw_neg.lstrip('-'))
+            if _n_neg is not None:
+                return -_n_neg, 'tail_sentence'
+
+        # 5c-try_extract: For lines processed here that contain a conclusion verb, try
+        # _extract_answer_number as a last attempt within Rule 5 before 5d
+        if re.search(r'\b(?:Therefore|Thus|Hence|So)\b', line_s, re.I):
+            _n_5c_ex = _extract_answer_number(re.sub(r'^.*?(?:Therefore|Thus|Hence|So)[,:]?\s*', '', line_s, flags=re.I))
+            if _n_5c_ex is not None:
+                return _n_5c_ex, 'tail_sentence'
 
         # 5d: Plain number only line
         # FIX: also accept leading negative sign for plain number (e.g. "-3 °C")
@@ -1181,6 +1351,19 @@ def extract_final_answer(text):
             num = normalize_number(m_plain.group(1))
             if num is not None:
                 return num, 'tail_plain'
+
+    # FIX: last-resort weak-marker fallback — only when ALL rules 1-5 failed.
+    # Uses the nearest-to-end 'Therefore/Thus/Hence' sentence's verb-predicate extraction.
+    if _last_weak_marker_search is not None:
+        _n_wk_final = _extract_answer_number(_last_weak_marker_search)
+        if _n_wk_final is not None:
+            return _n_wk_final, 'final_marker'
+        # Ordinal fallback: "Finley finished in 6th place" → 6
+        _ord_wk = re.search(r'\b(\d+)(?:st|nd|rd|th)\b', _last_weak_marker_search, re.I)
+        if _ord_wk:
+            _n_ord_wk = normalize_number(_ord_wk.group(1))
+            if _n_ord_wk is not None:
+                return _n_ord_wk, 'final_marker'
 
     return None, 'none'
 

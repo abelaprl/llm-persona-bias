@@ -1,6 +1,6 @@
 import csv
 
-csv_path = r'E:\Tugas Akhir\TugasAkhir\result\reports\google_gemma-3-27b-it\results.csv'
+csv_path = r'E:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct\results.csv'
 
 no_extract = []
 with open(csv_path, encoding='utf-8') as f:
