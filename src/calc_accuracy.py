@@ -3,8 +3,8 @@ import sys
 import os
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\allenai_olmo-3-32b-think\results.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\allenai_olmo-3-32b-think'
 
 PERSONA_ORDER = [
     'man_explicit_1','man_implicit_1','man_implicit_2','man_implicit_3',
@@ -36,7 +36,12 @@ with open(csv_path, encoding='utf-8') as f:
     for row in reader:
         persona = row['persona_folder']
         is_correct = row['is_correct'].strip().lower() == 'true'
-        error_cat  = row['error_category'].strip()
+        error_cat  = row.get('error_category', '').strip()
+        # fallback: infer no_extract from empty extracted_answer
+        if not error_cat:
+            extracted = row.get('extracted_answer', '').strip()
+            if not extracted or extracted.lower() in ('', 'none', 'null'):
+                error_cat = 'no_number_found'
         persona_stats[persona]['total'] += 1
         overall['total'] += 1
         if is_correct:
