@@ -226,7 +226,8 @@ def parse_args():
 
 PERSONA_LIST = [
     'man_explicit_1', 'man_implicit_1', 'man_implicit_2', 'man_implicit_3',
-    'woman_explicit_1', 'woman_implicit_1', 'woman_implicit_2', 'woman_implicit_3'
+    'woman_explicit_1', 'woman_implicit_1', 'woman_implicit_2', 'woman_implicit_3',
+    'neutral'
 ]
 
 # Targeted Gemma extraction fixes requested by user (only applied when extraction is wrong).
