@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00852",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:20:18.679943",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 852,
+    "dataset": "gsm8k_test",
+    "question": "A basket of green food costs $25 and a basket of red food costs $18. If you buy 3 baskets of green food and red food, how much will you have to pay in total if you get $2 off for each basket of red food?",
+    "ground_truth": "The 3 baskets of green food will cost $25 x 3 = $<<25*3=75>>75.\nThe 3 baskets of red food will cost $18 x 3 = $<<18*3=54>>54.\nThere will be $2 x 3 = $<<2*3=6>>6 off for the baskets of red food.\nSo, the 3 baskets of red food will now cost $54 - $6 = $<<54-6=48>>48.\nYou will have to pay $75 + $48 = $<<75+48=123>>123 for all the baskets of food.\n#### 123",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: A basket of green food costs $25 and a basket of red food costs $18. If you buy 3 baskets of green food and red food, how much will you have to pay in total if you get $2 off for each basket of red food?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First calculate the cost of the baskets before the discount:\n\n- Green baskets: \\(3 \\times \\$25 = \\$75\\)\n- Red baskets: \\(3 \\times \\$18 = \\$54\\)\n\nTotal before discount:  \n\\[\n\\$75 + \\$54 = \\$129\n\\]\n\nEach red basket gives a \\$2 discount, so for 3 red baskets the discount is  \n\\[\n3 \\times \\$2 = \\$6\n\\]\n\nSubtract the discount from the pre‑discount total:\n\n\\[\n\\$129 - \\$6 = \\$123\n\\]\n\n**Answer: \\$123**",
+    "raw_api_response": {
+      "id": "gen-1774455618-jCyZTV8pxgsNTGYSlOLR",
+      "object": "chat.completion",
+      "created": 1774455618,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "First calculate the cost of the baskets before the discount:\n\n- Green baskets: \\(3 \\times \\$25 = \\$75\\)\n- Red baskets: \\(3 \\times \\$18 = \\$54\\)\n\nTotal before discount:  \n\\[\n\\$75 + \\$54 = \\$129\n\\]\n\nEach red basket gives a \\$2 discount, so for 3 red baskets the discount is  \n\\[\n3 \\times \\$2 = \\$6\n\\]\n\nSubtract the discount from the pre‑discount total:\n\n\\[\n\\$129 - \\$6 = \\$123\n\\]\n\n**Answer: \\$123**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: \"A basket of green food costs $25 and a basket of red food costs $18. If you buy 3 baskets of green food and red food, how much will you have to pay in total if you get $2 off for each basket of red food?\" The phrase \"3 baskets of green food and red food\" ambiguous: could mean 3 baskets total, some green some red? Or 3 baskets of each? Usually \"3 baskets of green food and red food\" might mean 3 baskets of green and 3 baskets of red? But that would be 6 baskets. But maybe they mean 3 baskets of green food and 3 baskets of red food? Let's parse: \"If you buy 3 baskets of green food and red food\" could mean you buy 3 baskets of green food and 3 baskets of red food? But the phrase \"and red food\" might be part of the same phrase: \"3 baskets of green food and red food\" meaning 3 baskets of green food and 3 baskets of red food? Or maybe they mean you buy 3 baskets of green food and 3 baskets of red food? But the phrase \"and red food\" might be a conjunction. Let's examine typical math word problems: \"A basket of green food costs $25 and a basket of red food costs $18. If you buy 3 baskets of green food and red food, how much will you have to pay in total if you get $2 off for each basket of red food?\" Usually they'd say \"If you buy 3 baskets of green food and 3 baskets of red food\" but they omitted the second 3. But maybe they intend 3 baskets of each. But the phrase \"3 baskets of green food and red food\" could be interpreted as \"3 baskets of green food and 3 baskets of red food\" because they didn't repeat the number. But it's ambiguous.\n\nLet's consider both interpretations:\n\nInterpretation 1: 3 baskets of green and 3 baskets of red. Then cost: 3*25 + 3*18 = 75 + 54 = 129. Discount: $2 off per red basket: 3*2 = 6 discount. So total = 129 - 6 = 123.\n\nInterpretation 2: 3 baskets total, some green some red. But we don't know distribution. Maybe they mean 3 baskets of green and 3 baskets of red? But that would be 6 baskets. But the phrase \"3 baskets of green food and red food\" might mean 3 baskets of green food and 3 baskets of red food. So answer 123.\n\nAlternatively, maybe they mean 3 baskets of green food and 3 baskets of red food. So answer 123.\n\nLet's check if any other interpretation: maybe they mean 3 baskets of green food and 3 baskets of red food? Yes.\n\nThus answer: $123.\n\nBut we need to provide answer. Let's produce final answer: $123.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: \"A basket of green food costs $25 and a basket of red food costs $18. If you buy 3 baskets of green food and red food, how much will you have to pay in total if you get $2 off for each basket of red food?\" The phrase \"3 baskets of green food and red food\" ambiguous: could mean 3 baskets total, some green some red? Or 3 baskets of each? Usually \"3 baskets of green food and red food\" might mean 3 baskets of green and 3 baskets of red? But that would be 6 baskets. But maybe they mean 3 baskets of green food and 3 baskets of red food? Let's parse: \"If you buy 3 baskets of green food and red food\" could mean you buy 3 baskets of green food and 3 baskets of red food? But the phrase \"and red food\" might be part of the same phrase: \"3 baskets of green food and red food\" meaning 3 baskets of green food and 3 baskets of red food? Or maybe they mean you buy 3 baskets of green food and 3 baskets of red food? But the phrase \"and red food\" might be a conjunction. Let's examine typical math word problems: \"A basket of green food costs $25 and a basket of red food costs $18. If you buy 3 baskets of green food and red food, how much will you have to pay in total if you get $2 off for each basket of red food?\" Usually they'd say \"If you buy 3 baskets of green food and 3 baskets of red food\" but they omitted the second 3. But maybe they intend 3 baskets of each. But the phrase \"3 baskets of green food and red food\" could be interpreted as \"3 baskets of green food and 3 baskets of red food\" because they didn't repeat the number. But it's ambiguous.\n\nLet's consider both interpretations:\n\nInterpretation 1: 3 baskets of green and 3 baskets of red. Then cost: 3*25 + 3*18 = 75 + 54 = 129. Discount: $2 off per red basket: 3*2 = 6 discount. So total = 129 - 6 = 123.\n\nInterpretation 2: 3 baskets total, some green some red. But we don't know distribution. Maybe they mean 3 baskets of green and 3 baskets of red? But that would be 6 baskets. But the phrase \"3 baskets of green food and red food\" might mean 3 baskets of green food and 3 baskets of red food. So answer 123.\n\nAlternatively, maybe they mean 3 baskets of green food and 3 baskets of red food. So answer 123.\n\nLet's check if any other interpretation: maybe they mean 3 baskets of green food and 3 baskets of red food? Yes.\n\nThus answer: $123.\n\nBut we need to provide answer. Let's produce final answer: $123.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 141,
+        "completion_tokens": 749,
+        "total_tokens": 890,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 84,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00019712,
+          "upstream_inference_prompt_cost": 9.87e-06,
+          "upstream_inference_completions_cost": 0.00018725
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 612,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 5.045483827590942
+  },
+  "retry_count": 0
+}

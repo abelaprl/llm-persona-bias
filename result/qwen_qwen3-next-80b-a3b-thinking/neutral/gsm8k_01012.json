@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "qwen_qwen3-next-80b-a3b-thinking_neutral_gsm8k_01012",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:36:55.604712",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "qwen/qwen3-next-80b-a3b-thinking",
+      "model_name": "Qwen: Qwen3 Next 80B A3B (Thinking)",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1012,
+    "dataset": "gsm8k_test",
+    "question": "Maria was charging her power bank before going to the park when she disconnected it and noticed the power bank wasn’t fully charged yet. Once at the park, her friends asked her if they could charge their phones. While charging her friends’ phones, she noticed that her power bank was losing 9% of the total capacity each hour. 5 hours later the battery started to lose instead 7% of the total capacity each hour for about 3 hours. In the end, the charge remaining was 28%. What was the charge of the power bank when Maria went out to the park?",
+    "ground_truth": "At first, the power bank lost 9% per hour * 5 hours = 45%.\nLater on, the power bank lost 7% per hour * 3 hours = 21%.\nThe power bank charge remaining was 28%, so the power bank charge before going to the park was 45 + 21 +28 = 94%.\n#### 94",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Maria was charging her power bank before going to the park when she disconnected it and noticed the power bank wasn’t fully charged yet. Once at the park, her friends asked her if they could charge their phones. While charging her friends’ phones, she noticed that her power bank was losing 9% of the total capacity each hour. 5 hours later the battery started to lose instead 7% of the total capacity each hour for about 3 hours. In the end, the charge remaining was 28%. What was the charge of the power bank when Maria went out to the park?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "qwen/qwen3-next-80b-a3b-thinking"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": null,
+    "raw_api_response": {
+      "id": "gen-1774460216-UwqI9rSdfRl4jyOIr3Gd",
+      "object": "chat.completion",
+      "created": 1774460216,
+      "model": "qwen/qwen3-next-80b-a3b-thinking-2509",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "length",
+          "native_finish_reason": "length",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "refusal": null,
+            "reasoning": "Okay, let's try to solve this problem step by step. First, let's make sure I understand the problem correctly. Maria had a power bank that wasn't fully charged when she left home. Let's call the initial charge when she went to the park \"C\" (as a percentage, so 100% would be fully charged). Then, while charging her friends' phones, the power bank was losing charge. For the first 5 hours, it was losing 9% of the total capacity each hour. Wait, hold on—does \"losing 9% of the total capacity each hour\" mean 9% of the current capacity, or 9% of the original total capacity? That's important. Usually, when something loses a percentage each hour, it's a percentage of the current amount, like exponential decay. But sometimes problems might say \"9% of the total capacity\" meaning 9% of the full capacity, but that would be linear. Let's check the problem statement again: \"losing 9% of the total capacity each hour\". Hmm, \"total capacity\" might refer to the full capacity of the power bank, not the current charge. But that would be unusual because if it's losing a fixed percentage of the total capacity (i.e., a fixed amount each hour), then it's linear. But if it's losing 9% of the current charge each hour, that's exponential. Let's see the problem says \"losing 9% of the total capacity each hour\"—\"total capacity\" usually means the maximum capacity, so maybe 9% of the full capacity per hour. But let's check the numbers. Suppose the total capacity is 100% (since we're dealing with percentages), so \"total capacity\" is 100%. Then losing 9% of total capacity each hour would mean losing 9 percentage points per hour. Similarly, 7% of total capacity each hour would be 7 percentage points per hour. But let's see if that makes sense. Let's test both interpretations.\n\nFirst interpretation: linear decay. Let's say total capacity is 100%, so \"losing 9% of total capacity\" means losing 9% of 100% = 9 percentage points per hour. So each hour, the charge decreases by 9% (of the full capacity). Then for 5 hours, it loses 9*5=45 percentage points. Then for the next 3 hours, loses 7% of total capacity, so 7*3=21 percentage points. Total loss is 45+21=66 percentage points. Then remaining charge is initial charge minus 66, which is 28%. So initial charge would be 28+66=94%. But let's check if that's possible. But maybe \"losing 9% of the total capacity\" means 9% of the current charge, which is exponential decay. Let's see. If it's exponential, then after each hour, the remaining charge is (100% - 9%) = 91% of the previous charge. So for the first 5 hours, it's multiplied by 0.91 each hour. Then for the next 3 hours, multiplied by 0.93 each hour (since losing 7%, so 93% remaining). Then the final charge is initial * (0.91)^5 * (0.93)^3 = 28%. Let's calculate that. Let's compute (0.91)^5: 0.91^2=0.8281, 0.91^3=0.8281*0.91≈0.7536, 0.91^4≈0.7536*0.91≈0.6858, 0.91^5≈0.6858*0.91≈0.6241. Then 0.93^3: 0.93^2=0.8649, 0.93^3≈0.8649*0.93≈0.8044. Then total multiplier is 0.6241*0.8044≈0.502. So initial charge * 0.502 = 28%, so initial charge ≈28/0.502≈55.78%. But let's see if the problem says \"losing 9% of the total capacity each hour\"—if \"total capacity\" is the full capacity, then it's linear. But usually, when a battery loses a percentage per hour, it's of the current charge, but sometimes problems might specify \"of the total capacity\" to mean of the full capacity. Let's check the problem statement again: \"her power bank was losing 9% of the total capacity each hour\". The phrase \"total capacity\" usually refers to the maximum capacity of the power bank, so if the power bank's total capacity is, say, 10000mAh, then losing 9% of that would be 900mAh per hour. So in percentage terms, if the total capacity is 100%, then losing 9% of total capacity per hour means losing 9 percentage points per hour. Similarly, 7% of total capacity per hour is 7 percentage points per hour. Let's test this. Suppose initial charge is C (in percentage points, so between 0 and 100). After 5 hours: C - 9*5 = C - 45. Then for next 3 hours: (C - 45) - 7*3 = C - 45 -21 = C - 66. This equals 28%, so C = 28 + 66 = 94%. But is that possible? Let's see, if she started with 94%, lost 9% per hour (of total capacity) for 5 hours: 9*5=45, so 94-45=49%. Then lost 7% per hour for 3 hours: 7*3=21, 49-21=28%. That works. But wait, if it's losing 9% of the current charge each hour, then it's different. Let's check that case again. Suppose initial charge is C. After 1 hour: C*(1 - 0.09) = 0.91C. After 5 hours: C*(0.91)^5. Then for the next 3 hours, losing 7% of current charge each hour, so each hour multiplied by 0.93. So after 3 more hours: C*(0.91)^5*(0.93)^3 = 28%. Let's calculate (0.91)^5: 0.91^5 = e^(5*ln0.91) ≈ e^(5*(-0.0943)) ≈ e^(-0.4715) ≈ 0.624. (0.93)^3 = e^(3*ln0.93) ≈ e^(3*(-0.0726)) ≈ e^(-0.2178) ≈ 0.804. So 0.624*0.804 ≈ 0.502. So C = 28 / 0.502 ≈ 55.78%. But the problem says \"losing 9% of the total capacity each hour\"—\"total capacity\" is the full capacity, so if the power bank's total capacity is 100%, then 9% of total capacity is 9 percentage points, so linear. But sometimes people say \"losing 9% per hour\" meaning 9% of current charge, but the problem specifically says \"9% of the total capacity\", which would mean 9% of the full capacity, so fixed amount per hour. Let's see if the problem says \"the battery started to lose instead 7% of the total capacity each hour\"—so \"total capacity\" is the same as before, so the full capacity. So if total capacity is 100%, then 9% of total capacity is 9 units per hour, 7% is 7 units per hour. So the loss is linear. Let's confirm with the numbers. Suppose initial charge is C. After 5 hours: C - 5*9 = C - 45. Then after 3 more hours: (C - 45) - 3*7 = C - 45 -21 = C - 66. This equals 28%, so C = 28 + 66 = 94. So 94%. But let's check if that makes sense. If she started with 94%, lost 9% of total capacity (i.e., 9 percentage points) each hour for 5 hours: 9*5=45, so 94-45=49. Then lost 7 percentage points per hour for 3 hours: 7*3=21, 49-21=28. That's exactly the remaining charge. So that works. But why would the problem say \"losing 9% of the total capacity each hour\" instead of \"losing 9 percentage points per hour\"? Maybe because \"total capacity\" is the full capacity, so 9% of that is a",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Okay, let's try to solve this problem step by step. First, let's make sure I understand the problem correctly. Maria had a power bank that wasn't fully charged when she left home. Let's call the initial charge when she went to the park \"C\" (as a percentage, so 100% would be fully charged). Then, while charging her friends' phones, the power bank was losing charge. For the first 5 hours, it was losing 9% of the total capacity each hour. Wait, hold on—does \"losing 9% of the total capacity each hour\" mean 9% of the current capacity, or 9% of the original total capacity? That's important. Usually, when something loses a percentage each hour, it's a percentage of the current amount, like exponential decay. But sometimes problems might say \"9% of the total capacity\" meaning 9% of the full capacity, but that would be linear. Let's check the problem statement again: \"losing 9% of the total capacity each hour\". Hmm, \"total capacity\" might refer to the full capacity of the power bank, not the current charge. But that would be unusual because if it's losing a fixed percentage of the total capacity (i.e., a fixed amount each hour), then it's linear. But if it's losing 9% of the current charge each hour, that's exponential. Let's see the problem says \"losing 9% of the total capacity each hour\"—\"total capacity\" usually means the maximum capacity, so maybe 9% of the full capacity per hour. But let's check the numbers. Suppose the total capacity is 100% (since we're dealing with percentages), so \"total capacity\" is 100%. Then losing 9% of total capacity each hour would mean losing 9 percentage points per hour. Similarly, 7% of total capacity each hour would be 7 percentage points per hour. But let's see if that makes sense. Let's test both interpretations.\n\nFirst interpretation: linear decay. Let's say total capacity is 100%, so \"losing 9% of total capacity\" means losing 9% of 100% = 9 percentage points per hour. So each hour, the charge decreases by 9% (of the full capacity). Then for 5 hours, it loses 9*5=45 percentage points. Then for the next 3 hours, loses 7% of total capacity, so 7*3=21 percentage points. Total loss is 45+21=66 percentage points. Then remaining charge is initial charge minus 66, which is 28%. So initial charge would be 28+66=94%. But let's check if that's possible. But maybe \"losing 9% of the total capacity\" means 9% of the current charge, which is exponential decay. Let's see. If it's exponential, then after each hour, the remaining charge is (100% - 9%) = 91% of the previous charge. So for the first 5 hours, it's multiplied by 0.91 each hour. Then for the next 3 hours, multiplied by 0.93 each hour (since losing 7%, so 93% remaining). Then the final charge is initial * (0.91)^5 * (0.93)^3 = 28%. Let's calculate that. Let's compute (0.91)^5: 0.91^2=0.8281, 0.91^3=0.8281*0.91≈0.7536, 0.91^4≈0.7536*0.91≈0.6858, 0.91^5≈0.6858*0.91≈0.6241. Then 0.93^3: 0.93^2=0.8649, 0.93^3≈0.8649*0.93≈0.8044. Then total multiplier is 0.6241*0.8044≈0.502. So initial charge * 0.502 = 28%, so initial charge ≈28/0.502≈55.78%. But let's see if the problem says \"losing 9% of the total capacity each hour\"—if \"total capacity\" is the full capacity, then it's linear. But usually, when a battery loses a percentage per hour, it's of the current charge, but sometimes problems might specify \"of the total capacity\" to mean of the full capacity. Let's check the problem statement again: \"her power bank was losing 9% of the total capacity each hour\". The phrase \"total capacity\" usually refers to the maximum capacity of the power bank, so if the power bank's total capacity is, say, 10000mAh, then losing 9% of that would be 900mAh per hour. So in percentage terms, if the total capacity is 100%, then losing 9% of total capacity per hour means losing 9 percentage points per hour. Similarly, 7% of total capacity per hour is 7 percentage points per hour. Let's test this. Suppose initial charge is C (in percentage points, so between 0 and 100). After 5 hours: C - 9*5 = C - 45. Then for next 3 hours: (C - 45) - 7*3 = C - 45 -21 = C - 66. This equals 28%, so C = 28 + 66 = 94%. But is that possible? Let's see, if she started with 94%, lost 9% per hour (of total capacity) for 5 hours: 9*5=45, so 94-45=49%. Then lost 7% per hour for 3 hours: 7*3=21, 49-21=28%. That works. But wait, if it's losing 9% of the current charge each hour, then it's different. Let's check that case again. Suppose initial charge is C. After 1 hour: C*(1 - 0.09) = 0.91C. After 5 hours: C*(0.91)^5. Then for the next 3 hours, losing 7% of current charge each hour, so each hour multiplied by 0.93. So after 3 more hours: C*(0.91)^5*(0.93)^3 = 28%. Let's calculate (0.91)^5: 0.91^5 = e^(5*ln0.91) ≈ e^(5*(-0.0943)) ≈ e^(-0.4715) ≈ 0.624. (0.93)^3 = e^(3*ln0.93) ≈ e^(3*(-0.0726)) ≈ e^(-0.2178) ≈ 0.804. So 0.624*0.804 ≈ 0.502. So C = 28 / 0.502 ≈ 55.78%. But the problem says \"losing 9% of the total capacity each hour\"—\"total capacity\" is the full capacity, so if the power bank's total capacity is 100%, then 9% of total capacity is 9 percentage points, so linear. But sometimes people say \"losing 9% per hour\" meaning 9% of current charge, but the problem specifically says \"9% of the total capacity\", which would mean 9% of the full capacity, so fixed amount per hour. Let's see if the problem says \"the battery started to lose instead 7% of the total capacity each hour\"—so \"total capacity\" is the same as before, so the full capacity. So if total capacity is 100%, then 9% of total capacity is 9 units per hour, 7% is 7 units per hour. So the loss is linear. Let's confirm with the numbers. Suppose initial charge is C. After 5 hours: C - 5*9 = C - 45. Then after 3 more hours: (C - 45) - 3*7 = C - 45 -21 = C - 66. This equals 28%, so C = 28 + 66 = 94. So 94%. But let's check if that makes sense. If she started with 94%, lost 9% of total capacity (i.e., 9 percentage points) each hour for 5 hours: 9*5=45, so 94-45=49. Then lost 7 percentage points per hour for 3 hours: 7*3=21, 49-21=28. That's exactly the remaining charge. So that works. But why would the problem say \"losing 9% of the total capacity each hour\" instead of \"losing 9 percentage points per hour\"? Maybe because \"total capacity\" is the full capacity, so 9% of that is a",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 150,
+        "completion_tokens": 2048,
+        "total_tokens": 2198,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0024801,
+          "upstream_inference_prompt_cost": 2.25e-05,
+          "upstream_inference_completions_cost": 0.0024576
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1584,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 12.104163408279419
+  },
+  "retry_count": 0
+}

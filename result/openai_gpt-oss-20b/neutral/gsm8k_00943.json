@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00943",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:33:01.907463",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 943,
+    "dataset": "gsm8k_test",
+    "question": "James gets 10 new CDs.  Each CD cost $15.  He gets them for 40% off.  He decides he doesn't like 5 of them and sells them for 40. How much money was he out?",
+    "ground_truth": "He got a 15*.4=$<<15*.4=6>>6 discount on each CD\nThat means each CD cost 15-6=$<<15-6=9>>9\nSo he paid 10*9=$<<10*9=90>>90\nThat means he was out 90-40=$<<90-40=50>>50\n#### 50",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: James gets 10 new CDs.  Each CD cost $15.  He gets them for 40% off.  He decides he doesn't like 5 of them and sells them for 40. How much money was he out?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First, find how much James paid for the 10 CDs.\n\n* Cost of one CD before discount: \\$15  \n* Discount: 40 % → he pays 60 % of \\$15  \n  \\[\n  0.60 \\times 15 = \\$9 \\text{ per CD}\n  \\]\n* Total cost for 10 CDs:\n  \\[\n  10 \\times 9 = \\$90\n  \\]\n\nNext, he sells 5 of the CDs for \\$40 in total.\n\n* Money received from selling 5 CDs: \\$40\n\nNow compute his net out‑of‑pocket amount:\n\n\\[\n\\text{Net out} = \\text{Total cost} - \\text{Money received}\n                 = 90 - 40 = \\$50\n\\]\n\nSo James was **out \\$50**.",
+    "raw_api_response": {
+      "id": "gen-1774456384-vAjWVjHz229q8E0Hjzhr",
+      "object": "chat.completion",
+      "created": 1774456384,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "First, find how much James paid for the 10 CDs.\n\n* Cost of one CD before discount: \\$15  \n* Discount: 40 % → he pays 60 % of \\$15  \n  \\[\n  0.60 \\times 15 = \\$9 \\text{ per CD}\n  \\]\n* Total cost for 10 CDs:\n  \\[\n  10 \\times 9 = \\$90\n  \\]\n\nNext, he sells 5 of the CDs for \\$40 in total.\n\n* Money received from selling 5 CDs: \\$40\n\nNow compute his net out‑of‑pocket amount:\n\n\\[\n\\text{Net out} = \\text{Total cost} - \\text{Money received}\n                 = 90 - 40 = \\$50\n\\]\n\nSo James was **out \\$50**.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. James gets 10 new CDs. Each CD cost $15. He gets them for 40% off. So he pays 60% of $15 per CD. Then he decides he doesn't like 5 of them and sells them for $40. How much money was he out? Means net loss? He spent money buying CDs, then sold 5 for $40 each? Wait \"sells them for 40\" maybe $40 each? Or sells them for $40 total? Likely sells each for $40? But that seems high: each CD cost $15, he sells for $40, making profit. But maybe he sells them for $40 total? Let's interpret: He sells them for 40 (maybe $40 each). But then he would be making profit. The question: \"How much money was he out?\" Means net money out of pocket? He paid for 10 CDs at discounted price, then sold 5 for $40 each? Let's compute.\n\nCost per CD: $15 * 0.6 = $9. So total cost for 10 CDs: 10 * $9 = $90.\n\nHe sells 5 CDs for $40 each: revenue = 5 * $40 = $200.\n\nNet money out: He spent $90, earned $200, so net gain $110. But question asks \"How much money was he out?\" Could be net out-of-pocket: He spent $90, but then got $200 back, so he is actually $110 in profit, not out. But maybe they mean \"How much money was he out?\" meaning how much money did he lose? But he didn't lose money. Unless the $40 is total for 5 CDs, not each. Let's consider that scenario: He sells 5 CDs for $40 total. Then revenue = $40. Net out: spent $90, earned $40, net loss $50. That seems plausible.\n\nWhich interpretation is more likely? The phrase \"sells them for 40\" ambiguous. Usually they'd say \"sells them for $40 each\" or \"sells them for $40 total\". The problem might be from a math contest or something. Let's examine typical phrasing: \"He decides he doesn't like 5 of them and sells them for 40.\" Without a dollar sign, maybe they omitted. Could be \"sells them for $40 each\". But then they'd likely say \"sells them for $40 each\". The phrase \"sells them for 40\" maybe means $40 each? But they'd say \"sells them for $40 each\". The phrase \"sells them for 40\" could be ambiguous. But typical math problems: \"He gets them for 40% off. He decides he doesn't like 5 of them and sells them for 40.\" Might be missing a dollar sign. But if it's $40 each, then he makes profit. The question \"How much money was he out?\" might be negative? But they'd ask \"How much money did he make?\" or \"How much money was he out?\" could be net out-of-pocket. If he made profit, he would be out negative money? But they'd phrase \"How much money was he out?\" meaning net out-of-pocket, could be negative. But typical answer: He was out $50? Let's think.\n\nLet's compute both scenarios:\n\nScenario A: sells 5 CDs for $40 each. Net profit: +$110. So he was out -$110? Actually he is out of pocket $90, but he gets $200 back, so net gain $110. So he was out $90 but gained $200, so net out-of-pocket is -$110? That doesn't make sense. He actually gained money, so he was not out; he was in.\n\nScenario B: sells 5 CDs for $40 total. Net loss: $90 spent - $40 received = $50 loss. So he was out $50.\n\nWhich answer is likely? Let's examine typical math problem: \"James gets 10 new CDs. Each CD cost $15. He gets them for 40% off. He decides he doesn't like 5 of them and sells them for 40. How much money was he out?\" Usually they'd ask \"How much money was he out?\" meaning net out-of-pocket. If he sells them for $40 each, he would be in profit, so answer would be negative? But they'd likely ask \"How much money did he make?\" So maybe it's $40 total.\n\nThus answer: He was out $50.\n\nLet's produce answer: $50.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. James gets 10 new CDs. Each CD cost $15. He gets them for 40% off. So he pays 60% of $15 per CD. Then he decides he doesn't like 5 of them and sells them for $40. How much money was he out? Means net loss? He spent money buying CDs, then sold 5 for $40 each? Wait \"sells them for 40\" maybe $40 each? Or sells them for $40 total? Likely sells each for $40? But that seems high: each CD cost $15, he sells for $40, making profit. But maybe he sells them for $40 total? Let's interpret: He sells them for 40 (maybe $40 each). But then he would be making profit. The question: \"How much money was he out?\" Means net money out of pocket? He paid for 10 CDs at discounted price, then sold 5 for $40 each? Let's compute.\n\nCost per CD: $15 * 0.6 = $9. So total cost for 10 CDs: 10 * $9 = $90.\n\nHe sells 5 CDs for $40 each: revenue = 5 * $40 = $200.\n\nNet money out: He spent $90, earned $200, so net gain $110. But question asks \"How much money was he out?\" Could be net out-of-pocket: He spent $90, but then got $200 back, so he is actually $110 in profit, not out. But maybe they mean \"How much money was he out?\" meaning how much money did he lose? But he didn't lose money. Unless the $40 is total for 5 CDs, not each. Let's consider that scenario: He sells 5 CDs for $40 total. Then revenue = $40. Net out: spent $90, earned $40, net loss $50. That seems plausible.\n\nWhich interpretation is more likely? The phrase \"sells them for 40\" ambiguous. Usually they'd say \"sells them for $40 each\" or \"sells them for $40 total\". The problem might be from a math contest or something. Let's examine typical phrasing: \"He decides he doesn't like 5 of them and sells them for 40.\" Without a dollar sign, maybe they omitted. Could be \"sells them for $40 each\". But then they'd likely say \"sells them for $40 each\". The phrase \"sells them for 40\" maybe means $40 each? But they'd say \"sells them for $40 each\". The phrase \"sells them for 40\" could be ambiguous. But typical math problems: \"He gets them for 40% off. He decides he doesn't like 5 of them and sells them for 40.\" Might be missing a dollar sign. But if it's $40 each, then he makes profit. The question \"How much money was he out?\" might be negative? But they'd ask \"How much money did he make?\" or \"How much money was he out?\" could be net out-of-pocket. If he made profit, he would be out negative money? But they'd phrase \"How much money was he out?\" meaning net out-of-pocket, could be negative. But typical answer: He was out $50? Let's think.\n\nLet's compute both scenarios:\n\nScenario A: sells 5 CDs for $40 each. Net profit: +$110. So he was out -$110? Actually he is out of pocket $90, but he gets $200 back, so net gain $110. So he was out $90 but gained $200, so net out-of-pocket is -$110? That doesn't make sense. He actually gained money, so he was not out; he was in.\n\nScenario B: sells 5 CDs for $40 total. Net loss: $90 spent - $40 received = $50 loss. So he was out $50.\n\nWhich answer is likely? Let's examine typical math problem: \"James gets 10 new CDs. Each CD cost $15. He gets them for 40% off. He decides he doesn't like 5 of them and sells them for 40. How much money was he out?\" Usually they'd ask \"How much money was he out?\" meaning net out-of-pocket. If he sells them for $40 each, he would be in profit, so answer would be negative? But they'd likely ask \"How much money did he make?\" So maybe it's $40 total.\n\nThus answer: He was out $50.\n\nLet's produce answer: $50.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 136,
+        "completion_tokens": 1132,
+        "total_tokens": 1268,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 84,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00029252,
+          "upstream_inference_prompt_cost": 9.52e-06,
+          "upstream_inference_completions_cost": 0.000283
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 884,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 9.619819641113281
+  },
+  "retry_count": 0
+}

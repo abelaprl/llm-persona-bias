@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00780",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T22:22:02.562455",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 780,
+    "dataset": "gsm8k_test",
+    "question": "Ava and Emma want to know who is better at the new video game Ava got for her birthday. They are each going to play one level and whoever has the highest score wins. They receive 10 points for every enemy they jump on, 5 points for each berry they collect, and 30 points for every second left on the timer when they finish the level. If Ava jumps on 8 more enemies than Emma and collects 3 more berries, but finishes the level 4 seconds slower, what is the difference between their two scores?",
+    "ground_truth": "For jumping on enemies, Emma earns 8 * 10 = <<8*10=80>>80 fewer points than Ava.\nFor collecting berries, Emma earns 3 * 5 = <<3*5=15>>15 fewer points than Ava.\nFor finishing the level faster, Emma earns 4 * 30 = <<4*30=120>>120 more points than Ava.\nOverall, Emma has 120 – 80 - 15 = <<120-80-15=25>>25 more points than Ava.\n#### 25",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Ava and Emma want to know who is better at the new video game Ava got for her birthday. They are each going to play one level and whoever has the highest score wins. They receive 10 points for every enemy they jump on, 5 points for each berry they collect, and 30 points for every second left on the timer when they finish the level. If Ava jumps on 8 more enemies than Emma and collects 3 more berries, but finishes the level 4 seconds slower, what is the difference between their two scores?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Let  \n\n* Emma’s enemies = \\(E\\)  \n* Emma’s berries = \\(B\\)  \n* Emma’s seconds left on the timer = \\(T\\)\n\nAva’s numbers are then  \n\n* Enemies = \\(E+8\\) (8 more)  \n* Berries = \\(B+3\\) (3 more)  \n* Seconds left = \\(T-4\\) (4 seconds slower → 4 fewer seconds left)\n\nThe score for a player is  \n\n\\[\n\\text{Score}=10(\\text{enemies})+5(\\text{berries})+30(\\text{seconds left})\n\\]\n\n---\n\n### Compute the difference (Ava – Emma)\n\n\\[\n\\begin{aligned}\n\\Delta &= \\big[10(E+8)+5(B+3)+30(T-4)\\big] \\\\\n       &\\qquad -\\big[10E+5B+30T\\big] \\\\[4pt]\n       &= \\big(10E+80\\big)+\\big(5B+15\\big)+\\big(30T-120\\big) \\\\\n       &\\qquad -10E-5B-30T \\\\[4pt]\n       &= 80+15-120 \\\\[4pt]\n       &= -25 .\n\\end{aligned}\n\\]\n\nSo Ava’s score is **25 points lower** than Emma’s.\n\n---\n\n**Difference between their scores:** \\(25\\) points (Emma wins by 25 points).",
+    "raw_api_response": {
+      "id": "gen-1774452122-hXjklBhxETiQmJVqenWv",
+      "object": "chat.completion",
+      "created": 1774452122,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Let  \n\n* Emma’s enemies = \\(E\\)  \n* Emma’s berries = \\(B\\)  \n* Emma’s seconds left on the timer = \\(T\\)\n\nAva’s numbers are then  \n\n* Enemies = \\(E+8\\) (8 more)  \n* Berries = \\(B+3\\) (3 more)  \n* Seconds left = \\(T-4\\) (4 seconds slower → 4 fewer seconds left)\n\nThe score for a player is  \n\n\\[\n\\text{Score}=10(\\text{enemies})+5(\\text{berries})+30(\\text{seconds left})\n\\]\n\n---\n\n### Compute the difference (Ava – Emma)\n\n\\[\n\\begin{aligned}\n\\Delta &= \\big[10(E+8)+5(B+3)+30(T-4)\\big] \\\\\n       &\\qquad -\\big[10E+5B+30T\\big] \\\\[4pt]\n       &= \\big(10E+80\\big)+\\big(5B+15\\big)+\\big(30T-120\\big) \\\\\n       &\\qquad -10E-5B-30T \\\\[4pt]\n       &= 80+15-120 \\\\[4pt]\n       &= -25 .\n\\end{aligned}\n\\]\n\nSo Ava’s score is **25 points lower** than Emma’s.\n\n---\n\n**Difference between their scores:** \\(25\\) points (Emma wins by 25 points).",
+            "refusal": null,
+            "reasoning": "We need to compute difference in scores given differences in counts.\n\nLet variables: Let Emma's enemies = E, berries = B, time left = T (seconds). Ava's enemies = E+8, berries = B+3, time left = T-4 (since slower means less time left). Score formula: 10*enemies + 5*berries + 30*time.\n\nDifference = Ava - Emma = 10*(E+8) +5*(B+3) +30*(T-4) - [10*E +5*B +30*T] = 10E+80 +5B+15 +30T-120 -10E -5B -30T = (80+15-120) = -25.\n\nThus Ava scores 25 points less than Emma. Difference magnitude = 25 points. Probably answer: 25 points (Emma wins by 25).",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to compute difference in scores given differences in counts.\n\nLet variables: Let Emma's enemies = E, berries = B, time left = T (seconds). Ava's enemies = E+8, berries = B+3, time left = T-4 (since slower means less time left). Score formula: 10*enemies + 5*berries + 30*time.\n\nDifference = Ava - Emma = 10*(E+8) +5*(B+3) +30*(T-4) - [10*E +5*B +30*T] = 10E+80 +5B+15 +30T-120 -10E -5B -30T = (80+15-120) = -25.\n\nThus Ava scores 25 points less than Emma. Difference magnitude = 25 points. Probably answer: 25 points (Emma wins by 25).",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 180,
+        "completion_tokens": 507,
+        "total_tokens": 687,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00019872,
+          "upstream_inference_prompt_cost": 1.62e-05,
+          "upstream_inference_completions_cost": 0.00018252
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 140,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 14.711589813232422
+  },
+  "retry_count": 0
+}

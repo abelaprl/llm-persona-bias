@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_01215",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:38:57.339083",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1215,
+    "dataset": "gsm8k_test",
+    "question": "Tim enters a competition and has to try and guess the number of red jelly beans in a jar.  The jar has a square base and is 6 inches by 6 inches and 15 inches tall.  He knows that a jelly bean is .15 cubic inches.  He also knows that they get about 80% efficiency in packing.  He estimates 30% of the jelly beans are red.  The true number of red jelly beans in the container is 900.  How far off was his guess?",
+    "ground_truth": "The volume of the container is 6*6*15=<<6*6*15=540>>540 cubic inches\nThat means it can fit 540/.15=<<540/.15=3600>>3600 jelly beans\nWith 80% packing efficiency, you can fit 3600*.8=<<3600*.8=2880>>2880 jelly beans in there\nSo that means he guesses 2880*.3=<<2880*.3=864>>864 are red\nSo his guess is off by 900-864=<<900-864=36>>36\n#### 36",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Tim enters a competition and has to try and guess the number of red jelly beans in a jar.  The jar has a square base and is 6 inches by 6 inches and 15 inches tall.  He knows that a jelly bean is .15 cubic inches.  He also knows that they get about 80% efficiency in packing.  He estimates 30% of the jelly beans are red.  The true number of red jelly beans in the container is 900.  How far off was his guess?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First estimate the total number of jelly beans that can fit in the jar:\n\n\\[\n\\text{Jar volume} = 6\\text{ in} \\times 6\\text{ in} \\times 15\\text{ in}=540\\text{ in}^3\n\\]\n\nOnly about 80 % of that volume can be filled with beans, so the usable volume is\n\n\\[\n540\\text{ in}^3 \\times 0.80 = 432\\text{ in}^3 .\n\\]\n\nEach bean occupies \\(0.15\\text{ in}^3\\), so the estimated total number of beans is\n\n\\[\n\\frac{432\\text{ in}^3}{0.15\\text{ in}^3/\\text{bean}} = 2880\\text{ beans}.\n\\]\n\nTim assumes 30 % of the beans are red, so his guess for red beans is\n\n\\[\n0.30 \\times 2880 = 864\\text{ red beans}.\n\\]\n\nThe actual number of red beans is 900. The difference between his guess and the true number is\n\n\\[\n900 - 864 = 36.\n\\]\n\n**Answer: He was off by 36 red jelly beans.**",
+    "raw_api_response": {
+      "id": "gen-1774460341-YW8bHV5dy3rzxpGNzUYp",
+      "object": "chat.completion",
+      "created": 1774460341,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "First estimate the total number of jelly beans that can fit in the jar:\n\n\\[\n\\text{Jar volume} = 6\\text{ in} \\times 6\\text{ in} \\times 15\\text{ in}=540\\text{ in}^3\n\\]\n\nOnly about 80 % of that volume can be filled with beans, so the usable volume is\n\n\\[\n540\\text{ in}^3 \\times 0.80 = 432\\text{ in}^3 .\n\\]\n\nEach bean occupies \\(0.15\\text{ in}^3\\), so the estimated total number of beans is\n\n\\[\n\\frac{432\\text{ in}^3}{0.15\\text{ in}^3/\\text{bean}} = 2880\\text{ beans}.\n\\]\n\nTim assumes 30 % of the beans are red, so his guess for red beans is\n\n\\[\n0.30 \\times 2880 = 864\\text{ red beans}.\n\\]\n\nThe actual number of red beans is 900. The difference between his guess and the true number is\n\n\\[\n900 - 864 = 36.\n\\]\n\n**Answer: He was off by 36 red jelly beans.**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Tim enters a competition and has to guess the number of red jelly beans in a jar. The jar has a square base 6 inches by 6 inches and 15 inches tall. So volume of jar: base area 6*6 = 36 square inches, height 15 inches, so volume = 36*15 = 540 cubic inches. He knows that a jelly bean is .15 cubic inches. He also knows that they get about 80% efficiency in packing. He estimates 30% of the jelly beans are red. The true number of red jelly beans in the container is 900. How far off was his guess?\n\nWe need to compute his guess: He will estimate number of jelly beans in jar: jar volume * packing efficiency / volume per bean. So number of beans = 540 * 0.8 / 0.15. Let's compute: 540 * 0.8 = 432. 432 / 0.15 = 2880. So he estimates 2880 jelly beans total. He estimates 30% are red, so his guess for red beans = 0.3 * 2880 = 864. The true number is 900. So how far off was his guess? The difference: 900 - 864 = 36. So he was off by 36 beans. But maybe they want absolute difference or percent error? The question: \"How far off was his guess?\" Likely absolute difference: 36. Could also be percent error: (36/900)*100 = 4%. But likely 36. Let's read: \"The true number of red jelly beans in the container is 900. How far off was his guess?\" So difference: 900 - 864 = 36. So he was off by 36 beans. So answer: 36 beans. Let's produce that.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Tim enters a competition and has to guess the number of red jelly beans in a jar. The jar has a square base 6 inches by 6 inches and 15 inches tall. So volume of jar: base area 6*6 = 36 square inches, height 15 inches, so volume = 36*15 = 540 cubic inches. He knows that a jelly bean is .15 cubic inches. He also knows that they get about 80% efficiency in packing. He estimates 30% of the jelly beans are red. The true number of red jelly beans in the container is 900. How far off was his guess?\n\nWe need to compute his guess: He will estimate number of jelly beans in jar: jar volume * packing efficiency / volume per bean. So number of beans = 540 * 0.8 / 0.15. Let's compute: 540 * 0.8 = 432. 432 / 0.15 = 2880. So he estimates 2880 jelly beans total. He estimates 30% are red, so his guess for red beans = 0.3 * 2880 = 864. The true number is 900. So how far off was his guess? The difference: 900 - 864 = 36. So he was off by 36 beans. But maybe they want absolute difference or percent error? The question: \"How far off was his guess?\" Likely absolute difference: 36. Could also be percent error: (36/900)*100 = 4%. But likely 36. Let's read: \"The true number of red jelly beans in the container is 900. How far off was his guess?\" So difference: 900 - 864 = 36. So he was off by 36 beans. So answer: 36 beans. Let's produce that.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 194,
+        "completion_tokens": 662,
+        "total_tokens": 856,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 84,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00017908,
+          "upstream_inference_prompt_cost": 1.358e-05,
+          "upstream_inference_completions_cost": 0.0001655
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 344,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 7.401231527328491
+  },
+  "retry_count": 0
+}

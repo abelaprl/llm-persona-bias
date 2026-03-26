@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00244",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T18:22:27.268059",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 244,
+    "dataset": "gsm8k_test",
+    "question": "Griffin had 24 french fries, but Kyle took 5 of them.  Billy took twice as many as Kyle.  Ginger gave Griffin a handful of her fries, and then Colby took from Griffin 3 less than the number of fries that Kyle had taken.  If in the end Griffin had 27 fries, how many fries did Ginger give Griffin?",
+    "ground_truth": "Griffin had 24 french fries, but Kyle took 5 of them.\nBilly took twice as many as Kyle, removing 2*5=<<2*5=10>>10 fries.\nColby took 3 less than the number of fries that Kyle had taken, removing 5-3=<<5-3=2>>2 fries.\nIf we let X be the number of fries given to Griffin by Ginger, then 24-5-10-2+x=27\nThus, Ginger had given Griffin x=20 fries\n#### 20",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Griffin had 24 french fries, but Kyle took 5 of them.  Billy took twice as many as Kyle.  Ginger gave Griffin a handful of her fries, and then Colby took from Griffin 3 less than the number of fries that Kyle had taken.  If in the end Griffin had 27 fries, how many fries did Ginger give Griffin?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Griffin’s fries change as follows:\n\n| Event | Fries Griffin has |\n|-------|-------------------|\n| Start | 24 |\n| Kyle takes 5 | 24 – 5 = 19 |\n| Billy takes twice as many as Kyle (10) | 19 – 10 = 9 |\n| Ginger gives him \\(x\\) fries | 9 + \\(x\\) |\n| Colby takes 3 less than Kyle’s 5 (i.e., 2) | 9 + \\(x\\) – 2 = 7 + \\(x\\) |\n\nAt the end he has 27 fries:\n\n\\[\n7 + x = 27 \\quad\\Longrightarrow\\quad x = 20.\n\\]\n\n\\[\n\\boxed{20}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774437747-cmyR0kzZtDc6WtRdVITu",
+      "object": "chat.completion",
+      "created": 1774437747,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Griffin’s fries change as follows:\n\n| Event | Fries Griffin has |\n|-------|-------------------|\n| Start | 24 |\n| Kyle takes 5 | 24 – 5 = 19 |\n| Billy takes twice as many as Kyle (10) | 19 – 10 = 9 |\n| Ginger gives him \\(x\\) fries | 9 + \\(x\\) |\n| Colby takes 3 less than Kyle’s 5 (i.e., 2) | 9 + \\(x\\) – 2 = 7 + \\(x\\) |\n\nAt the end he has 27 fries:\n\n\\[\n7 + x = 27 \\quad\\Longrightarrow\\quad x = 20.\n\\]\n\n\\[\n\\boxed{20}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse problem. Griffin initially had 24 fries. Kyle took 5. Billy took twice as many as Kyle: so Billy took 10. Ginger gave Griffin a handful of her fries. Then Colby took from Griffin 3 less than the number of fries that Kyle had taken. Kyle had taken 5, so 3 less than 5 is 2. So Colby took 2 from Griffin. In the end Griffin had 27 fries. We need to find how many fries Ginger gave Griffin.\n\nLet's compute: Start 24. Kyle takes 5: Griffin has 24-5=19. Billy takes 10: but Billy took from Griffin? Wait: Billy took twice as many as Kyle. Did Billy take from Griffin? The problem: \"Billy took twice as many as Kyle.\" It likely means Billy took from Griffin as well. So Griffin loses 10. So after Billy: 19-10=9. Then Ginger gave Griffin a handful: +x. Then Colby took from Griffin 3 less than the number of fries that Kyle had taken: 3 less than 5 is 2. So Griffin loses 2. After Colby: 9 + x - 2 = 7 + x. In the end Griffin had 27 fries. So 7 + x = 27 => x = 20. So Ginger gave 20 fries.\n\nCheck: Starting 24, Kyle 5 -> 19, Billy 10 -> 9, Ginger +20 -> 29, Colby -2 -> 27. Yes.\n\nThus answer: 20 fries.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse problem. Griffin initially had 24 fries. Kyle took 5. Billy took twice as many as Kyle: so Billy took 10. Ginger gave Griffin a handful of her fries. Then Colby took from Griffin 3 less than the number of fries that Kyle had taken. Kyle had taken 5, so 3 less than 5 is 2. So Colby took 2 from Griffin. In the end Griffin had 27 fries. We need to find how many fries Ginger gave Griffin.\n\nLet's compute: Start 24. Kyle takes 5: Griffin has 24-5=19. Billy takes 10: but Billy took from Griffin? Wait: Billy took twice as many as Kyle. Did Billy take from Griffin? The problem: \"Billy took twice as many as Kyle.\" It likely means Billy took from Griffin as well. So Griffin loses 10. So after Billy: 19-10=9. Then Ginger gave Griffin a handful: +x. Then Colby took from Griffin 3 less than the number of fries that Kyle had taken: 3 less than 5 is 2. So Griffin loses 2. After Colby: 9 + x - 2 = 7 + x. In the end Griffin had 27 fries. So 7 + x = 27 => x = 20. So Ginger gave 20 fries.\n\nCheck: Starting 24, Kyle 5 -> 19, Billy 10 -> 9, Ginger +20 -> 29, Colby -2 -> 27. Yes.\n\nThus answer: 20 fries.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 161,
+        "completion_tokens": 509,
+        "total_tokens": 670,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 83,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00013852,
+          "upstream_inference_prompt_cost": 1.127e-05,
+          "upstream_inference_completions_cost": 0.00012725
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 283,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 3.8261425495147705
+  },
+  "retry_count": 0
+}

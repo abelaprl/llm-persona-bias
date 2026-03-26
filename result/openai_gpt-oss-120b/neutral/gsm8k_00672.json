@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00672",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T21:58:22.538864",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 672,
+    "dataset": "gsm8k_test",
+    "question": "Christina records her mood every day on a calendar. Over the past thirty days of moods, she had twelve good days and eight bad days and the rest were neutral. Her first eight days were good, her second eight days were bad, and her third eight days were neutral. If the next three days were good, neutral, and good, how many good days were left in the month?",
+    "ground_truth": "Christina had 30 - 12 - 8 = <<30-12-8=10>>10 neutral days in the month.\nAfter the first three 8-day periods, she had 30 - 8 * 3 = 30 - 24 = <<30-8*3=6>>6 days of moods left.\nOf those days, 12 - 8 = <<12-8=4>>4 days were good.\nAfter the next 3 days with 2 good days, Christina had 4 - 2 = <<4-2=2>>2 good days left.\n#### 2",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Christina records her mood every day on a calendar. Over the past thirty days of moods, she had twelve good days and eight bad days and the rest were neutral. Her first eight days were good, her second eight days were bad, and her third eight days were neutral. If the next three days were good, neutral, and good, how many good days were left in the month?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "She has already used  \n\n- 8 good days in the first eight days,  \n- 0 good days in the next eight (bad) days,  \n- 0 good days in the following eight (neutral) days,  \n- 2 good days in the three‑day stretch (good, neutral, good).\n\nSo far she’s had \\(8 + 2 = 10\\) good days.\n\nSince the month contains 12 good days in total, the number of good days still remaining is  \n\n\\[\n12 - 10 = 2.\n\\]\n\n**Answer: 2 good days left",
+    "raw_api_response": {
+      "id": "gen-1774450703-5FuWAQ0y2LLKQyfO9rzo",
+      "object": "chat.completion",
+      "created": 1774450703,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "She has already used  \n\n- 8 good days in the first eight days,  \n- 0 good days in the next eight (bad) days,  \n- 0 good days in the following eight (neutral) days,  \n- 2 good days in the three‑day stretch (good, neutral, good).\n\nSo far she’s had \\(8 + 2 = 10\\) good days.\n\nSince the month contains 12 good days in total, the number of good days still remaining is  \n\n\\[\n12 - 10 = 2.\n\\]\n\n**Answer: 2 good days left",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Christina records mood each day on a calendar. Over the past thirty days of moods, she had 12 good days, 8 bad days, rest neutral. So total days =30. Good=12, Bad=8, Neutral=30-12-8=10.\n\nHer first eight days were good, her second eight days were bad, and her third eight days were neutral. That's 8+8+8=24 days accounted for. The next three days (days 25,26,27?) were good, neutral, good. So days 25: good, 26: neutral, 27: good. That's three days. That accounts for 27 days total. There are 30 days in month, so there are 3 days remaining (days 28,29,30) unknown.\n\nQuestion: \"how many good days were left in the month?\" Means after day 27, how many good days remain among the remaining days (28-30). We need to compute total good days used so far, subtract from total good days (12) to get remaining good days.\n\nLet's count good days used:\n\nFirst eight days: all good => 8 good.\n\nSecond eight days: all bad => 0 good.\n\nThird eight days: all neutral => 0 good.\n\nNext three days: good, neutral, good => 2 good.\n\nSo total good days used so far = 8 + 2 = 10.\n\nTotal good days overall =12. So remaining good days =12-10=2.\n\nThus answer: 2 good days left in the month.\n\nCheck if any nuance: The month has 30 days, we accounted for 27 days. The remaining 3 days must contain the remaining 2 good days and maybe 1 neutral or bad. But we just need count of good days left: 2.\n\nThus answer: 2.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Christina records mood each day on a calendar. Over the past thirty days of moods, she had 12 good days, 8 bad days, rest neutral. So total days =30. Good=12, Bad=8, Neutral=30-12-8=10.\n\nHer first eight days were good, her second eight days were bad, and her third eight days were neutral. That's 8+8+8=24 days accounted for. The next three days (days 25,26,27?) were good, neutral, good. So days 25: good, 26: neutral, 27: good. That's three days. That accounts for 27 days total. There are 30 days in month, so there are 3 days remaining (days 28,29,30) unknown.\n\nQuestion: \"how many good days were left in the month?\" Means after day 27, how many good days remain among the remaining days (28-30). We need to compute total good days used so far, subtract from total good days (12) to get remaining good days.\n\nLet's count good days used:\n\nFirst eight days: all good => 8 good.\n\nSecond eight days: all bad => 0 good.\n\nThird eight days: all neutral => 0 good.\n\nNext three days: good, neutral, good => 2 good.\n\nSo total good days used so far = 8 + 2 = 10.\n\nTotal good days overall =12. So remaining good days =12-10=2.\n\nThus answer: 2 good days left in the month.\n\nCheck if any nuance: The month has 30 days, we accounted for 27 days. The remaining 3 days must contain the remaining 2 good days and maybe 1 neutral or bad. But we just need count of good days left: 2.\n\nThus answer: 2.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 149,
+        "completion_tokens": 525,
+        "total_tokens": 674,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00020241,
+          "upstream_inference_prompt_cost": 1.341e-05,
+          "upstream_inference_completions_cost": 0.000189
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 372,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 12.896339178085327
+  },
+  "retry_count": 0
+}

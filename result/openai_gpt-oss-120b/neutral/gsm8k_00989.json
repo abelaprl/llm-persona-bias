@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00989",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:43:56.194256",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 989,
+    "dataset": "gsm8k_test",
+    "question": "Emily can peel 6 shrimp a minute and saute 30 shrimp in 10 minutes. How long will it take her to peel and cook 90 shrimp?",
+    "ground_truth": "First find how long it takes Emily to peel the shrimp: 90 shrimp / 6 shrimp/minute = <<90/6=15>>15 minutes\nThen find how many batches of shrimp she needs to cook: 90 shrimp / 30 shrimp/batch = <<90/30=3>>3 batches\nThen multiply the number of batches by the time per batch to find the total cook time: 3 batches * 10 minutes/batch = <<3*10=30>>30 minutes\nThen add the peeling time to find the total time Emily spends: 30 minutes + 15 minutes = <<30+15=45>>45 minutes\n#### 45",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Emily can peel 6 shrimp a minute and saute 30 shrimp in 10 minutes. How long will it take her to peel and cook 90 shrimp?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Emily’s rates  \n\n* Peeling: 6 shrimp per minute → 1 shrimp takes \\(\\frac{1}{6}\\) min.  \n* Sautéing: 30 shrimp in 10 min → 3 shrimp per minute → 1 shrimp takes \\(\\frac{1}{3}\\) min.\n\nShe must **peel** each shrimp before it can be **cooked**, but she can peel shrimp while another batch is cooking.\n\n---\n\n### Step‑by‑step schedule  \n\n1. **First 5 minutes** – Peel the first 30 shrimp ( \\(30 ÷ 6 = 5\\) min).  \n   At the end of minute 5 the first 30 shrimp are ready to be sautéed.\n\n2. **Minutes 5–15** – Sauté the first batch of 30 shrimp (10 min).  \n   While they are cooking, continue peeling the remaining shrimp.  \n   In those 10 minutes she peels another \\(10 × 6 = 60\\) shrimp.\n\n   By minute 15 all 90 shrimp are peeled, and the first batch is done cooking.\n\n3. **Minutes 15–25** – Sauté the second batch of 30 shrimp (10 min).  \n   No peeling is needed any more.\n\n4. **Minutes 25–35** – Sauté the third batch of the last 30 shrimp (10 min).\n\n---\n\n### Total time  \n\n\\[\n5\\text{ min (initial peel)} + 10\\text{ min (first sauté)} + 10\\text{ min (second sauté)} + 10\\text{ min (third sauté)} = 35\\text{ minutes}.\n\\]\n\n\\[\n\\boxed{35\\text{ minutes}}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774457039-46OUr0oW6e0GeZ3sOAwS",
+      "object": "chat.completion",
+      "created": 1774457039,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Emily’s rates  \n\n* Peeling: 6 shrimp per minute → 1 shrimp takes \\(\\frac{1}{6}\\) min.  \n* Sautéing: 30 shrimp in 10 min → 3 shrimp per minute → 1 shrimp takes \\(\\frac{1}{3}\\) min.\n\nShe must **peel** each shrimp before it can be **cooked**, but she can peel shrimp while another batch is cooking.\n\n---\n\n### Step‑by‑step schedule  \n\n1. **First 5 minutes** – Peel the first 30 shrimp ( \\(30 ÷ 6 = 5\\) min).  \n   At the end of minute 5 the first 30 shrimp are ready to be sautéed.\n\n2. **Minutes 5–15** – Sauté the first batch of 30 shrimp (10 min).  \n   While they are cooking, continue peeling the remaining shrimp.  \n   In those 10 minutes she peels another \\(10 × 6 = 60\\) shrimp.\n\n   By minute 15 all 90 shrimp are peeled, and the first batch is done cooking.\n\n3. **Minutes 15–25** – Sauté the second batch of 30 shrimp (10 min).  \n   No peeling is needed any more.\n\n4. **Minutes 25–35** – Sauté the third batch of the last 30 shrimp (10 min).\n\n---\n\n### Total time  \n\n\\[\n5\\text{ min (initial peel)} + 10\\text{ min (first sauté)} + 10\\text{ min (second sauté)} + 10\\text{ min (third sauté)} = 35\\text{ minutes}.\n\\]\n\n\\[\n\\boxed{35\\text{ minutes}}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse problem: Emily can peel 6 shrimp per minute. She can sauté 30 shrimp in 10 minutes. So cooking rate: 30 shrimp / 10 min = 3 shrimp per minute. She needs to peel and cook 90 shrimp. She must peel each shrimp then cook it. Assuming she can do tasks sequentially? Or possibly parallel? Usually such problems assume she does peeling first then cooking, but maybe she can peel while cooking? The problem likely expects total time = time to peel 90 + time to cook 90. Peeling: 6 per minute => 90/6 = 15 minutes. Cooking: 3 per minute => 90/3 = 30 minutes. Total = 45 minutes. However, maybe she can peel while cooking, overlapping. But typical word problems: \"Emily can peel 6 shrimp a minute and saute 30 shrimp in 10 minutes. How long will it take her to peel and cook 90 shrimp?\" Usually they assume she does both tasks sequentially, but maybe she can peel while cooking, but cooking is a batch process? She can sauté 30 shrimp in 10 minutes, maybe she can only sauté a batch of up to 30 at a time. So she could peel some while cooking a batch. Let's think: She can peel 6 per minute, so in 10 minutes she can peel 60 shrimp. She can sauté 30 in 10 minutes. So she could peel 60 while cooking first batch of 30. Then after 10 minutes, she has peeled 60, cooked 30, remaining: 30 peeled but not cooked, and 30 not peeled. She can continue: In next 10 minutes, she can peel remaining 30 (takes 5 minutes) and also cook next batch of 30 (10 minutes). But she can't cook until peeled? She could peel the remaining 30 in 5 minutes, then start cooking them, but cooking takes 10 minutes. Meanwhile after finishing cooking first batch at 10 min, she could start cooking second batch at 10 min, but need peeled shrimp ready. She will have peeled 30 of the remaining 30 by minute 5? Actually timeline: start at t=0. She peels at 6/min, cooks at 3/min but cooking batch limited to 30 at a time taking 10 minutes. She can peel while cooking. At t=0, start cooking first batch of 30 (needs 30 peeled). She must peel those first. So she can't start cooking until she has peeled 30. She peels 30 in 5 minutes (6/min). At t=5, she has 30 peeled, can start cooking them (takes 10 min). Meanwhile she continues peeling remaining 60 shrimp (since total 90). From t=5 to t=15, she peels 60 more (10 minutes *6 =60). So at t=15, all 90 peeled. Cooking first batch runs from t=5 to t=15 (10 min). At t=15, first batch done. She now has 60 peeled shrimp left, none cooked. She can start cooking second batch of 30 at t=15, finishes at t=25. Meanwhile she continues peeling? Already done peeling. Then third batch from t=25 to t=35. So total time = 35 minutes. But check if any idle time: after first batch finishes at t=15, she has 60 peeled ready. She can start second batch immediately. So total = 5 (initial peel) + 10 (first cook) + 10 (second) + 10 (third) = 35. So answer could be 35 minutes.\n\nBut typical simple answer likely 45 minutes. Which is intended? The problem statement: \"Emily can peel 6 shrimp a minute and saute 30 shrimp in 10 minutes. How long will it take her to peel and cook 90 shrimp?\" It doesn't specify she can do both simultaneously, but it's realistic she can peel while something is cooking. Many contest problems assume tasks can be done concurrently if not interfering. Since peeling and sautéing are separate tasks, she could peel while something is cooking. So answer likely 35 minutes.\n\nLet's present reasoning and answer: 35 minutes.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse problem: Emily can peel 6 shrimp per minute. She can sauté 30 shrimp in 10 minutes. So cooking rate: 30 shrimp / 10 min = 3 shrimp per minute. She needs to peel and cook 90 shrimp. She must peel each shrimp then cook it. Assuming she can do tasks sequentially? Or possibly parallel? Usually such problems assume she does peeling first then cooking, but maybe she can peel while cooking? The problem likely expects total time = time to peel 90 + time to cook 90. Peeling: 6 per minute => 90/6 = 15 minutes. Cooking: 3 per minute => 90/3 = 30 minutes. Total = 45 minutes. However, maybe she can peel while cooking, overlapping. But typical word problems: \"Emily can peel 6 shrimp a minute and saute 30 shrimp in 10 minutes. How long will it take her to peel and cook 90 shrimp?\" Usually they assume she does both tasks sequentially, but maybe she can peel while cooking, but cooking is a batch process? She can sauté 30 shrimp in 10 minutes, maybe she can only sauté a batch of up to 30 at a time. So she could peel some while cooking a batch. Let's think: She can peel 6 per minute, so in 10 minutes she can peel 60 shrimp. She can sauté 30 in 10 minutes. So she could peel 60 while cooking first batch of 30. Then after 10 minutes, she has peeled 60, cooked 30, remaining: 30 peeled but not cooked, and 30 not peeled. She can continue: In next 10 minutes, she can peel remaining 30 (takes 5 minutes) and also cook next batch of 30 (10 minutes). But she can't cook until peeled? She could peel the remaining 30 in 5 minutes, then start cooking them, but cooking takes 10 minutes. Meanwhile after finishing cooking first batch at 10 min, she could start cooking second batch at 10 min, but need peeled shrimp ready. She will have peeled 30 of the remaining 30 by minute 5? Actually timeline: start at t=0. She peels at 6/min, cooks at 3/min but cooking batch limited to 30 at a time taking 10 minutes. She can peel while cooking. At t=0, start cooking first batch of 30 (needs 30 peeled). She must peel those first. So she can't start cooking until she has peeled 30. She peels 30 in 5 minutes (6/min). At t=5, she has 30 peeled, can start cooking them (takes 10 min). Meanwhile she continues peeling remaining 60 shrimp (since total 90). From t=5 to t=15, she peels 60 more (10 minutes *6 =60). So at t=15, all 90 peeled. Cooking first batch runs from t=5 to t=15 (10 min). At t=15, first batch done. She now has 60 peeled shrimp left, none cooked. She can start cooking second batch of 30 at t=15, finishes at t=25. Meanwhile she continues peeling? Already done peeling. Then third batch from t=25 to t=35. So total time = 35 minutes. But check if any idle time: after first batch finishes at t=15, she has 60 peeled ready. She can start second batch immediately. So total = 5 (initial peel) + 10 (first cook) + 10 (second) + 10 (third) = 35. So answer could be 35 minutes.\n\nBut typical simple answer likely 45 minutes. Which is intended? The problem statement: \"Emily can peel 6 shrimp a minute and saute 30 shrimp in 10 minutes. How long will it take her to peel and cook 90 shrimp?\" It doesn't specify she can do both simultaneously, but it's realistic she can peel while something is cooking. Many contest problems assume tasks can be done concurrently if not interfering. Since peeling and sautéing are separate tasks, she could peel while something is cooking. So answer likely 35 minutes.\n\nLet's present reasoning and answer: 35 minutes.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 103,
+        "completion_tokens": 1259,
+        "total_tokens": 1362,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00046251,
+          "upstream_inference_prompt_cost": 9.27e-06,
+          "upstream_inference_completions_cost": 0.00045324
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 872,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 9.298449754714966
+  },
+  "retry_count": 0
+}

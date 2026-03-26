@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00814",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T22:33:22.994596",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 814,
+    "dataset": "gsm8k_test",
+    "question": "A new arcade opens up and Jack decides to play with his 3 friends.  Jack can play a game with 1 quarter for 20 minutes.  Two of his friends are significantly worse than him and can only play half as long.  One of them is significantly better and can play for 1.5 times as long.  They play for 4 hours.  How much money is used?",
+    "ground_truth": "Jack puts change in 60/20=<<60/20=3>>3 times an hour\nSo he spends 3*.25=$<<3*.25=.75>>.75 an hour\nHis two friends add change 3*2=<<3*2=6>>6 times an hour\nSo they spend 6*.25=$<<6*.25=1.5>>1.5 an hour\nHis last friend puts in money 3/1.5=<<3/1.5=2>>2 times an hour\nSo he spends 2*.25=$<<2*.25=.50>>.50 an hour\nSo in total they spend .75+1.5+.5=$<<.75+1.5+.5=2.75>>2.75 an hour\nSo they spend 2.75*4=$<<2.75*4=11>>11 in the 4 hours\n#### 11",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: A new arcade opens up and Jack decides to play with his 3 friends.  Jack can play a game with 1 quarter for 20 minutes.  Two of his friends are significantly worse than him and can only play half as long.  One of them is significantly better and can play for 1.5 times as long.  They play for 4 hours.  How much money is used?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Each quarter buys a certain amount of play‑time:\n\n* Jack: 1 quarter → 20 min  \n* Two “worse” friends: 1 quarter → ½ × 20 min = 10 min each  \n* One “better” friend: 1 quarter → 1.5 × 20 min = 30 min\n\nThey each play for the full 4 hours = 240 minutes.\n\n**Number of quarters each uses**\n\n- Jack: \\(240 \\text{ min} ÷ 20 \\text{ min/quarter} = 12\\) quarters  \n- Each worse friend: \\(240 ÷ 10 = 24\\) quarters → together \\(2 × 24 = 48\\) quarters  \n- Better friend: \\(240 ÷ 30 = 8\\) quarters  \n\n**Total quarters**\n\n\\[\n12 + 48 + 8 = 68 \\text{ quarters}\n\\]\n\nSince each quarter is \\$0.25:\n\n\\[\n68 \\times 0.25 = \\$17.00\n\\]\n\n\\[\n\\boxed{\\$17}\n",
+    "raw_api_response": {
+      "id": "gen-1774452808-cX5mn91NdFXwCeVCsXFd",
+      "object": "chat.completion",
+      "created": 1774452808,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Each quarter buys a certain amount of play‑time:\n\n* Jack: 1 quarter → 20 min  \n* Two “worse” friends: 1 quarter → ½ × 20 min = 10 min each  \n* One “better” friend: 1 quarter → 1.5 × 20 min = 30 min\n\nThey each play for the full 4 hours = 240 minutes.\n\n**Number of quarters each uses**\n\n- Jack: \\(240 \\text{ min} ÷ 20 \\text{ min/quarter} = 12\\) quarters  \n- Each worse friend: \\(240 ÷ 10 = 24\\) quarters → together \\(2 × 24 = 48\\) quarters  \n- Better friend: \\(240 ÷ 30 = 8\\) quarters  \n\n**Total quarters**\n\n\\[\n12 + 48 + 8 = 68 \\text{ quarters}\n\\]\n\nSince each quarter is \\$0.25:\n\n\\[\n68 \\times 0.25 = \\$17.00\n\\]\n\n\\[\n\\boxed{\\$17}\n",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Jack + 3 friends = total 4 players. They each play a game with 1 quarter for 20 minutes. So each quarter gives 20 minutes of play for a player. But the friends have different durations? Actually \"Jack can play a game with 1 quarter for 20 minutes. Two of his friends are significantly worse than him and can only play half as long. One of them is significantly better and can play for 1.5 times as long.\" Means that for the same quarter, Jack gets 20 minutes, the two worse friends get half that (10 minutes per quarter), and the better friend gets 1.5 times that (30 minutes per quarter). They play for 4 hours total. Need total money used (quarters). So we need total quarters spent across all four players over 4 hours.\n\nInterpretation: Each player plays continuously for 4 hours? Or collectively they play for 4 hours (maybe each playing simultaneously?). Likely they each play for 4 hours (the arcade open for 4 hours, they each play the whole time). So each player's total minutes = 4 hours = 240 minutes. For each player, number of quarters = total minutes / minutes per quarter (which varies). Then sum.\n\nJack: 20 min per quarter => quarters = 240/20 = 12.\n\nTwo worse friends: each 10 min per quarter => quarters = 240/10 = 24 each. So total for both = 48.\n\nBetter friend: 30 min per quarter => quarters = 240/30 = 8.\n\nTotal quarters = 12 + 48 + 8 = 68 quarters.\n\nConvert to dollars: 68 quarters = 68 * 0.25 = $17.00.\n\nThus answer: $17.\n\nCheck if any nuance: maybe they share a machine? But likely each individually. So answer $17.\n\nLet's produce final answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Jack + 3 friends = total 4 players. They each play a game with 1 quarter for 20 minutes. So each quarter gives 20 minutes of play for a player. But the friends have different durations? Actually \"Jack can play a game with 1 quarter for 20 minutes. Two of his friends are significantly worse than him and can only play half as long. One of them is significantly better and can play for 1.5 times as long.\" Means that for the same quarter, Jack gets 20 minutes, the two worse friends get half that (10 minutes per quarter), and the better friend gets 1.5 times that (30 minutes per quarter). They play for 4 hours total. Need total money used (quarters). So we need total quarters spent across all four players over 4 hours.\n\nInterpretation: Each player plays continuously for 4 hours? Or collectively they play for 4 hours (maybe each playing simultaneously?). Likely they each play for 4 hours (the arcade open for 4 hours, they each play the whole time). So each player's total minutes = 4 hours = 240 minutes. For each player, number of quarters = total minutes / minutes per quarter (which varies). Then sum.\n\nJack: 20 min per quarter => quarters = 240/20 = 12.\n\nTwo worse friends: each 10 min per quarter => quarters = 240/10 = 24 each. So total for both = 48.\n\nBetter friend: 30 min per quarter => quarters = 240/30 = 8.\n\nTotal quarters = 12 + 48 + 8 = 68 quarters.\n\nConvert to dollars: 68 quarters = 68 * 0.25 = $17.00.\n\nThus answer: $17.\n\nCheck if any nuance: maybe they share a machine? But likely each individually. So answer $17.\n\nLet's produce final answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 154,
+        "completion_tokens": 646,
+        "total_tokens": 800,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00024642,
+          "upstream_inference_prompt_cost": 1.386e-05,
+          "upstream_inference_completions_cost": 0.00023256
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 413,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 25.097087383270264
+  },
+  "retry_count": 0
+}

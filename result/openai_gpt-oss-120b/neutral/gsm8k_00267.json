@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00267",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T20:08:42.288596",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 267,
+    "dataset": "gsm8k_test",
+    "question": "It takes 20 minutes for the oil to heat up to 300 degrees.  It then takes 40% longer for the oil to heat up to the desired temperature of 400 degrees.  After warming the oil it takes 5 minutes less time to cook than it took to warm up the oil.  How much time passes from starting the oil to having cooked chicken?",
+    "ground_truth": "It takes 20*.4=8 more minutes to go from 300 to 400 degrees than from room temperature to 300\nSo it takes 20+8=<<20+8=28>>28 minutes to warm up\nSo the total warming time was 28+20=<<28+20=48>>48 minutes\nSo it took 48-5=<<48-5=43>>43 minutes to cook the chicken\nSo it took 48+43=<<48+43=91>>91 minutes to make the chicken.\n#### 91",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: It takes 20 minutes for the oil to heat up to 300 degrees.  It then takes 40% longer for the oil to heat up to the desired temperature of 400 degrees.  After warming the oil it takes 5 minutes less time to cook than it took to warm up the oil.  How much time passes from starting the oil to having cooked chicken?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The oil is heated in two stages.\n\n1. **First stage:**  \n   Heating from cold to 300 ° takes **20 minutes**.\n\n2. **Second stage:**  \n   Heating from 300 ° to the desired 400 ° takes **40 % longer** than the first stage.  \n   \\[\n   \\text{Time for second stage}=20\\text{ min}\\times(1+0.40)=20\\times1.40=28\\text{ min}\n   \\]\n\n3. **Total warming time:**  \n   \\[\n   20\\text{ min}+28\\text{ min}=48\\text{ min}\n   \\]\n\n4. **Cooking time:**  \n   After the oil is warmed, cooking takes **5 minutes less** than the total warming time.  \n   \\[\n   \\text{Cooking time}=48\\text{ min}-5\\text{ min}=43\\text{ min}\n   \\]\n\n5. **Overall time from start to finished chicken:**  \n   \\[\n   48\\text{ min (warming)}+43\\text{ min (cooking)}=91\\text{ minutes}\n   \\]\n\n\\[\n\\boxed{91\\text{ minutes}}\n",
+    "raw_api_response": {
+      "id": "gen-1774444123-LswvXuENIiC11dI4GXdC",
+      "object": "chat.completion",
+      "created": 1774444123,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The oil is heated in two stages.\n\n1. **First stage:**  \n   Heating from cold to 300 ° takes **20 minutes**.\n\n2. **Second stage:**  \n   Heating from 300 ° to the desired 400 ° takes **40 % longer** than the first stage.  \n   \\[\n   \\text{Time for second stage}=20\\text{ min}\\times(1+0.40)=20\\times1.40=28\\text{ min}\n   \\]\n\n3. **Total warming time:**  \n   \\[\n   20\\text{ min}+28\\text{ min}=48\\text{ min}\n   \\]\n\n4. **Cooking time:**  \n   After the oil is warmed, cooking takes **5 minutes less** than the total warming time.  \n   \\[\n   \\text{Cooking time}=48\\text{ min}-5\\text{ min}=43\\text{ min}\n   \\]\n\n5. **Overall time from start to finished chicken:**  \n   \\[\n   48\\text{ min (warming)}+43\\text{ min (cooking)}=91\\text{ minutes}\n   \\]\n\n\\[\n\\boxed{91\\text{ minutes}}\n",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. It says: It takes 20 minutes for the oil to heat up to 300 degrees. Then it takes 40% longer for the oil to heat up to the desired temperature of 400 degrees. After warming the oil it takes 5 minutes less time to cook than it took to warm up the oil. How much time passes from starting the oil to having cooked chicken?\n\nInterpretation: Starting from cold oil, first heat to 300°F (or degrees) takes 20 minutes. Then heating from 300 to 400 degrees takes 40% longer than the previous heating time? Or 40% longer than the 20 minutes? Usually \"it then takes 40% longer for the oil to heat up to the desired temperature of 400 degrees.\" Means the time to go from 300 to 400 is 40% longer than the time to go from start to 300 (which is 20 minutes). So that time = 20 * (1 + 0.40) = 28 minutes. So total heating time = 20 + 28 = 48 minutes.\n\nAfter warming the oil (i.e., after reaching 400), it takes 5 minutes less time to cook than it took to warm up the oil. \"Warm up the oil\" could refer to total warming time (48 minutes). So cooking time = 48 - 5 = 43 minutes.\n\nThus total time from start to cooked chicken = heating time (48) + cooking time (43) = 91 minutes.\n\nCheck: Could there be alternative interpretation: The 40% longer refers to the total time to reach 400 from start? That would be 20 * 1.40 = 28 total, but that seems less than 20, contradictory. So likely the first interpretation is correct.\n\nThus answer: 91 minutes.\n\nLet's produce final answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. It says: It takes 20 minutes for the oil to heat up to 300 degrees. Then it takes 40% longer for the oil to heat up to the desired temperature of 400 degrees. After warming the oil it takes 5 minutes less time to cook than it took to warm up the oil. How much time passes from starting the oil to having cooked chicken?\n\nInterpretation: Starting from cold oil, first heat to 300°F (or degrees) takes 20 minutes. Then heating from 300 to 400 degrees takes 40% longer than the previous heating time? Or 40% longer than the 20 minutes? Usually \"it then takes 40% longer for the oil to heat up to the desired temperature of 400 degrees.\" Means the time to go from 300 to 400 is 40% longer than the time to go from start to 300 (which is 20 minutes). So that time = 20 * (1 + 0.40) = 28 minutes. So total heating time = 20 + 28 = 48 minutes.\n\nAfter warming the oil (i.e., after reaching 400), it takes 5 minutes less time to cook than it took to warm up the oil. \"Warm up the oil\" could refer to total warming time (48 minutes). So cooking time = 48 - 5 = 43 minutes.\n\nThus total time from start to cooked chicken = heating time (48) + cooking time (43) = 91 minutes.\n\nCheck: Could there be alternative interpretation: The 40% longer refers to the total time to reach 400 from start? That would be 20 * 1.40 = 28 total, but that seems less than 20, contradictory. So likely the first interpretation is correct.\n\nThus answer: 91 minutes.\n\nLet's produce final answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 147,
+        "completion_tokens": 654,
+        "total_tokens": 801,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00024867,
+          "upstream_inference_prompt_cost": 1.323e-05,
+          "upstream_inference_completions_cost": 0.00023544
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 383,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 4.2021777629852295
+  },
+  "retry_count": 0
+}

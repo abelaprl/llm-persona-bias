@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00147",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T18:20:05.438766",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 147,
+    "dataset": "gsm8k_test",
+    "question": "Debra is monitoring a beehive to see how many bees come and go in a day. She sees 30 bees leave the hive in the first 6 hours, and then she sees 1/2 that many bees return in the next 6 hours. She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours. Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours. How many bees did Debra see return to the hive in the last 6 hours of the day?",
+    "ground_truth": "Debra first sees 30 bees leave the hive, then sees 1/2 that many return, 30 x 1/2 = <<30*1/2=15>>15 bees that return and 15 bees that are still away from the hive.\nDebra sees twice as many bees as first left the hive--which was 30--fly from the hive in the next 6 hours, 30 x 2 = <<30*2=60>>60 bees that leave the hive.\nIn total, 30 + 60 = <<30+60=90>>90 bees left the hive.\nThere were 90 bees total that left the hive - 15 bees that already returned = <<90-15=75>>75 bees that return to the hive in the last 6 hours of the day.\n#### 75",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Debra is monitoring a beehive to see how many bees come and go in a day. She sees 30 bees leave the hive in the first 6 hours, and then she sees 1/2 that many bees return in the next 6 hours. She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours. Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours. How many bees did Debra see return to the hive in the last 6 hours of the day?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "**Answer: 75 bees**\n\n**Explanation**\n\nBreak the day into four 6‑hour intervals and keep track of how many bees are *out* of the hive after each interval.\n\n| Interval | What happens | Bees that leave | Bees that return | Net change in “out” bees |\n|----------|--------------|----------------|------------------|--------------------------|\n| 1 (first 6 h) | 30 bees leave | +30 | 0 | **30 out** |\n| 2 (next 6 h) | ½ of the first‑interval number return | 0 | ½·30 = **15** | 30 – 15 = **15 out** |\n| 3 (next 6 h) | Twice the first‑interval number leave | **2·30 = 60** | 0 | 15 + 60 = **75 out** |\n| 4 (last 6 h) | Every bee that has left and not yet returned comes back | 0 | all “out” bees return | 75 – 75 = **0 out** |\n\nAt the start of the fourth interval there are 75 bees that have left the hive and have not yet returned (the 15 still out from interval 1 plus the 60 that left in interval 3). The problem states that *all* of those bees return in the final 6‑hour period.\n\nTherefore, Debra sees **75 bees return to the hive in the last 6 hours of the day**",
+    "raw_api_response": {
+      "id": "gen-1774437606-jLakDtbk3g5G4kYCIyEu",
+      "object": "chat.completion",
+      "created": 1774437606,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "**Answer: 75 bees**\n\n**Explanation**\n\nBreak the day into four 6‑hour intervals and keep track of how many bees are *out* of the hive after each interval.\n\n| Interval | What happens | Bees that leave | Bees that return | Net change in “out” bees |\n|----------|--------------|----------------|------------------|--------------------------|\n| 1 (first 6 h) | 30 bees leave | +30 | 0 | **30 out** |\n| 2 (next 6 h) | ½ of the first‑interval number return | 0 | ½·30 = **15** | 30 – 15 = **15 out** |\n| 3 (next 6 h) | Twice the first‑interval number leave | **2·30 = 60** | 0 | 15 + 60 = **75 out** |\n| 4 (last 6 h) | Every bee that has left and not yet returned comes back | 0 | all “out” bees return | 75 – 75 = **0 out** |\n\nAt the start of the fourth interval there are 75 bees that have left the hive and have not yet returned (the 15 still out from interval 1 plus the 60 that left in interval 3). The problem states that *all* of those bees return in the final 6‑hour period.\n\nTherefore, Debra sees **75 bees return to the hive in the last 6 hours of the day**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. It's a word problem about bees leaving and returning in 6-hour intervals.\n\nWe have a day = 24 hours, divided into four 6-hour periods.\n\nLet's denote:\n\nPeriod 1 (first 6 hours): 30 bees leave the hive.\n\nPeriod 2 (next 6 hours): She sees 1/2 that many bees return. So returns = 1/2 * 30 = 15 bees return.\n\nPeriod 3 (next 6 hours): \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" This sentence is confusing. Let's parse: \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Possibly means: In period 3, she sees twice as many bees as she saw first leave (i.e., twice 30 = 60) fly from the hive and leave (i.e., leave again). So 60 bees leave in period 3.\n\nThus period 3: 60 bees leave.\n\nPeriod 4 (last 6 hours): \"Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours.\" Means all bees that have left up to that point (i.e., from periods 1,2,3) that have not yet returned will return in period 4.\n\nWe need to compute how many bees return in period 4.\n\nWe need to track which bees have left and returned.\n\nAssume each bee is distinct? The counts are numbers of bees observed leaving or returning. Some may be same individuals.\n\nWe have:\n\n- Period 1: 30 leave. So currently out = 30.\n\n- Period 2: 15 return. So out after period 2 = 30 - 15 = 15. Also maybe some new leaves? No, only returns.\n\n- Period 3: 60 leave. Are these new bees that haven't left before? Could be some of the 15 that were still out could leave again? But they are already out; they can't leave again. So likely 60 distinct bees leave (maybe some of the 15 that were out could leave again? That would be weird). Typically, \"fly from the hive and leave\" means they exit the hive. So they must be inside at start of period 3. So we need to know how many bees are inside at start of period 3. At start of period 3, after period 2, there are original hive bees minus those that left and not returned. The hive originally had some unknown number of bees, but we only track those observed. At start of period 3, the bees that are inside are those that never left (unknown) plus those that returned (15). But we don't know total. However, the problem likely assumes the only bees we care about are those that have been observed leaving/returning. So we assume the hive initially had at least 30 bees, and maybe more, but we only track the observed ones.\n\nThus at start of period 3, there are 15 bees that are currently out (the ones that left in period 1 and haven't returned). The rest of the observed bees are inside (maybe the 15 that returned). So there are 15 observed bees inside (the ones that returned). So they could leave again. The problem says \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" That suggests 60 bees leave in period 3. Since only 15 observed bees are inside, we need additional bees that were not previously observed (maybe other bees in hive). That's okay.\n\nThus after period 3, total out = previous out (15) + new leaves (60) = 75. However, note that the 15 that were out could also be among the 60 leaving? No, they are already out, cannot leave again. So they remain out.\n\nNow period 4: \"Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours.\" So all bees that have left (i.e., are out) and have not yet returned will return. That includes the 75 out bees (30 from period1, 15 returned, leaving 15 still out; plus 60 new leaves). So total out before period4 = 75. None have returned in period4 yet. So all 75 return.\n\nThus answer: 75 bees return in last 6 hours.\n\nCheck if any nuance: The 15 that returned in period2 are already inside, they might have left again in period3? The problem says \"two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Could be interpreted that the 60 bees that leave in period3 are the same as the 30 that left initially? No, \"two times as many bees as she saw first leave the hive\" means double the number, not the same bees. So they are new.\n\nThus answer 75.\n\nLet's produce final answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. It's a word problem about bees leaving and returning in 6-hour intervals.\n\nWe have a day = 24 hours, divided into four 6-hour periods.\n\nLet's denote:\n\nPeriod 1 (first 6 hours): 30 bees leave the hive.\n\nPeriod 2 (next 6 hours): She sees 1/2 that many bees return. So returns = 1/2 * 30 = 15 bees return.\n\nPeriod 3 (next 6 hours): \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" This sentence is confusing. Let's parse: \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Possibly means: In period 3, she sees twice as many bees as she saw first leave (i.e., twice 30 = 60) fly from the hive and leave (i.e., leave again). So 60 bees leave in period 3.\n\nThus period 3: 60 bees leave.\n\nPeriod 4 (last 6 hours): \"Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours.\" Means all bees that have left up to that point (i.e., from periods 1,2,3) that have not yet returned will return in period 4.\n\nWe need to compute how many bees return in period 4.\n\nWe need to track which bees have left and returned.\n\nAssume each bee is distinct? The counts are numbers of bees observed leaving or returning. Some may be same individuals.\n\nWe have:\n\n- Period 1: 30 leave. So currently out = 30.\n\n- Period 2: 15 return. So out after period 2 = 30 - 15 = 15. Also maybe some new leaves? No, only returns.\n\n- Period 3: 60 leave. Are these new bees that haven't left before? Could be some of the 15 that were still out could leave again? But they are already out; they can't leave again. So likely 60 distinct bees leave (maybe some of the 15 that were out could leave again? That would be weird). Typically, \"fly from the hive and leave\" means they exit the hive. So they must be inside at start of period 3. So we need to know how many bees are inside at start of period 3. At start of period 3, after period 2, there are original hive bees minus those that left and not returned. The hive originally had some unknown number of bees, but we only track those observed. At start of period 3, the bees that are inside are those that never left (unknown) plus those that returned (15). But we don't know total. However, the problem likely assumes the only bees we care about are those that have been observed leaving/returning. So we assume the hive initially had at least 30 bees, and maybe more, but we only track the observed ones.\n\nThus at start of period 3, there are 15 bees that are currently out (the ones that left in period 1 and haven't returned). The rest of the observed bees are inside (maybe the 15 that returned). So there are 15 observed bees inside (the ones that returned). So they could leave again. The problem says \"She sees two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" That suggests 60 bees leave in period 3. Since only 15 observed bees are inside, we need additional bees that were not previously observed (maybe other bees in hive). That's okay.\n\nThus after period 3, total out = previous out (15) + new leaves (60) = 75. However, note that the 15 that were out could also be among the 60 leaving? No, they are already out, cannot leave again. So they remain out.\n\nNow period 4: \"Then every bee that left before that hadn't already returned returns to the hive in the next 6 hours.\" So all bees that have left (i.e., are out) and have not yet returned will return. That includes the 75 out bees (30 from period1, 15 returned, leaving 15 still out; plus 60 new leaves). So total out before period4 = 75. None have returned in period4 yet. So all 75 return.\n\nThus answer: 75 bees return in last 6 hours.\n\nCheck if any nuance: The 15 that returned in period2 are already inside, they might have left again in period3? The problem says \"two times as many bees as she saw first leave the hive fly from the hive and leave in the next 6 hours.\" Could be interpreted that the 60 bees that leave in period3 are the same as the 30 that left initially? No, \"two times as many bees as she saw first leave the hive\" means double the number, not the same bees. So they are new.\n\nThus answer 75.\n\nLet's produce final answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 194,
+        "completion_tokens": 1392,
+        "total_tokens": 1586,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00051858,
+          "upstream_inference_prompt_cost": 1.746e-05,
+          "upstream_inference_completions_cost": 0.00050112
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1101,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 11.888329267501831
+  },
+  "retry_count": 0
+}

@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00858",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T22:49:46.246318",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 858,
+    "dataset": "gsm8k_test",
+    "question": "A plague infects ten people. Every day, each infected person infects six others. How many people are infected after three days?",
+    "ground_truth": "On the first day, the original ten people infect six people each, so 10 * 6 = <<10*6=60>>60 more people are infected.\nThere are 10 + 60 = <<10+60=70>>70 infected people after the first day.\nOn the second day, 70 * 6 = <<70*6=420>>420 more people are infected.\nThere are 70 + 420 = <<70+420=490>>490 infected people after the second day.\nOn the third day, 490 * 6 = 2940 more people are infected. Therefore, there are 490 + 2940 = 3430 infected people after three days.\n#### 3430",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: A plague infects ten people. Every day, each infected person infects six others. How many people are infected after three days?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The infection grows multiplicatively.  \n\n- Day 0 (initial): 10 infected.  \n- Each day every infected person stays infected **and** infects 6 new people.  \n  So the total number of infected people multiplies by \\(1+6 = 7\\) each day.\n\n\\[\n\\begin{aligned}\n\\text{After 1 day} &= 10 \\times 7 = 70,\\\\[4pt]\n\\text{After 2 days} &= 70 \\times 7 = 490,\\\\[4pt]\n\\text{After 3 days} &= 490 \\times 7 = 3\\,430.\n\\end{aligned}\n\\]\n\n\\[\n\\boxed{3\\,430\\text{ people are infected after three days}.}\n",
+    "raw_api_response": {
+      "id": "gen-1774453789-ii4RumfzfNIjNJhYBI5e",
+      "object": "chat.completion",
+      "created": 1774453789,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The infection grows multiplicatively.  \n\n- Day 0 (initial): 10 infected.  \n- Each day every infected person stays infected **and** infects 6 new people.  \n  So the total number of infected people multiplies by \\(1+6 = 7\\) each day.\n\n\\[\n\\begin{aligned}\n\\text{After 1 day} &= 10 \\times 7 = 70,\\\\[4pt]\n\\text{After 2 days} &= 70 \\times 7 = 490,\\\\[4pt]\n\\text{After 3 days} &= 490 \\times 7 = 3\\,430.\n\\end{aligned}\n\\]\n\n\\[\n\\boxed{3\\,430\\text{ people are infected after three days}.}\n",
+            "refusal": null,
+            "reasoning": "We need to interpret: initial infected = 10. Each day, each infected person infects six others. Does that mean new infections each day = current infected * 6? Probably yes, and those newly infected also become infected and can infect next day. So it's exponential growth. Day 0: 10 infected. After day 1: each of the 10 infects 6 new => new infections = 10*6 = 60. Total infected = 10 + 60 = 70. After day 2: now total infected = 70, each infects 6 new => new = 70*6 = 420. Total = 70+420 = 490. After day 3: total infected = 490, new = 490*6 = 2940. Total = 490+2940 = 3430. So answer: 3430.\n\nAlternatively, maybe they consider only new infections each day, not cumulative? The question: \"How many people are infected after three days?\" Usually means total infected after three days. So 3430.\n\nWe can also compute using formula: initial * (1+6)^3? Actually each day multiplies by 7? Because each infected remains infected and infects 6 new, so total after each day = previous total *7. Starting 10, after 1 day = 10*7 =70, after 2 days = 70*7 =490, after 3 days = 490*7 =3430. Yes.\n\nThus answer: 3,430 people.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to interpret: initial infected = 10. Each day, each infected person infects six others. Does that mean new infections each day = current infected * 6? Probably yes, and those newly infected also become infected and can infect next day. So it's exponential growth. Day 0: 10 infected. After day 1: each of the 10 infects 6 new => new infections = 10*6 = 60. Total infected = 10 + 60 = 70. After day 2: now total infected = 70, each infects 6 new => new = 70*6 = 420. Total = 70+420 = 490. After day 3: total infected = 490, new = 490*6 = 2940. Total = 490+2940 = 3430. So answer: 3430.\n\nAlternatively, maybe they consider only new infections each day, not cumulative? The question: \"How many people are infected after three days?\" Usually means total infected after three days. So 3430.\n\nWe can also compute using formula: initial * (1+6)^3? Actually each day multiplies by 7? Because each infected remains infected and infects 6 new, so total after each day = previous total *7. Starting 10, after 1 day = 10*7 =70, after 2 days = 70*7 =490, after 3 days = 490*7 =3430. Yes.\n\nThus answer: 3,430 people.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 499,
+        "total_tokens": 597,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00018846,
+          "upstream_inference_prompt_cost": 8.82e-06,
+          "upstream_inference_completions_cost": 0.00017964
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 282,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 12.117961883544922
+  },
+  "retry_count": 0
+}

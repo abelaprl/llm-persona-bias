@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00611",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T21:45:17.100893",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 611,
+    "dataset": "gsm8k_test",
+    "question": "John decides to build a program capable of identifying cancer cells.  He gets initial funding of $100,000 for the first 5 months of research.  His research ends up taking 10 times that long and every month after those first 5 took 50% more funding per month.  How much did his research cost?",
+    "ground_truth": "The research ended up taking 5*10=<<5*10=50>>50 months\nSo he paid for expensive research for 50-5=<<50-5=45>>45 months\nEach month of research at the cheaper stage cost 100,000/5=$<<100000/5=20000>>20,000\nSo the more expensive research cost 20,000*1.5=$<<20000*1.5=30000>>30,000\nSo that research cost 45*30,000=$<<45*30000=1350000>>1,350,000\nSo the total cost was 1,350,000+100,000=$<<1350000+100000=1450000>>1,450,000\n#### 1,450,000",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: John decides to build a program capable of identifying cancer cells.  He gets initial funding of $100,000 for the first 5 months of research.  His research ends up taking 10 times that long and every month after those first 5 took 50% more funding per month.  How much did his research cost?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The first 5 months are funded with a total of  \n\n\\[\n\\$100{,}000 \\quad\\Rightarrow\\quad \\text{monthly rate}= \\frac{100{,}000}{5}= \\$20{,}000\\text{/month}.\n\\]\n\nThe research actually lasts 10 × the original 5‑month plan:\n\n\\[\n5\\text{ months}\\times 10 = 50\\text{ months total}.\n\\]\n\nAfter the first 5 months, each month costs 50 % more than the original monthly rate:\n\n\\[\n\\$20{,}000 \\times 1.5 = \\$30{,}000\\text{/month}.\n\\]\n\nThere are \\(50-5 = 45\\) months at this higher rate, so the cost for those months is  \n\n\\[\n45 \\times \\$30{,}000 = \\$1{,}350{,}000.\n\\]\n\nAdd the initial \\$100,000:\n\n\\[\n\\$100{,}000 + \\$1{,}350{,}000 = \\boxed{\\$1{,}450{,}000}.\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774449918-VpZWib1rIT9d98bAUl6S",
+      "object": "chat.completion",
+      "created": 1774449918,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The first 5 months are funded with a total of  \n\n\\[\n\\$100{,}000 \\quad\\Rightarrow\\quad \\text{monthly rate}= \\frac{100{,}000}{5}= \\$20{,}000\\text{/month}.\n\\]\n\nThe research actually lasts 10 × the original 5‑month plan:\n\n\\[\n5\\text{ months}\\times 10 = 50\\text{ months total}.\n\\]\n\nAfter the first 5 months, each month costs 50 % more than the original monthly rate:\n\n\\[\n\\$20{,}000 \\times 1.5 = \\$30{,}000\\text{/month}.\n\\]\n\nThere are \\(50-5 = 45\\) months at this higher rate, so the cost for those months is  \n\n\\[\n45 \\times \\$30{,}000 = \\$1{,}350{,}000.\n\\]\n\nAdd the initial \\$100,000:\n\n\\[\n\\$100{,}000 + \\$1{,}350{,}000 = \\boxed{\\$1{,}450{,}000}.\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: John gets initial funding of $100,000 for the first 5 months of research. His research ends up taking 10 times that long (i.e., 10 times longer than the initial 5 months? Or 10 times that long meaning 10 times the original duration? The phrase \"10 times that long\" likely means the total research duration is 10 times the original planned duration (which was 5 months). So total duration = 5 months * 10 = 50 months. So research lasts 50 months total.\n\nHe gets $100,000 for the first 5 months. So presumably that's the total funding for the first 5 months, not per month. So $100,000 covers the first 5 months. Then \"every month after those first 5 took 50% more funding per month.\" This phrase ambiguous: Does it mean each month after the first 5 months costs 50% more than the previous month? Or each month after the first 5 months costs 50% more than the per-month cost of the first 5 months? Likely the latter: the monthly funding after month 5 is 50% more than the monthly funding in the first 5 months. Since the first 5 months total $100,000, monthly amount = $100,000 / 5 = $20,000 per month. Then after month 5, each month costs 50% more, i.e., $20,000 * 1.5 = $30,000 per month.\n\nNow total months = 50. First 5 months cost $100,000. Remaining months = 50 - 5 = 45 months, each at $30,000 => cost = 45 * 30,000 = $1,350,000. Add initial $100,000 = $1,450,000.\n\nThus answer: $1,450,000.\n\nCheck if any other interpretation: If \"10 times that long\" means research takes 10 times longer than the first 5 months, i.e., 5 * 10 = 50 months, correct. If \"every month after those first 5 took 50% more funding per month\" could be interpreted as each subsequent month costs 50% more than the previous month (i.e., geometric increase). That would be more complex: month 6 cost = $20,000 * 1.5 = $30,000; month 7 cost = $30,000 * 1.5 = $45,000; etc. That would be a geometric series. Let's compute that scenario: months 6 to 50 (45 months) with first term a1 = $30,000, ratio r = 1.5. Sum = a1 * (r^n - 1) / (r - 1). n = 45. That's huge. r^45 is enormous (1.5^45 ~ maybe 1.5^10 ~ 57.7, 1.5^20 ~ 3333, 1.5^30 ~ 192k, 1.5^40 ~ 11 million, 1.5^45 ~ 11 million * 1.5^5 ~ 11 million * 7.6 ~ 84 million). So sum would be huge, unrealistic. Likely they intend simple 50% more per month relative to original monthly rate.\n\nThus answer: $1,450,000.\n\nProvide answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: John gets initial funding of $100,000 for the first 5 months of research. His research ends up taking 10 times that long (i.e., 10 times longer than the initial 5 months? Or 10 times that long meaning 10 times the original duration? The phrase \"10 times that long\" likely means the total research duration is 10 times the original planned duration (which was 5 months). So total duration = 5 months * 10 = 50 months. So research lasts 50 months total.\n\nHe gets $100,000 for the first 5 months. So presumably that's the total funding for the first 5 months, not per month. So $100,000 covers the first 5 months. Then \"every month after those first 5 took 50% more funding per month.\" This phrase ambiguous: Does it mean each month after the first 5 months costs 50% more than the previous month? Or each month after the first 5 months costs 50% more than the per-month cost of the first 5 months? Likely the latter: the monthly funding after month 5 is 50% more than the monthly funding in the first 5 months. Since the first 5 months total $100,000, monthly amount = $100,000 / 5 = $20,000 per month. Then after month 5, each month costs 50% more, i.e., $20,000 * 1.5 = $30,000 per month.\n\nNow total months = 50. First 5 months cost $100,000. Remaining months = 50 - 5 = 45 months, each at $30,000 => cost = 45 * 30,000 = $1,350,000. Add initial $100,000 = $1,450,000.\n\nThus answer: $1,450,000.\n\nCheck if any other interpretation: If \"10 times that long\" means research takes 10 times longer than the first 5 months, i.e., 5 * 10 = 50 months, correct. If \"every month after those first 5 took 50% more funding per month\" could be interpreted as each subsequent month costs 50% more than the previous month (i.e., geometric increase). That would be more complex: month 6 cost = $20,000 * 1.5 = $30,000; month 7 cost = $30,000 * 1.5 = $45,000; etc. That would be a geometric series. Let's compute that scenario: months 6 to 50 (45 months) with first term a1 = $30,000, ratio r = 1.5. Sum = a1 * (r^n - 1) / (r - 1). n = 45. That's huge. r^45 is enormous (1.5^45 ~ maybe 1.5^10 ~ 57.7, 1.5^20 ~ 3333, 1.5^30 ~ 192k, 1.5^40 ~ 11 million, 1.5^45 ~ 11 million * 1.5^5 ~ 11 million * 7.6 ~ 84 million). So sum would be huge, unrealistic. Likely they intend simple 50% more per month relative to original monthly rate.\n\nThus answer: $1,450,000.\n\nProvide answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 138,
+        "completion_tokens": 973,
+        "total_tokens": 1111,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0003627,
+          "upstream_inference_prompt_cost": 1.242e-05,
+          "upstream_inference_completions_cost": 0.00035028
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 605,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 18.300755977630615
+  },
+  "retry_count": 0
+}

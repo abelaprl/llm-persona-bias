@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00359",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T20:26:27.789201",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 359,
+    "dataset": "gsm8k_test",
+    "question": "Billy is buying some candy with $10 his father gave him. The candy costs $1.5 a pound. After buying candy, he takes half his change and spends it on gumballs, which cost $.05 each. If he bought 40 gumballs, how many pounds of candy did he buy?",
+    "ground_truth": "He spent $2 on gumballs because 40 x .05 = <<40*.05=2>>2\nHe had $4 in change because 2 / .5 = <<2/.5=4>>4\nHe spent $6 on candy because 10 - 4 = <<10-4=6>>6\nHe bought 4 pounds of candy because 6 / 1.5 = <<6/1.5=4>>4\n#### 4",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Billy is buying some candy with $10 his father gave him. The candy costs $1.5 a pound. After buying candy, he takes half his change and spends it on gumballs, which cost $.05 each. If he bought 40 gumballs, how many pounds of candy did he buy?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "He bought **4 pounds** of candy",
+    "raw_api_response": {
+      "id": "gen-1774445192-zFaUxthnvalWtU0ngRIP",
+      "object": "chat.completion",
+      "created": 1774445192,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "He bought **4 pounds** of candy",
+            "refusal": null,
+            "reasoning": "We need to parse problem. Billy has $10. Candy costs $1.5 per pound. He buys some candy, then after buying candy, he takes half his change and spends it on gumballs costing $0.05 each. He bought 40 gumballs. Find pounds of candy bought.\n\nLet x = pounds of candy bought. Cost of candy = 1.5 * x. He pays that from $10, leaving change = 10 - 1.5x. He takes half his change to spend on gumballs: amount spent on gumballs = (1/2)*(10 - 1.5x). He buys 40 gumballs at $0.05 each, total cost = 40 * 0.05 = $2. So we have (1/2)*(10 - 1.5x) = 2. Solve: 10 - 1.5x = 4 => 1.5x = 6 => x = 4. So 4 pounds of candy.\n\nCheck: Candy cost $6, leaving $4 change. Half of that = $2 spent on gumballs, buying 40 at $0.05 each = $2. Works.\n\nThus answer: 4 pounds.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse problem. Billy has $10. Candy costs $1.5 per pound. He buys some candy, then after buying candy, he takes half his change and spends it on gumballs costing $0.05 each. He bought 40 gumballs. Find pounds of candy bought.\n\nLet x = pounds of candy bought. Cost of candy = 1.5 * x. He pays that from $10, leaving change = 10 - 1.5x. He takes half his change to spend on gumballs: amount spent on gumballs = (1/2)*(10 - 1.5x). He buys 40 gumballs at $0.05 each, total cost = 40 * 0.05 = $2. So we have (1/2)*(10 - 1.5x) = 2. Solve: 10 - 1.5x = 4 => 1.5x = 6 => x = 4. So 4 pounds of candy.\n\nCheck: Candy cost $6, leaving $4 change. Half of that = $2 spent on gumballs, buying 40 at $0.05 each = $2. Works.\n\nThus answer: 4 pounds.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 135,
+        "completion_tokens": 281,
+        "total_tokens": 416,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00011331,
+          "upstream_inference_prompt_cost": 1.215e-05,
+          "upstream_inference_completions_cost": 0.00010116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 190,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 7.279529094696045
+  },
+  "retry_count": 0
+}

@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00943",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:31:04.941439",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 943,
+    "dataset": "gsm8k_test",
+    "question": "James gets 10 new CDs.  Each CD cost $15.  He gets them for 40% off.  He decides he doesn't like 5 of them and sells them for 40. How much money was he out?",
+    "ground_truth": "He got a 15*.4=$<<15*.4=6>>6 discount on each CD\nThat means each CD cost 15-6=$<<15-6=9>>9\nSo he paid 10*9=$<<10*9=90>>90\nThat means he was out 90-40=$<<90-40=50>>50\n#### 50",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: James gets 10 new CDs.  Each CD cost $15.  He gets them for 40% off.  He decides he doesn't like 5 of them and sells them for 40. How much money was he out?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "First, find out how much James paid for the 10 CDs.\n\n- Regular price of one CD = \\$15  \n- Discount = 40 % → he pays only 60 % of the regular price  \n\n\\[\n\\text{Price paid per CD}=0.60 \\times \\$15 = \\$9\n\\]\n\n- For 10 CDs:\n\n\\[\n\\text{Total cost}=10 \\times \\$9 = \\$90\n\\]\n\nNext, consider the money he gets back by selling the 5 CDs he doesn’t like.\n\n- He sells those 5 CDs for a total of \\$40 (the problem says “sells them for 40”, which is interpreted as a total amount, not \\$40 each).\n\n\\[\n\\text{Money received}= \\$40\n\\]\n\nFinally, compute his net loss (how much money he is “out”):\n\n\\[\n\\text{Net loss}= \\text{Total cost} - \\text{Money received}= \\$90 - \\$40 = \\$50\n\\]\n\n\\[\n\\boxed{\\$50}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774456264-f4MIh377QxHwNUR2Z7Ae",
+      "object": "chat.completion",
+      "created": 1774456264,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Phala",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "First, find out how much James paid for the 10 CDs.\n\n- Regular price of one CD = \\$15  \n- Discount = 40 % → he pays only 60 % of the regular price  \n\n\\[\n\\text{Price paid per CD}=0.60 \\times \\$15 = \\$9\n\\]\n\n- For 10 CDs:\n\n\\[\n\\text{Total cost}=10 \\times \\$9 = \\$90\n\\]\n\nNext, consider the money he gets back by selling the 5 CDs he doesn’t like.\n\n- He sells those 5 CDs for a total of \\$40 (the problem says “sells them for 40”, which is interpreted as a total amount, not \\$40 each).\n\n\\[\n\\text{Money received}= \\$40\n\\]\n\nFinally, compute his net loss (how much money he is “out”):\n\n\\[\n\\text{Net loss}= \\text{Total cost} - \\text{Money received}= \\$90 - \\$40 = \\$50\n\\]\n\n\\[\n\\boxed{\\$50}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: James gets 10 new CDs, each costs $15. He gets them for 40% off. So original price per CD $15, discount 40% => he pays 60% of $15 = $9 per CD. For 10 CDs, total cost = 10 * $9 = $90.\n\nHe decides he doesn't like 5 of them and sells them for $40. Probably sells each for $40? Or sells them all for $40 total? The phrasing: \"sells them for 40.\" Could be $40 each? Usually they'd say \"sells them for $40 each\". But ambiguous. Let's interpret: He sells the 5 CDs for $40 each? That would be $200 revenue. Then net out-of-pocket = $90 - $200 = -$110 (i.e., he made $110 profit). But question: \"How much money was he out?\" Means net loss? If he made profit, answer would be $0 out? Might be they intend he sells each for $40 total? Actually \"sells them for 40\" maybe means $40 total for the 5 CDs. Then revenue $40, cost $90, net loss $50. That seems plausible: He sells the 5 CDs for $40 total. So he is out $50.\n\nLet's compute both possibilities. The typical word problem: \"He decides he doesn't like 5 of them and sells them for $40.\" Usually they'd say \"sells them for $40 each\" if each. Since they didn't include \"each\", likely total $40. So answer: $50 out.\n\nThus answer: He is out $50.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: James gets 10 new CDs, each costs $15. He gets them for 40% off. So original price per CD $15, discount 40% => he pays 60% of $15 = $9 per CD. For 10 CDs, total cost = 10 * $9 = $90.\n\nHe decides he doesn't like 5 of them and sells them for $40. Probably sells each for $40? Or sells them all for $40 total? The phrasing: \"sells them for 40.\" Could be $40 each? Usually they'd say \"sells them for $40 each\". But ambiguous. Let's interpret: He sells the 5 CDs for $40 each? That would be $200 revenue. Then net out-of-pocket = $90 - $200 = -$110 (i.e., he made $110 profit). But question: \"How much money was he out?\" Means net loss? If he made profit, answer would be $0 out? Might be they intend he sells each for $40 total? Actually \"sells them for 40\" maybe means $40 total for the 5 CDs. Then revenue $40, cost $90, net loss $50. That seems plausible: He sells the 5 CDs for $40 total. So he is out $50.\n\nLet's compute both possibilities. The typical word problem: \"He decides he doesn't like 5 of them and sells them for $40.\" Usually they'd say \"sells them for $40 each\" if each. Since they didn't include \"each\", likely total $40. So answer: $50 out.\n\nThus answer: He is out $50.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 135,
+        "completion_tokens": 578,
+        "total_tokens": 713,
+        "cost": 0.00029672,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00029672,
+          "upstream_inference_prompt_cost": 1.35e-05,
+          "upstream_inference_completions_cost": 0.00028322
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 309,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 14.129137992858887
+  },
+  "retry_count": 0
+}

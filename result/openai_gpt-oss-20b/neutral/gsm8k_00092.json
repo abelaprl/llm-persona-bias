@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00092",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T18:07:35.380103",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 92,
+    "dataset": "gsm8k_test",
+    "question": "Emily has 4 kids named Amy, Jackson, Corey, and James. Amy is 5 years older than Jackson and 2 years younger than Corey. If James is 10 and is 1 year younger than Corey, how old is Jackson?",
+    "ground_truth": "James is 10 and 1 year younger than Corey, so Corey is 10 + 1 = <<10+1=11>>11 years old\nAmy is 2 years younger than Corey so is 11 - 2 = 9 years old\nAmy is also 5 years older than Jackson, so Jackson is 9 - 5 = <<9-5=4>>4 years old\n#### 4",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Emily has 4 kids named Amy, Jackson, Corey, and James. Amy is 5 years older than Jackson and 2 years younger than Corey. If James is 10 and is 1 year younger than Corey, how old is Jackson?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Jackson is **4** years old.",
+    "raw_api_response": {
+      "id": "gen-1774436855-wnidJv679SYUsi3TqNxt",
+      "object": "chat.completion",
+      "created": 1774436855,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Jackson is **4** years old.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Emily has 4 kids: Amy, Jackson, Corey, James. We know:\n\n- Amy is 5 years older than Jackson.\n- Amy is 2 years younger than Corey.\n- James is 10.\n- James is 1 year younger than Corey.\n\nWe need to find Jackson's age.\n\nLet ages: A, J, C, M? Actually James is Jm? Let's denote:\n\nAmy = A\nJackson = J\nCorey = C\nJames = M (but we know M=10)\n\nGiven: A = J + 5. (Amy 5 years older than Jackson)\nA = C - 2. (Amy 2 years younger than Corey)\nJames is 10: M = 10.\nJames is 1 year younger than Corey: M = C - 1. So C = M + 1 = 11.\n\nThus C = 11. Then A = C - 2 = 9. Then J = A - 5 = 4.\n\nThus Jackson is 4 years old.\n\nCheck: Amy 5 older than Jackson: 9 vs 4, difference 5. Amy 2 younger than Corey: 9 vs 11 difference 2. James 10, 1 younger than Corey: 10 vs 11 difference 1. All consistent.\n\nThus answer: 4.\n\nWe should output answer: 4.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Emily has 4 kids: Amy, Jackson, Corey, James. We know:\n\n- Amy is 5 years older than Jackson.\n- Amy is 2 years younger than Corey.\n- James is 10.\n- James is 1 year younger than Corey.\n\nWe need to find Jackson's age.\n\nLet ages: A, J, C, M? Actually James is Jm? Let's denote:\n\nAmy = A\nJackson = J\nCorey = C\nJames = M (but we know M=10)\n\nGiven: A = J + 5. (Amy 5 years older than Jackson)\nA = C - 2. (Amy 2 years younger than Corey)\nJames is 10: M = 10.\nJames is 1 year younger than Corey: M = C - 1. So C = M + 1 = 11.\n\nThus C = 11. Then A = C - 2 = 9. Then J = A - 5 = 4.\n\nThus Jackson is 4 years old.\n\nCheck: Amy 5 older than Jackson: 9 vs 4, difference 5. Amy 2 younger than Corey: 9 vs 11 difference 2. James 10, 1 younger than Corey: 10 vs 11 difference 1. All consistent.\n\nThus answer: 4.\n\nWe should output answer: 4.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 138,
+        "completion_tokens": 308,
+        "total_tokens": 446,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 83,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 8.666e-05,
+          "upstream_inference_prompt_cost": 9.66e-06,
+          "upstream_inference_completions_cost": 7.7e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 235,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.556492567062378
+  },
+  "retry_count": 0
+}

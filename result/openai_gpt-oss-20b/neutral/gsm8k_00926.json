@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00926",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:29:43.740987",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 926,
+    "dataset": "gsm8k_test",
+    "question": "Colby loves going to the movies and every month his parents give him $150 to spend at the movies. Tickets for Fridays and Saturdays cost $10. Tickets for any other day cost $7. Popcorn costs $8 and boxes of candy cost $2. It is the last day of the month and it's a Friday. He wants to make sure he gets a popcorn and box of candy that night. How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?",
+    "ground_truth": "He has spent $50 on Fri/Sat movies because 5 x 10 = <<50=50>>50\nHe has spent $56 on movies the rest of the day because 8 x 7 = <<8*7=56>>56\nHe has spent $16 on popcorn because 2 x 8 = <<16=16>>16\nHe has spent $8 on candy because 4 x 2 = <<4*2=8>>8\nHe has spent 130 in total because 50 + 56 + 16 + 8 = <<50+56+16+8=130>>130\nHe plans to spend $10 on popcorn and candy because 8 + 2 = <<8+2=10>>10\nHe has $10 left to spend because 150 - 130 - 10 = <<150-130-10=10>>10\nHe can see 1 movie because 10 / 10 = <<10/10=1>>1\n#### 1",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Colby loves going to the movies and every month his parents give him $150 to spend at the movies. Tickets for Fridays and Saturdays cost $10. Tickets for any other day cost $7. Popcorn costs $8 and boxes of candy cost $2. It is the last day of the month and it's a Friday. He wants to make sure he gets a popcorn and box of candy that night. How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "He can see **one** more movie that night.  \n\n**Explanation**\n\n- Total monthly allowance: \\$150  \n- Movies already seen:  \n  - 5 on Friday/Saturday × \\$10 = \\$50  \n  - 8 on other days × \\$7 = \\$56  \n- Snacks already bought:  \n  - 2 popcorn tubs × \\$8 = \\$16  \n  - 4 candy boxes × \\$2 = \\$8  \n\nTotal spent so far: \\$50 + \\$56 + \\$16 + \\$8 = \\$130  \n\nRemaining money: \\$150 – \\$130 = \\$20  \n\nOn the last Friday he wants a popcorn and a candy box that night: \\$8 + \\$2 = \\$10.  \nThat leaves \\$10 for tickets. A ticket on a Friday costs \\$10, so he can buy exactly one more ticket.\n\nThus he can see **one** additional movie that night.",
+    "raw_api_response": {
+      "id": "gen-1774456185-dnmWY2vZx2pWqXlREOWx",
+      "object": "chat.completion",
+      "created": 1774456185,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "He can see **one** more movie that night.  \n\n**Explanation**\n\n- Total monthly allowance: \\$150  \n- Movies already seen:  \n  - 5 on Friday/Saturday × \\$10 = \\$50  \n  - 8 on other days × \\$7 = \\$56  \n- Snacks already bought:  \n  - 2 popcorn tubs × \\$8 = \\$16  \n  - 4 candy boxes × \\$2 = \\$8  \n\nTotal spent so far: \\$50 + \\$56 + \\$16 + \\$8 = \\$130  \n\nRemaining money: \\$150 – \\$130 = \\$20  \n\nOn the last Friday he wants a popcorn and a candy box that night: \\$8 + \\$2 = \\$10.  \nThat leaves \\$10 for tickets. A ticket on a Friday costs \\$10, so he can buy exactly one more ticket.\n\nThus he can see **one** additional movie that night.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Colby gets $150 per month to spend at the movies. Tickets cost $10 on Fridays and Saturdays, $7 on other days. Popcorn $8, candy $2. It's the last day of the month and it's a Friday. He wants to make sure he gets a popcorn and box of candy that night. How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\n\nWe need to compute how many movies he can see on the last day? Or total movies he can see? The question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" It seems like we need to find the maximum number of movies he can see on the last day, given his remaining budget after spending on previous movies, popcorn, candy. He wants to get popcorn and candy that night. So we need to compute remaining money after previous expenses, then determine how many movies he can see on that Friday, given ticket cost $10 each, plus popcorn $8 and candy $2. But he wants to get popcorn and candy that night, so he must buy them. So the cost for that night: ticket $10 + popcorn $8 + candy $2 = $20. But he might also want to see multiple movies that night? The question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" It might be asking: given his monthly allowance, how many movies can he see in total, given his spending? But he already saw 5+8=13 movies. He also had 2 popcorn tubs and 4 candy boxes. He wants to see more movies on the last day, but he also wants popcorn and candy that night. So we need to compute remaining money after those expenses, then see how many additional movies he can see on that Friday, given that he must also buy popcorn and candy that night. But can he buy popcorn and candy only once? He already had 2 popcorn tubs and 4 candy boxes that month. He wants to get a popcorn and box of candy that night. So he will buy one more of each. So cost for that night: ticket $10 + popcorn $8 + candy $2 = $20. But if he wants to see multiple movies that night, he would need to pay ticket for each movie. But he also might want popcorn and candy for each movie? Usually one popcorn and candy per movie. But the problem says \"He wants to make sure he gets a popcorn and box of candy that night.\" That implies he wants at least one popcorn and candy that night. It doesn't say he wants one per movie. So maybe he wants to see as many movies as possible that night, but only one popcorn and candy. But that seems unrealistic. But maybe the problem intends that he wants to see as many movies as possible that night, but he will only buy one popcorn and candy. But the cost of popcorn and candy is fixed regardless of number of movies. So we need to compute remaining money after previous expenses, subtract cost of popcorn and candy for that night, then divide by ticket price $10 to get number of additional movies he can see that night. But we need to consider that he might have already spent some money on popcorn and candy earlier. He had 2 tubs of popcorn and 4 boxes of candy that month. He might have spent money on those earlier. So we need to subtract those costs too. But the question: \"He already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month.\" So those are his previous consumption. So we need to compute total cost of those: 5 movies on Friday/Saturday cost $10 each = $50. 8 movies on other days cost $7 each = $56. Popcorn: 2 tubs at $8 each = $16. Candy: 4 boxes at $2 each = $8. Total spent: $50 + $56 + $16 + $8 = $130. He has $150 total. So remaining money: $150 - $130 = $20. On the last day, he wants to get popcorn and candy that night. So he must spend $8 + $2 = $10 on those. That leaves $10 for tickets. Ticket cost $10 each. So he can see 1 more movie that night. So answer: 1 movie. But the question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" It might ask total movies he can see in the month, including the last day. He already saw 13 movies. He can see 1 more movie that night. So total movies: 14. But the question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" The phrasing \"How many movies can he see\" might refer to the last day. But it's ambiguous. Let's parse: \"It is the last day of the month and it's a Friday. He wants to make sure he gets a popcorn and box of candy that night. How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" So we are asked: On the last day, how many movies can he see? Because we know his remaining budget. So answer: 1 movie. But we might also mention total movies: 14. But the question likely expects 1. Let's double-check: He has $150. He spent $130. He wants popcorn and candy that night: $10. That leaves $10. Ticket cost $10. So he can see 1 movie. So answer: 1 movie. If we consider he might want to see multiple movies that night, but only one popcorn and candy, he can see 1. So answer: 1. Let's produce final answer: 1 movie.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Colby gets $150 per month to spend at the movies. Tickets cost $10 on Fridays and Saturdays, $7 on other days. Popcorn $8, candy $2. It's the last day of the month and it's a Friday. He wants to make sure he gets a popcorn and box of candy that night. How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\n\nWe need to compute how many movies he can see on the last day? Or total movies he can see? The question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" It seems like we need to find the maximum number of movies he can see on the last day, given his remaining budget after spending on previous movies, popcorn, candy. He wants to get popcorn and candy that night. So we need to compute remaining money after previous expenses, then determine how many movies he can see on that Friday, given ticket cost $10 each, plus popcorn $8 and candy $2. But he wants to get popcorn and candy that night, so he must buy them. So the cost for that night: ticket $10 + popcorn $8 + candy $2 = $20. But he might also want to see multiple movies that night? The question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" It might be asking: given his monthly allowance, how many movies can he see in total, given his spending? But he already saw 5+8=13 movies. He also had 2 popcorn tubs and 4 candy boxes. He wants to see more movies on the last day, but he also wants popcorn and candy that night. So we need to compute remaining money after those expenses, then see how many additional movies he can see on that Friday, given that he must also buy popcorn and candy that night. But can he buy popcorn and candy only once? He already had 2 popcorn tubs and 4 candy boxes that month. He wants to get a popcorn and box of candy that night. So he will buy one more of each. So cost for that night: ticket $10 + popcorn $8 + candy $2 = $20. But if he wants to see multiple movies that night, he would need to pay ticket for each movie. But he also might want popcorn and candy for each movie? Usually one popcorn and candy per movie. But the problem says \"He wants to make sure he gets a popcorn and box of candy that night.\" That implies he wants at least one popcorn and candy that night. It doesn't say he wants one per movie. So maybe he wants to see as many movies as possible that night, but only one popcorn and candy. But that seems unrealistic. But maybe the problem intends that he wants to see as many movies as possible that night, but he will only buy one popcorn and candy. But the cost of popcorn and candy is fixed regardless of number of movies. So we need to compute remaining money after previous expenses, subtract cost of popcorn and candy for that night, then divide by ticket price $10 to get number of additional movies he can see that night. But we need to consider that he might have already spent some money on popcorn and candy earlier. He had 2 tubs of popcorn and 4 boxes of candy that month. He might have spent money on those earlier. So we need to subtract those costs too. But the question: \"He already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month.\" So those are his previous consumption. So we need to compute total cost of those: 5 movies on Friday/Saturday cost $10 each = $50. 8 movies on other days cost $7 each = $56. Popcorn: 2 tubs at $8 each = $16. Candy: 4 boxes at $2 each = $8. Total spent: $50 + $56 + $16 + $8 = $130. He has $150 total. So remaining money: $150 - $130 = $20. On the last day, he wants to get popcorn and candy that night. So he must spend $8 + $2 = $10 on those. That leaves $10 for tickets. Ticket cost $10 each. So he can see 1 more movie that night. So answer: 1 movie. But the question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" It might ask total movies he can see in the month, including the last day. He already saw 13 movies. He can see 1 more movie that night. So total movies: 14. But the question: \"How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" The phrasing \"How many movies can he see\" might refer to the last day. But it's ambiguous. Let's parse: \"It is the last day of the month and it's a Friday. He wants to make sure he gets a popcorn and box of candy that night. How many movies can he see if he already saw 5 movies on a Friday or Saturday, 8 movies on other days, had 2 tubs of popcorn, and four boxes of candy that month?\" So we are asked: On the last day, how many movies can he see? Because we know his remaining budget. So answer: 1 movie. But we might also mention total movies: 14. But the question likely expects 1. Let's double-check: He has $150. He spent $130. He wants popcorn and candy that night: $10. That leaves $10. Ticket cost $10. So he can see 1 movie. So answer: 1 movie. If we consider he might want to see multiple movies that night, but only one popcorn and candy, he can see 1. So answer: 1. Let's produce final answer: 1 movie.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 211,
+        "completion_tokens": 1552,
+        "total_tokens": 1763,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 85,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00040277,
+          "upstream_inference_prompt_cost": 1.477e-05,
+          "upstream_inference_completions_cost": 0.000388
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1379,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 8.406763076782227
+  },
+  "retry_count": 0
+}

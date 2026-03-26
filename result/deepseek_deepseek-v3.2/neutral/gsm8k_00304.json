@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "run_id": "deepseek_deepseek-v3.2_neutral_gsm8k_00304",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T20:37:54.534308",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "deepseek/deepseek-v3.2",
+      "model_name": "DeepSeek V3.2",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 304,
+    "dataset": "gsm8k_test",
+    "question": "Watson works a 10-hour shift each day, five days a week. He earns $10 per hour and gets a $300 bonus each week if the company performs well. How much money did Watson make in April if the company performed very well for the whole month?",
+    "ground_truth": "In a day, Watson makes 10 * 10 = $<<10*10=100>>100\nIf he works five days a week, the total number of days for the whole month is 5 * 4= <<5*4=20>>20 days.\nSince he makes $100 per day, the total amount for the whole month is 20 * 100= $<<20*100=2000>>2000.\nHe also got a 300 * 4 = $<<300*4=1200>>1200 bonus because the company performed well in all the weeks of April.\nAt the end of April, he earned 2000 +1200 = $<<2000+1200=3200>>3200.\n#### 3200",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Watson works a 10-hour shift each day, five days a week. He earns $10 per hour and gets a $300 bonus each week if the company performs well. How much money did Watson make in April if the company performed very well for the whole month?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "deepseek/deepseek-v3.2"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Let’s break this down step by step.  \n\n---\n\n**1. Daily earnings without bonus**  \nWatson works 10 hours/day at $10/hour.  \nDaily pay = \\( 10 \\times 10 = 100 \\) dollars.\n\n---\n\n**2. Weekly earnings without bonus**  \nHe works 5 days/week.  \nWeekly pay = \\( 100 \\times 5 = 500 \\) dollars.\n\n---\n\n**3. Weekly earnings with bonus**  \nThe company performed well all month, so he gets the $300 bonus each week.  \nWeekly total = \\( 500 + 300 = 800 \\) dollars.\n\n---\n\n**4. Number of weeks in April**  \nApril has 30 days.  \nWeeks = \\( 30 \\div 7 \\approx 4.2857 \\) weeks.  \nBut Watson works only 5 days each week, so we should count **working days** in April instead of assuming full calendar weeks.\n\n---\n\n**5. Working days in April**  \nApril 2024 (or any April) has 30 days.  \nIf April starts on Monday:  \nDays of the week repeat every 7 days.  \nLet’s count:  \nIn 30 days, there are 4 full weeks (28 days) + 2 extra days.  \nFull weeks: \\( 4 \\times 5 = 20 \\) working days.  \nExtra 2 days: if they are weekdays, they add 0–2 working days depending on start day.  \n\nBut the problem likely assumes **April has exactly 4 weeks of work** (20 working days) because many such problems ignore partial weeks unless specified. Let’s check:  \nIf April 1 is Monday, then April 1–26 is 4 full weeks (20 work days), April 27–30 are Saturday, Sunday, Monday, Tuesday → that’s 2 extra workdays (Mon, Tue), so total 22 work days.  \nIf April 1 is Tuesday, then April 1–28 is 4 full weeks (20 work days), April 29–30 are Mon, Tue → 2 extra workdays, total 22 again.  \nActually, any April has either 21 or 22 work days (Mon–Fri), but **for 5-day work weeks**, April always contains parts of 5 different weeks of the year, but Watson gets **bonus per week worked**, not per day.  \n\n---\n\n**6. Better approach: Count full weeks in April for bonus**  \nIf the company performed well for the whole month, Watson gets $300 for each week that has at least one of his workdays in April.  \nApril has 30 days = 4 weeks + 2 days → that’s parts of **5 different Monday–Sunday weeks**.  \nBut Watson works only 5 days each of those weeks.  \n\nLet’s simplify:  \nIf April starts on Monday:  \nWeek 1: Apr 1–5 (5 work days)  \nWeek 2: Apr 8–12 (5 work days)  \nWeek 3: Apr 15–19 (5 work days)  \nWeek 4: Apr 22–26 (5 work days)  \nWeek 5: Apr 29–30 (only 2 work days, but still part of a week)  \n\nSo Watson works in 5 different weekly bonus periods.  \nThus, **bonus = \\( 5 \\times 300 = 1500 \\)**.  \n\n---\n\n**7. Total work days in April**  \nFrom above: 20 days (first 4 weeks) + 2 days (last partial week) = 22 work days.  \n\n---\n\n**8. Base pay for April**  \nBase pay = \\( 22 \\times 100 = 2200 \\) dollars.\n\n---\n\n**9. Total pay**  \nTotal = Base pay + Bonus = \\( 2200 + 1500 = 3700 \\) dollars.\n\n---\n\n**10. But** — many simple versions of this problem assume April has exactly 4 weeks (20 work days).  \nIf 20 work days:  \nBase pay = \\( 20 \\times 100 = 2000 \\)  \nBonus = \\( 4 \\times 300 = 1200 \\)  \nTotal = \\( 3200 \\).  \n\nWhich is correct?  \nThe problem says “in April” without stating year, so likely they mean **April has 4 weeks of work** (20 days) for simplicity.  \nGiven typical math problems, they ignore the extra days.  \n\n---\n\n**11. Most plausible answer**  \nIf April = 4 work weeks:  \nWeekly total with bonus = \\( 500 + 300 = 800 \\)  \nFor 4 weeks = \\( 800 \\times 4 = 3200 \\).  \n\n---\n\n\\[\n\\boxed{3200}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774445876-RuBABC1bNAGHjxV0NMDt",
+      "object": "chat.completion",
+      "created": 1774445876,
+      "model": "deepseek/deepseek-v3.2-20251201",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Let’s break this down step by step.  \n\n---\n\n**1. Daily earnings without bonus**  \nWatson works 10 hours/day at $10/hour.  \nDaily pay = \\( 10 \\times 10 = 100 \\) dollars.\n\n---\n\n**2. Weekly earnings without bonus**  \nHe works 5 days/week.  \nWeekly pay = \\( 100 \\times 5 = 500 \\) dollars.\n\n---\n\n**3. Weekly earnings with bonus**  \nThe company performed well all month, so he gets the $300 bonus each week.  \nWeekly total = \\( 500 + 300 = 800 \\) dollars.\n\n---\n\n**4. Number of weeks in April**  \nApril has 30 days.  \nWeeks = \\( 30 \\div 7 \\approx 4.2857 \\) weeks.  \nBut Watson works only 5 days each week, so we should count **working days** in April instead of assuming full calendar weeks.\n\n---\n\n**5. Working days in April**  \nApril 2024 (or any April) has 30 days.  \nIf April starts on Monday:  \nDays of the week repeat every 7 days.  \nLet’s count:  \nIn 30 days, there are 4 full weeks (28 days) + 2 extra days.  \nFull weeks: \\( 4 \\times 5 = 20 \\) working days.  \nExtra 2 days: if they are weekdays, they add 0–2 working days depending on start day.  \n\nBut the problem likely assumes **April has exactly 4 weeks of work** (20 working days) because many such problems ignore partial weeks unless specified. Let’s check:  \nIf April 1 is Monday, then April 1–26 is 4 full weeks (20 work days), April 27–30 are Saturday, Sunday, Monday, Tuesday → that’s 2 extra workdays (Mon, Tue), so total 22 work days.  \nIf April 1 is Tuesday, then April 1–28 is 4 full weeks (20 work days), April 29–30 are Mon, Tue → 2 extra workdays, total 22 again.  \nActually, any April has either 21 or 22 work days (Mon–Fri), but **for 5-day work weeks**, April always contains parts of 5 different weeks of the year, but Watson gets **bonus per week worked**, not per day.  \n\n---\n\n**6. Better approach: Count full weeks in April for bonus**  \nIf the company performed well for the whole month, Watson gets $300 for each week that has at least one of his workdays in April.  \nApril has 30 days = 4 weeks + 2 days → that’s parts of **5 different Monday–Sunday weeks**.  \nBut Watson works only 5 days each of those weeks.  \n\nLet’s simplify:  \nIf April starts on Monday:  \nWeek 1: Apr 1–5 (5 work days)  \nWeek 2: Apr 8–12 (5 work days)  \nWeek 3: Apr 15–19 (5 work days)  \nWeek 4: Apr 22–26 (5 work days)  \nWeek 5: Apr 29–30 (only 2 work days, but still part of a week)  \n\nSo Watson works in 5 different weekly bonus periods.  \nThus, **bonus = \\( 5 \\times 300 = 1500 \\)**.  \n\n---\n\n**7. Total work days in April**  \nFrom above: 20 days (first 4 weeks) + 2 days (last partial week) = 22 work days.  \n\n---\n\n**8. Base pay for April**  \nBase pay = \\( 22 \\times 100 = 2200 \\) dollars.\n\n---\n\n**9. Total pay**  \nTotal = Base pay + Bonus = \\( 2200 + 1500 = 3700 \\) dollars.\n\n---\n\n**10. But** — many simple versions of this problem assume April has exactly 4 weeks (20 work days).  \nIf 20 work days:  \nBase pay = \\( 20 \\times 100 = 2000 \\)  \nBonus = \\( 4 \\times 300 = 1200 \\)  \nTotal = \\( 3200 \\).  \n\nWhich is correct?  \nThe problem says “in April” without stating year, so likely they mean **April has 4 weeks of work** (20 days) for simplicity.  \nGiven typical math problems, they ignore the extra days.  \n\n---\n\n**11. Most plausible answer**  \nIf April = 4 work weeks:  \nWeekly total with bonus = \\( 500 + 300 = 800 \\)  \nFor 4 weeks = \\( 800 \\times 4 = 3200 \\).  \n\n---\n\n\\[\n\\boxed{3200}\n\\]",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 72,
+        "completion_tokens": 1001,
+        "total_tokens": 1073,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.001722,
+          "upstream_inference_prompt_cost": 4.032e-05,
+          "upstream_inference_completions_cost": 0.00168168
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 21.121586799621582
+  },
+  "retry_count": 0
+}

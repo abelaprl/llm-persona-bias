@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00045",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T18:10:20.820249",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 45,
+    "dataset": "gsm8k_test",
+    "question": "Meredith is a freelance blogger who writes about health topics and submits to clients each day as her permanent job. A blog article takes an average of 4 hours to research and write about. Last week, she wrote 5 articles on Monday and  2/5 times more articles on Tuesday than on Monday. On Wednesday, she wrote twice the number of articles she wrote on Tuesday. Calculate the total number of hours she spent writing articles in the three days.",
+    "ground_truth": "If she wrote five articles on Monday, then on Tuesday she wrote 2/5* 5 = 2 more articles.\nThe total number of articles she wrote on Tuesday is 5+2 = <<5+2=7>>7\nOn Wednesday, the number of articles was twice the number she wrote on Tuesday, so it was 2*7 = <<2*7=14>>14 articles.\nOver the three days, she wrote 5+7 +14 = <<5+7+14=26>>26 articles.\nIf each article takes her 4 hours to research and write about, she spent 4*26 = <<4*26=104>>104 hours on all the articles.\n#### 104",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Meredith is a freelance blogger who writes about health topics and submits to clients each day as her permanent job. A blog article takes an average of 4 hours to research and write about. Last week, she wrote 5 articles on Monday and  2/5 times more articles on Tuesday than on Monday. On Wednesday, she wrote twice the number of articles she wrote on Tuesday. Calculate the total number of hours she spent writing articles in the three days.\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Meredith writes each article in **4 hours**.\n\n**Monday**  \n- Articles written = 5  \n\n**Tuesday**  \n- “2/5 times more” than Monday means she wrote \\(1 + \\frac{2}{5}= \\frac{7}{5}\\) times as many as Monday.  \n- Articles written = \\(5 \\times \\frac{7}{5}=7\\)\n\n**Wednesday**  \n- She wrote twice the number she wrote on Tuesday.  \n- Articles written = \\(2 \\times 7 = 14\\)\n\n**Total articles** over the three days  \n\\[\n5 + 7 + 14 = 26 \\text{ articles}\n\\]\n\n**Total hours spent**  \n\\[\n26 \\text{ articles} \\times 4 \\text{ hours/article} = 104 \\text{ hours}\n\\]\n\n\\[\n\\boxed{104\\text{ hours",
+    "raw_api_response": {
+      "id": "gen-1774437020-OO76nLDxlCkLpzsmT6KC",
+      "object": "chat.completion",
+      "created": 1774437020,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Meredith writes each article in **4 hours**.\n\n**Monday**  \n- Articles written = 5  \n\n**Tuesday**  \n- “2/5 times more” than Monday means she wrote \\(1 + \\frac{2}{5}= \\frac{7}{5}\\) times as many as Monday.  \n- Articles written = \\(5 \\times \\frac{7}{5}=7\\)\n\n**Wednesday**  \n- She wrote twice the number she wrote on Tuesday.  \n- Articles written = \\(2 \\times 7 = 14\\)\n\n**Total articles** over the three days  \n\\[\n5 + 7 + 14 = 26 \\text{ articles}\n\\]\n\n**Total hours spent**  \n\\[\n26 \\text{ articles} \\times 4 \\text{ hours/article} = 104 \\text{ hours}\n\\]\n\n\\[\n\\boxed{104\\text{ hours",
+            "refusal": null,
+            "reasoning": "We need to parse the problem.\n\nMeredith writes articles. Average 4 hours per article.\n\nLast week, she wrote 5 articles on Monday.\n\nShe wrote \"2/5 times more articles on Tuesday than on Monday.\" This phrase is ambiguous. Usually \"2/5 times more\" means she wrote (1 + 2/5) = 7/5 times as many? Or \"2/5 times more\" could be interpreted as 2/5 as many (i.e., 0.4 times). But phrase \"times more\" often means \"times as many\". For example, \"twice as many\" = 2 times as many. \"2/5 times more\" would be 0.4 times as many? Actually \"2/5 times more\" is weird. Could be \"2/5 more\" meaning 0.4 more than Monday, i.e., Monday + 0.4*Monday = 1.4*Monday = 7/5 Monday. But they said \"2/5 times more articles on Tuesday than on Monday.\" I'd interpret as Tuesday = Monday + (2/5)*Monday = (1 + 2/5) Monday = 7/5 Monday. So Tuesday articles = 5 * 7/5 = 7 articles.\n\nThen Wednesday she wrote twice the number of articles she wrote on Tuesday. So Wednesday = 2 * Tuesday = 14 articles.\n\nNow total articles over three days = Monday 5 + Tuesday 7 + Wednesday 14 = 26 articles.\n\nEach article takes 4 hours. So total hours = 26 * 4 = 104 hours.\n\nThus answer: 104 hours.\n\nCheck if any other interpretation: If \"2/5 times more\" meant 2/5 times as many (i.e., 0.4 times Monday) then Tuesday = 5 * 0.4 = 2 articles. Then Wednesday = 2*2 = 4. Total = 5+2+4=11 articles => 44 hours. But likely they intend 7/5 factor.\n\nThus answer: 104 hours.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem.\n\nMeredith writes articles. Average 4 hours per article.\n\nLast week, she wrote 5 articles on Monday.\n\nShe wrote \"2/5 times more articles on Tuesday than on Monday.\" This phrase is ambiguous. Usually \"2/5 times more\" means she wrote (1 + 2/5) = 7/5 times as many? Or \"2/5 times more\" could be interpreted as 2/5 as many (i.e., 0.4 times). But phrase \"times more\" often means \"times as many\". For example, \"twice as many\" = 2 times as many. \"2/5 times more\" would be 0.4 times as many? Actually \"2/5 times more\" is weird. Could be \"2/5 more\" meaning 0.4 more than Monday, i.e., Monday + 0.4*Monday = 1.4*Monday = 7/5 Monday. But they said \"2/5 times more articles on Tuesday than on Monday.\" I'd interpret as Tuesday = Monday + (2/5)*Monday = (1 + 2/5) Monday = 7/5 Monday. So Tuesday articles = 5 * 7/5 = 7 articles.\n\nThen Wednesday she wrote twice the number of articles she wrote on Tuesday. So Wednesday = 2 * Tuesday = 14 articles.\n\nNow total articles over three days = Monday 5 + Tuesday 7 + Wednesday 14 = 26 articles.\n\nEach article takes 4 hours. So total hours = 26 * 4 = 104 hours.\n\nThus answer: 104 hours.\n\nCheck if any other interpretation: If \"2/5 times more\" meant 2/5 times as many (i.e., 0.4 times Monday) then Tuesday = 5 * 0.4 = 2 articles. Then Wednesday = 2*2 = 4. Total = 5+2+4=11 articles => 44 hours. But likely they intend 7/5 factor.\n\nThus answer: 104 hours.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 163,
+        "completion_tokens": 635,
+        "total_tokens": 798,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00024327,
+          "upstream_inference_prompt_cost": 1.467e-05,
+          "upstream_inference_completions_cost": 0.0002286
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 366,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 5.433966398239136
+  },
+  "retry_count": 0
+}

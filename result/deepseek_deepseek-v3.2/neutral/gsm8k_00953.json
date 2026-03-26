@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "run_id": "deepseek_deepseek-v3.2_neutral_gsm8k_00953",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:47:08.565246",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "deepseek/deepseek-v3.2",
+      "model_name": "DeepSeek V3.2",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 953,
+    "dataset": "gsm8k_test",
+    "question": "Kim sleepwalks, to monitor her sleeping hours, she installs a camera in her room. Kim usually goes to sleep at 10 p.m. and wakes up at 6 a.m. She is a sleepwalker. One day, after reviewing the cameras, she finds that she woke up that day and was sleepwalking from 2:15 to 2:38 am.  Also, that day she woke up 5 minutes earlier than usual to go to the bathroom. How many minutes did she sleep on her bed that day?",
+    "ground_truth": "Out of 24 hours in a day, 10 pm represents 22 hours.\nUntil 12 p.m. or 24 hours, Kim slept 24 - 22 = <<24-22=2>>2 hours.\nIn total, Kim usually sleeps 2 + 6 = <<2+6=8>>8 hours a day.\nIn minutes, Kim usually sleeps 8 * 60 = <<8*60=480>>480 minutes\nKim was sleepwalking for a total of 38 - 15 = <<38-15=23>>23 minutes.\nWithin her usual sleep routine, Kim was sleepwalking or awake a total of 23 + 5 =<<23+5=28>>28 minutes.\nOn that day, Kim slept in her bed for 480 - 28 = <<480-28=452>>452 minutes.\n#### 452",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Kim sleepwalks, to monitor her sleeping hours, she installs a camera in her room. Kim usually goes to sleep at 10 p.m. and wakes up at 6 a.m. She is a sleepwalker. One day, after reviewing the cameras, she finds that she woke up that day and was sleepwalking from 2:15 to 2:38 am.  Also, that day she woke up 5 minutes earlier than usual to go to the bathroom. How many minutes did she sleep on her bed that day?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "deepseek/deepseek-v3.2"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Let’s break this down step by step.  \n\n---\n\n**1. Understand the usual sleep schedule**  \nKim usually sleeps from **10:00 p.m.** to **6:00 a.m.**  \nThat’s \\( 8 \\) hours = \\( 8 \\times 60 = 480 \\) minutes of sleep in bed normally.\n\n---\n\n**2. Events on the particular day**  \n\n- **Usual bedtime:** 10:00 p.m.  \n- **Sleepwalking episode:** 2:15 a.m. to 2:38 a.m.  \n  Duration of sleepwalking = \\( 23 \\) minutes.  \n  During sleepwalking, she is **not** in bed, so these minutes are **not** counted as “sleeping in bed.”\n\n- **Woke up earlier than usual:** Normally wakes at 6:00 a.m., but woke up **5 minutes earlier** to go to the bathroom.  \n  That means she woke up at **5:55 a.m.** for the bathroom.  \n  After that, does she go back to bed? The problem says “How many minutes did she sleep on her bed that day?” — so we need to know if she returned to bed after the bathroom trip.\n\n---\n\n**3. Interpreting the bathroom wake-up**  \nIf she woke at 5:55 a.m. to go to the bathroom and then got back into bed until 6:00 a.m., she’d be in bed for those extra 5 minutes but possibly awake. But “sleep on her bed” means time spent sleeping in bed, not just lying awake.  \n\nHowever, the problem likely assumes:  \n- She woke at 5:55 a.m. and **stayed awake** after that (didn’t return to bed).  \n- So her final wake-up time for the day is **5:55 a.m.**, not 6:00 a.m.\n\n---\n\n**4. Adjusting total time in bed asleep**  \n\nFrom 10:00 p.m. to 5:55 a.m. = \\( 7 \\) hours \\( 55 \\) minutes = \\( 475 \\) minutes in bed **if no interruptions**.  \n\nBut she was sleepwalking from 2:15 to 2:38 a.m. (23 minutes not in bed).  \nSo total time in bed = \\( 475 - 23 = 452 \\) minutes.\n\n---\n\n**5. Is she asleep during those 452 minutes in bed?**  \nYes — except possibly the 5 minutes from 5:55 to 6:00 a.m. are not there (she woke at 5:55 and didn’t sleep after).  \n\nBut wait — careful:  \n\nWe already subtracted the 23 minutes of sleepwalking from total possible bed time.  \nThe 452 minutes is **time physically in bed**. But during that time, was she asleep the whole time?  \n\nSleepwalking episode: She got out of bed at 2:15 a.m. and returned at 2:38 a.m.  \nSo from 2:15 to 2:38 she was not in bed.  \n\nTherefore, total time in bed = \\( 475 - 23 = 452 \\) minutes.  \n\nBut the question asks: “How many minutes did she **sleep** on her bed that day?”  \nSleeping in bed means time in bed AND asleep.  \n\nDuring the 452 minutes in bed, she was asleep except possibly:  \n- At 5:55 a.m., she woke up and got out of bed — so she was asleep until 5:55 a.m.  \n- So all 452 minutes in bed were asleep? No — because she woke at 5:55 a.m. and got up. That means from 5:55 a.m. onward she was not in bed. So the last 5 minutes of the night (5:55–6:00) are not in bed at all.  \n\nThus, the 452 minutes already account for waking at 5:55 a.m. (since we ended at 5:55 a.m., not 6:00 a.m.).  \n\nSo 452 minutes is the total time she was sleeping in bed.\n\n---\n\n**6. Check logic**  \n\nFrom 10:00 p.m. to 5:55 a.m. = 475 minutes.  \nSubtract 23 minutes (2:15–2:38 a.m. not in bed) → 452 minutes in bed.  \nDuring those 452 minutes in bed, she was asleep (sleepwalking time was out of bed, bathroom wake-up was final wake-up, so no awake time in bed).  \n\nThus, **452 minutes** is the answer.\n\n---\n\n\\[\n\\boxed{452}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774460830-8K5U1PDiR21YsBDi36u7",
+      "object": "chat.completion",
+      "created": 1774460830,
+      "model": "deepseek/deepseek-v3.2-20251201",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Let’s break this down step by step.  \n\n---\n\n**1. Understand the usual sleep schedule**  \nKim usually sleeps from **10:00 p.m.** to **6:00 a.m.**  \nThat’s \\( 8 \\) hours = \\( 8 \\times 60 = 480 \\) minutes of sleep in bed normally.\n\n---\n\n**2. Events on the particular day**  \n\n- **Usual bedtime:** 10:00 p.m.  \n- **Sleepwalking episode:** 2:15 a.m. to 2:38 a.m.  \n  Duration of sleepwalking = \\( 23 \\) minutes.  \n  During sleepwalking, she is **not** in bed, so these minutes are **not** counted as “sleeping in bed.”\n\n- **Woke up earlier than usual:** Normally wakes at 6:00 a.m., but woke up **5 minutes earlier** to go to the bathroom.  \n  That means she woke up at **5:55 a.m.** for the bathroom.  \n  After that, does she go back to bed? The problem says “How many minutes did she sleep on her bed that day?” — so we need to know if she returned to bed after the bathroom trip.\n\n---\n\n**3. Interpreting the bathroom wake-up**  \nIf she woke at 5:55 a.m. to go to the bathroom and then got back into bed until 6:00 a.m., she’d be in bed for those extra 5 minutes but possibly awake. But “sleep on her bed” means time spent sleeping in bed, not just lying awake.  \n\nHowever, the problem likely assumes:  \n- She woke at 5:55 a.m. and **stayed awake** after that (didn’t return to bed).  \n- So her final wake-up time for the day is **5:55 a.m.**, not 6:00 a.m.\n\n---\n\n**4. Adjusting total time in bed asleep**  \n\nFrom 10:00 p.m. to 5:55 a.m. = \\( 7 \\) hours \\( 55 \\) minutes = \\( 475 \\) minutes in bed **if no interruptions**.  \n\nBut she was sleepwalking from 2:15 to 2:38 a.m. (23 minutes not in bed).  \nSo total time in bed = \\( 475 - 23 = 452 \\) minutes.\n\n---\n\n**5. Is she asleep during those 452 minutes in bed?**  \nYes — except possibly the 5 minutes from 5:55 to 6:00 a.m. are not there (she woke at 5:55 and didn’t sleep after).  \n\nBut wait — careful:  \n\nWe already subtracted the 23 minutes of sleepwalking from total possible bed time.  \nThe 452 minutes is **time physically in bed**. But during that time, was she asleep the whole time?  \n\nSleepwalking episode: She got out of bed at 2:15 a.m. and returned at 2:38 a.m.  \nSo from 2:15 to 2:38 she was not in bed.  \n\nTherefore, total time in bed = \\( 475 - 23 = 452 \\) minutes.  \n\nBut the question asks: “How many minutes did she **sleep** on her bed that day?”  \nSleeping in bed means time in bed AND asleep.  \n\nDuring the 452 minutes in bed, she was asleep except possibly:  \n- At 5:55 a.m., she woke up and got out of bed — so she was asleep until 5:55 a.m.  \n- So all 452 minutes in bed were asleep? No — because she woke at 5:55 a.m. and got up. That means from 5:55 a.m. onward she was not in bed. So the last 5 minutes of the night (5:55–6:00) are not in bed at all.  \n\nThus, the 452 minutes already account for waking at 5:55 a.m. (since we ended at 5:55 a.m., not 6:00 a.m.).  \n\nSo 452 minutes is the total time she was sleeping in bed.\n\n---\n\n**6. Check logic**  \n\nFrom 10:00 p.m. to 5:55 a.m. = 475 minutes.  \nSubtract 23 minutes (2:15–2:38 a.m. not in bed) → 452 minutes in bed.  \nDuring those 452 minutes in bed, she was asleep (sleepwalking time was out of bed, bathroom wake-up was final wake-up, so no awake time in bed).  \n\nThus, **452 minutes** is the answer.\n\n---\n\n\\[\n\\boxed{452}\n\\]",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 128,
+        "completion_tokens": 988,
+        "total_tokens": 1116,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00173152,
+          "upstream_inference_prompt_cost": 7.168e-05,
+          "upstream_inference_completions_cost": 0.00165984
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 23.313080072402954
+  },
+  "retry_count": 0
+}
