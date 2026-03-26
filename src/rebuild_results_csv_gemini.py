@@ -226,7 +226,8 @@ def parse_args():
 
 PERSONA_LIST = [
     'man_explicit_1', 'man_implicit_1', 'man_implicit_2', 'man_implicit_3',
-    'woman_explicit_1', 'woman_implicit_1', 'woman_implicit_2', 'woman_implicit_3'
+    'woman_explicit_1', 'woman_implicit_1', 'woman_implicit_2', 'woman_implicit_3',
+    'neutral'
 ]
 
 FINAL_MARKERS = [
@@ -1218,15 +1219,28 @@ def is_truly_truncated(text, finish_reason, completion_tokens, max_tokens):
 def main():
     args = parse_args()
     os.makedirs(args.report_dir, exist_ok=True)
+
+    # --- Extract model name from input_root path ---
+    model_name = os.path.basename(args.input_root)
+    if not model_name: # handle trailing slash
+        model_name = os.path.basename(os.path.dirname(args.input_root))
+
     persona_dirs = [p for p in os.listdir(args.input_root) if p in PERSONA_LIST]
     all_rows = []
     error_counter = Counter()
     persona_counter = Counter()
+
+    correct_answers = 0
+    total_files = 0
+
     for persona in persona_dirs:
         folder = os.path.join(args.input_root, persona)
         files = [f for f in os.listdir(folder) if f.startswith('gsm8k_') and f.endswith('.json')]
         if len(files) != 1319:
             print(f"WARNING: Persona {persona} has {len(files)} JSON files (expected 1319)")
+        
+        total_files += len(files)
+
         for fname in sorted(files):
             fpath = os.path.join(folder, fname)
             try:
@@ -1280,6 +1294,8 @@ def main():
                 tail_preview = content.strip()[-80:].replace('\n', ' ')
                 print(f"DEBUG None extraction: {persona}/{fname} | tail: {tail_preview!r}", file=sys.stderr)
             is_correct = (extracted == gt_num) if (extracted is not None and gt_num is not None) else False
+            if is_correct:
+                correct_answers += 1
             has_boxed = bool(re.search(r'\\boxed\{[^}]+\}', content))
             has_hashes = bool(re.search(r'####\s*-?[$]?[\d,]+', content))
             boxed_match = has_boxed and (extracted == gt_num) and extraction_reason == 'boxed'
@@ -1315,15 +1331,25 @@ def main():
             row = [persona, os.path.relpath(fpath, args.input_root), qid, dataset, gt, gt_num, content, extracted, is_correct, has_boxed, has_hashes, boxed_match, hashes_match, extraction_issue, error_category, extraction_reason, finish_reason, prompt_tokens, completion_tokens, reasoning_tokens, total_tokens, truncated_by_metadata, truncated_by_content, has_final, text_tail]
             all_rows.append(row)
     # Write results.csv
-    out_csv = os.path.join(args.report_dir, 'results.csv')
+    out_csv = os.path.join(args.report_dir, f'result_{model_name}.csv')
     with open(out_csv, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f, quoting=csv.QUOTE_ALL, escapechar='\\', doublequote=True)
         writer.writerow(["persona_folder","file","question_id","dataset","ground_truth","ground_truth_answer","response_content_full","extracted_answer","is_correct","has_boxed","has_hashes","boxed_match","hashes_match","extraction_issue","error_category","extraction_reason","finish_reason","prompt_tokens","completion_tokens","reasoning_tokens","total_tokens","truncated_by_metadata","truncated_by_content","has_final_marker","text_tail"])
         for row in all_rows:
             writer.writerow(row)
     print(f"Wrote {len(all_rows)} rows to {out_csv}")
+    
+    # --- Accuracy Calculation ---
+    accuracy = (correct_answers / total_files) * 100 if total_files > 0 else 0
+    print("\n--- Accuracy Summary ---")
+    print(f"Model: {model_name}")
+    print(f"Total Files Processed: {total_files}")
+    print(f"Correct Answers: {correct_answers}")
+    print(f"Accuracy: {accuracy:.2f}%")
+    print("------------------------\n")
+
     print("Error category breakdown:")
-    for persona in PERSONA_LIST:
+    for persona in sorted(persona_dirs):
         print(f"{persona:20s}", end=' ')
         for cat in ['ok','truncated_output','no_number_found','picked_intermediate_step_bug','other_extraction_error']:
             print(f"{cat}: {error_counter.get((persona,cat),0):4d}", end=' | ')

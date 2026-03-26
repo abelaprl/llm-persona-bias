@@ -3,12 +3,13 @@ import sys
 import os
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\google_gemma-2-9b-it_fixrun_v1\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\google_gemma-2-9b-it_fixrun_v1'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\google_gemini-2.5-flash\result_google_gemini-2.5-flash.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\google_gemini-2.5-flash'
 
 PERSONA_ORDER = [
     'man_explicit_1','man_implicit_1','man_implicit_2','man_implicit_3',
-    'woman_explicit_1','woman_implicit_1','woman_implicit_2','woman_implicit_3'
+    'woman_explicit_1','woman_implicit_1','woman_implicit_2','woman_implicit_3',
+    'neutral'
 ]
 
 persona_stats = defaultdict(lambda: {'correct': 0, 'total': 0, 'no_extract': 0, 'truncated': 0})
