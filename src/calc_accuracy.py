@@ -3,8 +3,8 @@ import sys
 import os
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.1-8b-instruct\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.1-8b-instruct'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct\results.csv'
+out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct'
 
 # For Qwen reports, use legacy denominator to reduce truncation/no-extract bias.
 is_qwen_report = 'qwen_' in (csv_path + ' ' + out_dir).lower()
@@ -22,9 +22,6 @@ persona_stats = defaultdict(lambda: {
     'sum_reasoning_tokens': 0, 'sum_total_tokens': 0
 })
 overall = defaultdict(lambda: 0)
-
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.1-8b-instruct\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.1-8b-instruct'
 # Helper to safely convert token values to int
 def to_int(val):
     if val is None or val == '':

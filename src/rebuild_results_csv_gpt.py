@@ -656,6 +656,16 @@ def extract_final_answer(text):
                 num_groups.append((g, gc, nums))
         if not num_groups:
             return None, None
+        # Skip likely intermediate lines: many bold numbers but no final-answer cue.
+        # This prevents picking setup values such as unit prices/counts.
+        final_cue = re.search(
+            r'\b(answer|final|therefore|thus|hence|so|total|altogether|in\s+total|remaining|left|profit|will\s+be)\b',
+            line,
+            re.I,
+        )
+        total_nums = sum(len(nums) for _, _, nums in num_groups)
+        if not final_cue and total_nums >= 2 and '=' not in line:
+            return None, None
         # FIX: check for inline LaTeX math result on the line — prefer that over bold text label (e.g. "Total = \(40+20+100=160\) min, i.e. **2 hours**")
         m_inline_r4 = re.search(r'\\+\([^)]*=\s*(' + NUMBER_RE + r')[^)]*\\+\)', line)  # FIX: greedy = last =
         if m_inline_r4:
@@ -684,12 +694,29 @@ def extract_final_answer(text):
             # FIX (sum-and inside single bold): "**86 glasses and 42 plates**" → 128
             if re.search(r'\band\b', g0, re.I) and len(nums0) >= 2:
                 return sum(nums0), 'bold_final'
-            # FIX: single bold with "from now/will be" context → take last number (the answer, not the offset)
-            if len(nums0) >= 2 and re.search(r'\b(from now|will be)\b', g0, re.I):
-                return nums0[-1], 'bold_final'
+            # Prefer the number attached to the "will be" phrase when present.
+            if len(nums0) >= 2 and re.search(r'\bwill\s+be\b', gc0, re.I):
+                m_will = re.search(r'\bwill\s+be\D*(' + NUMBER_RE + r')', gc0, re.I)
+                if m_will:
+                    n_will = normalize_number(m_will.group(1))
+                    if n_will is not None:
+                        return n_will, 'bold_final'
+            # For "X from now" phrasing, prefer the number nearest "from now".
+            if len(nums0) >= 2 and re.search(r'\bfrom\s+now\b', gc0, re.I):
+                m_from = re.search(r'(' + NUMBER_RE + r')\D{0,24}\bfrom\s+now\b', gc0, re.I)
+                if m_from:
+                    n_from = normalize_number(m_from.group(1))
+                    if n_from is not None:
+                        return n_from, 'bold_final'
             # FIX: single bold ending with currency amount → last number is the cost answer
             if len(nums0) >= 2 and re.search(r'[\$\u20ac\xa3]\s*' + NUMBER_RE + r'\s*[.,]?\s*$', gc0):
                 return nums0[-1], 'bold_final'
+            # Conservative default for multi-number bold text: keep first number unless
+            # explicit final/total wording suggests the last is the result.
+            if len(nums0) >= 2:
+                if re.search(r'\b(total|final|answer|altogether|in\s+total|remaining|left)\b', gc0, re.I):
+                    return nums0[-1], 'bold_final'
+                return nums0[0], 'bold_final'
             return nums0[0], 'bold_final'
         # Multiple bold groups with numbers
         # FIX: unit-conversion patterns (which is / that is / i.e. / **N**=**M** / or) →
@@ -784,6 +811,27 @@ def extract_final_answer(text):
                 if nums_aeq:
                     return nums_aeq[-1], 'currency_final'
             else:
+                nums_line = [normalize_number(t) for t in re.findall(NUMBER_RE, line)]
+                nums_line = [n for n in nums_line if n is not None]
+                # Heuristic: if this is a count/quantity target line, prefer the last
+                # numeric value on the line (often the computed count) rather than
+                # the last currency amount.
+                count_hint = re.search(
+                    r'\b(number\s+of|how\s+many|can\s+afford|required|needed|days?|weeks?|months?|years?|boxes?|trips?|jobs?|times?)\b',
+                    line,
+                    re.I,
+                )
+                money_target_hint = re.search(
+                    r'\b(profit|revenue|cost|price|commission|amount|income|salary)\b',
+                    line,
+                    re.I,
+                )
+                if count_hint and not money_target_hint and nums_line:
+                    return nums_line[-1], 'currency_final'
+                # If a line mixes currency with arithmetic or division, prefer the last
+                # plain numeric result (often a count) over the currency figure.
+                if nums_line and re.search(r'[\/=]', line):
+                    return nums_line[-1], 'currency_final'
                 # FIX (Rule 4c last-currency no-eq): take LAST currency amount, not first (e.g. "bill is $100, leaves with $25" → 25)
                 all_curs = [normalize_number(t) for t in re.findall(r'(?<=[\$€£])\s*(' + NUMBER_RE + r')', line)]
                 all_curs = [n for n in all_curs if n is not None]
