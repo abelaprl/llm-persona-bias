@@ -260,19 +260,49 @@ def extract_final_answer(text):
                 num = normalize_number(nums[-1].group(1))
                 if num is not None:
                     return num, 'final_marker'
-    # 4. Bold or currency in last lines
+    # 4. Equation/sentence tail lines in last lines (including truncated text)
     for line in reversed(lines):
+        l = line.strip()
+        if not l:
+            continue
+        nums = list(re.finditer(r'(-?[$]?[\d,]+(?:\.\d+)?)', l))
+        if not nums:
+            continue
+        has_answer_hint = bool(re.search(r'(answer|therefore|thus|hence|will be|is|so)', l, re.I))
+        has_math_hint = ('=' in l) or ('\\frac' in l)
+        if has_answer_hint or has_math_hint:
+            num = normalize_number(nums[-1].group(1))
+            if num is not None:
+                return num, 'tail_equation'
+    # 5. Bold/boxed (also allow truncated opening) and guarded currency in last lines
+    for line in reversed(lines):
+        # Complete bold number
         m = re.search(r'\*\*\s*(-?[$]?[\d,]+(?:\.\d+)?)\s*\*\*', line)
         if m:
             num = normalize_number(m.group(1))
             if num is not None:
                 return num, 'bold_final'
+        # Truncated bold answer like "**... 26" without closing **
+        m = re.search(r'\*\*[^*\n]*?(-?[$]?[\d,]+(?:\.\d+)?)\s*$', line)
+        if m:
+            num = normalize_number(m.group(1))
+            if num is not None:
+                return num, 'bold_truncated'
+        # Truncated boxed like "\\boxed{10" near end
+        m = re.search(r'\\boxed\{\s*(-?[$]?[\d,]+(?:\.\d+)?)\s*$', line)
+        if m:
+            num = normalize_number(m.group(1))
+            if num is not None:
+                return num, 'boxed_truncated'
+        # Currency fallback only when line looks answer-like
+        if not re.search(r'(answer|therefore|thus|hence|total|pay|cost|will be|is|=)', line, re.I):
+            continue
         m = re.search(r'[$]([\d,]+(?:\.\d+)?)', line)
         if m:
             num = normalize_number(m.group(1))
             if num is not None:
                 return num, 'currency_final'
-    # 5. Fallback: last number in output, skip percent/ratio/enumeration/if/note
+    # 6. Fallback: last number in output, skip percent/ratio/enumeration/if/note
     all_lines = text.splitlines()
     for idx in range(len(all_lines)-1, -1, -1):
         line = all_lines[idx].strip()

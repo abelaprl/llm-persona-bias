@@ -1,10 +1,22 @@
 import csv
 import sys
 import os
+import argparse
 from collections import defaultdict
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct\results.csv'
-out_dir  = r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct'
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '--csv_path',
+    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct\results.csv'
+)
+parser.add_argument(
+    '--out_dir',
+    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct'
+)
+args = parser.parse_args()
+
+csv_path = args.csv_path
+out_dir = args.out_dir
 
 # For Qwen reports, use legacy denominator to reduce truncation/no-extract bias.
 is_qwen_report = 'qwen_' in (csv_path + ' ' + out_dir).lower()
