@@ -17,6 +17,26 @@ from datetime import datetime
 from collections import defaultdict
 import argparse
 
+
+def sanitize_user_content(text):
+    """Remove disallowed phrase from any user message content in SQuAD runs."""
+    if not text:
+        return text
+    cleaned = text.replace("Solve the following question:", "")
+    cleaned = cleaned.replace("solve the following question:", "")
+    return cleaned.strip()
+
+
+def load_samples_file(filepath):
+    """Load pre-selected 20 samples from JSON file (no resampling)."""
+    with open(filepath, 'r', encoding='utf-8') as f:
+        samples = json.load(f)
+
+    if not isinstance(samples, list):
+        raise ValueError(f"Input sample file must be a list: {filepath}")
+
+    return samples
+
 # ============================================================================
 # HELPER FUNCTIONS - SQuAD Metrics
 # ============================================================================
@@ -380,10 +400,10 @@ def build_messages_implicit(persona_config, question, context):
     if not warmup:
         return None
     
-    warmup_q = warmup.get('input', {}).get('prompt', '')
+    warmup_q = sanitize_user_content(warmup.get('input', {}).get('prompt', ''))
     warmup_a = warmup.get('response', {}).get('content', '')
     
-    system_msg = "You are a helpful AI assistant. Answer the question using ONLY the given context. Keep the answer concise."
+    system_msg = "You are a helpful AI assistant."
     
     messages = [
         {"role": "system", "content": system_msg},
@@ -391,7 +411,9 @@ def build_messages_implicit(persona_config, question, context):
         {"role": "assistant", "content": warmup_a},
         {
             "role": "user",
-            "content": f"Context: {context}\n\nQuestion: {question}\n\nAnswer:"
+            "content": sanitize_user_content(
+                f"Answer questions using ONLY the given context. Keep the answer concise.\n\nContext: {context}\n\nQuestion: {question}\n\nAnswer:"
+            )
         }
     ]
     
@@ -399,32 +421,39 @@ def build_messages_implicit(persona_config, question, context):
 
 def build_messages_explicit(persona_config, question, context):
     """Build messages untuk explicit persona (dengan persona prompt)"""
-    persona_prompt = persona_config['explicit_prompt']
+    persona_prompt = sanitize_user_content(persona_config['explicit_prompt'])
     
     if not persona_prompt:
         return None
     
-    system_msg = f"{persona_prompt}\n\nAnswer questions using ONLY the given context. Keep the answer concise."
+    system_msg = "You are a helpful AI assistant."
+
+    combined_user = sanitize_user_content(
+        f"{persona_prompt}\n\n"
+        f"Answer questions using ONLY the given context. Keep the answer concise.\n\n"
+        f"Context: {context}\n\n"
+        f"Question: {question}\n\n"
+        f"Answer:"
+    )
     
     messages = [
         {"role": "system", "content": system_msg},
-        {
-            "role": "user",
-            "content": f"Context: {context}\n\nQuestion: {question}\n\nAnswer:"
-        }
+        {"role": "user", "content": combined_user}
     ]
     
     return messages
 
 def build_messages_neutral(question, context):
     """Build messages untuk neutral persona (direct QA)"""
-    system_msg = "You are a helpful AI assistant. Answer the question using ONLY the given context. Keep the answer concise."
+    system_msg = "You are a helpful AI assistant."
     
     messages = [
         {"role": "system", "content": system_msg},
         {
             "role": "user",
-            "content": f"Context: {context}\n\nQuestion: {question}\n\nAnswer:"
+            "content": sanitize_user_content(
+                f"Answer questions using ONLY the given context. Keep the answer concise.\n\nContext: {context}\n\nQuestion: {question}\n\nAnswer:"
+            )
         }
     ]
     
@@ -564,7 +593,7 @@ def create_result_json(model_config, persona_name, persona_type, sample, message
         choice = api_resp.get('choices', [{}])[0]
         message = choice.get('message', {})
         
-        prediction = message.get('content', '').strip()
+        prediction = (message.get('content') or '').strip()
         em = exact_match_score(prediction, sample['answer'])
         f1 = f1_score(prediction, sample['answer'])
         
@@ -620,6 +649,12 @@ def save_result_json(result_json, persona_name, sample_id):
         print(f"    [ERR] Failed to save JSON: {e}")
         return None
 
+
+def result_exists(persona_name, sample_id):
+    """Check if result JSON already exists (resume support)."""
+    filepath = Path(f"result/SQuAD/allenai_olmo-3-32b-think/{persona_name}/squad_{sample_id}.json")
+    return filepath.exists()
+
 # ============================================================================
 # MAIN PIPELINE
 # ============================================================================
@@ -636,21 +671,23 @@ def load_model_config(order):
 def main():
     parser = argparse.ArgumentParser(description='SQuAD 20-Sample Pipeline dengan 9 Persona')
     parser.add_argument('--dry-run', action='store_true', help='Hanya buat sampling tanpa API call')
+    parser.add_argument('--samples_file', type=str, default='data/squad_20_cleaned.json', help='Path ke file 20 sampel siap pakai')
+    parser.add_argument('--limit_samples', type=int, default=0, help='Limit jumlah sample dari awal file (0 = semua)')
     args = parser.parse_args()
     
     print("="*80)
     print("SQuAD 20-SAMPLE EVALUATION PIPELINE")
     print("="*80)
     
-    # STEP 1: Load SQuAD
-    squad_data = load_and_flatten_squad('data/SQuAD_validation.json')
-    
-    # STEP 2: Smart Sampling
-    filtered = prefilter_samples(squad_data)
-    samples_20 = smart_sample_20(filtered)
+    # STEP 1: Load fixed 20 samples (no resampling)
+    print("[STEP 1] Loading fixed sample file...")
+    samples_20 = load_samples_file(args.samples_file)
     samples_20 = sorted(samples_20, key=lambda x: x['id'])  # Sort by ID
+    if args.limit_samples and args.limit_samples > 0:
+        samples_20 = samples_20[:args.limit_samples]
+    print(f"  Loaded samples: {len(samples_20)}")
     
-    print("\n[STEP 2] Selected 20 samples:")
+    print("\n[STEP 2] Using provided samples:")
     for i, s in enumerate(samples_20, 1):
         cat = get_answer_category(s)
         print(f"  {i:2d}. [{cat:6s}] {s['id']:20s} Q: {s['question'][:40]}")
@@ -694,6 +731,10 @@ def main():
             progress = f"{task_count}/{len(samples_20) * len(personas)}"
             
             print(f"  [{progress}] {sample['id']:20s} ...", end=' ', flush=True)
+
+            if result_exists(persona_name, sample['id']):
+                print("[SKIP] exists")
+                continue
             
             # Build messages
             if persona_type == 'implicit':
