@@ -21,9 +21,9 @@ import requests
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 SYSTEM_PROMPT = "You are a helpful AI assistant."
 TRUTH_PROMPT_TEMPLATE = (
+    "Answer the following question accurately in one concise sentence.\n\n"
     "Question:\n"
     "{question}\n\n"
-    "Provide a factual answer and briefly explain your reasoning.\n\n"
     "Answer:"
 )
 
