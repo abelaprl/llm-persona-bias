@@ -10,6 +10,7 @@ ETHICS test runner: 1 scenario x 9 personas.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import time
@@ -384,6 +385,27 @@ def save_result_json(base_folder: Path, persona_name: str, sample_id: str, resul
     return out_file
 
 
+def csv_row_from_result(result_json: dict, persona_name: str, persona_type: str) -> dict:
+    input_obj = result_json.get("input", {})
+    response_obj = result_json.get("response", {})
+    analysis_obj = result_json.get("analysis", {})
+    return {
+        "id": input_obj.get("sample_id", ""),
+        "persona_name": persona_name,
+        "persona_type": persona_type,
+        "scenario": input_obj.get("scenario", ""),
+        "prediction": response_obj.get("prediction") or "",
+        "ground_truth_label": analysis_obj.get("ground_truth_label", input_obj.get("ground_truth_label", -1)),
+        "predicted_label": analysis_obj.get("predicted_label", -1),
+        "correct": analysis_obj.get("correct", False),
+        "explanation_length": analysis_obj.get("explanation_length", 0),
+        "total_tokens": analysis_obj.get("total_tokens", 0),
+        "reasoning_tokens": analysis_obj.get("reasoning_tokens", 0),
+        "latency_sec": analysis_obj.get("latency_sec", 0.0),
+        "status": "SUCCESS" if response_obj.get("success") else "FAILED",
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="ETHICS runner for persona evaluation")
     parser.add_argument("--samples_file", type=str, default="data/ethics_sample_20.json")
@@ -406,6 +428,7 @@ def main() -> None:
     print(f"Output base: {base}")
 
     task_i = 0
+    csv_rows: list[dict] = []
     for persona_name in PERSONA_NAMES:
         persona_cfg = personas[persona_name]
         ptype = persona_cfg["type"]
@@ -435,16 +458,41 @@ def main() -> None:
                     },
                 )
                 save_result_json(base, persona_name, sample_id, fail_json)
+                csv_rows.append(csv_row_from_result(fail_json, persona_name, ptype))
                 continue
 
             api_result = call_openrouter_api(model_cfg, messages)
             result_json = build_result_json(model_cfg, sample, persona_name, ptype, messages, api_result)
             out_path = save_result_json(base, persona_name, sample_id, result_json)
+            csv_rows.append(csv_row_from_result(result_json, persona_name, ptype))
 
             if api_result["success"]:
                 print(f"[OK] -> {out_path}")
             else:
                 print(f"[FAIL] -> {out_path}")
+
+    csv_path = base / "results.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        fieldnames = [
+            "id",
+            "persona_name",
+            "persona_type",
+            "scenario",
+            "prediction",
+            "ground_truth_label",
+            "predicted_label",
+            "correct",
+            "explanation_length",
+            "total_tokens",
+            "reasoning_tokens",
+            "latency_sec",
+            "status",
+        ]
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(csv_rows)
+
+    print(f"CSV saved: {csv_path}")
 
     print("\nDone.")
 

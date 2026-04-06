@@ -337,8 +337,13 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_type: str, sa
     return result
 
 
-def save_result_json(result_json: dict, persona_name: str, sample_id: str) -> str:
-    folder = Path(f"result/ELI5/allenai_olmo-3-32b-think/{persona_name}")
+def output_base_folder(model_cfg: dict) -> Path:
+    model_slug = model_cfg["model_id"].replace("/", "_")
+    return Path("result") / "ELI5" / model_slug
+
+
+def save_result_json(model_cfg: dict, result_json: dict, persona_name: str, sample_id: str) -> str:
+    folder = output_base_folder(model_cfg) / persona_name
     folder.mkdir(parents=True, exist_ok=True)
     filepath = folder / f"{sample_id}.json"
     with open(filepath, "w", encoding="utf-8") as f:
@@ -346,16 +351,16 @@ def save_result_json(result_json: dict, persona_name: str, sample_id: str) -> st
     return str(filepath)
 
 
-def load_result_json(persona_name: str, sample_id: str) -> dict | None:
-    filepath = Path(f"result/ELI5/allenai_olmo-3-32b-think/{persona_name}/{sample_id}.json")
+def load_result_json(model_cfg: dict, persona_name: str, sample_id: str) -> dict | None:
+    filepath = output_base_folder(model_cfg) / persona_name / f"{sample_id}.json"
     if not filepath.exists():
         return None
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def result_exists(persona_name: str, sample_id: str) -> bool:
-    filepath = Path(f"result/ELI5/allenai_olmo-3-32b-think/{persona_name}/{sample_id}.json")
+def result_exists(model_cfg: dict, persona_name: str, sample_id: str) -> bool:
+    filepath = output_base_folder(model_cfg) / persona_name / f"{sample_id}.json"
     return filepath.exists()
 
 
@@ -423,9 +428,9 @@ def main() -> None:
             sid = s["id"]
             print(f"  [{task_i}/{len(samples) * len(personas)}] {sid} ...", end=" ", flush=True)
 
-            if result_exists(persona_name, sid):
+            if result_exists(model_cfg, persona_name, sid):
                 print("[SKIP] exists")
-                existing = load_result_json(persona_name, sid)
+                existing = load_result_json(model_cfg, persona_name, sid)
                 if existing:
                     rows.append(csv_row_from_result_json(existing, s, persona_name, ptype))
                 continue
@@ -443,7 +448,7 @@ def main() -> None:
 
             api_result = call_openrouter_api(model_cfg, messages)
             result_json = create_result_json(model_cfg, persona_name, ptype, s, messages, api_result)
-            save_result_json(result_json, persona_name, sid)
+            save_result_json(model_cfg, result_json, persona_name, sid)
 
             if api_result["success"]:
                 print("[OK]")
@@ -454,7 +459,7 @@ def main() -> None:
 
             time.sleep(0.5)
 
-    csv_path = Path("result/ELI5/allenai_olmo-3-32b-think/results.csv")
+    csv_path = output_base_folder(model_cfg) / "results.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         fieldnames = [
