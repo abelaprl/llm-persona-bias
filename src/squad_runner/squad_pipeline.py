@@ -633,9 +633,15 @@ def create_result_json(model_config, persona_name, persona_type, sample, message
     
     return result
 
-def save_result_json(result_json, persona_name, sample_id):
+def output_base_folder(model_config):
+    """Output base folder based on model_id."""
+    model_slug = model_config['model_id'].replace('/', '_')
+    return Path("result") / "SQuAD" / model_slug
+
+
+def save_result_json(result_json, model_config, persona_name, sample_id):
     """Save result ke JSON file"""
-    folder = Path(f"result/SQuAD/allenai_olmo-3-32b-think/{persona_name}")
+    folder = output_base_folder(model_config) / persona_name
     folder.mkdir(parents=True, exist_ok=True)
     
     filename = f"squad_{sample_id}.json"
@@ -650,9 +656,9 @@ def save_result_json(result_json, persona_name, sample_id):
         return None
 
 
-def result_exists(persona_name, sample_id):
+def result_exists(model_config, persona_name, sample_id):
     """Check if result JSON already exists (resume support)."""
-    filepath = Path(f"result/SQuAD/allenai_olmo-3-32b-think/{persona_name}/squad_{sample_id}.json")
+    filepath = output_base_folder(model_config) / persona_name / f"squad_{sample_id}.json"
     return filepath.exists()
 
 # ============================================================================
@@ -732,7 +738,7 @@ def main():
             
             print(f"  [{progress}] {sample['id']:20s} ...", end=' ', flush=True)
 
-            if result_exists(persona_name, sample['id']):
+            if result_exists(model_config, persona_name, sample['id']):
                 print("[SKIP] exists")
                 continue
             
@@ -754,7 +760,7 @@ def main():
             
             # Create & save JSON
             result_json = create_result_json(model_config, persona_name, persona_type, sample, messages, api_result)
-            filepath = save_result_json(result_json, persona_name, sample['id'])
+            filepath = save_result_json(result_json, model_config, persona_name, sample['id'])
             
             # Add to CSV aggregation
             if api_result['success']:
@@ -791,7 +797,7 @@ def main():
     # STEP 6: Save CSV
     overall_elapsed = time.time() - overall_start
     
-    csv_path = Path("result/SQuAD/allenai_olmo-3-32b-think/results.csv")
+    csv_path = output_base_folder(model_config) / "results.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     
     try:
