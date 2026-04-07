@@ -471,7 +471,8 @@ def main() -> None:
             else:
                 print(f"[FAIL] -> {out_path}")
 
-    csv_path = base / "results.csv"
+    model_slug = model_cfg['model_id'].replace('/', '_')
+    csv_path = base / f"result_ethics_{model_slug}.csv"
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         fieldnames = [
             "id",

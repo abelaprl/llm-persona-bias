@@ -459,7 +459,8 @@ def main() -> None:
 
             time.sleep(0.5)
 
-    csv_path = output_base_folder(model_cfg) / "results.csv"
+    model_slug = model_cfg['model_id'].replace('/', '_')
+    csv_path = output_base_folder(model_cfg) / f"result_eli5_{model_slug}.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         fieldnames = [

@@ -10,6 +10,7 @@ TruthfulQA test runner: 1 sample x 9 personas.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import time
@@ -362,6 +363,32 @@ def save_result_json(result_json: dict, base_folder: Path, persona_name: str, sa
     return filepath
 
 
+def csv_row_from_result(result_json: dict) -> dict:
+    """Convert result JSON to CSV row"""
+    inp = result_json.get("input", {})
+    analysis = result_json.get("analysis", {})
+    response = result_json.get("response", {})
+    
+    return {
+        "id": inp.get("sample_id", ""),
+        "persona_name": inp.get("persona", {}).get("name", ""),
+        "persona_type": inp.get("persona", {}).get("type", ""),
+        "question": inp.get("question", ""),
+        "prediction": response.get("prediction", "") or "",
+        "ground_truth": inp.get("ground_truth", ""),
+        "category": inp.get("category", ""),
+        "semantic_similarity": analysis.get("semantic_similarity", 0.0),
+        "rouge_l": analysis.get("rouge_l", 0.0),
+        "prediction_length": analysis.get("prediction_length", 0),
+        "ground_truth_length": analysis.get("ground_truth_length", 0),
+        "verbosity_ratio": analysis.get("verbosity_ratio", 0.0),
+        "total_tokens": analysis.get("total_tokens", 0),
+        "reasoning_tokens": analysis.get("reasoning_tokens", 0),
+        "latency_sec": analysis.get("latency_sec", 0.0),
+        "status": "SUCCESS" if response.get("success") else "FAILED",
+    }
+
+
 def output_base_folder(model_cfg: dict) -> Path:
     model_slug = model_cfg["model_id"].replace("/", "_")
     return Path("result") / "TRUTHFULQA" / model_slug
@@ -387,6 +414,7 @@ def main() -> None:
     print(f"Total tasks: {len(samples) * len(PERSONA_NAMES)}")
     print(f"Output base: {base}")
 
+    csv_rows = []
     task_i = 0
     for persona_name in PERSONA_NAMES:
         persona_cfg = personas[persona_name]
@@ -417,17 +445,31 @@ def main() -> None:
                     },
                 )
                 save_result_json(fail_json, base, persona_name, sample_id)
+                csv_rows.append(csv_row_from_result(fail_json))
                 continue
 
             api_result = call_openrouter_api(model_cfg, messages)
             result_json = create_result_json(model_cfg, persona_name, ptype, sample, messages, api_result)
             out_path = save_result_json(result_json, base, persona_name, sample_id)
+            csv_rows.append(csv_row_from_result(result_json))
 
             if api_result["success"]:
                 print(f"[OK] -> {out_path}")
             else:
                 print(f"[FAIL] -> {out_path}")
 
+    # Save CSV
+    model_slug = model_cfg['model_id'].replace('/', '_')
+    csv_path = base / f"result_truthfulqa_{model_slug}.csv"
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+        fieldnames = ['id', 'persona_name', 'persona_type', 'question', 'prediction', 'ground_truth', 'category', 'semantic_similarity', 'rouge_l', 'prediction_length', 'ground_truth_length', 'verbosity_ratio', 'total_tokens', 'reasoning_tokens', 'latency_sec', 'status']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(csv_rows)
+    
+    print(f"\n[CSV] Saved: {csv_path}")
     print("\nDone.")
 
 

@@ -797,7 +797,8 @@ def main():
     # STEP 6: Save CSV
     overall_elapsed = time.time() - overall_start
     
-    csv_path = output_base_folder(model_config) / "results.csv"
+    model_slug = model_config['model_id'].replace('/', '_')
+    csv_path = output_base_folder(model_config) / f"result_squad_{model_slug}.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     
     try:
