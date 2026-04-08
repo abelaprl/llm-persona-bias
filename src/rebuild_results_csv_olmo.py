@@ -388,8 +388,12 @@ def main():
             print(f"WARNING: Persona {persona} has {len(files)} JSON files (expected 1319)")
         for fname in sorted(files):
             fpath = os.path.join(folder, fname)
-            with open(fpath, encoding='utf-8') as jf:
-                data = json.load(jf)
+            try:
+                with open(fpath, encoding='utf-8') as jf:
+                    data = json.load(jf)
+            except Exception as e:
+                print(f"SKIP: {persona}/{fname} (invalid or empty JSON) -- {e}", file=sys.stderr)
+                continue
             inp = data.get('input', {})
             resp = data.get('response', {})
             req = data.get('request', {})
