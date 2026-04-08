@@ -75,6 +75,40 @@ def exact_match_score(prediction, ground_truth):
     """Compute exact match"""
     return float(normalize_answer(prediction) == normalize_answer(ground_truth))
 
+
+def extract_text_from_message(message):
+    """Prefer assistant content; fallback to reasoning text when content is empty."""
+    content = (message.get('content') or '').strip()
+    if content:
+        return content
+
+    reasoning = (message.get('reasoning') or '').strip()
+    if reasoning:
+        # Some providers append final answer after </think>
+        if '</think>' in reasoning:
+            tail = reasoning.split('</think>')[-1].strip()
+            if tail:
+                return tail
+        return reasoning
+
+    details = message.get('reasoning_details') or []
+    if isinstance(details, list):
+        texts = []
+        for item in details:
+            if isinstance(item, dict):
+                txt = (item.get('text') or '').strip()
+                if txt:
+                    texts.append(txt)
+        if texts:
+            merged = "\n".join(texts)
+            if '</think>' in merged:
+                tail = merged.split('</think>')[-1].strip()
+                if tail:
+                    return tail
+            return merged
+
+    return ''
+
 # ============================================================================
 # STEP 1: LOAD & FLATTEN SQuAD
 # ============================================================================
@@ -592,8 +626,16 @@ def create_result_json(model_config, persona_name, persona_type, sample, message
         api_resp = api_result['api_response']
         choice = api_resp.get('choices', [{}])[0]
         message = choice.get('message', {})
-        
-        prediction = (message.get('content') or '').strip()
+        finish_reason = (choice.get('finish_reason') or '').lower()
+        usage = api_resp.get('usage', {}) or {}
+        completion_tokens = usage.get('completion_tokens', 0) or 0
+        max_tokens = result['request']['parameters'].get('max_tokens', 0) or 0
+
+        # Avoid promoting incomplete reasoning text when generation hit token limit.
+        if finish_reason == 'length' or (max_tokens and completion_tokens >= max_tokens):
+            prediction = ''
+        else:
+            prediction = extract_text_from_message(message)
         em = exact_match_score(prediction, sample['answer'])
         f1 = f1_score(prediction, sample['answer'])
         
