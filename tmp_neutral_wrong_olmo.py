@@ -1,0 +1,16 @@
+﻿import pandas as pd
+from pathlib import Path
+p = Path(r"e:/Tugas Akhir/TugasAkhir/result/reports/allenai_olmo-3-32b-think/result_allenai_olmo-3-32b-think.csv")
+df = pd.read_csv(p, keep_default_na=False)
+df['ok'] = df['is_correct'].astype(str).str.lower().eq('true')
+neu = df[df['persona_folder'].eq('neutral')].copy()
+wrong = neu[~neu['ok']].copy()
+print('neutral_total', len(neu), 'neutral_wrong', len(wrong))
+print('reasons')
+print(wrong['extraction_reason'].fillna('').value_counts().head(15).to_string())
+print('error_category')
+print(wrong['error_category'].fillna('').value_counts().head(15).to_string())
+print('finish_reason')
+print(wrong['finish_reason'].fillna('').value_counts().head(10).to_string())
+print('top files')
+print(wrong[['file','ground_truth_answer','extracted_answer','extraction_reason','error_category','finish_reason']].head(20).to_string(index=False))
