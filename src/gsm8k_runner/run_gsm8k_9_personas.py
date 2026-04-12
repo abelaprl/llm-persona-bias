@@ -273,6 +273,14 @@ def load_warmup(model_cfg: dict, persona_name: str) -> dict | None:
         return json.load(f)
 
 
+def is_valid_warmup_data(warmup_data: dict | None) -> bool:
+    if not isinstance(warmup_data, dict):
+        return False
+    warmup_q = (warmup_data.get("input", {}) or {}).get("prompt", "")
+    warmup_a = (warmup_data.get("response", {}) or {}).get("content", "")
+    return bool(str(warmup_q).strip()) and bool(str(warmup_a).strip())
+
+
 def build_messages(persona_name: str, persona_cfg: dict, question: str, warmup_data: dict | None) -> list[dict] | None:
     ptype = persona_cfg["type"]
     prompt = GSM8K_PROMPT_TEMPLATE.format(question=question)
@@ -452,6 +460,13 @@ def main() -> None:
     for persona_name in implicit_personas:
         p_cfg = personas[persona_name]
         warmup_path = ensure_warmup(model_cfg, persona_name, p_cfg, force=args.force_warmup)
+        warmup_data = load_warmup(model_cfg, persona_name)
+        if not is_valid_warmup_data(warmup_data):
+            print(f"  [WARN] {persona_name} warmup invalid, regenerating...")
+            warmup_path = ensure_warmup(model_cfg, persona_name, p_cfg, force=True)
+            warmup_data = load_warmup(model_cfg, persona_name)
+            if not is_valid_warmup_data(warmup_data):
+                raise RuntimeError(f"Warmup generation failed for {persona_name}; stop to avoid cascading FAIL files")
         print(f"  [OK] {persona_name} -> {warmup_path}")
         time.sleep(max(args.sleep_sec, 0.0))
 
@@ -461,6 +476,12 @@ def main() -> None:
     for persona_name in selected_personas:
         p_cfg = personas[persona_name]
         warmup = load_warmup(model_cfg, persona_name) if p_cfg["type"] == "implicit" else None
+        if p_cfg["type"] == "implicit" and not is_valid_warmup_data(warmup):
+            print(f"[WARN] {persona_name} warmup missing/invalid during run, regenerating...")
+            ensure_warmup(model_cfg, persona_name, p_cfg, force=True)
+            warmup = load_warmup(model_cfg, persona_name)
+            if not is_valid_warmup_data(warmup):
+                raise RuntimeError(f"Warmup still invalid for {persona_name}; aborting run")
         print(f"\n[PERSONA] {persona_name} ({p_cfg['type']})")
 
         for sample in samples:
