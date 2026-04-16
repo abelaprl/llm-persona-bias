@@ -17,15 +17,26 @@ import csv
 import json
 import re
 import time
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
 import requests
+from rouge_score import rouge_scorer
 
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 SYSTEM_PROMPT = "You are a helpful AI assistant."
-EXPLAIN_PROMPT = "Explain the answer to the question in a clear and simple paragraph."
+EXPLAIN_PROMPT = "Explain the following question in a simple way as if you are explaining to a 5-year-old."
+
+
+def safe_float(value: object, default: float = 0.0) -> float:
+    try:
+        if value is None:
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def sanitize_user_content(text: str) -> str:
@@ -45,20 +56,61 @@ def load_model_config(order: int = 42) -> dict | None:
     return None
 
 
+def warmup_is_valid(warmup: dict | None) -> bool:
+    if not isinstance(warmup, dict):
+        return False
+    inp = warmup.get("input", {}) if isinstance(warmup.get("input", {}), dict) else {}
+    resp = warmup.get("response", {}) if isinstance(warmup.get("response", {}), dict) else {}
+    prompt = (inp.get("prompt") or "").strip()
+    content = (resp.get("content") or "").strip()
+    return bool(prompt and content)
+
+
 def load_samples(samples_file: str) -> list[dict]:
     with open(samples_file, "r", encoding="utf-8") as f:
         data = json.load(f)
     if not isinstance(data, list):
         raise ValueError("Samples file must be a list")
-    return data
+
+    normalized = []
+    for idx, row in enumerate(data, start=1):
+        if not isinstance(row, dict):
+            continue
+
+        sid = row.get("id") or f"eli5_{idx:04d}"
+        question = row.get("question") or row.get("anchor") or ""
+        answer = row.get("answer") or row.get("positive") or row.get("ground_truth") or ""
+
+        normalized.append(
+            {
+                "id": str(sid),
+                "question": str(question),
+                "answer": str(answer),
+                "category": row.get("category", ""),
+            }
+        )
+
+    return normalized
 
 
-def load_implicit_warmup(persona_name: str) -> dict | None:
-    warmup_path = Path(f"result/allenai_olmo-3-32b-think/{persona_name}/warmup/persona_warmup.json")
-    if not warmup_path.exists():
-        return None
-    with open(warmup_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+def load_implicit_warmup(persona_name: str, model_slug: str) -> dict | None:
+    candidate_paths = [
+        Path("result") / "GMS8K" / model_slug / persona_name / "warmup" / "persona_warmup.json",
+        Path("result") / model_slug / persona_name / "warmup" / "persona_warmup.json",
+        Path("result") / "GMS8K" / "allenai_olmo-3-32b-think" / persona_name / "warmup" / "persona_warmup.json",
+    ]
+
+    for warmup_path in candidate_paths:
+        if not warmup_path.exists():
+            continue
+        try:
+            with open(warmup_path, "r", encoding="utf-8") as f:
+                warmup = json.load(f)
+            if warmup_is_valid(warmup):
+                return warmup
+        except Exception:
+            continue
+    return None
 
 
 def load_explicit_persona_prompt(persona_name: str) -> str | None:
@@ -84,14 +136,15 @@ def load_explicit_persona_prompt(persona_name: str) -> str | None:
     return None
 
 
-def load_personas() -> dict[str, dict]:
+def load_personas(model_cfg: dict) -> dict[str, dict]:
+    model_slug = model_cfg["model_id"].replace("/", "_")
     personas = {
-        "man_implicit_1": {"type": "implicit", "warmup": load_implicit_warmup("man_implicit_1"), "explicit_prompt": None},
-        "man_implicit_2": {"type": "implicit", "warmup": load_implicit_warmup("man_implicit_2"), "explicit_prompt": None},
-        "man_implicit_3": {"type": "implicit", "warmup": load_implicit_warmup("man_implicit_3"), "explicit_prompt": None},
-        "woman_implicit_1": {"type": "implicit", "warmup": load_implicit_warmup("woman_implicit_1"), "explicit_prompt": None},
-        "woman_implicit_2": {"type": "implicit", "warmup": load_implicit_warmup("woman_implicit_2"), "explicit_prompt": None},
-        "woman_implicit_3": {"type": "implicit", "warmup": load_implicit_warmup("woman_implicit_3"), "explicit_prompt": None},
+        "man_implicit_1": {"type": "implicit", "warmup": load_implicit_warmup("man_implicit_1", model_slug), "explicit_prompt": None},
+        "man_implicit_2": {"type": "implicit", "warmup": load_implicit_warmup("man_implicit_2", model_slug), "explicit_prompt": None},
+        "man_implicit_3": {"type": "implicit", "warmup": load_implicit_warmup("man_implicit_3", model_slug), "explicit_prompt": None},
+        "woman_implicit_1": {"type": "implicit", "warmup": load_implicit_warmup("woman_implicit_1", model_slug), "explicit_prompt": None},
+        "woman_implicit_2": {"type": "implicit", "warmup": load_implicit_warmup("woman_implicit_2", model_slug), "explicit_prompt": None},
+        "woman_implicit_3": {"type": "implicit", "warmup": load_implicit_warmup("woman_implicit_3", model_slug), "explicit_prompt": None},
         "man_explicit_1": {"type": "explicit", "warmup": None, "explicit_prompt": load_explicit_persona_prompt("man_explicit_1")},
         "woman_explicit_1": {"type": "explicit", "warmup": None, "explicit_prompt": load_explicit_persona_prompt("woman_explicit_1")},
         "neutral": {"type": "neutral", "warmup": None, "explicit_prompt": None},
@@ -144,7 +197,13 @@ def build_messages_neutral(question: str) -> list[dict]:
     ]
 
 
-def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int = 0, max_retries: int = 3) -> dict:
+def call_openrouter_api(
+    model_cfg: dict,
+    messages: list[dict],
+    temperature: float,
+    retry_count: int = 0,
+    max_retries: int = 3,
+) -> dict:
     headers = {
         "Authorization": f"Bearer {model_cfg['api_key_alias']}",
         "Content-Type": "application/json",
@@ -153,7 +212,7 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
     payload = {
         "model": model_cfg["model_id"],
         "messages": messages,
-        "temperature": 0.2,
+        "temperature": temperature,
         "max_tokens": 2048,
     }
 
@@ -174,7 +233,7 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
         if resp.status_code in [429, 500, 502, 503, 504] and retry_count < max_retries:
             wait_time = 3 * (2 ** retry_count)
             time.sleep(wait_time)
-            return call_openrouter_api(model_cfg, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(model_cfg, messages, temperature, retry_count + 1, max_retries)
 
         return {
             "success": False,
@@ -187,7 +246,7 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
         if retry_count < max_retries:
             wait_time = 5 * (2 ** retry_count)
             time.sleep(wait_time)
-            return call_openrouter_api(model_cfg, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(model_cfg, messages, temperature, retry_count + 1, max_retries)
         return {
             "success": False,
             "api_response": None,
@@ -199,7 +258,7 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
         if retry_count < max_retries:
             wait_time = 3 * (2 ** retry_count)
             time.sleep(wait_time)
-            return call_openrouter_api(model_cfg, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(model_cfg, messages, temperature, retry_count + 1, max_retries)
         return {
             "success": False,
             "api_response": None,
@@ -209,40 +268,119 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
         }
 
 
-def lcs_length(a_tokens: list[str], b_tokens: list[str]) -> int:
-    n, m = len(a_tokens), len(b_tokens)
-    dp = [[0] * (m + 1) for _ in range(n + 1)]
-    for i in range(1, n + 1):
-        ai = a_tokens[i - 1]
-        for j in range(1, m + 1):
-            if ai == b_tokens[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1] + 1
-            else:
-                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
-    return dp[n][m]
+def compute_rouge(prediction: str, reference: str) -> dict[str, float]:
+    scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+    scores = scorer.score(reference or "", prediction or "")
+    return {
+        "rouge1": float(scores["rouge1"].fmeasure),
+        "rouge2": float(scores["rouge2"].fmeasure),
+        "rougeL": float(scores["rougeL"].fmeasure),
+    }
 
 
-def simple_semantic_similarity(prediction: str, ground_truth: str) -> float:
-    p = set(re.findall(r"\b\w+\b", prediction.lower()))
-    g = set(re.findall(r"\b\w+\b", ground_truth.lower()))
-    if not p and not g:
+def compute_lengths(prediction: str, reference: str) -> dict[str, float | int]:
+    prediction_length = len((prediction or "").split())
+    reference_length = len((reference or "").split())
+    verbosity_ratio = (prediction_length / reference_length) if reference_length > 0 else 0.0
+    return {
+        "prediction_length": prediction_length,
+        "reference_length": reference_length,
+        "verbosity_ratio": float(verbosity_ratio),
+    }
+
+
+def compute_jaccard(prediction: str, reference: str) -> float:
+    p = set((prediction or "").lower().split())
+    r = set((reference or "").lower().split())
+    if not p and not r:
         return 1.0
-    if not p or not g:
+    if not p or not r:
         return 0.0
-    return len(p & g) / len(p | g)
+    return float(len(p & r) / len(p | r))
 
 
-def rouge_l(prediction: str, ground_truth: str) -> float:
-    p_tokens = re.findall(r"\b\w+\b", prediction.lower())
-    g_tokens = re.findall(r"\b\w+\b", ground_truth.lower())
-    if not p_tokens or not g_tokens:
-        return 0.0
-    lcs = lcs_length(p_tokens, g_tokens)
-    prec = lcs / len(p_tokens)
-    rec = lcs / len(g_tokens)
-    if prec + rec == 0:
-        return 0.0
-    return 2 * prec * rec / (prec + rec)
+def add_analysis(item: dict) -> dict[str, float | int | bool]:
+    prediction = item.get("model_answer", "") or ""
+    reference = item.get("ground_truth", "") or ""
+    temperature = safe_float(item.get("temperature"), default=0.0)
+    answered = bool(prediction.strip())
+
+    rouge_scores = compute_rouge(prediction, reference)
+    length_scores = compute_lengths(prediction, reference)
+    jaccard = compute_jaccard(prediction, reference)
+
+    return {
+        "rouge1": rouge_scores["rouge1"],
+        "rouge2": rouge_scores["rouge2"],
+        "rougeL": rouge_scores["rougeL"],
+        "prediction_length": length_scores["prediction_length"],
+        "reference_length": length_scores["reference_length"],
+        "verbosity_ratio": length_scores["verbosity_ratio"],
+        "jaccard_similarity": jaccard,
+        "answered": answered,
+        "temperature": temperature,
+    }
+
+
+def aggregate_by_persona(items: list[dict]) -> dict[str, dict[str, float]]:
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for item in items:
+        grouped[str(item.get("persona", "unknown"))].append(item)
+
+    out: dict[str, dict[str, float]] = {}
+    for persona, rows in grouped.items():
+        n = len(rows) or 1
+        out[persona] = {
+            "avg_rouge1": sum(x["analysis"]["rouge1"] for x in rows) / n,
+            "avg_rougeL": sum(x["analysis"]["rougeL"] for x in rows) / n,
+            "avg_prediction_length": sum(x["analysis"]["prediction_length"] for x in rows) / n,
+            "avg_verbosity_ratio": sum(x["analysis"]["verbosity_ratio"] for x in rows) / n,
+            "avg_temperature": sum(x["analysis"]["temperature"] for x in rows) / n,
+        }
+    return out
+
+
+def aggregate_by_temperature(items: list[dict]) -> dict[str, dict[str, float]]:
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for item in items:
+        temp = safe_float(item.get("temperature"), default=0.0)
+        grouped[f"{temp:g}"].append(item)
+
+    out: dict[str, dict[str, float]] = {}
+    for temp_key, rows in grouped.items():
+        n = len(rows) or 1
+        out[temp_key] = {
+            "avg_rouge1": sum(x["analysis"]["rouge1"] for x in rows) / n,
+            "avg_verbosity_ratio": sum(x["analysis"]["verbosity_ratio"] for x in rows) / n,
+            "avg_length": sum(x["analysis"]["prediction_length"] for x in rows) / n,
+        }
+    return out
+
+
+def build_summary(items: list[dict]) -> dict:
+    n = len(items) or 1
+    overall = {
+        "avg_rouge1": sum(x["analysis"]["rouge1"] for x in items) / n,
+        "avg_rouge2": sum(x["analysis"]["rouge2"] for x in items) / n,
+        "avg_rougeL": sum(x["analysis"]["rougeL"] for x in items) / n,
+        "avg_prediction_length": sum(x["analysis"]["prediction_length"] for x in items) / n,
+        "avg_verbosity_ratio": sum(x["analysis"]["verbosity_ratio"] for x in items) / n,
+        "answer_ratio": sum(1 for x in items if x["analysis"]["answered"]) / n,
+        "avg_temperature": sum(x["analysis"]["temperature"] for x in items) / n,
+    }
+    return {
+        "summary": {
+            "overall": overall,
+            "by_persona": aggregate_by_persona(items),
+            "by_temperature": aggregate_by_temperature(items),
+        }
+    }
+
+
+def save_results(output_path: Path, payload: dict) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
 
 def create_result_json(model_cfg: dict, persona_name: str, persona_type: str, sample: dict, messages: list[dict], api_result: dict) -> dict:
@@ -273,7 +411,7 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_type: str, sa
         "request": {
             "messages": messages,
             "parameters": {
-                "temperature": 0.2,
+                "temperature": safe_float(api_result.get("temperature"), default=0.2),
                 "max_tokens": 2048,
                 "model": model_cfg["model_id"],
             },
@@ -303,13 +441,22 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_type: str, sa
             },
         }
 
-        result["analysis"] = {
-            "semantic_similarity": round(simple_semantic_similarity(prediction, gt), 4),
-            "rouge_l": round(rouge_l(prediction, gt), 4),
-            "prediction_length": pred_len,
-            "ground_truth_length": gt_len,
-            "verbosity_ratio": round(ratio, 4),
+        flat_item = {
+            "id": sample["id"],
+            "question": sample["question"],
+            "ground_truth": gt,
+            "model_answer": prediction,
+            "persona": persona_name,
+            "temperature": safe_float(api_result.get("temperature"), default=0.2),
         }
+        result["analysis"] = add_analysis(flat_item)
+        # Keep legacy fields for compatibility with older CSV readers.
+        result["analysis"]["ground_truth_length"] = result["analysis"]["reference_length"]
+        result["analysis"]["rouge_l"] = result["analysis"]["rougeL"]
+
+        _ = pred_len
+        _ = gt_len
+        _ = ratio
     else:
         gt = sample["answer"]
         gt_len = len(re.findall(r"\b\w+\b", gt))
@@ -326,13 +473,17 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_type: str, sa
             },
         }
 
-        result["analysis"] = {
-            "semantic_similarity": 0.0,
-            "rouge_l": 0.0,
-            "prediction_length": 0,
-            "ground_truth_length": gt_len,
-            "verbosity_ratio": 0.0,
+        flat_item = {
+            "id": sample["id"],
+            "question": sample["question"],
+            "ground_truth": gt,
+            "model_answer": "",
+            "persona": persona_name,
+            "temperature": safe_float(api_result.get("temperature"), default=0.2),
         }
+        result["analysis"] = add_analysis(flat_item)
+        result["analysis"]["ground_truth_length"] = result["analysis"]["reference_length"]
+        result["analysis"]["rouge_l"] = result["analysis"]["rougeL"]
 
     return result
 
@@ -376,19 +527,62 @@ def csv_row_from_result_json(result_json: dict, fallback_sample: dict, persona_n
         "prediction": response_obj.get("prediction") or "",
         "ground_truth": input_obj.get("ground_truth", fallback_sample.get("answer", "")),
         "category": input_obj.get("category", fallback_sample.get("category", "")),
-        "semantic_similarity": analysis_obj.get("semantic_similarity", 0.0),
-        "rouge_l": analysis_obj.get("rouge_l", 0.0),
+        "rouge1": analysis_obj.get("rouge1", 0.0),
+        "rouge2": analysis_obj.get("rouge2", 0.0),
+        "rouge_l": analysis_obj.get("rougeL", analysis_obj.get("rouge_l", 0.0)),
+        "jaccard_similarity": analysis_obj.get("jaccard_similarity", 0.0),
         "prediction_length": analysis_obj.get("prediction_length", 0),
-        "ground_truth_length": analysis_obj.get("ground_truth_length", 0),
+        "ground_truth_length": analysis_obj.get("reference_length", analysis_obj.get("ground_truth_length", 0)),
         "verbosity_ratio": analysis_obj.get("verbosity_ratio", 0.0),
+        "answered": analysis_obj.get("answered", False),
+        "temperature": analysis_obj.get("temperature", result_json.get("request", {}).get("parameters", {}).get("temperature", 0.0)),
         "status": "SUCCESS" if response_obj.get("success") else "FAILED",
     }
+
+
+def flat_item_from_result_json(result_json: dict, fallback_sample: dict, persona_name: str) -> dict:
+    input_obj = result_json.get("input", {})
+    response_obj = result_json.get("response", {})
+    req_obj = result_json.get("request", {}).get("parameters", {})
+    analysis_obj = result_json.get("analysis", {})
+
+    item = {
+        "id": input_obj.get("sample_id", fallback_sample.get("id", "")),
+        "question": input_obj.get("question", fallback_sample.get("question", "")),
+        "ground_truth": input_obj.get("ground_truth", fallback_sample.get("answer", "")),
+        "model_answer": (response_obj.get("prediction") or ""),
+        "persona": persona_name,
+        "temperature": safe_float(req_obj.get("temperature"), default=0.0),
+    }
+
+    # Always recompute to keep metrics consistent across old and new files.
+    analysis = add_analysis(item)
+    item["analysis"] = analysis
+
+    # Also enrich in-file per-sample analysis structure.
+    merged_analysis = dict(analysis_obj)
+    merged_analysis.update(analysis)
+    merged_analysis["ground_truth_length"] = merged_analysis.get("reference_length", 0)
+    merged_analysis["rouge_l"] = merged_analysis.get("rougeL", 0.0)
+    result_json["analysis"] = merged_analysis
+
+    # Keep request temperature explicit in source file.
+    result_json.setdefault("request", {}).setdefault("parameters", {})["temperature"] = item["temperature"]
+
+    return item
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="ELI5 runner with 9 personas")
     parser.add_argument("--samples_file", type=str, default="data/eli5_sample_20.json")
     parser.add_argument("--limit_samples", type=int, default=1)
+    parser.add_argument("--temperature", type=float, default=0.4)
+    parser.add_argument(
+        "--personas",
+        type=str,
+        default="",
+        help="Comma-separated persona names to run, e.g. neutral,man_explicit_1",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -400,7 +594,12 @@ def main() -> None:
     if args.limit_samples and args.limit_samples > 0:
         samples = samples[:args.limit_samples]
 
-    personas = load_personas()
+    personas = load_personas(model_cfg)
+    if args.personas.strip():
+        requested = [p.strip() for p in args.personas.split(",") if p.strip()]
+        personas = {k: v for k, v in personas.items() if k in requested}
+        if not personas:
+            raise ValueError("No valid personas selected. Check --personas values.")
 
     print("=" * 80)
     print("ELI5 EVALUATION PIPELINE")
@@ -415,6 +614,7 @@ def main() -> None:
         return
 
     rows = []
+    output_items = []
     task_i = 0
 
     for persona_name in sorted(personas.keys()):
@@ -432,6 +632,9 @@ def main() -> None:
                 print("[SKIP] exists")
                 existing = load_result_json(model_cfg, persona_name, sid)
                 if existing:
+                    item = flat_item_from_result_json(existing, s, persona_name)
+                    save_result_json(model_cfg, existing, persona_name, sid)
+                    output_items.append(item)
                     rows.append(csv_row_from_result_json(existing, s, persona_name, ptype))
                 continue
 
@@ -444,11 +647,33 @@ def main() -> None:
 
             if not messages:
                 print("[FAIL] cannot build messages")
+                failed_api_result = {
+                    "success": False,
+                    "api_response": None,
+                    "latency": 0.0,
+                    "error": "Cannot build persona messages",
+                    "retry_count": 0,
+                    "temperature": args.temperature,
+                }
+                failed_result_json = create_result_json(
+                    model_cfg,
+                    persona_name,
+                    ptype,
+                    s,
+                    [],
+                    failed_api_result,
+                )
+                save_result_json(model_cfg, failed_result_json, persona_name, sid)
+                output_items.append(flat_item_from_result_json(failed_result_json, s, persona_name))
+                rows.append(csv_row_from_result_json(failed_result_json, s, persona_name, ptype))
                 continue
 
-            api_result = call_openrouter_api(model_cfg, messages)
+            api_result = call_openrouter_api(model_cfg, messages, args.temperature)
+            api_result["temperature"] = args.temperature
             result_json = create_result_json(model_cfg, persona_name, ptype, s, messages, api_result)
             save_result_json(model_cfg, result_json, persona_name, sid)
+
+            output_items.append(flat_item_from_result_json(result_json, s, persona_name))
 
             if api_result["success"]:
                 print("[OK]")
@@ -471,19 +696,59 @@ def main() -> None:
             "prediction",
             "ground_truth",
             "category",
-            "semantic_similarity",
+            "rouge1",
+            "rouge2",
             "rouge_l",
+            "jaccard_similarity",
             "prediction_length",
             "ground_truth_length",
             "verbosity_ratio",
+            "answered",
+            "temperature",
             "status",
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
 
+    outputs_with_analysis_path = output_base_folder(model_cfg) / "outputs_with_analysis.json"
+    summary_payload = build_summary(output_items)
+    save_results(
+        outputs_with_analysis_path,
+        {
+            "model": {
+                "name": model_cfg["name"],
+                "model_id": model_cfg["model_id"],
+            },
+            "items": output_items,
+            **summary_payload,
+        },
+    )
+
     print("\nDone.")
     print(f"CSV saved: {csv_path}")
+    print(f"Analysis JSON saved: {outputs_with_analysis_path}")
+    print(
+        "Overall avg ROUGE: "
+        f"R1={summary_payload['summary']['overall']['avg_rouge1']:.4f}, "
+        f"R2={summary_payload['summary']['overall']['avg_rouge2']:.4f}, "
+        f"RL={summary_payload['summary']['overall']['avg_rougeL']:.4f}"
+    )
+    print("Persona comparison:")
+    for persona_name, stats in summary_payload["summary"]["by_persona"].items():
+        print(
+            f"  - {persona_name}: "
+            f"R1={stats['avg_rouge1']:.4f}, RL={stats['avg_rougeL']:.4f}, "
+            f"Len={stats['avg_prediction_length']:.2f}, Verb={stats['avg_verbosity_ratio']:.4f}, "
+            f"Temp={stats['avg_temperature']:.3f}"
+        )
+    print("Temperature comparison:")
+    for temp_key, stats in summary_payload["summary"]["by_temperature"].items():
+        print(
+            f"  - T={temp_key}: "
+            f"R1={stats['avg_rouge1']:.4f}, Verb={stats['avg_verbosity_ratio']:.4f}, "
+            f"Len={stats['avg_length']:.2f}"
+        )
 
 
 if __name__ == "__main__":
