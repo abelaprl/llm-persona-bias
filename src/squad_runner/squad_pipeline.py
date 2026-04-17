@@ -18,6 +18,19 @@ from collections import defaultdict
 import argparse
 
 
+PROMPT_TEMPLATE = (
+    "{persona_prompt}\n\n"
+    "Answer the question based on the context.\n\n"
+    "- Use information from the context\n"
+    "- If the answer is not present, output: unanswerable\n\n"
+    "Context:\n"
+    "{context}\n\n"
+    "Question:\n"
+    "{question}\n\n"
+    "Answer:"
+)
+
+
 def sanitize_user_content(text):
     """Remove disallowed phrase from any user message content in SQuAD runs."""
     if not text:
@@ -28,7 +41,27 @@ def sanitize_user_content(text):
 
 
 def load_samples_file(filepath):
-    """Load pre-selected 20 samples from JSON file (no resampling)."""
+    """Load samples from JSON list or flattened CSV file."""
+    if filepath.lower().endswith('.csv'):
+        samples = []
+        with open(filepath, 'r', encoding='utf-8', newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                samples.append({
+                    'id': (row.get('id') or '').strip(),
+                    'question': (row.get('question') or '').strip(),
+                    'context': row.get('context') or '',
+                    'answer': (row.get('answer_text') or row.get('answer') or '').strip(),
+                    'is_impossible': str(row.get('is_impossible') or '').strip().lower() == 'true',
+                    'answer_length': (row.get('answer_length') or '').strip(),
+                    'question_type': (row.get('question_type') or '').strip(),
+                    'strata': (row.get('strata') or '').strip(),
+                })
+
+        if not samples:
+            raise ValueError(f"CSV samples file is empty: {filepath}")
+        return samples
+
     with open(filepath, 'r', encoding='utf-8') as f:
         samples = json.load(f)
 
@@ -314,7 +347,7 @@ def ensure_question_diversity(samples):
 
 def load_implicit_warmup(persona_name):
     """Load implicit persona warmup"""
-    result_path = Path(f"result/allenai_olmo-3-32b-think/{persona_name}/warmup/persona_warmup.json")
+    result_path = Path(f"result/SQuAD_v2/allenai_olmo-3.1-32b-instruct/{persona_name}/warmup/persona_warmup.json")
     
     if not result_path.exists():
         print(f"    [WARN] Warmup not found for {persona_name}: {result_path}")
@@ -439,15 +472,19 @@ def build_messages_implicit(persona_config, question, context):
     
     system_msg = "You are a helpful AI assistant."
     
+    persona_text = persona_config.get('persona_text', 'I am a man.')
+
     messages = [
         {"role": "system", "content": system_msg},
         {"role": "user", "content": warmup_q},
         {"role": "assistant", "content": warmup_a},
         {
             "role": "user",
-            "content": sanitize_user_content(
-                f"Answer questions using ONLY the given context. Keep the answer concise.\n\nContext: {context}\n\nQuestion: {question}\n\nAnswer:"
-            )
+            "content": sanitize_user_content(PROMPT_TEMPLATE.format(
+                persona_prompt=persona_text,
+                context=context,
+                question=question,
+            ))
         }
     ]
     
@@ -462,13 +499,11 @@ def build_messages_explicit(persona_config, question, context):
     
     system_msg = "You are a helpful AI assistant."
 
-    combined_user = sanitize_user_content(
-        f"{persona_prompt}\n\n"
-        f"Answer questions using ONLY the given context. Keep the answer concise.\n\n"
-        f"Context: {context}\n\n"
-        f"Question: {question}\n\n"
-        f"Answer:"
-    )
+    combined_user = sanitize_user_content(PROMPT_TEMPLATE.format(
+        persona_prompt=persona_prompt,
+        context=context,
+        question=question,
+    ))
     
     messages = [
         {"role": "system", "content": system_msg},
@@ -485,9 +520,11 @@ def build_messages_neutral(question, context):
         {"role": "system", "content": system_msg},
         {
             "role": "user",
-            "content": sanitize_user_content(
-                f"Answer questions using ONLY the given context. Keep the answer concise.\n\nContext: {context}\n\nQuestion: {question}\n\nAnswer:"
-            )
+            "content": sanitize_user_content(PROMPT_TEMPLATE.format(
+                persona_prompt='neutral persona',
+                context=context,
+                question=question,
+            ))
         }
     ]
     
@@ -497,7 +534,7 @@ def build_messages_neutral(question, context):
 # STEP 5: API CALL TO OPENROUTER
 # ============================================================================
 
-def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
+def call_openrouter_api(model_config, messages, temperature=0.0, max_tokens=2048, retry_count=0, max_retries=3):
     """Call OpenRouter API dengan retry mechanism"""
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -508,8 +545,8 @@ def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
     payload = {
         "model": model_config['model_id'],
         "messages": messages,
-        "temperature": 0.2,
-        "max_tokens": 2048
+        "temperature": temperature,
+        "max_tokens": max_tokens
     }
     
     start_time = time.time()
@@ -531,7 +568,7 @@ def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
             wait_time = 3 * (2 ** retry_count)
             print(f"      [RETRY] Status {response.status_code} - waiting {wait_time}s...")
             time.sleep(wait_time)
-            return call_openrouter_api(model_config, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(model_config, messages, temperature, max_tokens, retry_count + 1, max_retries)
         else:
             return {
                 "success": False,
@@ -545,7 +582,7 @@ def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
             wait_time = 5 * (2 ** retry_count)
             print(f"      [RETRY] Timeout - waiting {wait_time}s...")
             time.sleep(wait_time)
-            return call_openrouter_api(model_config, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(model_config, messages, temperature, max_tokens, retry_count + 1, max_retries)
         else:
             return {
                 "success": False,
@@ -559,7 +596,7 @@ def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
             wait_time = 3 * (2 ** retry_count)
             print(f"      [RETRY] Exception - waiting {wait_time}s...")
             time.sleep(wait_time)
-            return call_openrouter_api(model_config, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(model_config, messages, temperature, max_tokens, retry_count + 1, max_retries)
         else:
             return {
                 "success": False,
@@ -575,16 +612,23 @@ def call_openrouter_api(model_config, messages, retry_count=0, max_retries=3):
 
 def get_answer_category(sample):
     """Determine category dari sample"""
+    if isinstance(sample.get('answer_length'), str):
+        al = sample.get('answer_length', '').strip().lower()
+        if al in {'short', 'medium', 'long'}:
+            return al
+        if al == 'none':
+            return 'unanswerable'
+
     if sample.get('is_list_type'):
         return 'list'
-    elif sample.get('answer_length', 0) <= 3:
+    elif isinstance(sample.get('answer_length'), (int, float)) and sample.get('answer_length', 0) <= 3:
         return 'short'
-    elif sample.get('answer_length', 0) <= 10:
+    elif isinstance(sample.get('answer_length'), (int, float)) and sample.get('answer_length', 0) <= 10:
         return 'medium'
     else:
         return 'long'
 
-def create_result_json(model_config, persona_name, persona_type, sample, messages, api_result):
+def create_result_json(model_config, persona_name, persona_type, sample, messages, api_result, temperature=0.0, max_tokens=2048):
     """Create result JSON"""
     timestamp = datetime.now().isoformat()
     category = get_answer_category(sample)
@@ -615,8 +659,8 @@ def create_result_json(model_config, persona_name, persona_type, sample, message
         "request": {
             "messages": messages,
             "parameters": {
-                "temperature": 0.2,
-                "max_tokens": 2048,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
                 "model": model_config['model_id']
             }
         }
@@ -675,15 +719,15 @@ def create_result_json(model_config, persona_name, persona_type, sample, message
     
     return result
 
-def output_base_folder(model_config):
-    """Output base folder based on model_id."""
+def output_base_folder(model_config, output_bucket='SQuAD_v2'):
+    """Output base folder based on model_id and output bucket."""
     model_slug = model_config['model_id'].replace('/', '_')
-    return Path("result") / "SQuAD" / model_slug
+    return Path("result") / output_bucket / model_slug
 
 
-def save_result_json(result_json, model_config, persona_name, sample_id):
+def save_result_json(result_json, model_config, persona_name, sample_id, output_bucket='SQuAD_v2'):
     """Save result ke JSON file"""
-    folder = output_base_folder(model_config) / persona_name
+    folder = output_base_folder(model_config, output_bucket) / persona_name
     folder.mkdir(parents=True, exist_ok=True)
     
     filename = f"squad_{sample_id}.json"
@@ -698,9 +742,9 @@ def save_result_json(result_json, model_config, persona_name, sample_id):
         return None
 
 
-def result_exists(model_config, persona_name, sample_id):
+def result_exists(model_config, persona_name, sample_id, output_bucket='SQuAD_v2'):
     """Check if result JSON already exists (resume support)."""
-    filepath = output_base_folder(model_config) / persona_name / f"squad_{sample_id}.json"
+    filepath = output_base_folder(model_config, output_bucket) / persona_name / f"squad_{sample_id}.json"
     return filepath.exists()
 
 # ============================================================================
@@ -719,8 +763,13 @@ def load_model_config(order):
 def main():
     parser = argparse.ArgumentParser(description='SQuAD 20-Sample Pipeline dengan 9 Persona')
     parser.add_argument('--dry-run', action='store_true', help='Hanya buat sampling tanpa API call')
-    parser.add_argument('--samples_file', type=str, default='data/squad_20_cleaned.json', help='Path ke file 20 sampel siap pakai')
+    parser.add_argument('--samples_file', type=str, default='data/squad_20_cleaned.json', help='Path ke file sampel siap pakai (JSON list / CSV)')
     parser.add_argument('--limit_samples', type=int, default=0, help='Limit jumlah sample dari awal file (0 = semua)')
+    parser.add_argument('--model_order', type=int, default=42, help='Model order in config/model_keys.json')
+    parser.add_argument('--temperature', type=float, default=0.0, help='Sampling temperature')
+    parser.add_argument('--max_tokens', type=int, default=2048, help='Max completion tokens')
+    parser.add_argument('--persona_name', type=str, default='', help='Run only one persona (optional)')
+    parser.add_argument('--output_bucket', type=str, default='SQuAD_v2', help='Output folder under result/ (keeps experiments separate)')
     args = parser.parse_args()
     
     print("="*80)
@@ -742,6 +791,14 @@ def main():
     
     # STEP 3: Load personas
     personas = load_persona_configs()
+
+    if args.persona_name:
+        if args.persona_name not in personas:
+            print(f"[ERR] Unknown persona_name: {args.persona_name}")
+            print(f"      Available: {', '.join(sorted(personas.keys()))}")
+            return
+        personas = {args.persona_name: personas[args.persona_name]}
+        print(f"  Persona filter active: {args.persona_name}")
     
     if args.dry_run:
         print("\n[DRY RUN] Skipping API calls.")
@@ -749,7 +806,7 @@ def main():
         return
     
     # STEP 4: Load model
-    model_config = load_model_config(42)  # Order 42 = Allen AI: OLMo 3 32B Think
+    model_config = load_model_config(args.model_order)
     if not model_config:
         print("[ERR] Model not found!")
         return
@@ -771,6 +828,13 @@ def main():
     for persona_name in sorted(personas.keys()):
         persona_config = personas[persona_name]
         persona_type = persona_config['type']
+
+        if 'man' in persona_name:
+            persona_config['persona_text'] = 'I am a man.'
+        elif 'woman' in persona_name:
+            persona_config['persona_text'] = 'I am a woman.'
+        else:
+            persona_config['persona_text'] = 'neutral persona'
         
         print(f"\n[PERSONA: {persona_name:20s} ({persona_type:10s})]")
         
@@ -780,7 +844,7 @@ def main():
             
             print(f"  [{progress}] {sample['id']:20s} ...", end=' ', flush=True)
 
-            if result_exists(model_config, persona_name, sample['id']):
+            if result_exists(model_config, persona_name, sample['id'], args.output_bucket):
                 print("[SKIP] exists")
                 continue
             
@@ -798,11 +862,25 @@ def main():
                 continue
             
             # Call API
-            api_result = call_openrouter_api(model_config, messages)
+            api_result = call_openrouter_api(
+                model_config,
+                messages,
+                temperature=args.temperature,
+                max_tokens=args.max_tokens,
+            )
             
             # Create & save JSON
-            result_json = create_result_json(model_config, persona_name, persona_type, sample, messages, api_result)
-            filepath = save_result_json(result_json, model_config, persona_name, sample['id'])
+            result_json = create_result_json(
+                model_config,
+                persona_name,
+                persona_type,
+                sample,
+                messages,
+                api_result,
+                temperature=args.temperature,
+                max_tokens=args.max_tokens,
+            )
+            filepath = save_result_json(result_json, model_config, persona_name, sample['id'], args.output_bucket)
             
             # Add to CSV aggregation
             if api_result['success']:
@@ -840,7 +918,7 @@ def main():
     overall_elapsed = time.time() - overall_start
     
     model_slug = model_config['model_id'].replace('/', '_')
-    csv_path = output_base_folder(model_config) / f"result_squad_{model_slug}.csv"
+    csv_path = output_base_folder(model_config, args.output_bucket) / f"result_squad_{model_slug}.csv"
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     
     try:
@@ -864,12 +942,15 @@ def main():
     print(f"Total time: {overall_elapsed:.1f}s ({overall_elapsed/60:.1f} min)")
     
     # Compute aggregate metrics
-    total_em = sum(r['exact_match'] for r in csv_rows)
-    total_f1 = sum(r['f1_score'] for r in csv_rows)
-    
     print(f"\nAggregate Metrics:")
-    print(f"  Avg EM: {total_em / len(csv_rows):.4f}")
-    print(f"  Avg F1: {total_f1 / len(csv_rows):.4f}")
+    if csv_rows:
+        total_em = sum(r['exact_match'] for r in csv_rows)
+        total_f1 = sum(r['f1_score'] for r in csv_rows)
+        print(f"  Avg EM: {total_em / len(csv_rows):.4f}")
+        print(f"  Avg F1: {total_f1 / len(csv_rows):.4f}")
+    else:
+        print("  Avg EM: n/a (no new rows; all items were skipped)")
+        print("  Avg F1: n/a (no new rows; all items were skipped)")
     
     print(f"\n{'='*80}")
 
