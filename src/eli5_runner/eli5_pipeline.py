@@ -1,7 +1,7 @@
 """
 ELI5 evaluation pipeline (derived from SQuAD runner style).
 
-- Model fixed to order 42 (Allen AI: OLMo 3 32B Think)
+- Model selectable via --model_order
 - Persona support: 9 personas (6 implicit, 2 explicit, 1 neutral)
 - Input samples from data/eli5_sample_20.json
 - Output JSON: result/ELI5/allenai_olmo-3-32b-think/<persona>/eli5_<id>.json
@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import random
 import re
 import time
 from collections import defaultdict
@@ -203,6 +204,7 @@ def call_openrouter_api(
     temperature: float,
     retry_count: int = 0,
     max_retries: int = 3,
+    retry_base_sec: float = 8.0,
 ) -> dict:
     headers = {
         "Authorization": f"Bearer {model_cfg['api_key_alias']}",
@@ -231,9 +233,21 @@ def call_openrouter_api(
             }
 
         if resp.status_code in [429, 500, 502, 503, 504] and retry_count < max_retries:
-            wait_time = 3 * (2 ** retry_count)
+            retry_after_header = resp.headers.get("Retry-After")
+            retry_after_sec = safe_float(retry_after_header, default=0.0)
+            base = retry_base_sec if resp.status_code == 429 else max(3.0, retry_base_sec / 2.0)
+            wait_time = max(base * (2 ** retry_count), retry_after_sec)
+            # Add small jitter to avoid synchronized retries during provider throttling.
+            wait_time += random.uniform(0.0, 0.8)
             time.sleep(wait_time)
-            return call_openrouter_api(model_cfg, messages, temperature, retry_count + 1, max_retries)
+            return call_openrouter_api(
+                model_cfg,
+                messages,
+                temperature,
+                retry_count + 1,
+                max_retries,
+                retry_base_sec,
+            )
 
         return {
             "success": False,
@@ -244,9 +258,17 @@ def call_openrouter_api(
         }
     except requests.exceptions.Timeout:
         if retry_count < max_retries:
-            wait_time = 5 * (2 ** retry_count)
+            wait_time = max(5.0, retry_base_sec / 2.0) * (2 ** retry_count)
+            wait_time += random.uniform(0.0, 0.8)
             time.sleep(wait_time)
-            return call_openrouter_api(model_cfg, messages, temperature, retry_count + 1, max_retries)
+            return call_openrouter_api(
+                model_cfg,
+                messages,
+                temperature,
+                retry_count + 1,
+                max_retries,
+                retry_base_sec,
+            )
         return {
             "success": False,
             "api_response": None,
@@ -256,9 +278,17 @@ def call_openrouter_api(
         }
     except Exception as e:
         if retry_count < max_retries:
-            wait_time = 3 * (2 ** retry_count)
+            wait_time = max(3.0, retry_base_sec / 2.0) * (2 ** retry_count)
+            wait_time += random.uniform(0.0, 0.8)
             time.sleep(wait_time)
-            return call_openrouter_api(model_cfg, messages, temperature, retry_count + 1, max_retries)
+            return call_openrouter_api(
+                model_cfg,
+                messages,
+                temperature,
+                retry_count + 1,
+                max_retries,
+                retry_base_sec,
+            )
         return {
             "success": False,
             "api_response": None,
@@ -574,9 +604,13 @@ def flat_item_from_result_json(result_json: dict, fallback_sample: dict, persona
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="ELI5 runner with 9 personas")
+    parser.add_argument("--model_order", type=int, default=42)
     parser.add_argument("--samples_file", type=str, default="data/eli5_sample_20.json")
     parser.add_argument("--limit_samples", type=int, default=1)
     parser.add_argument("--temperature", type=float, default=0.4)
+    parser.add_argument("--max_retries", type=int, default=8)
+    parser.add_argument("--retry_base_sec", type=float, default=8.0)
+    parser.add_argument("--sleep_sec", type=float, default=1.5)
     parser.add_argument(
         "--personas",
         type=str,
@@ -586,9 +620,9 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    model_cfg = load_model_config(42)
+    model_cfg = load_model_config(args.model_order)
     if not model_cfg:
-        raise RuntimeError("Model order 42 not found in config/model_keys.json")
+        raise RuntimeError(f"Model order {args.model_order} not found in config/model_keys.json")
 
     samples = load_samples(args.samples_file)
     if args.limit_samples and args.limit_samples > 0:
@@ -668,7 +702,13 @@ def main() -> None:
                 rows.append(csv_row_from_result_json(failed_result_json, s, persona_name, ptype))
                 continue
 
-            api_result = call_openrouter_api(model_cfg, messages, args.temperature)
+            api_result = call_openrouter_api(
+                model_cfg,
+                messages,
+                args.temperature,
+                max_retries=max(0, args.max_retries),
+                retry_base_sec=max(1.0, args.retry_base_sec),
+            )
             api_result["temperature"] = args.temperature
             result_json = create_result_json(model_cfg, persona_name, ptype, s, messages, api_result)
             save_result_json(model_cfg, result_json, persona_name, sid)
@@ -682,7 +722,8 @@ def main() -> None:
 
             rows.append(csv_row_from_result_json(result_json, s, persona_name, ptype))
 
-            time.sleep(0.5)
+            if args.sleep_sec > 0:
+                time.sleep(args.sleep_sec)
 
     model_slug = model_cfg['model_id'].replace('/', '_')
     csv_path = output_base_folder(model_cfg) / f"result_eli5_{model_slug}.csv"
