@@ -40,6 +40,12 @@ def numeric_value(value):
 def gather_persona_stats(persona_dir):
     sums = defaultdict(float)
     total = 0
+    token_sums = {
+        "sum_prompt_tokens": 0.0,
+        "sum_completion_tokens": 0.0,
+        "sum_reasoning_tokens": 0.0,
+        "sum_total_tokens": 0.0,
+    }
 
     for fp in sorted(persona_dir.glob("*.json")):
         with open(fp, "r", encoding="utf-8") as f:
@@ -52,28 +58,62 @@ def gather_persona_stats(persona_dir):
             if num is not None:
                 sums[key] += num
 
+        perf_tokens = (
+            obj.get("response", {})
+            .get("performance", {})
+            .get("tokens", {})
+        )
+        token_sums["sum_prompt_tokens"] += float(perf_tokens.get("prompt_tokens", 0) or 0)
+        token_sums["sum_completion_tokens"] += float(perf_tokens.get("completion_tokens", 0) or 0)
+        token_sums["sum_total_tokens"] += float(perf_tokens.get("total_tokens", 0) or 0)
+        token_sums["sum_reasoning_tokens"] += float(
+            perf_tokens.get("completion_tokens_details", {}).get("reasoning_tokens", 0) or 0
+        )
+
     means = {}
     if total > 0:
         for key, val in sums.items():
             means[key] = val / total
 
-    return total, sums, means
+    token_avgs = {
+        "avg_prompt_tokens": (token_sums["sum_prompt_tokens"] / total) if total else 0.0,
+        "avg_completion_tokens": (token_sums["sum_completion_tokens"] / total) if total else 0.0,
+        "avg_reasoning_tokens": (token_sums["sum_reasoning_tokens"] / total) if total else 0.0,
+        "avg_total_tokens": (token_sums["sum_total_tokens"] / total) if total else 0.0,
+    }
+
+    return total, sums, means, token_sums, token_avgs
 
 
 def merge_overall(persona_results):
     total_all = sum(item["total"] for item in persona_results)
     sums_all = defaultdict(float)
+    token_sums_all = {
+        "sum_prompt_tokens": 0.0,
+        "sum_completion_tokens": 0.0,
+        "sum_reasoning_tokens": 0.0,
+        "sum_total_tokens": 0.0,
+    }
 
     for item in persona_results:
         for key, val in item["sums"].items():
             sums_all[key] += val
+        for key in token_sums_all:
+            token_sums_all[key] += item["token_sums"].get(key, 0.0)
 
     means_all = {}
     if total_all > 0:
         for key, val in sums_all.items():
             means_all[key] = val / total_all
 
-    return total_all, sums_all, means_all
+    token_avgs_all = {
+        "avg_prompt_tokens": (token_sums_all["sum_prompt_tokens"] / total_all) if total_all else 0.0,
+        "avg_completion_tokens": (token_sums_all["sum_completion_tokens"] / total_all) if total_all else 0.0,
+        "avg_reasoning_tokens": (token_sums_all["sum_reasoning_tokens"] / total_all) if total_all else 0.0,
+        "avg_total_tokens": (token_sums_all["sum_total_tokens"] / total_all) if total_all else 0.0,
+    }
+
+    return total_all, sums_all, means_all, token_sums_all, token_avgs_all
 
 
 def build_column_order(persona_results):
@@ -140,16 +180,63 @@ def print_table(persona_results, overall, metric_keys, model_dir):
 
 
 def save_summary_csv(out_path, persona_results, overall, metric_keys):
-    fieldnames = ["persona_name", "total"] + metric_keys
+    requested_prefix = [
+        "persona_name",
+        "prediction_length",
+        "ground_truth_length",
+        "verbosity_ratio",
+        "verbosity_Ratio_avg",
+        "total",
+        "sum_prompt_tokens",
+        "sum_completion_tokens",
+        "sum_reasoning_tokens",
+        "sum_total_tokens",
+        "avg_prompt_tokens",
+        "avg_completion_tokens",
+        "avg_reasoning_tokens",
+        "avg_total_tokens",
+    ]
+    remaining_metrics = [m for m in metric_keys if m not in requested_prefix]
+    fieldnames = requested_prefix + remaining_metrics
     rows = []
 
     for item in persona_results:
-        row = {"persona_name": item["persona"], "total": item["total"]}
+        row = {
+            "persona_name": item["persona"],
+            "prediction_length": round(item["means"].get("prediction_length", 0.0), 6),
+            "ground_truth_length": round(item["means"].get("ground_truth_length", 0.0), 6),
+            "verbosity_ratio": round(item["means"].get("verbosity_ratio", 0.0), 6),
+            "verbosity_Ratio_avg": round(item["means"].get("verbosity_ratio", 0.0), 6),
+            "total": item["total"],
+            "sum_prompt_tokens": round(item["token_sums"].get("sum_prompt_tokens", 0.0), 6),
+            "sum_completion_tokens": round(item["token_sums"].get("sum_completion_tokens", 0.0), 6),
+            "sum_reasoning_tokens": round(item["token_sums"].get("sum_reasoning_tokens", 0.0), 6),
+            "sum_total_tokens": round(item["token_sums"].get("sum_total_tokens", 0.0), 6),
+            "avg_prompt_tokens": round(item["token_avgs"].get("avg_prompt_tokens", 0.0), 6),
+            "avg_completion_tokens": round(item["token_avgs"].get("avg_completion_tokens", 0.0), 6),
+            "avg_reasoning_tokens": round(item["token_avgs"].get("avg_reasoning_tokens", 0.0), 6),
+            "avg_total_tokens": round(item["token_avgs"].get("avg_total_tokens", 0.0), 6),
+        }
         for k in metric_keys:
             row[k] = round(item["means"].get(k, 0.0), 6)
         rows.append(row)
 
-    row = {"persona_name": "OVERALL", "total": overall["total"]}
+    row = {
+        "persona_name": "OVERALL",
+        "prediction_length": round(overall["means"].get("prediction_length", 0.0), 6),
+        "ground_truth_length": round(overall["means"].get("ground_truth_length", 0.0), 6),
+        "verbosity_ratio": round(overall["means"].get("verbosity_ratio", 0.0), 6),
+        "verbosity_Ratio_avg": round(overall["means"].get("verbosity_ratio", 0.0), 6),
+        "total": overall["total"],
+        "sum_prompt_tokens": round(overall["token_sums"].get("sum_prompt_tokens", 0.0), 6),
+        "sum_completion_tokens": round(overall["token_sums"].get("sum_completion_tokens", 0.0), 6),
+        "sum_reasoning_tokens": round(overall["token_sums"].get("sum_reasoning_tokens", 0.0), 6),
+        "sum_total_tokens": round(overall["token_sums"].get("sum_total_tokens", 0.0), 6),
+        "avg_prompt_tokens": round(overall["token_avgs"].get("avg_prompt_tokens", 0.0), 6),
+        "avg_completion_tokens": round(overall["token_avgs"].get("avg_completion_tokens", 0.0), 6),
+        "avg_reasoning_tokens": round(overall["token_avgs"].get("avg_reasoning_tokens", 0.0), 6),
+        "avg_total_tokens": round(overall["token_avgs"].get("avg_total_tokens", 0.0), 6),
+    }
     for k in metric_keys:
         row[k] = round(overall["means"].get(k, 0.0), 6)
     rows.append(row)
@@ -190,7 +277,7 @@ def main():
         pdir = model_dir / persona
         if not pdir.exists() or not pdir.is_dir():
             continue
-        total, sums, means = gather_persona_stats(pdir)
+        total, sums, means, token_sums, token_avgs = gather_persona_stats(pdir)
         if total == 0:
             continue
         persona_results.append({
@@ -198,16 +285,20 @@ def main():
             "total": total,
             "sums": sums,
             "means": means,
+            "token_sums": token_sums,
+            "token_avgs": token_avgs,
         })
 
     if not persona_results:
         raise SystemExit(f"No persona JSON files found under: {model_dir}")
 
-    overall_total, overall_sums, overall_means = merge_overall(persona_results)
+    overall_total, overall_sums, overall_means, overall_token_sums, overall_token_avgs = merge_overall(persona_results)
     overall = {
         "total": overall_total,
         "sums": overall_sums,
         "means": overall_means,
+        "token_sums": overall_token_sums,
+        "token_avgs": overall_token_avgs,
     }
 
     metric_keys = build_column_order(persona_results)
