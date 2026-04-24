@@ -1,6 +1,7 @@
 import argparse
 import csv
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -40,6 +41,28 @@ def to_bool(value):
     return str(value).strip().lower() in {"1", "true", "yes", "y"}
 
 
+def normalize_binary_label(value):
+    if value is None:
+        return None
+    text = str(value).strip().lower()
+    if not text or text in {"none", "null", "nan", "na", "n/a"}:
+        return None
+    if text in {"0", "1"}:
+        return int(text)
+    m = re.search(r"\b([01])\b", text)
+    if m:
+        return int(m.group(1))
+    return None
+
+
+def compute_is_correct(ground_truth_label, prediction_label):
+    gt = normalize_binary_label(ground_truth_label)
+    pred = normalize_binary_label(prediction_label)
+    if gt is None or pred is None:
+        return None
+    return gt == pred
+
+
 def load_json_safely(file_path: Path):
     text = file_path.read_text(encoding="utf-8")
     try:
@@ -48,6 +71,63 @@ def load_json_safely(file_path: Path):
         decoder = json.JSONDecoder()
         obj, _ = decoder.raw_decode(text.lstrip("\ufeff \t\r\n"))
         return obj
+
+
+def first_non_empty(*values):
+    for value in values:
+        text = "" if value is None else str(value).strip()
+        if text and text.lower() not in {"<>", "<&gt;"}:
+            return text
+    return ""
+
+
+def extract_prediction_parts(text: str):
+    content = first_non_empty(text)
+    if not content:
+        return "", ""
+
+    answer = ""
+    excuse_lines = []
+    in_excuse = False
+
+    for raw_line in content.splitlines():
+        line = raw_line.strip()
+        low = line.lower()
+
+        if not line:
+            if in_excuse:
+                excuse_lines.append("")
+            continue
+
+        if low.startswith("answer:"):
+            if not answer:
+                answer = line.split(":", 1)[1].strip()
+            in_excuse = False
+            continue
+
+        if low.startswith("excuse:"):
+            excuse_lines = [line.split(":", 1)[1].strip()]
+            in_excuse = True
+            continue
+
+        if in_excuse:
+            excuse_lines.append(raw_line.rstrip())
+
+    excuse = "\n".join(excuse_lines).strip()
+    if excuse in {"<>", "<&gt;"}:
+        excuse = ""
+
+    if not answer:
+        answer_match = re.search(r"(?im)^\s*answer\s*:\s*(.+?)\s*$", content)
+        if answer_match:
+            answer = answer_match.group(1).strip()
+
+    if answer:
+        answer_match = re.search(r"\b([01])\b", answer)
+        if answer_match:
+            answer = answer_match.group(1)
+
+    return answer, excuse
 
 
 def normalize_rows_from_model_dir(model_dir: Path):
@@ -67,18 +147,55 @@ def normalize_rows_from_model_dir(model_dir: Path):
             analysis = obj.get("analysis", {}) or {}
             prediction = obj.get("prediction", {}) or {}
             response = obj.get("response", {}) or {}
+            raw_response_content = ""
+            raw_api_response = response.get("raw_api_response", {}) or {}
+            choices = raw_api_response.get("choices") or []
+            if choices and isinstance(choices[0], dict):
+                msg = choices[0].get("message") or {}
+                raw_response_content = first_non_empty(msg.get("content"))
             usage = (response.get("raw_api_response", {}) or {}).get("usage", {}) or {}
             completion_details = usage.get("completion_tokens_details", {}) or {}
+
+            parsed_answer = first_non_empty(prediction.get("parsed_answer"))
+            explanation = first_non_empty(prediction.get("explanation"))
+            fallback_content = first_non_empty(response.get("content"), raw_response_content)
+            fallback_answer, fallback_explanation = extract_prediction_parts(fallback_content)
+
+            if not parsed_answer:
+                parsed_answer = fallback_answer
+            if not explanation:
+                explanation = fallback_explanation
+
+            prediction_label_raw = first_non_empty(
+                analysis.get("prediction_label"),
+                parsed_answer,
+                fallback_answer,
+            )
+            prediction_label = normalize_binary_label(prediction_label_raw)
+
+            ground_truth_label_raw = first_non_empty(analysis.get("ground_truth_label"), analysis.get("GT", ""))
+            ground_truth_label = normalize_binary_label(ground_truth_label_raw)
+            if ground_truth_label is None:
+                ground_truth_label = ground_truth_label_raw
+
+            is_correct_raw = analysis.get("is_correct", None)
+            is_correct_missing = is_correct_raw is None or str(is_correct_raw).strip().lower() in {
+                "",
+                "none",
+                "null",
+                "nan",
+            }
+            is_correct = compute_is_correct(ground_truth_label, prediction_label) if is_correct_missing else to_bool(is_correct_raw)
 
             row = {
                 "id": obj.get("id", fp.stem),
                 "subset": obj.get("subset", ""),
                 "persona": persona,
-                "ground_truth_label": analysis.get("ground_truth_label", analysis.get("GT", "")),
-                "prediction_label": analysis.get("prediction_label", prediction.get("parsed_answer", "")),
-                "is_correct": analysis.get("is_correct", False),
-                "parsed_answer": prediction.get("parsed_answer", ""),
-                "explanation": prediction.get("explanation", ""),
+                "ground_truth_label": ground_truth_label,
+                "prediction_label": prediction_label,
+                "is_correct": is_correct,
+                "parsed_answer": parsed_answer,
+                "explanation": explanation,
                 "success": response.get("success", False),
                 "error": response.get("error", ""),
                 "latency_sec": response.get("latency_sec", 0.0),
@@ -93,9 +210,9 @@ def normalize_rows_from_model_dir(model_dir: Path):
     return rows
 
 
-def write_result_csv(rows, model_dir: Path):
+def write_result_csv(rows, model_dir: Path, out_path: Path | None = None):
     model_name = model_dir.name
-    result_path = model_dir / f"result_ethics_{model_name}.csv"
+    result_path = out_path if out_path is not None else (model_dir / f"result_ethics_{model_name}.csv")
     fields = [
         "id",
         "subset",
@@ -123,7 +240,7 @@ def write_result_csv(rows, model_dir: Path):
     return result_path
 
 
-def build_reports_from_rows(rows, model_dir: Path):
+def build_reports_from_rows(rows, model_dir: Path, out_path: Path | None = None):
     model_name = model_dir.name
 
 
@@ -144,8 +261,14 @@ def build_reports_from_rows(rows, model_dir: Path):
         st = stats[persona]
 
         st["total"] += 1
-        st["predicted_label_count"] += to_int(row.get("prediction_label"), 0)
-        st["correct_count"] += 1 if to_bool(row.get("is_correct")) else 0
+        pred_label = normalize_binary_label(row.get("prediction_label"))
+        if pred_label is not None:
+            st["predicted_label_count"] += 1
+
+        is_correct = row.get("is_correct")
+        if is_correct is None or str(is_correct).strip().lower() in {"", "none", "null", "nan"}:
+            is_correct = compute_is_correct(row.get("ground_truth_label"), row.get("prediction_label"))
+        st["correct_count"] += 1 if is_correct is True else 0
         st["sum_explanation_length"] += len((row.get("explanation") or "").strip())
         st["sum_latency_sec"] += to_float(row.get("latency_sec"), 0.0)
         st["sum_prompt_tokens"] += to_int(row.get("prompt_tokens"), 0)
@@ -229,7 +352,7 @@ def build_reports_from_rows(rows, model_dir: Path):
         }
         out_rows.append(all_row)
 
-    report_path = model_dir / f"reports_accuracy_{model_name}.csv"
+    report_path = out_path if out_path is not None else (model_dir / f"reports_accuracy_{model_name}.csv")
     fields = [
         "persona_folder",
         "predicted_label_count",
@@ -277,6 +400,18 @@ def main():
         default=r"result\ETHICS\deepseek_deepseek-v3.2\result_ethics_deepseek_deepseek-v3.2.csv",
         help="Path to source result_ethics_<model>.csv",
     )
+    parser.add_argument(
+        "--result_out",
+        type=str,
+        default="",
+        help="Optional output path for rebuilt result CSV (useful if default file is locked)",
+    )
+    parser.add_argument(
+        "--report_out",
+        type=str,
+        default="",
+        help="Optional output path for report CSV (useful if default file is locked)",
+    )
     args = parser.parse_args()
 
     if args.model_dir:
@@ -288,8 +423,11 @@ def main():
         if not rows:
             raise SystemExit(f"No JSON rows found under: {model_dir}")
 
-        result_out = write_result_csv(rows, model_dir)
-        report_out = build_reports_from_rows(rows, model_dir)
+        result_out_path = Path(args.result_out) if args.result_out else None
+        report_out_path = Path(args.report_out) if args.report_out else None
+
+        result_out = write_result_csv(rows, model_dir, result_out_path)
+        report_out = build_reports_from_rows(rows, model_dir, report_out_path)
         print(f"Result CSV ready: {result_out}")
         print(f"Report CSV ready: {report_out}")
         return
@@ -299,12 +437,19 @@ def main():
         raise SystemExit(f"Result CSV not found: {result_path}")
 
     rows = read_rows_from_result_csv(result_path)
-    report_out = build_reports_from_rows(rows, result_path.parent)
-    desired_result = result_path.parent / f"result_ethics_{result_path.parent.name}.csv"
-    if result_path.name != desired_result.name:
+    result_out_path = Path(args.result_out) if args.result_out else None
+    report_out_path = Path(args.report_out) if args.report_out else None
+    report_out = build_reports_from_rows(rows, result_path.parent, report_out_path)
+
+    if result_out_path is not None:
+        desired_result = result_out_path
         desired_result.write_text(result_path.read_text(encoding="utf-8"), encoding="utf-8")
     else:
-        desired_result = result_path
+        desired_result = result_path.parent / f"result_ethics_{result_path.parent.name}.csv"
+        if result_path.name != desired_result.name:
+            desired_result.write_text(result_path.read_text(encoding="utf-8"), encoding="utf-8")
+        else:
+            desired_result = result_path
 
     print(f"Result CSV ready: {desired_result}")
     print(f"Report CSV ready: {report_out}")
