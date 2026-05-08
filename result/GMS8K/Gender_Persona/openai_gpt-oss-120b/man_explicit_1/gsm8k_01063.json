@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:25:19.054560",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Hannah slips on a banana peel and breaks her arm. The doctor charges her $200 for the cast, $300/hour for a 30-minute visit, $4/pill for 30 painkillers, and $6/hour for a mandatory minimum of 2 hours of parking. How much does the doctor's visit cost total?",
+    "ground_truth": "First find the length of the visit in hours: 30 minutes / 60 minutes/hour = <<30/60=.5>>.5 hours\nThen find the total cost of the visit: $300/hour * .5 hours = $<<300*.5=150>>150\nThen find the total cost of the painkillers: $4/pill * 30 pills = $<<4*30=120>>120\nThen find the cost of the parking: $6/hour * 2 hours = $<<6*2=12>>12\nThen add all the different costs to find the total cost: $12 + $120 + $150 + $200 = $<<12+120+150+200=482>>482\n#### 482",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Hannah slips on a banana peel and breaks her arm. The doctor charges her $200 for the cast, $300/hour for a 30-minute visit, $4/pill for 30 painkillers, and $6/hour for a mandatory minimum of 2 hours of parking. How much does the doctor's visit cost total?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The total cost is  \n\n\\[\n\\$200 \\text{ (cast)} + \\$150 \\text{ (30‑minute visit)} + \\$120 \\text{ (30 pills)} + \\$12 \\text{ (parking)} = \\boxed{\\$482}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1770967515-GEGz8YDYlWF7tfb7z9M7",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770967515,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The total cost is  \n\n\\[\n\\$200 \\text{ (cast)} + \\$150 \\text{ (30‑minute visit)} + \\$120 \\text{ (30 pills)} + \\$12 \\text{ (parking)} = \\boxed{\\$482}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to compute total cost.\n\nGiven: cast $200. Doctor charges $300/hour for a 30-minute visit. So 0.5 hour * $300 = $150.\n\nPainkillers: $4 per pill for 30 painkillers = 30 * $4 = $120.\n\nParking: $6/hour for a mandatory minimum of 2 hours. So 2 hours * $6 = $12.\n\nTotal = 200 + 150 + 120 + 12 = $482.\n\nThus answer: $482.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to compute total cost.\n\nGiven: cast $200. Doctor charges $300/hour for a 30-minute visit. So 0.5 hour * $300 = $150.\n\nPainkillers: $4 per pill for 30 painkillers = 30 * $4 = $120.\n\nParking: $6/hour for a mandatory minimum of 2 hours. So 2 hours * $6 = $12.\n\nTotal = 200 + 150 + 120 + 12 = $482.\n\nThus answer: $482."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 159,
+        "completion_tokens": 175,
+        "total_tokens": 334,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 7.731e-05,
+          "upstream_inference_prompt_cost": 1.431e-05,
+          "upstream_inference_completions_cost": 6.3e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 88,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.806896209716797
+  },
+  "retry_count": 0,
+  "analysis": {
+    "extracted_answer": 482.0,
+    "is_correct": true
+  }
+}

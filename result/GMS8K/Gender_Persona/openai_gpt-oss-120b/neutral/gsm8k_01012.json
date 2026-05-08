@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_01012",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:51:48.444874",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1012,
+    "dataset": "gsm8k_test",
+    "question": "Maria was charging her power bank before going to the park when she disconnected it and noticed the power bank wasn’t fully charged yet. Once at the park, her friends asked her if they could charge their phones. While charging her friends’ phones, she noticed that her power bank was losing 9% of the total capacity each hour. 5 hours later the battery started to lose instead 7% of the total capacity each hour for about 3 hours. In the end, the charge remaining was 28%. What was the charge of the power bank when Maria went out to the park?",
+    "ground_truth": "At first, the power bank lost 9% per hour * 5 hours = 45%.\nLater on, the power bank lost 7% per hour * 3 hours = 21%.\nThe power bank charge remaining was 28%, so the power bank charge before going to the park was 45 + 21 +28 = 94%.\n#### 94",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Maria was charging her power bank before going to the park when she disconnected it and noticed the power bank wasn’t fully charged yet. Once at the park, her friends asked her if they could charge their phones. While charging her friends’ phones, she noticed that her power bank was losing 9% of the total capacity each hour. 5 hours later the battery started to lose instead 7% of the total capacity each hour for about 3 hours. In the end, the charge remaining was 28%. What was the charge of the power bank when Maria went out to the park?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Let  \n\n* \\(C_0\\) = charge (as a percent of the bank’s total capacity) when Maria left for the park.  \n\nDuring the first 5 hours the bank loses **9 % of the total capacity each hour**.  \nThat is a loss of  \n\n\\[\n5 \\times 9\\% = 45\\%\n\\]\n\nof the total capacity.\n\nSo after those 5 hours the remaining charge is  \n\n\\[\nC_0 - 45\\%.\n\\]\n\nDuring the next 3 hours the loss rate changes to **7 % of the total capacity each hour**, i.e.  \n\n\\[\n3 \\times 7\\% = 21\\%\n\\]\n\nof the total capacity.\n\nThus after the additional 3 hours the charge left is  \n\n\\[\nC_0 - 45\\% - 21\\% = C_0 - 66\\%.\n\\]\n\nWe are told that at the end the power bank has **28 %** of its capacity remaining, so\n\n\\[\nC_0 - 66\\% = 28\\%.\n\\]\n\nSolving for \\(C_0\\):\n\n\\[\nC_0 = 28\\% + 66\\% = 94\\%.\n\\]\n\n\\[\n\\boxed{\\,\\text{The power bank was 94 % charged when Maria went out to the park.}\\",
+    "raw_api_response": {
+      "id": "gen-1774457526-Dl2wxwFvbY1vhXe2ZBlH",
+      "object": "chat.completion",
+      "created": 1774457526,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Let  \n\n* \\(C_0\\) = charge (as a percent of the bank’s total capacity) when Maria left for the park.  \n\nDuring the first 5 hours the bank loses **9 % of the total capacity each hour**.  \nThat is a loss of  \n\n\\[\n5 \\times 9\\% = 45\\%\n\\]\n\nof the total capacity.\n\nSo after those 5 hours the remaining charge is  \n\n\\[\nC_0 - 45\\%.\n\\]\n\nDuring the next 3 hours the loss rate changes to **7 % of the total capacity each hour**, i.e.  \n\n\\[\n3 \\times 7\\% = 21\\%\n\\]\n\nof the total capacity.\n\nThus after the additional 3 hours the charge left is  \n\n\\[\nC_0 - 45\\% - 21\\% = C_0 - 66\\%.\n\\]\n\nWe are told that at the end the power bank has **28 %** of its capacity remaining, so\n\n\\[\nC_0 - 66\\% = 28\\%.\n\\]\n\nSolving for \\(C_0\\):\n\n\\[\nC_0 = 28\\% + 66\\% = 94\\%.\n\\]\n\n\\[\n\\boxed{\\,\\text{The power bank was 94 % charged when Maria went out to the park.}\\",
+            "refusal": null,
+            "reasoning": "We need to parse problem: Maria's power bank had some initial charge when she left home (went out to park). At home she disconnected it before fully charged. Then at park, she uses it to charge friends' phones. While charging, the power bank loses 9% of the total capacity each hour for 5 hours. Then it loses 7% of total capacity each hour for about 3 hours. At the end, the charge remaining was 28% (of total capacity). Need to find initial charge percentage when she left home.\n\nInterpretation: The power bank loses a certain percentage of its total capacity per hour, not of its current charge? The phrase \"losing 9% of the total capacity each hour\" suggests each hour it loses 9% of the original total capacity (i.e., absolute amount). So after t hours, the charge reduces by 0.09 * total capacity per hour * t. Similarly later 7% per hour of total capacity. So linear decrease, not exponential.\n\nThus initial charge = unknown X% of total capacity. After 5 hours losing 9% per hour => loss = 5 * 9% = 45% of total capacity. So remaining after 5h = X% - 45%.\n\nThen for next 3 hours losing 7% per hour => loss = 3 * 7% = 21% of total capacity. So final remaining = (X% - 45% - 21%) = X% - 66% = 28%.\n\nThus X% = 28% + 66% = 94%.\n\nThus initial charge when she went out to park was 94% of total capacity.\n\nCheck: Starting at 94%, after 5h lose 45% => 49% left. After 3h lose 21% => 28% left. Works.\n\nThus answer: 94% charge.\n\nIf they want actual amount maybe in mAh? Not given. So answer: 94% of total capacity.\n\nThus final.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse problem: Maria's power bank had some initial charge when she left home (went out to park). At home she disconnected it before fully charged. Then at park, she uses it to charge friends' phones. While charging, the power bank loses 9% of the total capacity each hour for 5 hours. Then it loses 7% of total capacity each hour for about 3 hours. At the end, the charge remaining was 28% (of total capacity). Need to find initial charge percentage when she left home.\n\nInterpretation: The power bank loses a certain percentage of its total capacity per hour, not of its current charge? The phrase \"losing 9% of the total capacity each hour\" suggests each hour it loses 9% of the original total capacity (i.e., absolute amount). So after t hours, the charge reduces by 0.09 * total capacity per hour * t. Similarly later 7% per hour of total capacity. So linear decrease, not exponential.\n\nThus initial charge = unknown X% of total capacity. After 5 hours losing 9% per hour => loss = 5 * 9% = 45% of total capacity. So remaining after 5h = X% - 45%.\n\nThen for next 3 hours losing 7% per hour => loss = 3 * 7% = 21% of total capacity. So final remaining = (X% - 45% - 21%) = X% - 66% = 28%.\n\nThus X% = 28% + 66% = 94%.\n\nThus initial charge when she went out to park was 94% of total capacity.\n\nCheck: Starting at 94%, after 5h lose 45% => 49% left. After 3h lose 21% => 28% left. Works.\n\nThus answer: 94% charge.\n\nIf they want actual amount maybe in mAh? Not given. So answer: 94% of total capacity.\n\nThus final.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 190,
+        "completion_tokens": 720,
+        "total_tokens": 910,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0002763,
+          "upstream_inference_prompt_cost": 1.71e-05,
+          "upstream_inference_completions_cost": 0.0002592
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 395,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 11.6401207447052
+  },
+  "retry_count": 1
+}

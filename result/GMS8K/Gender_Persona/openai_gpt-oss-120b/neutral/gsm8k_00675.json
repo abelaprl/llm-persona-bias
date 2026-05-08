@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00675",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T21:59:24.466547",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 675,
+    "dataset": "gsm8k_test",
+    "question": "James needs to get more toys for his doggie shelter. Each dog needs one toy. James currently has 4 toys on hand for 4 dogs, but there are 8 more dogs in the shelter now. After buying the toys, he went back to see that there are twice as many more dogs than when he left so he had to buy some more toys. When James came back yet again, 3 dogs were gone so he no longer needed those toys. How many toys in total does James need?",
+    "ground_truth": "James has 4+8=<<4+8=12>>12 toys.\nThere were 12*2=<<12*2=24>>24 dogs.\nJames needed to buy 24-12=<<24-12=12>>12 more toys.\nThere are 36 total toys.\n36-3=<<36-3=33>>33 toys are now needed.\n#### 33",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: James needs to get more toys for his doggie shelter. Each dog needs one toy. James currently has 4 toys on hand for 4 dogs, but there are 8 more dogs in the shelter now. After buying the toys, he went back to see that there are twice as many more dogs than when he left so he had to buy some more toys. When James came back yet again, 3 dogs were gone so he no longer needed those toys. How many toys in total does James need?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "James ends up needing **21 toys**.  \n\n- He starts with 4 toys for 4 dogs.  \n- 8 more dogs arrive → 12 dogs total → he buys 8 more toys (now 12 toys).  \n- When he returns, the number of dogs has doubled → 24 dogs total → he buys 12 more toys (now 24 toys).  \n- On his next return, 3 dogs are gone → 21 dogs remain → he only needs 21 toys.  \n\nSo the total number of toys required for the dogs that are still there is **21**",
+    "raw_api_response": {
+      "id": "gen-1774450766-3SD4vPB0hBfYq1AHJ5bX",
+      "object": "chat.completion",
+      "created": 1774450766,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "James ends up needing **21 toys**.  \n\n- He starts with 4 toys for 4 dogs.  \n- 8 more dogs arrive → 12 dogs total → he buys 8 more toys (now 12 toys).  \n- When he returns, the number of dogs has doubled → 24 dogs total → he buys 12 more toys (now 24 toys).  \n- On his next return, 3 dogs are gone → 21 dogs remain → he only needs 21 toys.  \n\nSo the total number of toys required for the dogs that are still there is **21**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. James initially has 4 toys for 4 dogs. There are 8 more dogs now, so total dogs = 4 + 8 = 12? Actually \"James currently has 4 toys on hand for 4 dogs, but there are 8 more dogs in the shelter now.\" So initially there were 4 dogs, he has 4 toys. Then 8 more dogs appear, making total dogs = 12. He needs toys for each dog, so he needs 12 toys total. He already has 4, so he needs to buy 8 more toys.\n\n\"After buying the toys, he went back to see that there are twice as many more dogs than when he left so he had to buy some more toys.\" This is ambiguous: \"twice as many more dogs than when he left\". He left after buying the toys? He left after buying the toys (the 8). At that point there were 12 dogs. When he returns, there are \"twice as many more dogs than when he left\". Does that mean the number of dogs increased by a factor of 2 (i.e., double) compared to when he left? Or \"twice as many more dogs\" could be interpreted as there are twice as many additional dogs beyond the original? Likely means the total number of dogs is double the number when he left. So now there are 2 * 12 = 24 dogs. He already has toys for 12 dogs (4 original + 8 bought). He needs toys for the extra 12 dogs, so he buys 12 more toys.\n\nThen: \"When James came back yet again, 3 dogs were gone so he no longer needed those toys.\" Means after the second purchase, when he returns again, 3 dogs have left (or are gone). So the total dogs now is 24 - 3 = 21 dogs. He already has toys for 24 dogs (4 original + 8 + 12 = 24 toys). But now only 21 dogs remain, so he has 3 extra toys that are no longer needed. The question: \"How many toys in total does James need?\" Could be interpreted as the total number of toys he needs to have at the end (i.e., for the current dogs) which is 21. Or total toys he needed to buy throughout the process? The phrase \"in total does James need\" maybe means total number of toys he needs to have to satisfy all dogs at the final state, which is 21. But maybe they want total toys purchased (including initial 4). He initially had 4, then bought 8, then bought 12, total toys he has = 4+8+12 = 24. But after 3 dogs left, he no longer needs those toys, so maybe the answer is 21 (the needed toys). The wording: \"When James came back yet again, 3 dogs were gone so he no longer needed those toys.\" So he no longer needs those toys, meaning he can discard them. So the total needed is 21.\n\nThus answer: 21 toys.\n\nLet's answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. James initially has 4 toys for 4 dogs. There are 8 more dogs now, so total dogs = 4 + 8 = 12? Actually \"James currently has 4 toys on hand for 4 dogs, but there are 8 more dogs in the shelter now.\" So initially there were 4 dogs, he has 4 toys. Then 8 more dogs appear, making total dogs = 12. He needs toys for each dog, so he needs 12 toys total. He already has 4, so he needs to buy 8 more toys.\n\n\"After buying the toys, he went back to see that there are twice as many more dogs than when he left so he had to buy some more toys.\" This is ambiguous: \"twice as many more dogs than when he left\". He left after buying the toys? He left after buying the toys (the 8). At that point there were 12 dogs. When he returns, there are \"twice as many more dogs than when he left\". Does that mean the number of dogs increased by a factor of 2 (i.e., double) compared to when he left? Or \"twice as many more dogs\" could be interpreted as there are twice as many additional dogs beyond the original? Likely means the total number of dogs is double the number when he left. So now there are 2 * 12 = 24 dogs. He already has toys for 12 dogs (4 original + 8 bought). He needs toys for the extra 12 dogs, so he buys 12 more toys.\n\nThen: \"When James came back yet again, 3 dogs were gone so he no longer needed those toys.\" Means after the second purchase, when he returns again, 3 dogs have left (or are gone). So the total dogs now is 24 - 3 = 21 dogs. He already has toys for 24 dogs (4 original + 8 + 12 = 24 toys). But now only 21 dogs remain, so he has 3 extra toys that are no longer needed. The question: \"How many toys in total does James need?\" Could be interpreted as the total number of toys he needs to have at the end (i.e., for the current dogs) which is 21. Or total toys he needed to buy throughout the process? The phrase \"in total does James need\" maybe means total number of toys he needs to have to satisfy all dogs at the final state, which is 21. But maybe they want total toys purchased (including initial 4). He initially had 4, then bought 8, then bought 12, total toys he has = 4+8+12 = 24. But after 3 dogs left, he no longer needs those toys, so maybe the answer is 21 (the needed toys). The wording: \"When James came back yet again, 3 dogs were gone so he no longer needed those toys.\" So he no longer needs those toys, meaning he can discard them. So the total needed is 21.\n\nThus answer: 21 toys.\n\nLet's answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 174,
+        "completion_tokens": 780,
+        "total_tokens": 954,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00029646,
+          "upstream_inference_prompt_cost": 1.566e-05,
+          "upstream_inference_completions_cost": 0.0002808
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 621,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 17.23600196838379
+  },
+  "retry_count": 0
+}

@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:06:55.251170",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Steve is 60 years old. His wife is 4 years older than him. Their son is currently half as old as his mom and their son's wife is 3 years younger than her husband. How old is Steve's son's wife?",
+    "ground_truth": "Steve's wife is 60+4=<<60+4=64>>64 years old.\nSteve's son is 64/2=<<64/2=32>>32 years old.\nHis wife is 32-3=<<32-3=29>>29 years old.\n#### 29",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Steve is 60 years old. His wife is 4 years older than him. Their son is currently half as old as his mom and their son's wife is 3 years younger than her husband. How old is Steve's son's wife?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Steve’s wife is 64 years old, so their son is half that age: 32 years old.  \nSince the son’s wife is 3 years younger than her husband, she is  \n\n\\(32 - 3 = 29\\) years old.  \n\n**Answer: 29 years old.**",
+    "raw_api_response": {
+      "id": "gen-1770966413-09ka7E308l28nPsNziMo",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770966413,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Steve’s wife is 64 years old, so their son is half that age: 32 years old.  \nSince the son’s wife is 3 years younger than her husband, she is  \n\n\\(32 - 3 = 29\\) years old.  \n\n**Answer: 29 years old.**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem.\n\nSteve is 60. His wife is 4 years older than him, so she is 64.\n\nTheir son is currently half as old as his mom. Mom is Steve's wife, age 64. Half of 64 is 32. So son is 32.\n\nTheir son's wife is 3 years younger than her husband (the son). So son's wife is 32 - 3 = 29.\n\nThus answer: 29 years old.\n\nCheck if any trick: \"Steve's son\" is male, his wife is female. So answer: 29.\n\nThus output.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem.\n\nSteve is 60. His wife is 4 years older than him, so she is 64.\n\nTheir son is currently half as old as his mom. Mom is Steve's wife, age 64. Half of 64 is 32. So son is 32.\n\nTheir son's wife is 3 years younger than her husband (the son). So son's wife is 32 - 3 = 29.\n\nThus answer: 29 years old.\n\nCheck if any trick: \"Steve's son\" is male, his wife is female. So answer: 29.\n\nThus output."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 141,
+        "completion_tokens": 203,
+        "total_tokens": 344,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 8.577e-05,
+          "upstream_inference_prompt_cost": 1.269e-05,
+          "upstream_inference_completions_cost": 7.308e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 114,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 1.191225290298462
+  },
+  "retry_count": 0,
+  "analysis": {
+    "extracted_answer": 29.0,
+    "is_correct": true
+  }
+}

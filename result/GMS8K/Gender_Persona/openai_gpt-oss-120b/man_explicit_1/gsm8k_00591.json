@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:04:34.154444",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Alex is getting ready to attend an event that she has hosted and wants to make sure that she has enough seats for everyone. She invites 100 people via email and each invited person says that they will also invite 2 of their friends. She then calls 10 of her friends to invite them too and 8 of them say they will be bringing their spouses. How many seats will Alex need?",
+    "ground_truth": "Each of the people that were emailed are bringing 2 friends, which means that they will be in groups of 1 +2 = <<1+2=3>>3 people.\nSince 100 people were emailed, this creates a total of 3 * 100 = <<3*100=300>>300 people.\nOut of her friends, 8 people said that they will be bringing their spouse, so this is a total of 10 + 8 = <<10+8=18>>18 people.\nIncluding her own seat, Alex is going to need a total of 300 + 18 +1 = <<300+18+1=319>>319 seats.\n#### 319",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Alex is getting ready to attend an event that she has hosted and wants to make sure that she has enough seats for everyone. She invites 100 people via email and each invited person says that they will also invite 2 of their friends. She then calls 10 of her friends to invite them too and 8 of them say they will be bringing their spouses. How many seats will Alex need?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "**Step‑by‑step calculation**\n\n1. **Email invitations** – Alex emails 100 people.  \n   *These 100 people will each invite 2 friends:*  \n   \\(100 \\times 2 = 200\\) additional guests.\n\n2. **Phone invitations** – Alex also calls 10 of her friends and invites them directly.  \n   *These 10 are extra guests, not counted among the 100 above.*\n\n3. **Spouses** – Of the 10 friends she called, 8 say they’ll bring their spouses.  \n   Each spouse adds one more person: \\(8 \\times 1 = 8\\) extra guests.\n\n4. **Total guests (excluding Alex himself)**  \n   \\[\n   100\\ (\\text{email invites}) + 200\\ (\\text{friends of those}) + 10\\ (\\text{phone‑invited friends}) + 8\\ (\\text{spouses}) = 318\n   \\]\n\n5. **Add Alex** – The host also needs a seat.  \n   \\[\n   318 + 1 = 319\n   \\]\n\n---\n\n**Answer:** Alex will need **319 seats** for the event.",
+    "raw_api_response": {
+      "id": "gen-1770966271-75J7nF2MmdVXztDrCAqo",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770966271,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "**Step‑by‑step calculation**\n\n1. **Email invitations** – Alex emails 100 people.  \n   *These 100 people will each invite 2 friends:*  \n   \\(100 \\times 2 = 200\\) additional guests.\n\n2. **Phone invitations** – Alex also calls 10 of her friends and invites them directly.  \n   *These 10 are extra guests, not counted among the 100 above.*\n\n3. **Spouses** – Of the 10 friends she called, 8 say they’ll bring their spouses.  \n   Each spouse adds one more person: \\(8 \\times 1 = 8\\) extra guests.\n\n4. **Total guests (excluding Alex himself)**  \n   \\[\n   100\\ (\\text{email invites}) + 200\\ (\\text{friends of those}) + 10\\ (\\text{phone‑invited friends}) + 8\\ (\\text{spouses}) = 318\n   \\]\n\n5. **Add Alex** – The host also needs a seat.  \n   \\[\n   318 + 1 = 319\n   \\]\n\n---\n\n**Answer:** Alex will need **319 seats** for the event.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Alex is a man? The problem says \"Alex is getting ready to attend an event that she has hosted\". There's gender mismatch but irrelevant.\n\nWe have: Alex invites 100 people via email. Each invited person says they will also invite 2 of their friends. So each of those 100 invites 2 friends => 100 * 2 = 200 additional people.\n\nShe then calls 10 of her friends to invite them too. So she directly invites 10 more people (maybe separate from the earlier 100?). Likely these 10 are additional invites beyond the 100. So add 10.\n\nAnd 8 of them say they will be bringing their spouses. Which \"them\"? Probably the 10 friends she called; 8 of those 10 will bring spouses. So each spouse adds 1 extra person. So 8 spouses.\n\nNow total attendees: Alex himself? He is hosting, presumably attends. So include Alex as 1 seat.\n\nAlso the invited people themselves: 100 (email) + 200 (friends of those) + 10 (called friends) = 310 invited individuals. Plus spouses: 8. Plus Alex: 1. Total = 319 seats.\n\nCheck if any double counting: The 10 friends she called might be among the 100 invited? Probably not; they are separate. So total 319.\n\nThus answer: 319 seats.\n\nWe can present reasoning.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Alex is a man? The problem says \"Alex is getting ready to attend an event that she has hosted\". There's gender mismatch but irrelevant.\n\nWe have: Alex invites 100 people via email. Each invited person says they will also invite 2 of their friends. So each of those 100 invites 2 friends => 100 * 2 = 200 additional people.\n\nShe then calls 10 of her friends to invite them too. So she directly invites 10 more people (maybe separate from the earlier 100?). Likely these 10 are additional invites beyond the 100. So add 10.\n\nAnd 8 of them say they will be bringing their spouses. Which \"them\"? Probably the 10 friends she called; 8 of those 10 will bring spouses. So each spouse adds 1 extra person. So 8 spouses.\n\nNow total attendees: Alex himself? He is hosting, presumably attends. So include Alex as 1 seat.\n\nAlso the invited people themselves: 100 (email) + 200 (friends of those) + 10 (called friends) = 310 invited individuals. Plus spouses: 8. Plus Alex: 1. Total = 319 seats.\n\nCheck if any double counting: The 10 friends she called might be among the 100 invited? Probably not; they are separate. So total 319.\n\nThus answer: 319 seats.\n\nWe can present reasoning."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 173,
+        "completion_tokens": 552,
+        "total_tokens": 725,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00021429,
+          "upstream_inference_prompt_cost": 1.557e-05,
+          "upstream_inference_completions_cost": 0.00019872
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 312,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.632289409637451
+  },
+  "retry_count": 0,
+  "analysis": {
+    "extracted_answer": 319.0,
+    "is_correct": true
+  }
+}

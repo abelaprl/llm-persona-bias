@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_00150",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T18:20:39.585328",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 150,
+    "dataset": "gsm8k_test",
+    "question": "Steve and Tim decide to see who can get home from school the fastest. Steve lives further away than Tim, so he is allowed to ride his bike. Steve lives 3 miles from the school and can bike at 440 feet per minute. Tim lives 2 miles away from the school. If Tim can ride his skateboard at 264 feet per minute, how long will the winner be waiting at their house before the loser finishes the race?",
+    "ground_truth": "Steve has to travel 3 miles * (5280 feet/1 mile) = <<3*5280=15840>>15840 feet to get home.\nIt will take Steve 15840 feet / (440 feet/minute) = <<15840/(440)=36>>36 minutes to get home.\nTim has to travel 2 miles * (5280 feet/1 mile) = <<2*5280=10560>>10560 feet to get home.\nIt will take Tim 10560 feet / (264 feet/minute) = <<10560/264=40>>40 minutes to get home.\nSteve will finish the race in 40 minutes - 36 minutes = <<40-36=4>>4 minutes less time than Tim.\n#### 4",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Steve and Tim decide to see who can get home from school the fastest. Steve lives further away than Tim, so he is allowed to ride his bike. Steve lives 3 miles from the school and can bike at 440 feet per minute. Tim lives 2 miles away from the school. If Tim can ride his skateboard at 264 feet per minute, how long will the winner be waiting at their house before the loser finishes the race?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Steve’s trip:  \n\n- Distance = 3 mi = 3 × 5280 ft = 15 840 ft  \n- Speed = 440 ft/min  \n\n\\[\n\\text{Time}_{\\text{Steve}}=\\frac{15\\,840\\text{ ft}}{440\\text{ ft/min}}=36\\text{ min}\n\\]\n\nTim’s trip:  \n\n- Distance = 2 mi = 2 × 5280 ft = 10 560 ft  \n- Speed = 264 ft/min  \n\n\\[\n\\text{Time}_{\\text{Tim}}=\\frac{10\\,560\\text{ ft}}{264\\text{ ft/min}}=40\\text{ min}\n\\]\n\nSteve arrives first (36 min) and waits until Tim arrives (40 min).  \n\n\\[\n\\text{Waiting time}=40\\text{ min}-36\\text{ min}=4\\text{ minutes}\n\\]\n\n**Answer: 4 minutes",
+    "raw_api_response": {
+      "id": "gen-1774437640-OvNio62RiCDQOXJbJEsH",
+      "object": "chat.completion",
+      "created": 1774437640,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Steve’s trip:  \n\n- Distance = 3 mi = 3 × 5280 ft = 15 840 ft  \n- Speed = 440 ft/min  \n\n\\[\n\\text{Time}_{\\text{Steve}}=\\frac{15\\,840\\text{ ft}}{440\\text{ ft/min}}=36\\text{ min}\n\\]\n\nTim’s trip:  \n\n- Distance = 2 mi = 2 × 5280 ft = 10 560 ft  \n- Speed = 264 ft/min  \n\n\\[\n\\text{Time}_{\\text{Tim}}=\\frac{10\\,560\\text{ ft}}{264\\text{ ft/min}}=40\\text{ min}\n\\]\n\nSteve arrives first (36 min) and waits until Tim arrives (40 min).  \n\n\\[\n\\text{Waiting time}=40\\text{ min}-36\\text{ min}=4\\text{ minutes}\n\\]\n\n**Answer: 4 minutes",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: Steve and Tim race to get home from school. Steve lives 3 miles away, can bike at 440 ft/min. Tim lives 2 miles away, can skateboard at 264 ft/min. They start at school same time, go home. The winner arrives first, then waits at his house until the loser arrives. We need to compute how long the winner will be waiting (i.e., difference in arrival times). So compute travel times for each, subtract.\n\nFirst convert distances to feet: 1 mile = 5280 ft.\n\nSteve distance: 3 miles = 3 * 5280 = 15840 ft.\nTim distance: 2 miles = 2 * 5280 = 10560 ft.\n\nSpeeds: Steve 440 ft/min, Tim 264 ft/min.\n\nTravel times:\nSteve time = distance / speed = 15840 / 440 minutes.\nCompute: 440*36 = 15840? Let's check: 440*30 = 13200; 440*6 = 2640; sum = 15840. Yes, 36 minutes.\n\nTim time = 10560 / 264 minutes.\nCompute: 264*40 = 10560? 264*40 = 10560 indeed. So Tim time = 40 minutes.\n\nThus Steve arrives in 36 minutes, Tim in 40 minutes. Winner is Steve (arrives earlier). Wait time = 40 - 36 = 4 minutes.\n\nThus answer: 4 minutes.\n\nCheck if any nuance: The problem says \"how long will the winner be waiting at their house before the loser finishes the race?\" So answer: 4 minutes.\n\nThus final.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: Steve and Tim race to get home from school. Steve lives 3 miles away, can bike at 440 ft/min. Tim lives 2 miles away, can skateboard at 264 ft/min. They start at school same time, go home. The winner arrives first, then waits at his house until the loser arrives. We need to compute how long the winner will be waiting (i.e., difference in arrival times). So compute travel times for each, subtract.\n\nFirst convert distances to feet: 1 mile = 5280 ft.\n\nSteve distance: 3 miles = 3 * 5280 = 15840 ft.\nTim distance: 2 miles = 2 * 5280 = 10560 ft.\n\nSpeeds: Steve 440 ft/min, Tim 264 ft/min.\n\nTravel times:\nSteve time = distance / speed = 15840 / 440 minutes.\nCompute: 440*36 = 15840? Let's check: 440*30 = 13200; 440*6 = 2640; sum = 15840. Yes, 36 minutes.\n\nTim time = 10560 / 264 minutes.\nCompute: 264*40 = 10560? 264*40 = 10560 indeed. So Tim time = 40 minutes.\n\nThus Steve arrives in 36 minutes, Tim in 40 minutes. Winner is Steve (arrives earlier). Wait time = 40 - 36 = 4 minutes.\n\nThus answer: 4 minutes.\n\nCheck if any nuance: The problem says \"how long will the winner be waiting at their house before the loser finishes the race?\" So answer: 4 minutes.\n\nThus final.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 160,
+        "completion_tokens": 580,
+        "total_tokens": 740,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0002232,
+          "upstream_inference_prompt_cost": 1.44e-05,
+          "upstream_inference_completions_cost": 0.0002088
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 317,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 9.571709394454956
+  },
+  "retry_count": 0
+}

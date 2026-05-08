@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:17:40.208070",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Ellen is on a diet. She eats two carrots, a salad, and a yogurt every day. The salad costs her $6, while the yogurt is half the price. How much does Ellen pay for one carrot every day when in total she pays $11 for her goods?",
+    "ground_truth": "Ellen's yogurt cost is half the price of the salad, so it's $6 / 2 = $<<6/2=3>>3.\nFor the two carrots Ellen needs to pay $11 - $6 - $3 = $<<11-6-3=2>>2.\nSo one carrot costs $2 / $2 = $<<2/2=1>>1.\n#### 1",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Ellen is on a diet. She eats two carrots, a salad, and a yogurt every day. The salad costs her $6, while the yogurt is half the price. How much does Ellen pay for one carrot every day when in total she pays $11 for her goods?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Each carrot costs **$1** per day.",
+    "raw_api_response": {
+      "id": "gen-1770967058-6e94Mqs7nFZswYwId3iP",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770967058,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Each carrot costs **$1** per day.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: Ellen eats two carrots, a salad, and a yogurt each day. Salad costs $6. Yogurt is half the price (presumably half the price of the salad? Or half the price of something else? Likely half the price of the salad, i.e., $3). Total she pays $11 for her goods each day. Need price per carrot.\n\nLet salad = $6. Yogurt = half the price of salad = $3. So total cost of salad + yogurt = $9. Total daily cost = $11. So remaining $2 is for two carrots. So each carrot costs $1.\n\nThus answer: $1 per carrot.\n\nCheck: 2 carrots * $1 = $2, salad $6, yogurt $3 => $11.\n\nThus answer: $1.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: Ellen eats two carrots, a salad, and a yogurt each day. Salad costs $6. Yogurt is half the price (presumably half the price of the salad? Or half the price of something else? Likely half the price of the salad, i.e., $3). Total she pays $11 for her goods each day. Need price per carrot.\n\nLet salad = $6. Yogurt = half the price of salad = $3. So total cost of salad + yogurt = $9. Total daily cost = $11. So remaining $2 is for two carrots. So each carrot costs $1.\n\nThus answer: $1 per carrot.\n\nCheck: 2 carrots * $1 = $2, salad $6, yogurt $3 => $11.\n\nThus answer: $1."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 149,
+        "completion_tokens": 190,
+        "total_tokens": 339,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 8.181e-05,
+          "upstream_inference_prompt_cost": 1.341e-05,
+          "upstream_inference_completions_cost": 6.84e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 156,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 1.2621488571166992
+  },
+  "retry_count": 0,
+  "analysis": {
+    "extracted_answer": 1.0,
+    "is_correct": true
+  }
+}

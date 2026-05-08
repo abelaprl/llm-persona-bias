@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_01062",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:04:03.244287",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1062,
+    "dataset": "gsm8k_test",
+    "question": "Hannah slips on a banana peel and breaks her arm. The doctor charges her $200 for the cast, $300/hour for a 30-minute visit, $4/pill for 30 painkillers, and $6/hour for a mandatory minimum of 2 hours of parking. How much does the doctor's visit cost total?",
+    "ground_truth": "First find the length of the visit in hours: 30 minutes / 60 minutes/hour = <<30/60=.5>>.5 hours\nThen find the total cost of the visit: $300/hour * .5 hours = $<<300*.5=150>>150\nThen find the total cost of the painkillers: $4/pill * 30 pills = $<<4*30=120>>120\nThen find the cost of the parking: $6/hour * 2 hours = $<<6*2=12>>12\nThen add all the different costs to find the total cost: $12 + $120 + $150 + $200 = $<<12+120+150+200=482>>482\n#### 482",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Hannah slips on a banana peel and breaks her arm. The doctor charges her $200 for the cast, $300/hour for a 30-minute visit, $4/pill for 30 painkillers, and $6/hour for a mandatory minimum of 2 hours of parking. How much does the doctor's visit cost total?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The total cost is  \n\n- Cast: $200  \n- 30‑minute visit at $300 / hour → $300 × 0.5 h = $150  \n- Painkillers: $4 × 30 = $120  \n- Parking (minimum 2 h at $6 / h) → $6 × 2 = $12  \n\nAdding them up:  \n\n\\(200 + 150 + 120 + 12 = \\boxed{ \\$482 }\\",
+    "raw_api_response": {
+      "id": "gen-1774458244-HCDcU6J54OR49mNPWutL",
+      "object": "chat.completion",
+      "created": 1774458244,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The total cost is  \n\n- Cast: $200  \n- 30‑minute visit at $300 / hour → $300 × 0.5 h = $150  \n- Painkillers: $4 × 30 = $120  \n- Parking (minimum 2 h at $6 / h) → $6 × 2 = $12  \n\nAdding them up:  \n\n\\(200 + 150 + 120 + 12 = \\boxed{ \\$482 }\\",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: Hannah slips, doctor charges: $200 for the cast, $300/hour for a 30-minute visit, $4/pill for 30 painkillers, and $6/hour for a mandatory minimum of 2 hours of parking. Compute total cost.\n\nCompute each component:\n\n- Cast: $200.\n\n- Visit: $300 per hour, but visit is 30 minutes = 0.5 hour. So cost = 300 * 0.5 = $150.\n\n- Painkillers: $4 per pill, 30 pills => 4*30 = $120.\n\n- Parking: $6 per hour, mandatory minimum of 2 hours. So cost = 6*2 = $12.\n\nTotal = 200 + 150 + 120 + 12 = $482.\n\nThus answer: $482.\n\nCheck if any nuance: \"mandatory minimum of 2 hours of parking\" means at least 2 hours, maybe she parked exactly 2 hours. So $12.\n\nThus answer: $482.\n\nReturn answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: Hannah slips, doctor charges: $200 for the cast, $300/hour for a 30-minute visit, $4/pill for 30 painkillers, and $6/hour for a mandatory minimum of 2 hours of parking. Compute total cost.\n\nCompute each component:\n\n- Cast: $200.\n\n- Visit: $300 per hour, but visit is 30 minutes = 0.5 hour. So cost = 300 * 0.5 = $150.\n\n- Painkillers: $4 per pill, 30 pills => 4*30 = $120.\n\n- Parking: $6 per hour, mandatory minimum of 2 hours. So cost = 6*2 = $12.\n\nTotal = 200 + 150 + 120 + 12 = $482.\n\nThus answer: $482.\n\nCheck if any nuance: \"mandatory minimum of 2 hours of parking\" means at least 2 hours, maybe she parked exactly 2 hours. So $12.\n\nThus answer: $482.\n\nReturn answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 137,
+        "completion_tokens": 333,
+        "total_tokens": 470,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00013221,
+          "upstream_inference_prompt_cost": 1.233e-05,
+          "upstream_inference_completions_cost": 0.00011988
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 191,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 4.0172202587127686
+  },
+  "retry_count": 0
+}

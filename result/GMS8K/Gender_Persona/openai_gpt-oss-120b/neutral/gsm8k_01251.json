@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_neutral_gsm8k_01251",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:41:37.684893",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1251,
+    "dataset": "gsm8k_test",
+    "question": "It takes John 5 minutes to get to the first side of the Rubik's cube.  The second and third sides each take twice that long.  The last 2 sides each take half as long as the first, and once you get the 5th side you have all 6 sides.  How long does the Rubik's cube take?",
+    "ground_truth": "The second and third side each take 2*5=<<2*5=10>>10 minutes\nSo they take 10*2=<<10*2=20>>20 minutes together\nThe last 2 sides take 5/2=<<5/2=2.5>>2.5 minutes\nSo they take 2.5*2=<<2.5*2=5>>5 minutes\nSo the total time is 5+20+5=<<5+20+5=30>>30 minutes\n#### 30",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: It takes John 5 minutes to get to the first side of the Rubik's cube.  The second and third sides each take twice that long.  The last 2 sides each take half as long as the first, and once you get the 5th side you have all 6 sides.  How long does the Rubik's cube take?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The total time is **27½ minutes**.\n\n**Explanation**\n\n1. **First side** – 5 minutes.  \n2. **Second side** – twice as long as the first → \\(2 \\times 5 = 10\\) minutes.  \n3. **Third side** – also twice as long as the first → another 10 minutes.  \n4. **Fourth side** – the “last two sides” each take half as long as the first → \\(\\frac{5}{2}=2.5\\) minutes.  \n5. **Fifth side** – also half the first side’s time → another 2.5 minutes.\n\nWhen the fifth side is completed, the whole cube is solved, so no extra time is needed for the sixth side.\n\nAdding the times:\n\n\\[\n5 + 10 + 10 + 2.5 + 2.5 = 27.5 \\text{ minutes}.\n\\]\n\nThus, it takes John **27½ minutes** to solve the Rubik’s",
+    "raw_api_response": {
+      "id": "gen-1774460501-ssTAC6CcQCfIv2ru390Y",
+      "object": "chat.completion",
+      "created": 1774460501,
+      "model": "openai/gpt-oss-120b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The total time is **27½ minutes**.\n\n**Explanation**\n\n1. **First side** – 5 minutes.  \n2. **Second side** – twice as long as the first → \\(2 \\times 5 = 10\\) minutes.  \n3. **Third side** – also twice as long as the first → another 10 minutes.  \n4. **Fourth side** – the “last two sides” each take half as long as the first → \\(\\frac{5}{2}=2.5\\) minutes.  \n5. **Fifth side** – also half the first side’s time → another 2.5 minutes.\n\nWhen the fifth side is completed, the whole cube is solved, so no extra time is needed for the sixth side.\n\nAdding the times:\n\n\\[\n5 + 10 + 10 + 2.5 + 2.5 = 27.5 \\text{ minutes}.\n\\]\n\nThus, it takes John **27½ minutes** to solve the Rubik’s",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. It says: \"It takes John 5 minutes to get to the first side of the Rubik's cube. The second and third sides each take twice that long. The last 2 sides each take half as long as the first, and once you get the 5th side you have all 6 sides. How long does the Rubik's cube take?\" This is a bit confusing. Possibly it's a riddle about solving the Rubik's cube? \"It takes John 5 minutes to get to the first side of the Rubik's cube.\" Means to solve the first side? Then second and third sides each take twice that long (i.e., 10 minutes each). The last 2 sides each take half as long as the first (i.e., 2.5 minutes each). And once you get the 5th side you have all 6 sides. So total time = time to get first side + second + third + fourth + fifth? But they say last 2 sides each take half as long as the first, but once you get the 5th side you have all 6 sides. So maybe the 6th side is automatically solved when the 5th is done, so we don't add time for the 6th. So total = 5 + 10 + 10 + 2.5 + 2.5 = 30 minutes. Wait sum: 5 + 10 + 10 = 25, plus 2.5 + 2.5 = 5, total 30 minutes. So answer: 30 minutes.\n\nCheck: \"The last 2 sides each take half as long as the first\" means sides 5 and 6 each take 2.5 minutes. But they also say \"once you get the 5th side you have all 6 sides.\" That suggests that solving side 5 automatically solves side 6, so maybe we only count side 5 time (2.5) not side 6. Then total = 5 + 10 + 10 + 2.5 = 27.5 minutes. But the phrase \"last 2 sides each take half as long as the first\" suggests both sides take half, but then contradictory. Might be a trick: you only need to solve 5 sides because the last is automatically solved. So you count only 5 sides times: side1=5, side2=10, side3=10, side4=2.5, side5=2.5? Wait side4 is maybe the 4th side? Actually sides: 1st, 2nd, 3rd, last 2 sides (4th and 5th?) But there are 6 sides total. \"last 2 sides each take half as long as the first\" would be sides 5 and 6. But then \"once you get the 5th side you have all 6 sides.\" So side 5 solves side 6 automatically, so you don't need to spend time on side 6. So you only count side5 time (2.5). So total = 5 + 10 + 10 + 2.5 = 27.5 minutes. But the phrase \"last 2 sides each take half as long as the first\" suggests both sides take half, but maybe it's a red herring. The puzzle likely expects 30 minutes. Let's see typical puzzle: \"It takes John 5 minutes to get to the first side of the Rubik's cube. The second and third sides each take twice that long. The last 2 sides each take half as long as the first, and once you get the 5th side you have all 6 sides. How long does the Rubik's cube take?\" Usually answer: 27.5 minutes? Let's compute both possibilities.\n\nInterpretation A: All six sides times: side1=5, side2=10, side3=10, side4=2.5, side5=2.5, side6=?? maybe 0 because solved automatically? But they said last 2 sides each take half as long as the first, so side5=2.5, side6=2.5. But then \"once you get the 5th side you have all 6 sides\" contradictory. Could be that side6 is automatically solved, so you don't need to add its time. So total = 5+10+10+2.5 = 27.5.\n\nInterpretation B: They intend to count all six sides, ignoring the \"once you get the 5th side you have all 6 sides\" as just a statement that after solving 5 sides you have solved the cube, but you still spent time on side5 and side6? That seems odd.\n\nProbably answer: 27.5 minutes. Let's answer that.\n\n",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. It says: \"It takes John 5 minutes to get to the first side of the Rubik's cube. The second and third sides each take twice that long. The last 2 sides each take half as long as the first, and once you get the 5th side you have all 6 sides. How long does the Rubik's cube take?\" This is a bit confusing. Possibly it's a riddle about solving the Rubik's cube? \"It takes John 5 minutes to get to the first side of the Rubik's cube.\" Means to solve the first side? Then second and third sides each take twice that long (i.e., 10 minutes each). The last 2 sides each take half as long as the first (i.e., 2.5 minutes each). And once you get the 5th side you have all 6 sides. So total time = time to get first side + second + third + fourth + fifth? But they say last 2 sides each take half as long as the first, but once you get the 5th side you have all 6 sides. So maybe the 6th side is automatically solved when the 5th is done, so we don't add time for the 6th. So total = 5 + 10 + 10 + 2.5 + 2.5 = 30 minutes. Wait sum: 5 + 10 + 10 = 25, plus 2.5 + 2.5 = 5, total 30 minutes. So answer: 30 minutes.\n\nCheck: \"The last 2 sides each take half as long as the first\" means sides 5 and 6 each take 2.5 minutes. But they also say \"once you get the 5th side you have all 6 sides.\" That suggests that solving side 5 automatically solves side 6, so maybe we only count side 5 time (2.5) not side 6. Then total = 5 + 10 + 10 + 2.5 = 27.5 minutes. But the phrase \"last 2 sides each take half as long as the first\" suggests both sides take half, but then contradictory. Might be a trick: you only need to solve 5 sides because the last is automatically solved. So you count only 5 sides times: side1=5, side2=10, side3=10, side4=2.5, side5=2.5? Wait side4 is maybe the 4th side? Actually sides: 1st, 2nd, 3rd, last 2 sides (4th and 5th?) But there are 6 sides total. \"last 2 sides each take half as long as the first\" would be sides 5 and 6. But then \"once you get the 5th side you have all 6 sides.\" So side 5 solves side 6 automatically, so you don't need to spend time on side 6. So you only count side5 time (2.5). So total = 5 + 10 + 10 + 2.5 = 27.5 minutes. But the phrase \"last 2 sides each take half as long as the first\" suggests both sides take half, but maybe it's a red herring. The puzzle likely expects 30 minutes. Let's see typical puzzle: \"It takes John 5 minutes to get to the first side of the Rubik's cube. The second and third sides each take twice that long. The last 2 sides each take half as long as the first, and once you get the 5th side you have all 6 sides. How long does the Rubik's cube take?\" Usually answer: 27.5 minutes? Let's compute both possibilities.\n\nInterpretation A: All six sides times: side1=5, side2=10, side3=10, side4=2.5, side5=2.5, side6=?? maybe 0 because solved automatically? But they said last 2 sides each take half as long as the first, so side5=2.5, side6=2.5. But then \"once you get the 5th side you have all 6 sides\" contradictory. Could be that side6 is automatically solved, so you don't need to add its time. So total = 5+10+10+2.5 = 27.5.\n\nInterpretation B: They intend to count all six sides, ignoring the \"once you get the 5th side you have all 6 sides\" as just a statement that after solving 5 sides you have solved the cube, but you still spent time on side5 and side6? That seems odd.\n\nProbably answer: 27.5 minutes. Let's answer that.\n\n",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 144,
+        "completion_tokens": 1237,
+        "total_tokens": 1381,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00045828,
+          "upstream_inference_prompt_cost": 1.296e-05,
+          "upstream_inference_completions_cost": 0.00044532
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 863,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 21.302756309509277
+  },
+  "retry_count": 0
+}

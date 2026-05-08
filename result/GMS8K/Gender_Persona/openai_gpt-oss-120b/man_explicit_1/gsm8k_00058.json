@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-120b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T13:40:50.918797",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-120b",
+      "model_name": "OpenAI: GPT-OSS-120B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "A wooden bridge can carry no more than 5000 pounds. A delivery truck filled with identical boxes, each weighing 15 pounds, will pass over the bridge. The combined weight of the driver and the empty truck is 3755 pounds. What is the maximum number of boxes which can be loaded onto the truck while not exceeding the bridge's weight limit?",
+    "ground_truth": "The boxes can weigh up to 5000 pounds - 3755 pounds = <<5000-3755=1245>>1245 pounds in total.\nThere can be 1245 / 15 = <<1245/15=83>>83 boxes loaded onto the truck without exceeding the bridge's weight limit.\n#### 83",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: A wooden bridge can carry no more than 5000 pounds. A delivery truck filled with identical boxes, each weighing 15 pounds, will pass over the bridge. The combined weight of the driver and the empty truck is 3755 pounds. What is the maximum number of boxes which can be loaded onto the truck while not exceeding the bridge's weight limit?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-120b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The bridge can support at most **5000 lb**.\n\n- Weight of the truck + driver (empty): **3755 lb**\n- Weight of each box: **15 lb**\n\nLet \\(n\\) be the number of boxes. The total weight on the bridge will be  \n\n\\[\n3755 \\text{ lb} + 15n \\text{ lb} \\le 5000 \\text{ lb}.\n\\]\n\nSolve for \\(n\\):\n\n\\[\n15n \\le 5000 - 3755 = 1245 \\\\\nn \\le \\frac{1245}{15} = 83.\n\\]\n\nSince \\(n\\) must be an integer, the greatest possible number of boxes is **\\(n = 83\\)**.\n\n**Answer: 83 boxes.**",
+    "raw_api_response": {
+      "id": "gen-1770964847-jM6u6HHWf7kVyK4hIUeN",
+      "provider": "Google",
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "created": 1770964847,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "The bridge can support at most **5000 lb**.\n\n- Weight of the truck + driver (empty): **3755 lb**\n- Weight of each box: **15 lb**\n\nLet \\(n\\) be the number of boxes. The total weight on the bridge will be  \n\n\\[\n3755 \\text{ lb} + 15n \\text{ lb} \\le 5000 \\text{ lb}.\n\\]\n\nSolve for \\(n\\):\n\n\\[\n15n \\le 5000 - 3755 = 1245 \\\\\nn \\le \\frac{1245}{15} = 83.\n\\]\n\nSince \\(n\\) must be an integer, the greatest possible number of boxes is **\\(n = 83\\)**.\n\n**Answer: 83 boxes.**",
+            "refusal": null,
+            "reasoning": "We need to compute max boxes such that total weight (truck+driver + boxes) <= 5000. Truck+driver = 3755. Each box 15 lbs. So max boxes = floor((5000-3755)/15). Compute 5000-3755 = 1245. 1245/15 = 83 exactly? 15*80 = 1200, remainder 45, so 83. So answer: 83 boxes. Provide explanation.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to compute max boxes such that total weight (truck+driver + boxes) <= 5000. Truck+driver = 3755. Each box 15 lbs. So max boxes = floor((5000-3755)/15). Compute 5000-3755 = 1245. 1245/15 = 83 exactly? 15*80 = 1200, remainder 45, so 83. So answer: 83 boxes. Provide explanation."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 165,
+        "completion_tokens": 277,
+        "total_tokens": 442,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 64,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00011457,
+          "upstream_inference_prompt_cost": 1.485e-05,
+          "upstream_inference_completions_cost": 9.972e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 71,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 3.342116117477417
+  },
+  "retry_count": 0,
+  "analysis": {
+    "extracted_answer": 83.0,
+    "is_correct": true
+  }
+}
