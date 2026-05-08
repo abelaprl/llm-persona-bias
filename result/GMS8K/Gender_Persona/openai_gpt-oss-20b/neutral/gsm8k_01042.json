@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_01042",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:00:16.372504",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1042,
+    "dataset": "gsm8k_test",
+    "question": "Johnny's dad brought him to watch some horse racing and his dad bet money. On the first race, he lost $5. On the second race, he won $1 more than twice the amount he previously lost. On the third race, he lost 1.5 times as much as he won in the second race. How much did he lose on average that day?",
+    "ground_truth": "On the second race he won $11 because 1+ 5 x 2 = <<1+5*2=11>>11\nOn the third race he lost $15 because 10 x 1.5 = <<10*1.5=15>>15\nHe lost a total of $20 on the first and third races because 15 + 5 = <<15+5=20>>20\n\nHe lost $9 that day because 11 - 20 = <<11-20=-9>>-9\nHe lost an average of $3 per race because 9 / 3 = <<9/3=3>>3\n#### 3",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Johnny's dad brought him to watch some horse racing and his dad bet money. On the first race, he lost $5. On the second race, he won $1 more than twice the amount he previously lost. On the third race, he lost 1.5 times as much as he won in the second race. How much did he lose on average that day?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "**Step‑by‑step**\n\n1. **First race** – loss = **$5**.  \n2. **Second race** – win = “$1 more than twice the amount he previously lost”  \n   \\[\n   \\text{win} = 1 + 2\\times5 = 1 + 10 = \\boxed{\\$11}\n   \\]  \n3. **Third race** – loss = “1.5 times as much as he won in the second race”  \n   \\[\n   \\text{loss} = 1.5 \\times 11 = \\boxed{\\$16.50}\n   \\]\n\n**Total net result**\n\n\\[\n\\text{Net} = (-5) + 11 + (-16.5) = -10.5\n\\]\n\nSo Johnny’s dad ended the day **$10.50 in the red**.\n\n**Average loss per race**\n\nThere were 3 races, so\n\n\\[\n\\text{Average loss} = \\frac{-10.5}{3} = -\\$3.50\n\\]\n\n---\n\n**Answer:** He lost **$10.50 in total**, which is an average loss of **$3.50 per race**.",
+    "raw_api_response": {
+      "id": "gen-1774458016-8XKMXaefBSnwBJf8UZoh",
+      "object": "chat.completion",
+      "created": 1774458016,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "**Step‑by‑step**\n\n1. **First race** – loss = **$5**.  \n2. **Second race** – win = “$1 more than twice the amount he previously lost”  \n   \\[\n   \\text{win} = 1 + 2\\times5 = 1 + 10 = \\boxed{\\$11}\n   \\]  \n3. **Third race** – loss = “1.5 times as much as he won in the second race”  \n   \\[\n   \\text{loss} = 1.5 \\times 11 = \\boxed{\\$16.50}\n   \\]\n\n**Total net result**\n\n\\[\n\\text{Net} = (-5) + 11 + (-16.5) = -10.5\n\\]\n\nSo Johnny’s dad ended the day **$10.50 in the red**.\n\n**Average loss per race**\n\nThere were 3 races, so\n\n\\[\n\\text{Average loss} = \\frac{-10.5}{3} = -\\$3.50\n\\]\n\n---\n\n**Answer:** He lost **$10.50 in total**, which is an average loss of **$3.50 per race**.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: Johnny's dad bet money. On first race, he lost $5. On second race, he won $1 more than twice the amount he previously lost. So previous lost amount is $5. Twice that is $10. $1 more is $11. So he won $11 on second race. On third race, he lost 1.5 times as much as he won in the second race. So he lost 1.5 * $11 = $16.5. So total net: first lost $5, second won $11, third lost $16.5. Net loss = -$5 + $11 - $16.5 = -$10.5? Wait compute: -5 + 11 = 6. 6 - 16.5 = -10.5. So net loss $10.5. The question: \"How much did he lose on average that day?\" Usually average loss per race? He had 3 races. Total loss is $10.5. But average loss per race would be total loss divided by number of races? But he had both wins and losses. The phrase \"lose on average\" might mean average net loss per race. So average = total loss / 3 = -$3.5. But maybe they want average amount lost per race? But he had a win on second race, so not lost. But average loss per race might be total loss divided by number of races. So -$3.5. But maybe they want average amount lost across the races that he lost? He lost on first and third. So average loss across those two races: (5 + 16.5)/2 = 10.75. But the phrase \"lose on average that day\" ambiguous. Usually average loss per race. So answer: $3.5 loss per race. But negative sign? \"How much did he lose on average that day?\" Could answer: $3.50 per race. But maybe they want \"He lost $10.50 in total, averaging $3.50 loss per race.\" Let's craft answer accordingly.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: Johnny's dad bet money. On first race, he lost $5. On second race, he won $1 more than twice the amount he previously lost. So previous lost amount is $5. Twice that is $10. $1 more is $11. So he won $11 on second race. On third race, he lost 1.5 times as much as he won in the second race. So he lost 1.5 * $11 = $16.5. So total net: first lost $5, second won $11, third lost $16.5. Net loss = -$5 + $11 - $16.5 = -$10.5? Wait compute: -5 + 11 = 6. 6 - 16.5 = -10.5. So net loss $10.5. The question: \"How much did he lose on average that day?\" Usually average loss per race? He had 3 races. Total loss is $10.5. But average loss per race would be total loss divided by number of races? But he had both wins and losses. The phrase \"lose on average\" might mean average net loss per race. So average = total loss / 3 = -$3.5. But maybe they want average amount lost per race? But he had a win on second race, so not lost. But average loss per race might be total loss divided by number of races. So -$3.5. But maybe they want average amount lost across the races that he lost? He lost on first and third. So average loss across those two races: (5 + 16.5)/2 = 10.75. But the phrase \"lose on average that day\" ambiguous. Usually average loss per race. So answer: $3.5 loss per race. But negative sign? \"How much did he lose on average that day?\" Could answer: $3.50 per race. But maybe they want \"He lost $10.50 in total, averaging $3.50 loss per race.\" Let's craft answer accordingly.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 164,
+        "completion_tokens": 703,
+        "total_tokens": 867,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 83,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00018723,
+          "upstream_inference_prompt_cost": 1.148e-05,
+          "upstream_inference_completions_cost": 0.00017575
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 378,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 3.9192616939544678
+  },
+  "retry_count": 0
+}

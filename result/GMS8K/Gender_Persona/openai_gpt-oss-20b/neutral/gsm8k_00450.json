@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00450",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T20:39:49.186000",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 450,
+    "dataset": "gsm8k_test",
+    "question": "You can buy a movie super ticket for $20 that includes rights to watch any movie and you get one popcorn with a soda for only $1 extra. Or you can buy a movie ticket for $12 and buy one popcorn and a soda at regular price. What's the regular price of popcorn if the soda costs $3 and you didn't buy the super ticket and ended up saving $2?",
+    "ground_truth": "The super ticket costs $20 and for $1 extra I can get a popcorn and a soda, there I'd pay in total $20+$1 = $<<20+1=21>>21\nIf I didn't buy the ($21) super ticket but bought everything included on it and still saved $2, then I spent in total $21-$2 = $<<21-2=19>>19\nIf the regular movie ticket costs $12 and the soda costs $3 then the popcorn would cost $19-$12-$3=$4\n#### 4",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: You can buy a movie super ticket for $20 that includes rights to watch any movie and you get one popcorn with a soda for only $1 extra. Or you can buy a movie ticket for $12 and buy one popcorn and a soda at regular price. What's the regular price of popcorn if the soda costs $3 and you didn't buy the super ticket and ended up saving $2?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The regular price of the popcorn is **$4**.",
+    "raw_api_response": {
+      "id": "gen-1774445992-OswbEYIsIijdUk6c8Bdh",
+      "object": "chat.completion",
+      "created": 1774445992,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The regular price of the popcorn is **$4**.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. We have two options:\n\nOption 1: Super ticket for $20 includes rights to watch any movie. Additionally, you get one popcorn with a soda for only $1 extra. So the total cost of super ticket + popcorn+ soda is $20 + $1 = $21. But the wording: \"You can buy a movie super ticket for $20 that includes rights to watch any movie and you get one popcorn with a soda for only $1 extra.\" So yes, super ticket cost $20, plus $1 for popcorn+ soda. So total $21.\n\nOption 2: Buy a movie ticket for $12 and buy one popcorn and a soda at regular price. So cost = $12 + price of popcorn + price of soda.\n\nWe know soda costs $3. So cost = $12 + popcorn + $3 = $15 + popcorn.\n\nWe didn't buy the super ticket and ended up saving $2. That means the cost of option 2 (regular ticket + popcorn + soda) is $2 less than the cost of option 1? Wait: \"you didn't buy the super ticket and ended up saving $2\" implies that by not buying the super ticket, you saved $2 relative to what? Usually, if you didn't buy the super ticket, you would have paid $12 + popcorn + soda. But if you had bought the super ticket, you'd pay $21. So the difference is $21 - (12 + popcorn + 3) = $21 - (15 + popcorn) = $6 - popcorn. If you saved $2, that means the difference is $2. So $6 - popcorn = $2 => popcorn = $4. But check: If popcorn is $4, then regular ticket + popcorn + soda = $12 + $4 + $3 = $19. Super ticket cost $21. So difference = $2. Yes, you saved $2 by not buying super ticket. So popcorn price is $4.\n\nBut we need to confirm that \"you didn't buy the super ticket and ended up saving $2\" means that the cost of the regular ticket + popcorn + soda is $2 less than the cost of the super ticket + popcorn + soda. That seems plausible.\n\nAlternatively, maybe the phrase \"you didn't buy the super ticket and ended up saving $2\" means that you saved $2 relative to the super ticket price? But that would be weird: If you didn't buy the super ticket, you saved $20? That doesn't make sense. So the interpretation above is correct.\n\nThus answer: $4.\n\nBut let's double-check: The super ticket includes popcorn+ soda for $1 extra. So cost of popcorn+ soda under super ticket is $1. But under regular ticket, popcorn+ soda cost is popcorn + soda. Soda is $3. So popcorn + soda = popcorn + 3. So the difference between the two options is: (12 + popcorn + 3) vs (20 + 1). So difference = (15 + popcorn) vs 21. So difference = 21 - (15 + popcorn) = 6 - popcorn. If you saved $2, then 6 - popcorn = 2 => popcorn = 4. Yes.\n\nThus answer: $4.\n\nBut maybe the question expects \"regular price of popcorn\" as $4. So answer: $4.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. We have two options:\n\nOption 1: Super ticket for $20 includes rights to watch any movie. Additionally, you get one popcorn with a soda for only $1 extra. So the total cost of super ticket + popcorn+ soda is $20 + $1 = $21. But the wording: \"You can buy a movie super ticket for $20 that includes rights to watch any movie and you get one popcorn with a soda for only $1 extra.\" So yes, super ticket cost $20, plus $1 for popcorn+ soda. So total $21.\n\nOption 2: Buy a movie ticket for $12 and buy one popcorn and a soda at regular price. So cost = $12 + price of popcorn + price of soda.\n\nWe know soda costs $3. So cost = $12 + popcorn + $3 = $15 + popcorn.\n\nWe didn't buy the super ticket and ended up saving $2. That means the cost of option 2 (regular ticket + popcorn + soda) is $2 less than the cost of option 1? Wait: \"you didn't buy the super ticket and ended up saving $2\" implies that by not buying the super ticket, you saved $2 relative to what? Usually, if you didn't buy the super ticket, you would have paid $12 + popcorn + soda. But if you had bought the super ticket, you'd pay $21. So the difference is $21 - (12 + popcorn + 3) = $21 - (15 + popcorn) = $6 - popcorn. If you saved $2, that means the difference is $2. So $6 - popcorn = $2 => popcorn = $4. But check: If popcorn is $4, then regular ticket + popcorn + soda = $12 + $4 + $3 = $19. Super ticket cost $21. So difference = $2. Yes, you saved $2 by not buying super ticket. So popcorn price is $4.\n\nBut we need to confirm that \"you didn't buy the super ticket and ended up saving $2\" means that the cost of the regular ticket + popcorn + soda is $2 less than the cost of the super ticket + popcorn + soda. That seems plausible.\n\nAlternatively, maybe the phrase \"you didn't buy the super ticket and ended up saving $2\" means that you saved $2 relative to the super ticket price? But that would be weird: If you didn't buy the super ticket, you saved $20? That doesn't make sense. So the interpretation above is correct.\n\nThus answer: $4.\n\nBut let's double-check: The super ticket includes popcorn+ soda for $1 extra. So cost of popcorn+ soda under super ticket is $1. But under regular ticket, popcorn+ soda cost is popcorn + soda. Soda is $3. So popcorn + soda = popcorn + 3. So the difference between the two options is: (12 + popcorn + 3) vs (20 + 1). So difference = (15 + popcorn) vs 21. So difference = 21 - (15 + popcorn) = 6 - popcorn. If you saved $2, then 6 - popcorn = 2 => popcorn = 4. Yes.\n\nThus answer: $4.\n\nBut maybe the question expects \"regular price of popcorn\" as $4. So answer: $4.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 166,
+        "completion_tokens": 712,
+        "total_tokens": 878,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 83,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00018962,
+          "upstream_inference_prompt_cost": 1.162e-05,
+          "upstream_inference_completions_cost": 0.000178
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 667,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 9.666452884674072
+  },
+  "retry_count": 0
+}

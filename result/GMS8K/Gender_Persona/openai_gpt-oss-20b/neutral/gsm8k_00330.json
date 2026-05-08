@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00330",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T20:14:41.667050",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 330,
+    "dataset": "gsm8k_test",
+    "question": "A customer’s loyalty card at a store gives them rewards of $1 off their next purchase for every $20 they spend. Their last shopping trip, they spent $80. This shopping trip, they spent $43, used their rewards, and applied a coupon that took twice the amount of rewards off the price. How many dollars did the customer pay on this shopping trip?",
+    "ground_truth": "The customer had 80 / 20 = $<<80/20=4>>4 in rewards.\nTheir coupon was worth 4 * 2 = $<<4*2=8>>8.\nThus, they paid 43 - 4 - 8 = $<<43-4-8=31>>31 on this shopping trip.\n#### 31",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: A customer’s loyalty card at a store gives them rewards of $1 off their next purchase for every $20 they spend. Their last shopping trip, they spent $80. This shopping trip, they spent $43, used their rewards, and applied a coupon that took twice the amount of rewards off the price. How many dollars did the customer pay on this shopping trip?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The loyalty card earns $1 off for every $20 spent.  \nLast trip: $80 ÷ $20 = **4** rewards of $1 each → $4 reward balance.\n\nThis trip:  \n- Spent $43.  \n- Used the $4 reward → price becomes $43 – $4 = $39.  \n- Applied a coupon that takes twice the reward amount off the price → coupon discount = 2 × $4 = $8.  \n- Final price = $39 – $8 = **$31**.\n\nSo the customer paid **$31** on this shopping trip.",
+    "raw_api_response": {
+      "id": "gen-1774444482-zg9HvgKZvimNhk88FfeH",
+      "object": "chat.completion",
+      "created": 1774444482,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The loyalty card earns $1 off for every $20 spent.  \nLast trip: $80 ÷ $20 = **4** rewards of $1 each → $4 reward balance.\n\nThis trip:  \n- Spent $43.  \n- Used the $4 reward → price becomes $43 – $4 = $39.  \n- Applied a coupon that takes twice the reward amount off the price → coupon discount = 2 × $4 = $8.  \n- Final price = $39 – $8 = **$31**.\n\nSo the customer paid **$31** on this shopping trip.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. The loyalty card gives them rewards of $1 off their next purchase for every $20 they spend. So for every $20 spent, they earn $1 reward. They spent $80 last shopping trip. That yields $80 / 20 = 4 rewards of $1 each? Wait: \"rewards of $1 off their next purchase for every $20 they spend.\" So each $20 spent gives $1 reward. So $80 gives 4 rewards of $1 each. So they have $4 reward balance? Actually they earned $4 reward. But the problem says: \"Their last shopping trip, they spent $80. This shopping trip, they spent $43, used their rewards, and applied a coupon that took twice the amount of rewards off the price.\" So on this shopping trip, they spent $43. They used their rewards (the $4 reward from previous trip). They also applied a coupon that took twice the amount of rewards off the price. So the coupon discount equals twice the amount of rewards used? Let's interpret: The coupon takes twice the amount of rewards off the price. So if they used $4 reward, the coupon discount is $8? Or maybe the coupon discount is twice the amount of rewards off the price. Wait: \"applied a coupon that took twice the amount of rewards off the price.\" That could mean the coupon discount equals twice the reward amount. So if they used $4 reward, coupon discount is $8. But we need to confirm: They used their rewards, and applied a coupon that took twice the amount of rewards off the price. So the coupon discount is twice the reward amount. So total discount = reward + coupon = $4 + $8 = $12. So they spent $43, discount $12, so they paid $31. But we need to check if the coupon discount is applied after reward or before? Usually, you apply reward first, then coupon. But the coupon discount is based on the reward amount used? The phrase \"took twice the amount of rewards off the price\" could mean the coupon discount equals twice the reward amount. So if reward is $4, coupon discount is $8. So total discount $12. So final price $43 - $12 = $31. But we need to consider if the coupon discount is applied to the price after reward or before? But the phrase \"took twice the amount of rewards off the price\" suggests the coupon discount is twice the reward amount. So answer $31.\n\nBut let's double-check: The loyalty card rewards $1 off next purchase for every $20 spent. So after spending $80, they earned $4 reward. On the next trip, they spent $43, used their rewards ($4), and applied a coupon that took twice the amount of rewards off the price. So coupon discount = 2 * $4 = $8. So total discount = $4 + $8 = $12. So final price = $43 - $12 = $31.\n\nBut maybe the coupon discount is applied to the price after reward? But that doesn't change the total discount. If you apply reward first, price becomes $39, then coupon discount $8, final price $31. If you apply coupon first, price becomes $35, then reward $4, final price $31. So same.\n\nThus answer: $31. But we need to ensure no other nuance: The coupon that took twice the amount of rewards off the price. Could also mean the coupon discount equals twice the reward amount used. So yes.\n\nThus answer: 31.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. The loyalty card gives them rewards of $1 off their next purchase for every $20 they spend. So for every $20 spent, they earn $1 reward. They spent $80 last shopping trip. That yields $80 / 20 = 4 rewards of $1 each? Wait: \"rewards of $1 off their next purchase for every $20 they spend.\" So each $20 spent gives $1 reward. So $80 gives 4 rewards of $1 each. So they have $4 reward balance? Actually they earned $4 reward. But the problem says: \"Their last shopping trip, they spent $80. This shopping trip, they spent $43, used their rewards, and applied a coupon that took twice the amount of rewards off the price.\" So on this shopping trip, they spent $43. They used their rewards (the $4 reward from previous trip). They also applied a coupon that took twice the amount of rewards off the price. So the coupon discount equals twice the amount of rewards used? Let's interpret: The coupon takes twice the amount of rewards off the price. So if they used $4 reward, the coupon discount is $8? Or maybe the coupon discount is twice the amount of rewards off the price. Wait: \"applied a coupon that took twice the amount of rewards off the price.\" That could mean the coupon discount equals twice the reward amount. So if they used $4 reward, coupon discount is $8. But we need to confirm: They used their rewards, and applied a coupon that took twice the amount of rewards off the price. So the coupon discount is twice the reward amount. So total discount = reward + coupon = $4 + $8 = $12. So they spent $43, discount $12, so they paid $31. But we need to check if the coupon discount is applied after reward or before? Usually, you apply reward first, then coupon. But the coupon discount is based on the reward amount used? The phrase \"took twice the amount of rewards off the price\" could mean the coupon discount equals twice the reward amount. So if reward is $4, coupon discount is $8. So total discount $12. So final price $43 - $12 = $31. But we need to consider if the coupon discount is applied to the price after reward or before? But the phrase \"took twice the amount of rewards off the price\" suggests the coupon discount is twice the reward amount. So answer $31.\n\nBut let's double-check: The loyalty card rewards $1 off next purchase for every $20 spent. So after spending $80, they earned $4 reward. On the next trip, they spent $43, used their rewards ($4), and applied a coupon that took twice the amount of rewards off the price. So coupon discount = 2 * $4 = $8. So total discount = $4 + $8 = $12. So final price = $43 - $12 = $31.\n\nBut maybe the coupon discount is applied to the price after reward? But that doesn't change the total discount. If you apply reward first, price becomes $39, then coupon discount $8, final price $31. If you apply coupon first, price becomes $35, then reward $4, final price $31. So same.\n\nThus answer: $31. But we need to ensure no other nuance: The coupon that took twice the amount of rewards off the price. Could also mean the coupon discount equals twice the reward amount used. So yes.\n\nThus answer: 31.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 163,
+        "completion_tokens": 869,
+        "total_tokens": 1032,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 84,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00022866,
+          "upstream_inference_prompt_cost": 1.141e-05,
+          "upstream_inference_completions_cost": 0.00021725
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 780,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 4.810698509216309
+  },
+  "retry_count": 0
+}

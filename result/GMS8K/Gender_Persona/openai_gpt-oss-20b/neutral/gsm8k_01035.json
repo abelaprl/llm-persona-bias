@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_01035",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T23:58:47.556923",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1035,
+    "dataset": "gsm8k_test",
+    "question": "Richard wants to make a video to share online of him doing a science experiment that creates a fountain of diet soda after placing a specific branded candy inside it. Richard's driveway is 24 feet wide and he wants to put a bottle of soda every 3 feet of the driveway. After starting at the first bottle, it will take Richard 5 seconds to go from one soda bottle to the next, dropping the candy in. How many seconds total will it take Richard to set off all the soda fountains?",
+    "ground_truth": "If Richard's driveway is 24 feet long and he puts a bottle of soda every 3 feet, then out of 24 feet total there are 24 / 3 feet between each bottle = <<24/3=8>>8 bottles.\nIf Richard starts at 0 seconds with the first bottle and it takes him 5 seconds to go onto the next bottle to drop the candy, then it will take him 5 seconds x 7 bottles = 35 seconds total.\n#### 35",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Richard wants to make a video to share online of him doing a science experiment that creates a fountain of diet soda after placing a specific branded candy inside it. Richard's driveway is 24 feet wide and he wants to put a bottle of soda every 3 feet of the driveway. After starting at the first bottle, it will take Richard 5 seconds to go from one soda bottle to the next, dropping the candy in. How many seconds total will it take Richard to set off all the soda fountains?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "There are \\( \\frac{24}{3}=8 \\) intervals of 3 ft along the driveway, so the number of soda bottles is \\(8+1=9\\).  \nRichard spends 5 s moving from one bottle to the next, and he starts at the first bottle (no time spent there).  \nThus the total time is\n\n\\[\n(9-1)\\times 5\\text{ s}=8\\times 5\\text{ s}=40\\text{ seconds}.\n\\]\n\n**Answer: 40 seconds.**",
+    "raw_api_response": {
+      "id": "gen-1774457928-aftwTxQinzVIfLzYOWBI",
+      "object": "chat.completion",
+      "created": 1774457928,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "There are \\( \\frac{24}{3}=8 \\) intervals of 3 ft along the driveway, so the number of soda bottles is \\(8+1=9\\).  \nRichard spends 5 s moving from one bottle to the next, and he starts at the first bottle (no time spent there).  \nThus the total time is\n\n\\[\n(9-1)\\times 5\\text{ s}=8\\times 5\\text{ s}=40\\text{ seconds}.\n\\]\n\n**Answer: 40 seconds.**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: driveway 24 feet wide. He wants to put a bottle of soda every 3 feet. Starting at the first bottle, it will take 5 seconds to go from one soda bottle to the next, dropping the candy in. How many seconds total will it take Richard to set off all the soda fountains?\n\nWe need to count number of bottles along the driveway. Starting at first bottle at presumably the beginning of driveway? He wants to put a bottle every 3 feet. The driveway is 24 feet wide. So positions: 0, 3, 6, 9, 12, 15, 18, 21, 24? Wait 24 feet wide: if we start at 0 and go to 24 inclusive, that's 9 positions (0 to 24 step 3). But if the driveway is 24 feet wide, maybe the last bottle is at 24? But if he starts at first bottle, then he will go from one soda bottle to the next, dropping candy. The time between bottles is 5 seconds. So number of intervals between bottles equals number of bottles minus 1. So if there are N bottles, time = (N-1)*5 seconds. But maybe he also needs to drop candy at the first bottle? The problem says \"After starting at the first bottle, it will take Richard 5 seconds to go from one soda bottle to the next, dropping the candy in.\" That implies he starts at first bottle, presumably drops candy there? Or maybe he starts at first bottle and then moves to next. It says \"After starting at the first bottle, it will take Richard 5 seconds to go from one soda bottle to the next, dropping the candy in.\" So he starts at first bottle, then takes 5 seconds to go to next bottle, drop candy, etc. So the time for the first bottle is zero? He just starts there. So total time = (number of bottles - 1)*5 seconds.\n\nNow we need to determine number of bottles. If the driveway is 24 feet wide and he wants to put a bottle every 3 feet. Usually you would place at 0, 3, 6, 9, 12, 15, 18, 21, 24. That's 9 bottles. But maybe the driveway width is 24 feet, so the last bottle is at 24? That would be 9 bottles. So time = (9-1)*5 = 8*5 = 40 seconds.\n\nBut maybe the first bottle is at 3 feet? If he starts at the first bottle at 3 feet? But \"starting at the first bottle\" suggests first bottle is at the start of driveway. So 0.\n\nThus answer: 40 seconds.\n\nBut let's double-check: If he wants to put a bottle every 3 feet along a 24 foot driveway, the number of intervals of 3 feet is 24/3 = 8 intervals. But number of bottles is intervals + 1 = 9. So yes.\n\nThus answer: 40 seconds.\n\nBut maybe the question expects 40 seconds. Let's produce final answer: 40 seconds.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: driveway 24 feet wide. He wants to put a bottle of soda every 3 feet. Starting at the first bottle, it will take 5 seconds to go from one soda bottle to the next, dropping the candy in. How many seconds total will it take Richard to set off all the soda fountains?\n\nWe need to count number of bottles along the driveway. Starting at first bottle at presumably the beginning of driveway? He wants to put a bottle every 3 feet. The driveway is 24 feet wide. So positions: 0, 3, 6, 9, 12, 15, 18, 21, 24? Wait 24 feet wide: if we start at 0 and go to 24 inclusive, that's 9 positions (0 to 24 step 3). But if the driveway is 24 feet wide, maybe the last bottle is at 24? But if he starts at first bottle, then he will go from one soda bottle to the next, dropping candy. The time between bottles is 5 seconds. So number of intervals between bottles equals number of bottles minus 1. So if there are N bottles, time = (N-1)*5 seconds. But maybe he also needs to drop candy at the first bottle? The problem says \"After starting at the first bottle, it will take Richard 5 seconds to go from one soda bottle to the next, dropping the candy in.\" That implies he starts at first bottle, presumably drops candy there? Or maybe he starts at first bottle and then moves to next. It says \"After starting at the first bottle, it will take Richard 5 seconds to go from one soda bottle to the next, dropping the candy in.\" So he starts at first bottle, then takes 5 seconds to go to next bottle, drop candy, etc. So the time for the first bottle is zero? He just starts there. So total time = (number of bottles - 1)*5 seconds.\n\nNow we need to determine number of bottles. If the driveway is 24 feet wide and he wants to put a bottle every 3 feet. Usually you would place at 0, 3, 6, 9, 12, 15, 18, 21, 24. That's 9 bottles. But maybe the driveway width is 24 feet, so the last bottle is at 24? That would be 9 bottles. So time = (9-1)*5 = 8*5 = 40 seconds.\n\nBut maybe the first bottle is at 3 feet? If he starts at the first bottle at 3 feet? But \"starting at the first bottle\" suggests first bottle is at the start of driveway. So 0.\n\nThus answer: 40 seconds.\n\nBut let's double-check: If he wants to put a bottle every 3 feet along a 24 foot driveway, the number of intervals of 3 feet is 24/3 = 8 intervals. But number of bottles is intervals + 1 = 9. So yes.\n\nThus answer: 40 seconds.\n\nBut maybe the question expects 40 seconds. Let's produce final answer: 40 seconds.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 189,
+        "completion_tokens": 780,
+        "total_tokens": 969,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 83,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00020823,
+          "upstream_inference_prompt_cost": 1.323e-05,
+          "upstream_inference_completions_cost": 0.000195
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 633,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 4.998952150344849
+  },
+  "retry_count": 0
+}

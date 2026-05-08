@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00371",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T20:21:59.211607",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 371,
+    "dataset": "gsm8k_test",
+    "question": "A shoe store was having a weekend sale on a brand of popular tennis shoes. On Friday the store sold 14 pairs of tennis shoes. The next day they sold double that number of shoes. On the last day of the sale they sold one-half the amount that they did the day before, but six people returned their pairs because they didn't fit. How many tennis shoes were sold by the end of the sale?",
+    "ground_truth": "On Saturday 14*2=<<14*2=28>>28 shoes were sold\nOn Sunday 28/2=<<28/2=14>>14 shoes were sold\nBefore the returns were made 14+28+14=<<14+28+14=56>>56 pairs of shoes were sold\nAfter the returns were made 56-6=<<56-6=50>>50 pairs of shoe were sold\n#### 50",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: A shoe store was having a weekend sale on a brand of popular tennis shoes. On Friday the store sold 14 pairs of tennis shoes. The next day they sold double that number of shoes. On the last day of the sale they sold one-half the amount that they did the day before, but six people returned their pairs because they didn't fit. How many tennis shoes were sold by the end of the sale?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "On Friday the store sold  \n\\(14\\) pairs \\(= 14 \\times 2 = 28\\) shoes.\n\nOn Saturday they sold double that number of shoes:  \n\\(2 \\times 28 = 56\\) shoes.\n\nOn Sunday they sold half of what they sold on Saturday:  \n\\(\\frac{1}{2}\\times 56 = 28\\) shoes.\n\nHowever, six pairs were returned, which is  \n\\(6 \\times 2 = 12\\) shoes.\n\nNet shoes sold on Sunday:  \n\\(28 - 12 = 16\\) shoes.\n\nTotal shoes sold over the three days:  \n\\(28 + 56 + 16 = 100\\).\n\n\\[\n\\boxed{100}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774444920-muh0mJ1oium6Ecn9qV8z",
+      "object": "chat.completion",
+      "created": 1774444920,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "On Friday the store sold  \n\\(14\\) pairs \\(= 14 \\times 2 = 28\\) shoes.\n\nOn Saturday they sold double that number of shoes:  \n\\(2 \\times 28 = 56\\) shoes.\n\nOn Sunday they sold half of what they sold on Saturday:  \n\\(\\frac{1}{2}\\times 56 = 28\\) shoes.\n\nHowever, six pairs were returned, which is  \n\\(6 \\times 2 = 12\\) shoes.\n\nNet shoes sold on Sunday:  \n\\(28 - 12 = 16\\) shoes.\n\nTotal shoes sold over the three days:  \n\\(28 + 56 + 16 = 100\\).\n\n\\[\n\\boxed{100}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. The store sold 14 pairs of tennis shoes on Friday. Next day (Saturday) they sold double that number of shoes. Wait: \"double that number of shoes\" could mean double the number of pairs? Or double the number of shoes? The phrasing: \"On Friday the store sold 14 pairs of tennis shoes. The next day they sold double that number of shoes.\" The phrase \"double that number of shoes\" ambiguous. Usually they'd refer to pairs. But they say \"shoes\" not \"pairs\". Could be double the number of shoes (not pairs). But we need to interpret.\n\nLet's analyze: On Friday: 14 pairs. So 14 pairs = 28 shoes. On Saturday: double that number of shoes. If they double the number of shoes, they'd sell 56 shoes. But that would be 28 pairs. But if they double the number of pairs, they'd sell 28 pairs = 56 shoes. So both interpretations produce same number of shoes? Wait: 14 pairs = 28 shoes. Double that number of shoes: 56 shoes. That corresponds to 28 pairs. So either interpretation yields 56 shoes. So no ambiguity.\n\nNow on the last day (Sunday), they sold one-half the amount that they did the day before, but six people returned their pairs because they didn't fit. So they sold half of the amount of shoes sold on Saturday, but then six pairs were returned. So we need to compute total shoes sold by the end of the sale (i.e., total sold minus returns? The question: \"How many tennis shoes were sold by the end of the sale?\" Usually \"sold\" means net sold, after returns. So we need to subtract the returned pairs (6 pairs = 12 shoes). So compute.\n\nLet's compute: Friday: 28 shoes. Saturday: 56 shoes. Sunday: half of 56 = 28 shoes sold. Then 6 pairs returned: 12 shoes returned. So net sold on Sunday: 28 - 12 = 16 shoes. Total sold: 28 + 56 + 16 = 100 shoes.\n\nCheck: 28 + 56 = 84. 84 + 16 = 100. So answer: 100 tennis shoes.\n\nBut let's double-check: Did we interpret \"six people returned their pairs\" as 6 pairs returned? Yes. So 6 pairs = 12 shoes. So net sold on Sunday: 28 - 12 = 16 shoes. So total sold: 28 + 56 + 16 = 100.\n\nThus answer: 100 tennis shoes.\n\nBut maybe they want number of pairs? The question: \"How many tennis shoes were sold by the end of the sale?\" So shoes. So 100.\n\nLet's produce final answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. The store sold 14 pairs of tennis shoes on Friday. Next day (Saturday) they sold double that number of shoes. Wait: \"double that number of shoes\" could mean double the number of pairs? Or double the number of shoes? The phrasing: \"On Friday the store sold 14 pairs of tennis shoes. The next day they sold double that number of shoes.\" The phrase \"double that number of shoes\" ambiguous. Usually they'd refer to pairs. But they say \"shoes\" not \"pairs\". Could be double the number of shoes (not pairs). But we need to interpret.\n\nLet's analyze: On Friday: 14 pairs. So 14 pairs = 28 shoes. On Saturday: double that number of shoes. If they double the number of shoes, they'd sell 56 shoes. But that would be 28 pairs. But if they double the number of pairs, they'd sell 28 pairs = 56 shoes. So both interpretations produce same number of shoes? Wait: 14 pairs = 28 shoes. Double that number of shoes: 56 shoes. That corresponds to 28 pairs. So either interpretation yields 56 shoes. So no ambiguity.\n\nNow on the last day (Sunday), they sold one-half the amount that they did the day before, but six people returned their pairs because they didn't fit. So they sold half of the amount of shoes sold on Saturday, but then six pairs were returned. So we need to compute total shoes sold by the end of the sale (i.e., total sold minus returns? The question: \"How many tennis shoes were sold by the end of the sale?\" Usually \"sold\" means net sold, after returns. So we need to subtract the returned pairs (6 pairs = 12 shoes). So compute.\n\nLet's compute: Friday: 28 shoes. Saturday: 56 shoes. Sunday: half of 56 = 28 shoes sold. Then 6 pairs returned: 12 shoes returned. So net sold on Sunday: 28 - 12 = 16 shoes. Total sold: 28 + 56 + 16 = 100 shoes.\n\nCheck: 28 + 56 = 84. 84 + 16 = 100. So answer: 100 tennis shoes.\n\nBut let's double-check: Did we interpret \"six people returned their pairs\" as 6 pairs returned? Yes. So 6 pairs = 12 shoes. So net sold on Sunday: 28 - 12 = 16 shoes. So total sold: 28 + 56 + 16 = 100.\n\nThus answer: 100 tennis shoes.\n\nBut maybe they want number of pairs? The question: \"How many tennis shoes were sold by the end of the sale?\" So shoes. So 100.\n\nLet's produce final answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 171,
+        "completion_tokens": 739,
+        "total_tokens": 910,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 84,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00019672,
+          "upstream_inference_prompt_cost": 1.197e-05,
+          "upstream_inference_completions_cost": 0.00018475
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 570,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 5.245479106903076
+  },
+  "retry_count": 0
+}

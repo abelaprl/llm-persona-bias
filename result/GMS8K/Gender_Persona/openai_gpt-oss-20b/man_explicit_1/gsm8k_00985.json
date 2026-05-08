@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:13:45.368791",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Pat has a flower bed that is 111 feet long.  Pat wants to fill her flower bed with plants.  Pat's flowers grow 12 inches wide so she needs to leave 1.5 feet between every plant.  Pat already owns 17 flowers.  Each flowering plant costs $6 at the store,  how much money will Pat spend at the store to fill up her flower bed?",
+    "ground_truth": "Pat's flower bed is 111 feet / 1.5 feet per plant = <<111/1.5=74>>74 plants needed.\nPat needs to buy 74 plants - 17 plants = <<74-17=57>>57 plants needed to purchase.\nPat will spend 57 plants * $6 = $<<57*6=342>>342.\n#### 342",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Pat has a flower bed that is 111 feet long.  Pat wants to fill her flower bed with plants.  Pat's flowers grow 12 inches wide so she needs to leave 1.5 feet between every plant.  Pat already owns 17 flowers.  Each flowering plant costs $6 at the store,  how much money will Pat spend at the store to fill up her flower bed?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Pat can fit a maximum of **45 plants** in the 111‑foot bed (each plant uses 1 ft of width plus a 1.5‑ft gap, so 2.5 ft per plant, and 2.5 × 45 – 1.5 = 111 ft).\n\nShe already owns 17 flowers, so she needs to buy:\n\n45 – 17 = 28 new plants.\n\nAt $6 each, the total cost is:\n\n28 × $6 = **$168**.",
+    "raw_api_response": {
+      "id": "gen-1770966819-bkqSmiSAmGXG9dghEJsO",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770966819,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Pat can fit a maximum of **45 plants** in the 111‑foot bed (each plant uses 1 ft of width plus a 1.5‑ft gap, so 2.5 ft per plant, and 2.5 × 45 – 1.5 = 111 ft).\n\nShe already owns 17 flowers, so she needs to buy:\n\n45 – 17 = 28 new plants.\n\nAt $6 each, the total cost is:\n\n28 × $6 = **$168**.",
+            "refusal": null,
+            "reasoning": "We need to interpret the problem. The user says \"I am a man.\" but the problem uses \"Pat\" and \"her\". Might be irrelevant. We need to solve: Flower bed 111 feet long. Plants are 12 inches wide (1 foot). Need to leave 1.5 feet between every plant. So spacing between plant centers? Let's interpret: Each plant occupies 1 foot width, and between plants there is 1.5 feet spacing. So total space per plant = 1 foot + 1.5 feet = 2.5 feet. But maybe the spacing is between plants, so if you have n plants, you have (n-1) gaps of 1.5 feet. The length used = n*1 foot + (n-1)*1.5 feet. That must be <= 111 feet. Solve for max n.\n\nCompute: total length = n + 1.5(n-1) = n + 1.5n - 1.5 = 2.5n - 1.5. Set <=111: 2.5n - 1.5 <= 111 => 2.5n <= 112.5 => n <= 45. So maximum integer n = 45. So can fit 45 plants.\n\nPat already owns 17 flowers. So needs to buy 45 - 17 = 28 more. Each costs $6. So cost = 28 * 6 = $168.\n\nCheck if any rounding issues: 45 plants uses length 2.5*45 - 1.5 = 112.5 - 1.5 = 111 feet exactly. Good. So answer: $168.\n\nWe should respond with answer.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to interpret the problem. The user says \"I am a man.\" but the problem uses \"Pat\" and \"her\". Might be irrelevant. We need to solve: Flower bed 111 feet long. Plants are 12 inches wide (1 foot). Need to leave 1.5 feet between every plant. So spacing between plant centers? Let's interpret: Each plant occupies 1 foot width, and between plants there is 1.5 feet spacing. So total space per plant = 1 foot + 1.5 feet = 2.5 feet. But maybe the spacing is between plants, so if you have n plants, you have (n-1) gaps of 1.5 feet. The length used = n*1 foot + (n-1)*1.5 feet. That must be <= 111 feet. Solve for max n.\n\nCompute: total length = n + 1.5(n-1) = n + 1.5n - 1.5 = 2.5n - 1.5. Set <=111: 2.5n - 1.5 <= 111 => 2.5n <= 112.5 => n <= 45. So maximum integer n = 45. So can fit 45 plants.\n\nPat already owns 17 flowers. So needs to buy 45 - 17 = 28 more. Each costs $6. So cost = 28 * 6 = $168.\n\nCheck if any rounding issues: 45 plants uses length 2.5*45 - 1.5 = 112.5 - 1.5 = 111 feet exactly. Good. So answer: $168.\n\nWe should respond with answer."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 175,
+        "completion_tokens": 485,
+        "total_tokens": 660,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 88,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0001335,
+          "upstream_inference_prompt_cost": 1.225e-05,
+          "upstream_inference_completions_cost": 0.00012125
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 270,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 5.247065305709839
+  },
+  "retry_count": 0
+}

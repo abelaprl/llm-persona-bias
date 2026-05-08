@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:26:32.306430",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Dr. Hugo Grumpus and his assistant, Igor, were preparing to perform a laboratory experiment.  Dr. Grumpus told Igor to gather 16 test tubes, 7 beakers, and 14 Petri dishes, and to place them all on the lab bench.  By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.  And while he had picked up the correct number of beakers, he lost several on the way to the lab bench.  In total, the number of items Igor had placed on the lab bench was 29.  How many beakers did Igor lose?",
+    "ground_truth": "On the lab bench, there were half of the requested number of test tubes, or 16/2=<<16/2=8>>8 test tubes.\nOn the lab bench, there were 14+2=<<14+2=16>>16 Petri dishes.\nSince the remaining items on the bench were beakers, there were 29-8-16=<<29-8-16=5>>5 beakers on the lab bench.\nThus, Igor lost 7-5=<<7-5=2>>2 beakers.\n#### 2",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Dr. Hugo Grumpus and his assistant, Igor, were preparing to perform a laboratory experiment.  Dr. Grumpus told Igor to gather 16 test tubes, 7 beakers, and 14 Petri dishes, and to place them all on the lab bench.  By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.  And while he had picked up the correct number of beakers, he lost several on the way to the lab bench.  In total, the number of items Igor had placed on the lab bench was 29.  How many beakers did Igor lose?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Igor lost **2 beakers**.",
+    "raw_api_response": {
+      "id": "gen-1770967588-Di1LzxGofWWzJVx5cgdo",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770967588,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Igor lost **2 beakers**.",
+            "refusal": null,
+            "reasoning": "We need to solve the puzzle. Let’s denote requested numbers: test tubes T_req = 16, beakers B_req = 7, Petri dishes P_req = 14. Igor gathered: test tubes T = half as many as requested, so T = 16/2 = 8. But also \"two more than the number of Petri dishes requested.\" Wait: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" The phrase ambiguous: He gathered half as many test tubes as requested, and also two more than the number of Petri dishes requested. That could mean he gathered 2 more test tubes than the number of Petri dishes requested? Or he gathered 2 more test tubes than the number of Petri dishes requested? Let's parse: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" Usually such phrasing means: He gathered half as many test tubes as requested, and he gathered two more Petri dishes than requested? Wait: \"two more than the number of Petri dishes requested\" could refer to test tubes? Actually the phrase \"two more than the number of Petri dishes requested\" modifies the test tubes? Let's examine: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" The comma indicates two separate clauses: first, he gathered half as many test tubes as requested; second, he gathered two more than the number of Petri dishes requested. But what is \"two more than the number of Petri dishes requested\"? It could refer to test tubes? But test tubes are already described. Maybe it's describing the number of Petri dishes he gathered: he gathered two more than requested. That seems plausible: He gathered 2 more Petri dishes than requested. But the phrase \"two more than the number of Petri dishes requested\" would then refer to Petri dishes. But the grammar: \"two more than the number of Petri dishes requested\" is ambiguous. Let's parse: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" If we read as: He gathered half as many test tubes as requested, and he gathered two more Petri dishes than requested. That seems consistent: test tubes: 8; Petri dishes: 14 + 2 = 16. But the phrase \"two more than the number of Petri dishes requested\" could also mean he gathered 2 more test tubes than the number of Petri dishes requested. But that would be weird: test tubes 8, Petri dishes 14, 8 is not 2 more than 14. So that can't be. So it's Petri dishes: 16.\n\nNow beakers: He had the correct number of beakers (7) but lost several on the way to the lab bench. So he had 7 but lost x, so he placed 7 - x beakers on bench.\n\nTotal items placed on bench: test tubes 8 + beakers 7 - x + Petri dishes 16 = 29.\n\nCompute: 8 + 16 = 24. 24 + 7 - x = 29 => 31 - x = 29 => x = 2.\n\nThus Igor lost 2 beakers.\n\nBut let's double-check: 8 + 16 + (7 - 2) = 8 + 16 + 5 = 29. Yes.\n\nThus answer: 2 beakers lost.\n\nBut we should double-check the interpretation: The phrase \"two more than the number of Petri dishes requested\" could also mean he gathered 2 more test tubes than the number of Petri dishes requested. But that would be 2 more than 14 = 16 test tubes, but he gathered half as many test tubes as requested (8). Contradiction. So the only consistent interpretation is he gathered 2 more Petri dishes than requested.\n\nThus answer: 2 beakers lost.\n\nWe should provide answer: 2.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to solve the puzzle. Let’s denote requested numbers: test tubes T_req = 16, beakers B_req = 7, Petri dishes P_req = 14. Igor gathered: test tubes T = half as many as requested, so T = 16/2 = 8. But also \"two more than the number of Petri dishes requested.\" Wait: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" The phrase ambiguous: He gathered half as many test tubes as requested, and also two more than the number of Petri dishes requested. That could mean he gathered 2 more test tubes than the number of Petri dishes requested? Or he gathered 2 more test tubes than the number of Petri dishes requested? Let's parse: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" Usually such phrasing means: He gathered half as many test tubes as requested, and he gathered two more Petri dishes than requested? Wait: \"two more than the number of Petri dishes requested\" could refer to test tubes? Actually the phrase \"two more than the number of Petri dishes requested\" modifies the test tubes? Let's examine: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" The comma indicates two separate clauses: first, he gathered half as many test tubes as requested; second, he gathered two more than the number of Petri dishes requested. But what is \"two more than the number of Petri dishes requested\"? It could refer to test tubes? But test tubes are already described. Maybe it's describing the number of Petri dishes he gathered: he gathered two more than requested. That seems plausible: He gathered 2 more Petri dishes than requested. But the phrase \"two more than the number of Petri dishes requested\" would then refer to Petri dishes. But the grammar: \"two more than the number of Petri dishes requested\" is ambiguous. Let's parse: \"By accident, Igor gathered half as many test tubes as requested, two more than the number of Petri dishes requested.\" If we read as: He gathered half as many test tubes as requested, and he gathered two more Petri dishes than requested. That seems consistent: test tubes: 8; Petri dishes: 14 + 2 = 16. But the phrase \"two more than the number of Petri dishes requested\" could also mean he gathered 2 more test tubes than the number of Petri dishes requested. But that would be weird: test tubes 8, Petri dishes 14, 8 is not 2 more than 14. So that can't be. So it's Petri dishes: 16.\n\nNow beakers: He had the correct number of beakers (7) but lost several on the way to the lab bench. So he had 7 but lost x, so he placed 7 - x beakers on bench.\n\nTotal items placed on bench: test tubes 8 + beakers 7 - x + Petri dishes 16 = 29.\n\nCompute: 8 + 16 = 24. 24 + 7 - x = 29 => 31 - x = 29 => x = 2.\n\nThus Igor lost 2 beakers.\n\nBut let's double-check: 8 + 16 + (7 - 2) = 8 + 16 + 5 = 29. Yes.\n\nThus answer: 2 beakers lost.\n\nBut we should double-check the interpretation: The phrase \"two more than the number of Petri dishes requested\" could also mean he gathered 2 more test tubes than the number of Petri dishes requested. But that would be 2 more than 14 = 16 test tubes, but he gathered half as many test tubes as requested (8). Contradiction. So the only consistent interpretation is he gathered 2 more Petri dishes than requested.\n\nThus answer: 2 beakers lost.\n\nWe should provide answer: 2."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 228,
+        "completion_tokens": 866,
+        "total_tokens": 1094,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 88,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00023246,
+          "upstream_inference_prompt_cost": 1.596e-05,
+          "upstream_inference_completions_cost": 0.0002165
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 873,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 3.7151832580566406
+  },
+  "retry_count": 0
+}

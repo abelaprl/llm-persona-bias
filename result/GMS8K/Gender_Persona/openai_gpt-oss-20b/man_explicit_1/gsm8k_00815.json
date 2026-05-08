@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:06:59.053242",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "A new arcade opens up and Jack decides to play with his 3 friends.  Jack can play a game with 1 quarter for 20 minutes.  Two of his friends are significantly worse than him and can only play half as long.  One of them is significantly better and can play for 1.5 times as long.  They play for 4 hours.  How much money is used?",
+    "ground_truth": "Jack puts change in 60/20=<<60/20=3>>3 times an hour\nSo he spends 3*.25=$<<3*.25=.75>>.75 an hour\nHis two friends add change 3*2=<<3*2=6>>6 times an hour\nSo they spend 6*.25=$<<6*.25=1.5>>1.5 an hour\nHis last friend puts in money 3/1.5=<<3/1.5=2>>2 times an hour\nSo he spends 2*.25=$<<2*.25=.50>>.50 an hour\nSo in total they spend .75+1.5+.5=$<<.75+1.5+.5=2.75>>2.75 an hour\nSo they spend 2.75*4=$<<2.75*4=11>>11 in the 4 hours\n#### 11",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: A new arcade opens up and Jack decides to play with his 3 friends.  Jack can play a game with 1 quarter for 20 minutes.  Two of his friends are significantly worse than him and can only play half as long.  One of them is significantly better and can play for 1.5 times as long.  They play for 4 hours.  How much money is used?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Jack uses 1 quarter for 20 minutes of play.  \n- Jack: 20 min/quarter → 240 min ÷ 20 min = **12 quarters**  \n- Two worse friends: half as long → 10 min/quarter → 240 min ÷ 10 min = **24 quarters** each  \n- One better friend: 1.5× as long → 30 min/quarter → 240 min ÷ 30 min = **8 quarters**  \n\nTotal quarters used = 12 + 24 + 24 + 8 = **68 quarters**.  \nAt 25 ¢ per quarter, the total cost is 68 × $0.25 = **$17**.",
+    "raw_api_response": {
+      "id": "gen-1770966414-C2ekN4MzCzX1J8JLhYka",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770966414,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Jack uses 1 quarter for 20 minutes of play.  \n- Jack: 20 min/quarter → 240 min ÷ 20 min = **12 quarters**  \n- Two worse friends: half as long → 10 min/quarter → 240 min ÷ 10 min = **24 quarters** each  \n- One better friend: 1.5× as long → 30 min/quarter → 240 min ÷ 30 min = **8 quarters**  \n\nTotal quarters used = 12 + 24 + 24 + 8 = **68 quarters**.  \nAt 25 ¢ per quarter, the total cost is 68 × $0.25 = **$17**.",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: \"A new arcade opens up and Jack decides to play with his 3 friends. Jack can play a game with 1 quarter for 20 minutes. Two of his friends are significantly worse than him and can only play half as long. One of them is significantly better and can play for 1.5 times as long. They play for 4 hours. How much money is used?\"\n\nInterpretation: Jack uses 1 quarter per 20 minutes of play. So his rate: 20 minutes per quarter. That is 3 quarters per hour? Let's compute: 60 minutes / 20 = 3. So Jack uses 3 quarters per hour. For 4 hours, Jack uses 12 quarters.\n\nNow friends: Two of his friends are significantly worse and can only play half as long. That means they can play half as long as Jack? Or they can play half as long per quarter? The phrase \"can only play half as long\" likely means they can play half as long as Jack per quarter? Actually, the context: Jack can play a game with 1 quarter for 20 minutes. Two of his friends are significantly worse than him and can only play half as long. One of them is significantly better and can play for 1.5 times as long. They play for 4 hours. How much money is used?\n\nInterpretation: Each person uses a quarter to play a game. Jack uses 1 quarter for 20 minutes. The two worse friends can only play half as long per quarter, meaning they can play 10 minutes per quarter. The better friend can play 1.5 times as long per quarter, meaning 30 minutes per quarter. They all play for 4 hours. So we need to compute how many quarters each uses over 4 hours.\n\nBut wait: The phrase \"can only play half as long\" could mean they can only play half as long as Jack, i.e., 10 minutes per quarter. That seems plausible.\n\nAlternatively, maybe the phrase means they can only play half as long as Jack overall? But they all play for 4 hours, so that would be contradictory. So it's per quarter.\n\nThus, compute each person's quarter usage:\n\nJack: 20 minutes per quarter. Over 4 hours = 240 minutes. 240 / 20 = 12 quarters.\n\nWorse friend 1: 10 minutes per quarter. 240 / 10 = 24 quarters.\n\nWorse friend 2: same: 24 quarters.\n\nBetter friend: 30 minutes per quarter. 240 / 30 = 8 quarters.\n\nTotal quarters: 12 + 24 + 24 + 8 = 68 quarters.\n\n68 quarters = 68 * $0.25 = $17.\n\nThus answer: $17.\n\nBut check: Are we sure about the interpretation? Let's double-check: The phrase \"Jack can play a game with 1 quarter for 20 minutes.\" So each quarter gives 20 minutes of play for Jack. \"Two of his friends are significantly worse than him and can only play half as long.\" That likely means they can play half as long per quarter, i.e., 10 minutes per quarter. \"One of them is significantly better and can play for 1.5 times as long.\" That likely means 30 minutes per quarter. They play for 4 hours. How much money is used? Yes.\n\nThus answer: $17.\n\nBut maybe they all play simultaneously? Actually, they play together? The phrase \"Jack decides to play with his 3 friends\" might mean they play together, but each uses a quarter to play. They all play for 4 hours. So each uses quarters accordingly.\n\nThus answer: $17.\n\nBut maybe the question expects answer in quarters: 68 quarters. But likely money: $17.\n\nThus answer: $17.\n\nLet's produce final answer.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: \"A new arcade opens up and Jack decides to play with his 3 friends. Jack can play a game with 1 quarter for 20 minutes. Two of his friends are significantly worse than him and can only play half as long. One of them is significantly better and can play for 1.5 times as long. They play for 4 hours. How much money is used?\"\n\nInterpretation: Jack uses 1 quarter per 20 minutes of play. So his rate: 20 minutes per quarter. That is 3 quarters per hour? Let's compute: 60 minutes / 20 = 3. So Jack uses 3 quarters per hour. For 4 hours, Jack uses 12 quarters.\n\nNow friends: Two of his friends are significantly worse and can only play half as long. That means they can play half as long as Jack? Or they can play half as long per quarter? The phrase \"can only play half as long\" likely means they can play half as long as Jack per quarter? Actually, the context: Jack can play a game with 1 quarter for 20 minutes. Two of his friends are significantly worse than him and can only play half as long. One of them is significantly better and can play for 1.5 times as long. They play for 4 hours. How much money is used?\n\nInterpretation: Each person uses a quarter to play a game. Jack uses 1 quarter for 20 minutes. The two worse friends can only play half as long per quarter, meaning they can play 10 minutes per quarter. The better friend can play 1.5 times as long per quarter, meaning 30 minutes per quarter. They all play for 4 hours. So we need to compute how many quarters each uses over 4 hours.\n\nBut wait: The phrase \"can only play half as long\" could mean they can only play half as long as Jack, i.e., 10 minutes per quarter. That seems plausible.\n\nAlternatively, maybe the phrase means they can only play half as long as Jack overall? But they all play for 4 hours, so that would be contradictory. So it's per quarter.\n\nThus, compute each person's quarter usage:\n\nJack: 20 minutes per quarter. Over 4 hours = 240 minutes. 240 / 20 = 12 quarters.\n\nWorse friend 1: 10 minutes per quarter. 240 / 10 = 24 quarters.\n\nWorse friend 2: same: 24 quarters.\n\nBetter friend: 30 minutes per quarter. 240 / 30 = 8 quarters.\n\nTotal quarters: 12 + 24 + 24 + 8 = 68 quarters.\n\n68 quarters = 68 * $0.25 = $17.\n\nThus answer: $17.\n\nBut check: Are we sure about the interpretation? Let's double-check: The phrase \"Jack can play a game with 1 quarter for 20 minutes.\" So each quarter gives 20 minutes of play for Jack. \"Two of his friends are significantly worse than him and can only play half as long.\" That likely means they can play half as long per quarter, i.e., 10 minutes per quarter. \"One of them is significantly better and can play for 1.5 times as long.\" That likely means 30 minutes per quarter. They play for 4 hours. How much money is used? Yes.\n\nThus answer: $17.\n\nBut maybe they all play simultaneously? Actually, they play together? The phrase \"Jack decides to play with his 3 friends\" might mean they play together, but each uses a quarter to play. They all play for 4 hours. So each uses quarters accordingly.\n\nThus answer: $17.\n\nBut maybe the question expects answer in quarters: 68 quarters. But likely money: $17.\n\nThus answer: $17.\n\nLet's produce final answer."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 176,
+        "completion_tokens": 967,
+        "total_tokens": 1143,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 90,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00025407,
+          "upstream_inference_prompt_cost": 1.232e-05,
+          "upstream_inference_completions_cost": 0.00024175
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 830,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 4.370213270187378
+  },
+  "retry_count": 0
+}

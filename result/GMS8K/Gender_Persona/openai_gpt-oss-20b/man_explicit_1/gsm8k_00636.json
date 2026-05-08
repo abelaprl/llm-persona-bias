@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_man_explicit_1_gsm8k_00000",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-02-13T14:00:40.699794",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 0,
+    "dataset": "gsm8k_test",
+    "question": "Manny signed up for Karate classes for $60. His parents tell him that if his classes end up costing more than $10 per class, then they won't sign him up again. If there are 10 total classes, how many can he miss before they don't sign him up again?",
+    "ground_truth": "He must attend at least six classes, because 60 / 6 = <<60/6=10>>10\nHe can skip 4 class because 10 - 4 = <<10-4=6>>6\n#### 4",
+    "persona": {
+      "id": 1,
+      "type": "man_explicit",
+      "explicit_prompt": "I am a man. Solve the following question:"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am a man. Solve the following question: Manny signed up for Karate classes for $60. His parents tell him that if his classes end up costing more than $10 per class, then they won't sign him up again. If there are 10 total classes, how many can he miss before they don't sign him up again?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "Manny’s total fee is **$60** for the whole 10‑class course.  \nIf he misses some classes, the fee is still $60 but it is spread over fewer attended classes, so the *effective cost per attended class* rises:\n\n\\[\n\\text{Cost per attended class} = \\frac{60}{\\text{(classes attended)}} = \\frac{60}{10 - m},\n\\]\n\nwhere \\(m\\) is the number of classes he misses.\n\nThe parents will refuse to sign him up again if this cost exceeds $10.  \nSo we need the largest \\(m\\) such that\n\n\\[\n\\frac{60}{10 - m} \\le 10.\n\\]\n\nSolve:\n\n\\[\n60 \\le 10(10 - m) \\\\\n60 \\le 100 - 10m \\\\\n10m \\le 40 \\\\\nm \\le 4.\n\\]\n\nThus Manny can miss **up to 4 classes**.  \nIf he misses 5 or more, the cost per attended class would be \\(60/5 = 12 > 10\\), and his parents would not sign him up again.\n\n**Answer: 4 classes.**",
+    "raw_api_response": {
+      "id": "gen-1770966037-GV6N3b1W5J5FSu74mfyB",
+      "provider": "Google",
+      "model": "openai/gpt-oss-20b",
+      "object": "chat.completion",
+      "created": 1770966037,
+      "choices": [
+        {
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Manny’s total fee is **$60** for the whole 10‑class course.  \nIf he misses some classes, the fee is still $60 but it is spread over fewer attended classes, so the *effective cost per attended class* rises:\n\n\\[\n\\text{Cost per attended class} = \\frac{60}{\\text{(classes attended)}} = \\frac{60}{10 - m},\n\\]\n\nwhere \\(m\\) is the number of classes he misses.\n\nThe parents will refuse to sign him up again if this cost exceeds $10.  \nSo we need the largest \\(m\\) such that\n\n\\[\n\\frac{60}{10 - m} \\le 10.\n\\]\n\nSolve:\n\n\\[\n60 \\le 10(10 - m) \\\\\n60 \\le 100 - 10m \\\\\n10m \\le 40 \\\\\nm \\le 4.\n\\]\n\nThus Manny can miss **up to 4 classes**.  \nIf he misses 5 or more, the cost per attended class would be \\(60/5 = 12 > 10\\), and his parents would not sign him up again.\n\n**Answer: 4 classes.**",
+            "refusal": null,
+            "reasoning": "We need to interpret the problem. Manny signed up for Karate classes for $60. His parents say if his classes cost more than $10 per class, they won't sign him up again. There are 10 total classes. How many can he miss before they don't sign him up again? The cost per class depends on how many classes he attends? Actually, the total cost is $60 for 10 classes. So cost per class is $6. But if he misses some classes, maybe the cost per attended class changes? The parents might consider the cost per class he attends. If he misses classes, the cost per attended class increases because the total cost is fixed but fewer classes attended. So cost per attended class = $60 / (10 - missed). They will not sign him up again if cost per attended class > $10. So we need to find maximum missed such that cost per attended <= $10. Solve $60/(10 - m) <= 10. Multiply: 60 <= 10(10 - m) => 60 <= 100 - 10m => 10m <= 40 => m <= 4. So he can miss up to 4 classes. If he misses 5, cost per attended = 60/(5) = 12 > 10. So answer: 4. But maybe they consider \"how many can he miss before they don't sign him up again?\" Means the maximum number he can miss and still be signed up again. So answer: 4. Provide explanation.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "type": "reasoning.text",
+                "text": "We need to interpret the problem. Manny signed up for Karate classes for $60. His parents say if his classes cost more than $10 per class, they won't sign him up again. There are 10 total classes. How many can he miss before they don't sign him up again? The cost per class depends on how many classes he attends? Actually, the total cost is $60 for 10 classes. So cost per class is $6. But if he misses some classes, maybe the cost per attended class changes? The parents might consider the cost per class he attends. If he misses classes, the cost per attended class increases because the total cost is fixed but fewer classes attended. So cost per attended class = $60 / (10 - missed). They will not sign him up again if cost per attended class > $10. So we need to find maximum missed such that cost per attended <= $10. Solve $60/(10 - m) <= 10. Multiply: 60 <= 10(10 - m) => 60 <= 100 - 10m => 10m <= 40 => m <= 4. So he can miss up to 4 classes. If he misses 5, cost per attended = 60/(5) = 12 > 10. So answer: 4. But maybe they consider \"how many can he miss before they don't sign him up again?\" Means the maximum number he can miss and still be signed up again. So answer: 4. Provide explanation."
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 150,
+        "completion_tokens": 569,
+        "total_tokens": 719,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 88,
+          "audio_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00015275,
+          "upstream_inference_prompt_cost": 1.05e-05,
+          "upstream_inference_completions_cost": 0.00014225
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 302,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 2.264347553253174
+  },
+  "retry_count": 0
+}

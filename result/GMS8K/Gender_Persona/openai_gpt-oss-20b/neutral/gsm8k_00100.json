@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_neutral_gsm8k_00100",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-25T18:08:13.374878",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 100,
+    "dataset": "gsm8k_test",
+    "question": "Jerome had 4 friends who came to visit him on a certain day. The first friend pressed on the doorbell 20 times before Jerome opened, the second friend pressed on the doorbell 1/4 times more than Jerome's first friend. The third friend pressed on the doorbell 10 times more than the fourth friend. If the fourth friend pressed on the doorbell 60 times, how many doorbell rings did the doorbell make?",
+    "ground_truth": "The second friend pressed on the doorbell 1/4 times more than Jerome's first friend, a total of 1/4*20=<<1/4*20=5>>5 times.\nJerome's second friend pressed on the doorbell 20+5=<<20+5=25>>25\nThe first two friends pressed on the doorbell 25+20=<<25+20=45>>45 times altogether before Jerome could open the door.\nJerome's third friend pressed on the doorbell 60+10=<<60+10=70>>70 times before Jerome could open the door.\nAltogether, Jerome's third and fourth friends pressed on the doorbell 70+60=<<70+60=130>>130 times before Jerome could open.\nThe number of doorbell rings that Jerome's friend made before Jerome could open the door is 130+45=<<130+45=175>>175 times.\n#### 175",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: Jerome had 4 friends who came to visit him on a certain day. The first friend pressed on the doorbell 20 times before Jerome opened, the second friend pressed on the doorbell 1/4 times more than Jerome's first friend. The third friend pressed on the doorbell 10 times more than the fourth friend. If the fourth friend pressed on the doorbell 60 times, how many doorbell rings did the doorbell make?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "The first friend rang the bell 20 times.  \nThe second friend rang it “\\( \\tfrac14 \\) times more” than the first friend, i.e.  \n\n\\[\n20 \\times \\left(1+\\tfrac14\\right)=20 \\times 1.25=25 \\text{ times}.\n\\]\n\nThe fourth friend rang it 60 times.  \nThe third friend rang it 10 times more than the fourth friend, i.e.  \n\n\\[\n60+10=70 \\text{ times}.\n\\]\n\nAdding all the rings together:\n\n\\[\n20 + 25 + 70 + 60 = 175.\n\\]\n\n\\[\n\\boxed{175}\n\\]",
+    "raw_api_response": {
+      "id": "gen-1774436893-LYG8sm7NvU3sunYWSAQI",
+      "object": "chat.completion",
+      "created": 1774436893,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "The first friend rang the bell 20 times.  \nThe second friend rang it “\\( \\tfrac14 \\) times more” than the first friend, i.e.  \n\n\\[\n20 \\times \\left(1+\\tfrac14\\right)=20 \\times 1.25=25 \\text{ times}.\n\\]\n\nThe fourth friend rang it 60 times.  \nThe third friend rang it 10 times more than the fourth friend, i.e.  \n\n\\[\n60+10=70 \\text{ times}.\n\\]\n\nAdding all the rings together:\n\n\\[\n20 + 25 + 70 + 60 = 175.\n\\]\n\n\\[\n\\boxed{175}\n\\]",
+            "refusal": null,
+            "reasoning": "We need to parse the problem. Jerome had 4 friends who visited him on a certain day. The first friend pressed on the doorbell 20 times before Jerome opened. The second friend pressed on the doorbell 1/4 times more than Jerome's first friend. The third friend pressed on the doorbell 10 times more than the fourth friend. If the fourth friend pressed on the doorbell 60 times, how many doorbell rings did the doorbell make?\n\nWe need to interpret \"1/4 times more than Jerome's first friend\" meaning 1/4 times more than 20? Usually \"x times more than y\" means x*y. But \"1/4 times more\" is ambiguous. Could mean 1/4 more than? Actually \"1/4 times more than\" might mean 1/4 of the first friend's count more than the first friend's count? That would be 20 + (1/4)*20 = 20 + 5 = 25. But \"1/4 times more than\" could also mean 1/4 of the first friend's count? But \"times more\" usually means multiply. So 1/4 times more than 20 would be 20 * (1 + 1/4) = 20 * 1.25 = 25. So second friend pressed 25 times.\n\nThird friend pressed 10 times more than the fourth friend. Fourth friend pressed 60 times. So third friend pressed 60 + 10 = 70 times.\n\nNow total doorbell rings: 20 + 25 + 70 + 60 = 175. But we need to check if the second friend pressed 1/4 times more than Jerome's first friend. If it's 1/4 times more, that is 20 * 1.25 = 25. So answer 175.\n\nBut maybe they interpret \"1/4 times more\" as 1/4 of the first friend's count? That would be 5. But that would be weird: \"1/4 times more\" means 1/4 more? Actually \"1/4 times more\" could be interpreted as 1/4 more than, meaning 20 + 1/4 = 20.25? That seems unlikely. So likely 25.\n\nThus answer: 175.\n\nBut let's double-check: The third friend pressed 10 times more than the fourth friend. If fourth friend pressed 60 times, third friend pressed 70 times. Yes.\n\nTotal rings: 20 + 25 + 70 + 60 = 175.\n\nThus answer: 175.\n\nBut maybe the question expects 175. Let's produce final answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem. Jerome had 4 friends who visited him on a certain day. The first friend pressed on the doorbell 20 times before Jerome opened. The second friend pressed on the doorbell 1/4 times more than Jerome's first friend. The third friend pressed on the doorbell 10 times more than the fourth friend. If the fourth friend pressed on the doorbell 60 times, how many doorbell rings did the doorbell make?\n\nWe need to interpret \"1/4 times more than Jerome's first friend\" meaning 1/4 times more than 20? Usually \"x times more than y\" means x*y. But \"1/4 times more\" is ambiguous. Could mean 1/4 more than? Actually \"1/4 times more than\" might mean 1/4 of the first friend's count more than the first friend's count? That would be 20 + (1/4)*20 = 20 + 5 = 25. But \"1/4 times more than\" could also mean 1/4 of the first friend's count? But \"times more\" usually means multiply. So 1/4 times more than 20 would be 20 * (1 + 1/4) = 20 * 1.25 = 25. So second friend pressed 25 times.\n\nThird friend pressed 10 times more than the fourth friend. Fourth friend pressed 60 times. So third friend pressed 60 + 10 = 70 times.\n\nNow total doorbell rings: 20 + 25 + 70 + 60 = 175. But we need to check if the second friend pressed 1/4 times more than Jerome's first friend. If it's 1/4 times more, that is 20 * 1.25 = 25. So answer 175.\n\nBut maybe they interpret \"1/4 times more\" as 1/4 of the first friend's count? That would be 5. But that would be weird: \"1/4 times more\" means 1/4 more? Actually \"1/4 times more\" could be interpreted as 1/4 more than, meaning 20 + 1/4 = 20.25? That seems unlikely. So likely 25.\n\nThus answer: 175.\n\nBut let's double-check: The third friend pressed 10 times more than the fourth friend. If fourth friend pressed 60 times, third friend pressed 70 times. Yes.\n\nTotal rings: 20 + 25 + 70 + 60 = 175.\n\nThus answer: 175.\n\nBut maybe the question expects 175. Let's produce final answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 179,
+        "completion_tokens": 702,
+        "total_tokens": 881,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 83,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00018803,
+          "upstream_inference_prompt_cost": 1.253e-05,
+          "upstream_inference_completions_cost": 0.0001755
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 494,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 3.108849048614502
+  },
+  "retry_count": 0
+}
