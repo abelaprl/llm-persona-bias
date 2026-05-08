@@ -462,7 +462,7 @@ def main():
             row = [persona, os.path.relpath(fpath, args.input_root), qid, dataset, gt, gt_num, content, extracted, is_correct, has_boxed, has_hashes, boxed_match, hashes_match, extraction_issue, error_category, extraction_reason, finish_reason, prompt_tokens, completion_tokens, reasoning_tokens, total_tokens, truncated_by_metadata, truncated_by_content, has_final, text_tail]
             all_rows.append(row)
     # Write detailed result CSV
-    out_csv = os.path.join(args.report_dir, f'result_{model_slug}.csv')
+    out_csv = os.path.join(args.report_dir, 'results.csv')
     with open(out_csv, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f, quoting=csv.QUOTE_ALL, escapechar='\\', doublequote=True)
         writer.writerow(["persona_folder","file","question_id","dataset","ground_truth","ground_truth_answer","response_content_full","extracted_answer","is_correct","has_boxed","has_hashes","boxed_match","hashes_match","extraction_issue","error_category","extraction_reason","finish_reason","prompt_tokens","completion_tokens","reasoning_tokens","total_tokens","truncated_by_metadata","truncated_by_content","has_final_marker","text_tail"])
@@ -470,7 +470,7 @@ def main():
             writer.writerow(row)
 
     # Write accuracy summary CSV
-    acc_csv = os.path.join(args.report_dir, f'accuracy_{model_slug}.csv')
+    acc_csv = os.path.join(args.report_dir, 'accuracy.csv')
     grand_correct = 0
     grand_total = 0
     grand_prompt_sum = 0.0

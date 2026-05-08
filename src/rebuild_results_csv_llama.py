@@ -217,8 +217,8 @@ NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,\\!|,|\{,\}|\s)\d{3
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_root', default=r'E:\Tugas Akhir\TugasAkhir\result\meta-llama_llama-3.1-8b-instruct')  # FIX: default path for direct rebuild
-    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.1-8b-instruct')  # FIX: default output path
+    parser.add_argument('--input_root', default=r'E:\Tugas Akhir\TugasAkhir\result\GMS8K\arcee-ai_trinity-large-thinking')  # FIX: default path for direct rebuild
+    parser.add_argument('--report_dir', default=r'E:\Tugas Akhir\TugasAkhir\result\reports\arcee-ai_trinity-large-thinking_llama')  # FIX: default output path
     parser.add_argument('--include_personas', default=None)
     parser.add_argument('--exclude_dirs', default='warmup')
     parser.add_argument('--test', action='store_true', help='Run unit tests and exit')

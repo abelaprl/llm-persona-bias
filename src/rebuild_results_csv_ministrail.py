@@ -226,7 +226,8 @@ def parse_args():
 
 PERSONA_LIST = [
     'man_explicit_1', 'man_implicit_1', 'man_implicit_2', 'man_implicit_3',
-    'woman_explicit_1', 'woman_implicit_1', 'woman_implicit_2', 'woman_implicit_3'
+    'woman_explicit_1', 'woman_implicit_1', 'woman_implicit_2', 'woman_implicit_3',
+    'neutral'
 ]
 
 # User-reported problematic GSM8K IDs for ministral rebuild.

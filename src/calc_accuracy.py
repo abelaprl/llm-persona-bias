@@ -7,11 +7,11 @@ from collections import defaultdict
 parser = argparse.ArgumentParser()
 parser.add_argument(
     '--csv_path',
-    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct\results.csv'
+    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\arcee-ai_trinity-large-thinking_llama\results.csv'
 )
 parser.add_argument(
     '--out_dir',
-    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\meta-llama_llama-3.3-70b-instruct'
+    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\arcee-ai_trinity-large-thinking_llama'
 )
 args = parser.parse_args()
 
