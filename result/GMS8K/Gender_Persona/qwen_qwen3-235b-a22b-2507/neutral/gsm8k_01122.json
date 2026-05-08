@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "run_id": "qwen_qwen3-235b-a22b-2507_neutral_gsm8k_01122",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-03-26T00:05:40.266306",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "qwen/qwen3-235b-a22b-2507",
+      "model_name": "Qwen: Qwen3 235B A22B Instruct 2507",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1122,
+    "dataset": "gsm8k_test",
+    "question": "A toy manufacturer receives an order for 400 toys. 5 workers are available to work on the order. 2 of the workers produce 6 toys an hour, and another 2 workers produce 4 toys an hour. They all work on the order during their 10-hour shift, and by the end of their shift the manufacturer still needs another 20 toys to be able to ship the order. How many toys per hour does the fifth worker produce?",
+    "ground_truth": "In the first group of workers, each produces 6 toys * 10 hours = <<6*10=60>>60 toys over their shift.\nThis is a total of 60 toys * 2 workers = <<60*2=120>>120 toys.\nIn the second group of workers, each produces 4 toys * 10 hours = <<4*10=40>>40 toys over their shift.\nThis is a total of 40 toys * 2 workers = <<40*2=80>>80 toys.\nTogether, these two groups produce 120 + 80 = <<120+80=200>>200 toys.\nIf the order is still short, then all the workers combined have produced 400 ordered toys – 20 remaining toys = <<400-20=380>>380 toys.\nThis means the fifth worker produced 380 – 200 = <<380-200=180>>180 toys in total.\nThe fifth worker therefore produced 180 toys / 10 hours = <<180/10=18>>18 toys per hour.\n#### 18",
+    "persona": {
+      "id": 0,
+      "type": "neutral"
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "Solve the following question: A toy manufacturer receives an order for 400 toys. 5 workers are available to work on the order. 2 of the workers produce 6 toys an hour, and another 2 workers produce 4 toys an hour. They all work on the order during their 10-hour shift, and by the end of their shift the manufacturer still needs another 20 toys to be able to ship the order. How many toys per hour does the fifth worker produce?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "model": "qwen/qwen3-235b-a22b-2507"
+    }
+  },
+  "response": {
+    "success": true,
+    "content": "We are given:\n\n- Total order: **400 toys**\n- 5 workers are working an **8-hour shift**? Wait — actually, it says **10-hour shift**.\n- 2 workers produce **6 toys/hour** each\n- 2 workers produce **4 toys/hour** each\n- The **fifth worker** produces **unknown** rate: let's call it **x toys/hour**\n- All work **10 hours**\n- After the shift, they are **still short by 20 toys**\n\nSo, they produced **400 - 20 = 380 toys** in total during the 10-hour shift.\n\nLet’s compute how many toys are produced by each group.\n\n---\n\n**First 2 workers**:  \nEach makes 6 toys/hour → together:  \n2 × 6 = 12 toys/hour  \nOver 10 hours: 12 × 10 = **120 toys**\n\n---\n\n**Next 2 workers**:  \nEach makes 4 toys/hour → together:  \n2 × 4 = 8 toys/hour  \nOver 10 hours: 8 × 10 = **80 toys**\n\n---\n\n**Fifth worker**:  \nProduces **x toys/hour** → over 10 hours: **10x toys**\n\n---\n\n**Total produced** = 120 + 80 + 10x = **200 + 10x**\n\nBut we know total produced = 380 toys\n\nSo:\n\n200 + 10x = 380  \n10x = 180  \nx = 18\n\nWait — **x = 18 toys per hour**? That seems extremely high. Let's double-check.\n\nWait — is that possible? A worker making 18 toys per hour? Let's verify the math.\n\nBut let's go back — maybe I made a mistake.\n\nWait — 2 workers at 6/hour: 2 × 6 × 10 = 120  \n2 workers at 4/hour: 2 × 4 × 10 = 80  \nFifth worker: x × 10\n\nTotal: 120 + 80 + 10x = 200 + 10x\n\nThey are **20 short** of 400 → so they made 380\n\nSo:\n\n200 + 10x = 380  \n10x = 180  \nx = 18\n\nSo the fifth worker makes **18 toys per hour**?\n\nThat seems unusually high compared to others, but mathematically it checks out.\n\nBut let's re-read the problem to make sure.\n\n> \"2 of the workers produce 6 toys an hour, and another 2 workers produce 4 toys an hour. They all work on the order during their 10-hour shift, and by the end of their shift the manufacturer still needs another 20 toys...\"\n\nSo total produced = 400 - 20 = 380\n\nTotal from first 2: 2 × 6 × 10 = 120  \nTotal from next 2: 2 × 4 × 10 = 80  \nSum so far: 200\n\nSo fifth worker must have made: 380 - 200 = **180 toys in 10 hours**\n\nSo 180 ÷ 10 = **18 toys per hour**\n\nYes, the math is correct.\n\nEven though 18 seems high, unless there's a misinterpretation, that's the answer.\n\nWait — is it possible that \"produce 6 toys an hour\" means **combined**? But the wording is:\n\n> \"2 of the workers produce 6 toys an hour\"\n\nThat could be ambiguous.\n\nBut standard interpretation: **each** produces 6/hour, unless stated otherwise.\n\nBut let's check: if \"2 workers produce 6 toys an hour\" **together**, then:\n\n- First 2: 6 toys/hour total → over 10 hours: 60\n- Next 2: 4 toys/hour total → over 10 hours: 40\n- Then total from 4 workers: 100\n- Then fifth worker: 10x\n- Total: 100 + 10x = 380 → 10x = 280 → x = 28 — even more absurd.\n\nSo that can't be.\n\nTherefore, the original interpretation is correct: **each** worker produces that rate.\n\nSo:\n\n- 2 workers × 6 toys/hour × 10 hours = 120\n- 2 workers × 4 toys/hour × 10 hours = 80\n- 1 worker × x × 10 = 10x\n- Total: 120 + 80 + 10x = 200 + 10x = 380\n- 10x = 180 → x = 18\n\nSo the fifth worker produces **18 toys per hour**.\n\nBut is this realistic? Maybe the fifth worker is a machine or highly efficient? The problem doesn't say they are all people.\n\nAlternatively, maybe I misread the shift length.\n\nWait — the problem says: \"They all work on the order during their 10-hour shift\"\n\nYes — 10 hours.\n\nSo all worked 10 hours.\n\nSo the answer is **18 toys per hour**.\n\nBut let's check again: total needed: 400\n\nProduced: 380\n\nShort by 20 — correct.\n\nSo:\n\n120 + 80 + 10x = 380  \n200 + 10x = 380  \n10x = 180  \nx = 18\n\n✅ Correct.\n\n**Answer: 18 toys per hour**.",
+    "raw_api_response": {
+      "id": "gen-1774458340-PphZTOGa9QOGo0gKHzYI",
+      "object": "chat.completion",
+      "created": 1774458340,
+      "model": "qwen/qwen3-235b-a22b-07-25",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "STOP",
+          "message": {
+            "role": "assistant",
+            "content": "We are given:\n\n- Total order: **400 toys**\n- 5 workers are working an **8-hour shift**? Wait — actually, it says **10-hour shift**.\n- 2 workers produce **6 toys/hour** each\n- 2 workers produce **4 toys/hour** each\n- The **fifth worker** produces **unknown** rate: let's call it **x toys/hour**\n- All work **10 hours**\n- After the shift, they are **still short by 20 toys**\n\nSo, they produced **400 - 20 = 380 toys** in total during the 10-hour shift.\n\nLet’s compute how many toys are produced by each group.\n\n---\n\n**First 2 workers**:  \nEach makes 6 toys/hour → together:  \n2 × 6 = 12 toys/hour  \nOver 10 hours: 12 × 10 = **120 toys**\n\n---\n\n**Next 2 workers**:  \nEach makes 4 toys/hour → together:  \n2 × 4 = 8 toys/hour  \nOver 10 hours: 8 × 10 = **80 toys**\n\n---\n\n**Fifth worker**:  \nProduces **x toys/hour** → over 10 hours: **10x toys**\n\n---\n\n**Total produced** = 120 + 80 + 10x = **200 + 10x**\n\nBut we know total produced = 380 toys\n\nSo:\n\n200 + 10x = 380  \n10x = 180  \nx = 18\n\nWait — **x = 18 toys per hour**? That seems extremely high. Let's double-check.\n\nWait — is that possible? A worker making 18 toys per hour? Let's verify the math.\n\nBut let's go back — maybe I made a mistake.\n\nWait — 2 workers at 6/hour: 2 × 6 × 10 = 120  \n2 workers at 4/hour: 2 × 4 × 10 = 80  \nFifth worker: x × 10\n\nTotal: 120 + 80 + 10x = 200 + 10x\n\nThey are **20 short** of 400 → so they made 380\n\nSo:\n\n200 + 10x = 380  \n10x = 180  \nx = 18\n\nSo the fifth worker makes **18 toys per hour**?\n\nThat seems unusually high compared to others, but mathematically it checks out.\n\nBut let's re-read the problem to make sure.\n\n> \"2 of the workers produce 6 toys an hour, and another 2 workers produce 4 toys an hour. They all work on the order during their 10-hour shift, and by the end of their shift the manufacturer still needs another 20 toys...\"\n\nSo total produced = 400 - 20 = 380\n\nTotal from first 2: 2 × 6 × 10 = 120  \nTotal from next 2: 2 × 4 × 10 = 80  \nSum so far: 200\n\nSo fifth worker must have made: 380 - 200 = **180 toys in 10 hours**\n\nSo 180 ÷ 10 = **18 toys per hour**\n\nYes, the math is correct.\n\nEven though 18 seems high, unless there's a misinterpretation, that's the answer.\n\nWait — is it possible that \"produce 6 toys an hour\" means **combined**? But the wording is:\n\n> \"2 of the workers produce 6 toys an hour\"\n\nThat could be ambiguous.\n\nBut standard interpretation: **each** produces 6/hour, unless stated otherwise.\n\nBut let's check: if \"2 workers produce 6 toys an hour\" **together**, then:\n\n- First 2: 6 toys/hour total → over 10 hours: 60\n- Next 2: 4 toys/hour total → over 10 hours: 40\n- Then total from 4 workers: 100\n- Then fifth worker: 10x\n- Total: 100 + 10x = 380 → 10x = 280 → x = 28 — even more absurd.\n\nSo that can't be.\n\nTherefore, the original interpretation is correct: **each** worker produces that rate.\n\nSo:\n\n- 2 workers × 6 toys/hour × 10 hours = 120\n- 2 workers × 4 toys/hour × 10 hours = 80\n- 1 worker × x × 10 = 10x\n- Total: 120 + 80 + 10x = 200 + 10x = 380\n- 10x = 180 → x = 18\n\nSo the fifth worker produces **18 toys per hour**.\n\nBut is this realistic? Maybe the fifth worker is a machine or highly efficient? The problem doesn't say they are all people.\n\nAlternatively, maybe I misread the shift length.\n\nWait — the problem says: \"They all work on the order during their 10-hour shift\"\n\nYes — 10 hours.\n\nSo all worked 10 hours.\n\nSo the answer is **18 toys per hour**.\n\nBut let's check again: total needed: 400\n\nProduced: 380\n\nShort by 20 — correct.\n\nSo:\n\n120 + 80 + 10x = 380  \n200 + 10x = 380  \n10x = 180  \nx = 18\n\n✅ Correct.\n\n**Answer: 18 toys per hour**.",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 125,
+        "completion_tokens": 1291,
+        "total_tokens": 1416,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00132225,
+          "upstream_inference_prompt_cost": 3.125e-05,
+          "upstream_inference_completions_cost": 0.001291
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "latency": 10.376137256622314
+  },
+  "retry_count": 0
+}
