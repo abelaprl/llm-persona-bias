@@ -1,0 +1,270 @@
+{
+  "analysis_metadata": {
+    "total_cases": 20,
+    "analysis_date": "2025-01-20",
+    "dataset": "GSM8K Religion Persona (deepseek-r1-distill-qwen-32b)",
+    "base_path": "result/GMS8K/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b"
+  },
+  "failure_patterns": {
+    "EXPECTED_NOT_IN_CANDIDATES": {
+      "count": 14,
+      "percentage": 70,
+      "root_cause": "Regex misses expected number format or it's split across lines/calculations",
+      "examples": [
+        {
+          "id": "atheist_implicit_2/gsm8k_00175",
+          "extracted": 1,
+          "expected": 953,
+          "candidates": [95, 95, 1, 35, 60, 95],
+          "explanation": "Expected 953 appears 0 times in model output. Model likely calculated as '95 * 10 + 3' with each part extracted separately.",
+          "why_failure": "Compound number broken into parts by calculation; regex captures intermediate values but misses final composed number",
+          "fix_strategy": "Post-processing: detect calculation chains like 'X * Y + Z' and compose final result"
+        },
+        {
+          "id": "atheist_implicit_2/gsm8k_00325",
+          "extracted": 5,
+          "expected": 1412,
+          "candidates": [5, 14, 1, 1, 2, 2, 1, 2, 5, 7],
+          "explanation": "Expected 1412 never appears. Likely formatted as '1,412' or '1 412' (thousands separator not properly handled)",
+          "why_failure": "Thousands separator handling incomplete; number may be split across LaTeX formatting or special characters",
+          "fix_strategy": "Improve NUMBER_RE to handle: numbers with spaces (1 412), numbers with special chars (1{,}412), numbers in calculations (14 * 100 + 12)"
+        },
+        {
+          "id": "atheist_implicit_3/gsm8k_00006",
+          "extracted": 16,
+          "expected": 646,
+          "candidates": [64, 16, 1, 5, 60, 5, 0.6, 5, 3, 5],
+          "explanation": "Expected 646 appears 0 times. Likely '64 * 10 + 6' or '0.64 * 1000' with parts extracted separately",
+          "why_failure": "Compound computation; regex doesn't reconstruct final answer from intermediate steps",
+          "fix_strategy": "Add semantic pass to detect 'answer is', 'equals', 'total' and extract numbers from that sentence only"
+        }
+      ],
+      "fix_priority": 1,
+      "recommended_improvements": [
+        "Enhance NUMBER_RE: add pattern for compound numbers like '1 4 1 2' → '1412'",
+        "Add post-processing: combine adjacent small numbers if arithmetic context detected",
+        "Implement answer-sentence extraction: locate sentences with 'The answer is', 'Total is', 'equals', 'final' and extract ONLY from those",
+        "Handle scientific notation and fractions: '1.23e3' → '1230', '3 and 1/4' → '3.25'",
+        "Detect calculation completion patterns: '= 953' or 'is 953' as definitive final answer markers"
+      ]
+    },
+    "WRONG_INDEX": {
+      "count": 2,
+      "percentage": 10,
+      "root_cause": "Extraction picks early intermediate candidate when expected is much later in sequence",
+      "examples": [
+        {
+          "id": "christian_implicit_2/gsm8k_00202",
+          "extracted": 5,
+          "extracted_index": 3,
+          "expected": 114200,
+          "expected_index": 18,
+          "total_candidates": 20,
+          "candidates_sample": [1, 5000, 2, "<<<5>>>", 2000, -5, 100, 2100, 3, 52, 2100, 52, 109200, 4, 109200, 5000, 109200, 5000, "<<<114200>>>", 114200],
+          "explanation": "Model output shows multi-step calculation: 1 year + 5000 base + 2% increase... final total 114200. Extraction stops at '5' (from intermediate calculation like '5% × 100000')",
+          "why_failure": "No marker found; heuristic picks early 'plausible' number instead of scanning to final answer location",
+          "fix_strategy": "Implement positional weighting: numbers near text end get 3-5x score boost; requires scanning full text not just first occurrence"
+        },
+        {
+          "id": "islam_implicit_1/gsm8k_00018",
+          "extracted": 35000,
+          "extracted_index": 7,
+          "expected": 57500,
+          "expected_index": 21,
+          "total_candidates": 23,
+          "explanation": "Jill's salary calculation: base 35000, bonus 22500, total 57500. Extraction picked intermediate '35000' (base salary) instead of final '57500' (total earned)",
+          "why_failure": "Early extraction heuristic fires; no context scoring to realize later number is final result",
+          "fix_strategy": "Add semantic context: 'total earned', 'yearly salary', 'final amount' should trigger searching to end of text"
+        }
+      ],
+      "fix_priority": 2,
+      "recommended_improvements": [
+        "Add recency weighting: multiply score by (1 + distance_from_end / total_text_length)",
+        "Implement answer-position bias: strongly prefer numbers in last 10% of text",
+        "Add duplicate detection: if number appears multiple times, use LAST occurrence",
+        "Detect calculation chains: 'BASE + BONUS = TOTAL' - extract TOTAL not BASE",
+        "Use semantic keywords: 'total', 'final', 'overall', 'complete', 'spent', 'earned' should weight towards later candidates"
+      ]
+    },
+    "EXTRACTED_LAST": {
+      "count": 2,
+      "percentage": 10,
+      "root_cause": "Last-number heuristic triggers, but expected answer is first (or middle) in candidates",
+      "examples": [
+        {
+          "id": "christian_implicit_2/gsm8k_00357",
+          "extracted": 10,
+          "extracted_position": "last",
+          "expected": 21,
+          "expected_position": "first",
+          "candidates": [21, 10],
+          "model_text": "Dean has $21 left after his purchases and receiving the extra $10 from his mother",
+          "explanation": "Text clearly states 'left' (final state) = $21, then mentions '$10 from mother' (addition/timing detail). Extraction picks last mentioned $10 instead of final amount $21",
+          "why_failure": "'Last number in text' heuristic too aggressive; misses semantic that earlier number is the answer",
+          "fix_strategy": "Prioritize 'final state' keywords: 'left', 'remaining', 'total', 'outcome' over generic position"
+        },
+        {
+          "id": "islam_implicit_1/gsm8k_00138",
+          "extracted": 5.0,
+          "extracted_position": "last",
+          "expected": 29.0,
+          "expected_position": "first",
+          "candidates": [29.0, 20, 5.0],
+          "model_text": "The total cost of Rory's delivery order is $29.00. This includes... delivery fee $5",
+          "explanation": "Explicitly states 'total cost is $29.00' but extraction picks final mentioned $5",
+          "why_failure": "Extraction rule: 'if no marker, use last number' fires without considering explicit 'total cost is' phrase",
+          "fix_strategy": "Add keyword-priority pass BEFORE position heuristics"
+        }
+      ],
+      "fix_priority": 2,
+      "recommended_improvements": [
+        "Add keyword-based extraction: scan for 'total [is/=] NUM', 'final [is/=] NUM', 'remaining NUM', 'total cost NUM'",
+        "Reduce last-number heuristic weight: should be fallback, not primary",
+        "Check first N numbers when keywords present: 'total' found early? check first 5 candidates before last",
+        "Validate marker before defaulting to last: if 'total' or 'final' appears, trust that + immediate next number",
+        "Add semantic validation: does extracted number make sense given problem context?"
+      ]
+    },
+    "EXTRACTED_FIRST": {
+      "count": 1,
+      "percentage": 5,
+      "root_cause": "First-number heuristic picked, but expected is later in candidate list",
+      "examples": [
+        {
+          "id": "atheist_implicit_3/gsm8k_00302",
+          "extracted": 32,
+          "extracted_position": "first",
+          "expected": 8,
+          "explanation": "First calculation gives 32, but problem asks for final adjusted value which is 8",
+          "why_failure": "Generic first-number rule without understanding that problem asks for FINAL value not intermediate",
+          "fix_strategy": "Read question: 'What is the final...', 'How much... at the end', 'Total after...' - these trigger 'end of solution' logic"
+        }
+      ],
+      "fix_priority": 2,
+      "recommended_improvements": [
+        "Parse GSM8K question first: identify what's being asked",
+        "If question asks for 'final', 'total', 'remaining', 'after', 'left' - search toward end",
+        "If question asks for 'first', 'initially', 'starting' - prefer early numbers",
+        "Combine question + answer analysis for bidirectional validation"
+      ]
+    },
+    "NO_EXTRACTION": {
+      "count": 1,
+      "percentage": 5,
+      "root_cause": "All extraction rules failed; no number extracted at all",
+      "examples": [
+        {
+          "id": "islam_implicit_1/gsm8k_00002",
+          "extracted": null,
+          "expected": 3,
+          "explanation": "Expected number 3 failed to extract; likely unusual formatting or normalization issue",
+          "why_failure": "Edge case in NUMBER_RE, normalization failure, or number written as word 'three' instead of digits",
+          "fix_strategy": "Add fallback scan + word-to-number conversion"
+        }
+      ],
+      "fix_priority": 3,
+      "recommended_improvements": [
+        "Add word-to-digit conversion: 'one' → 1, 'twenty-three' → 23, 'hundred' → 100",
+        "Implement fallback full-text scan: if no NUMBER_RE match, try extracting ANY digit sequence",
+        "Better error logging: capture which rule failed and why",
+        "Handle edge cases: roman numerals (V, X, etc.), spelled-out fractions (one-quarter)",
+        "Add validation: if extraction is None but expected exists, flag for manual review"
+      ]
+    }
+  },
+  "rule_fixes_by_priority": {
+    "IMMEDIATE": [
+      {
+        "rule": "NUMBER_RE regex enhancement",
+        "current": "r'(?:[-\\u2212\\u2013]\\s*)?(?:\\$)?(?:\\d{1,3}(?:(?:,\\\\!|,|\\{,\\}|\\s)\\d{3})+|\\d+)(?:\\.\\d+)?'",
+        "issue": "Misses numbers split by LaTeX, spaces, or calculation operators",
+        "fix": "Add alternation for compound numbers; handle '1 4 1 2' as '1412'",
+        "impact": "Would fix ~50% of EXPECTED_NOT_IN_CANDIDATES cases"
+      },
+      {
+        "rule": "Add answer-sentence extraction pass",
+        "current": "Only looks for ####, \\boxed, generic markers",
+        "issue": "Model explanation often ends with 'The answer is X' but extraction doesn't capture this",
+        "fix": "After standard rules fail, scan last 500 chars for 'answer.*is|equals|=|final.*is' patterns",
+        "impact": "Would fix ~30% of EXPECTED_NOT_IN_CANDIDATES cases"
+      }
+    ],
+    "SHORT_TERM": [
+      {
+        "rule": "Semantic keyword prioritization",
+        "current": "No keyword-based scoring",
+        "issue": "'total is 100' ignored in favor of last number which is '10'",
+        "fix": "Score candidates: if 'total'/'final'/'remaining' found near number, boost score 5x",
+        "impact": "Would fix all EXTRACTED_LAST cases"
+      },
+      {
+        "rule": "Positional weighting",
+        "current": "Position barely factored into selection",
+        "issue": "Early intermediate values picked over final answer at end of text",
+        "fix": "Add distance_from_end * 3 to score for numbers in last 30% of text",
+        "impact": "Would fix most WRONG_INDEX cases"
+      },
+      {
+        "rule": "Remove last-number fallback default",
+        "current": "Falls back to last number when no marker found",
+        "issue": "Last number sometimes is detail, not answer",
+        "fix": "Only use last-number if it appears after 'The answer', 'Final', '='",
+        "impact": "Would fix EXTRACTED_LAST pattern entirely"
+      }
+    ],
+    "MEDIUM_TERM": [
+      {
+        "rule": "Multi-pass extraction with confidence",
+        "current": "Single-pass deterministic rules",
+        "issue": "No way to know if extraction is confident or guessing",
+        "fix": "Pass 1: markers; Pass 2: keywords; Pass 3: position; Return (number, confidence_score)",
+        "impact": "Enables downstream validation and error handling"
+      },
+      {
+        "rule": "Calculate chain detection",
+        "current": "Treats all numbers equally",
+        "issue": "Can't distinguish 'base cost' from 'total cost' in computation chains",
+        "fix": "Detect patterns like 'X + Y = Z', 'X * Y - Z', then prefer the Z",
+        "impact": "Would fix remaining WRONG_INDEX cases"
+      }
+    ]
+  },
+  "implementation_code_examples": {
+    "enhanced_keyword_scoring": {
+      "description": "Detect answer-indicating keywords and boost nearby numbers",
+      "pseudocode": "for candidate in candidates:\n  score = 1.0\n  for word in ['total', 'final', 'answer', 'result', 'equals', 'is']:\n    if word_near(candidate, word, window=50):\n      score *= 3.0\n  if candidate_near_line_end(candidate, text):\n    score *= 1.5\n  scored_candidates.append((candidate, score))\nreturn max(scored_candidates, key=lambda x: x[1])"
+    },
+    "compound_number_reconstruction": {
+      "description": "Detect and combine numbers split by operators/formatting",
+      "pseudocode": "def reconstruct_compound_numbers(candidates, text):\n  # Find sequences like 'X * Y + Z' where each is a candidate\n  for i, (num1, pos1, ...) in enumerate(candidates):\n    if text[pos1 + len(str(num1))] in ['*', '+', '-', '/']:\n      op = text[pos1 + len(str(num1))]\n      for j in range(i+1, min(i+4, len(candidates))):\n        num2, pos2, ... = candidates[j]\n        if has_consecutive_operator(text[pos1:pos2]):\n          # Try to evaluate: 95 * 10 + 3 = 953\n          try:\n            result = eval(f'{num1} {op} {num2}')\n            candidates.append((result, pos2, ...))\n          except: pass"
+    },
+    "answer_sentence_extraction": {
+      "description": "Final fallback: extract from explicit answer sentence",
+      "pseudocode": "def extract_from_answer_sentence(text):\n  patterns = [\n    r'answer\\s+(?:is|=|:)\\s*([\\$]?)([\\d,\\.]+)',\n    r'total\\s+(?:is|=|:)\\s*([\\$]?)([\\d,\\.]+)',\n    r'(?:final|final\\s+answer)\\s+(?:is|=|:)\\s*([\\$]?)([\\d,\\.]+)',\n    r'(?:equals|=)\\s*([\\$]?)([\\d,\\.]+)',\n  ]\n  for pattern in patterns:\n    for match in re.finditer(pattern, text[-500:], re.I):\n      num = normalize_number(match.group(2))\n      if num is not None:\n        return num\n  return None"
+    }
+  },
+  "validation_checklist": {
+    "before_using_extracted_number": [
+      "Is it non-negative (unless problem explicitly involves debt/loss)?",
+      "Is it in a reasonable range for the problem domain?",
+      "Does it appear in the last 30% of response text?",
+      "Does it follow a marker/keyword or appear near end?",
+      "Is it NOT part of a compound calculation (if multiple numbers close together)?",
+      "If multiple candidates: is this one confirmed by being the largest/most final?"
+    ]
+  },
+  "gsm8k_specific_notes": {
+    "ground_truth_format": "#### <answer_number>",
+    "model_response_variations": [
+      "Model produces full calculation chain before #### marker",
+      "Some models use \\boxed{} instead of ####",
+      "Persona-modified questions may have different reasoning output",
+      "Large numbers (>10000) frequently broken into calculations"
+    ],
+    "persona_impact": {
+      "explicit_personas": "Better marker-based output; extraction success high",
+      "implicit_personas": "More narrative format; extraction harder; 19/20 failures from implicit persona",
+      "recommendation": "May need persona-aware extraction rules"
+    }
+  }
+}

@@ -44,6 +44,30 @@ USER_PROMPT_TEMPLATE = (
     "{scenario}"
 )
 
+
+def clean_bpe_artifacts(text: str) -> str:
+    text = text.replace("Ġ", " ")
+    text = text.replace("Ċ", "\n")
+    text = " ".join(text.split())
+    return text
+
+
+def clean_api_response(api_response: dict | None) -> dict | None:
+    if not isinstance(api_response, dict):
+        return api_response
+    api_response = dict(api_response)
+    if "choices" in api_response and isinstance(api_response["choices"], list):
+        api_response["choices"] = [dict(choice) for choice in api_response["choices"]]
+        for choice in api_response["choices"]:
+            if isinstance(choice, dict) and "message" in choice:
+                choice["message"] = dict(choice["message"])
+                message = choice["message"]
+                if isinstance(message.get("content"), str):
+                    message["content"] = clean_bpe_artifacts(message["content"])
+                if isinstance(message.get("reasoning"), str):
+                    message["reasoning"] = clean_bpe_artifacts(message["reasoning"])
+    return api_response
+
 PERSONA_ORDER = [
     "man_explicit_1",
     "man_implicit_1",
@@ -54,6 +78,22 @@ PERSONA_ORDER = [
     "woman_implicit_2",
     "woman_implicit_3",
     "neutral",
+    "islam_explicit",
+    "islam_implicit_1",
+    "islam_implicit_2",
+    "islam_implicit_3",
+    "christian_explicit",
+    "christian_implicit_1",
+    "christian_implicit_2",
+    "christian_implicit_3",
+    "atheist_explicit",
+    "atheist_implicit_1",
+    "atheist_implicit_2",
+    "atheist_implicit_3",
+    "jewish_explicit",
+    "jewish_implicit_1",
+    "jewish_implicit_2",
+    "jewish_implicit_3"
 ]
 
 
@@ -94,6 +134,7 @@ def load_persona_files() -> dict[str, str]:
     woman_implicit = read_json(PERSONA_DIR / "implicits_woman_prompts.json")
     man_explicit = read_json(PERSONA_DIR / "explicits_man_prompts.json")
     woman_explicit = read_json(PERSONA_DIR / "explicits_woman_prompts.json")
+    religion_persona = read_json(PERSONA_DIR/ "religion_persona.json")
 
     def get_prompt(rows: list[dict], idx: int) -> str:
         if idx < 0 or idx >= len(rows):
@@ -111,6 +152,25 @@ def load_persona_files() -> dict[str, str]:
         "woman_implicit_2": get_prompt(woman_implicit, 1),
         "woman_implicit_3": get_prompt(woman_implicit, 2),
         "neutral": "You are a helpful AI assistant.",
+        "islam_explicit": get_prompt(religion_persona,0),
+        "islam_implicit_1": get_prompt(religion_persona,1),
+        "islam_implicit_2": get_prompt(religion_persona,2),
+        "islam_implicit_3": get_prompt(religion_persona,3),
+        "christian_explicit": get_prompt(religion_persona,4),
+        "christian_implicit_1": get_prompt(religion_persona,5),
+        "christtian_implicit_2": get_prompt(religion_persona,6),
+        "christian_implicit_3": get_prompt(religion_persona,7),
+        "jewish_explicit":  get_prompt(religion_persona,8),
+        "jewish_implicit_1":  get_prompt(religion_persona,9),
+        "jewish_implicit_2":  get_prompt(religion_persona,10),
+        "jewish_implicit_3":  get_prompt(religion_persona,11),
+        "atheist_explicit":  get_prompt(religion_persona,12),
+        "atheist_implicit_1":  get_prompt(religion_persona,13),
+        "atheist_implicit_2":  get_prompt(religion_persona,14),
+        "atheist_implicit_3":  get_prompt(religion_persona,15)
+
+  
+        
     }
 
     missing = [name for name, prompt in personas.items() if not prompt.strip()]
@@ -270,7 +330,7 @@ def extract_prediction_text(api_response: dict | None) -> str:
         message = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
         content = message.get("content")
         if isinstance(content, str):
-            return content.strip()
+            return clean_bpe_artifacts(content.strip())
     return ""
 
 
@@ -419,7 +479,7 @@ def main() -> None:
     parser.add_argument("--limit_samples", type=int, default=0)
     parser.add_argument("--personas", type=str, default="")
     parser.add_argument("--temperature", type=float, default=0.0)
-    parser.add_argument("--max_tokens", type=int, default=2048)
+    parser.add_argument("--max_tokens", type=int, default=4096)
     parser.add_argument("--max_retries", type=int, default=8)
     parser.add_argument("--retry_base_sec", type=float, default=8.0)
     parser.add_argument("--sleep_sec", type=float, default=1.0)
@@ -521,6 +581,7 @@ def main() -> None:
             )
 
             raw_api = api_result["api_response"] if api_result["success"] else None
+            raw_api = clean_api_response(raw_api)
             prediction_text = extract_prediction_text(raw_api) if raw_api else ""
             parsed_answer, explanation = parse_answer_and_explanation(prediction_text)
             gt_label = normalize_binary_label(sample.get("label"))

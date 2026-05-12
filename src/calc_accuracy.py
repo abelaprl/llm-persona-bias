@@ -48,12 +48,36 @@ def to_int(val):
 persona_writers = {}
 persona_files = {}
 fieldnames_global = None
+detected_personas = set()
 
 try:
     with open(csv_path, encoding='utf-8') as f:
         reader = csv.DictReader(f)
         fieldnames_global = reader.fieldnames
-        
+
+        # First pass: detect all personas in the CSV
+        for row in reader:
+            persona = row['persona_folder']
+            detected_personas.add(persona)
+finally:
+    pass
+
+# Use detected personas, sorted alphabetically
+PERSONA_ORDER = sorted(list(detected_personas))
+
+# Track row count per persona to cap at 400 each
+persona_row_count = defaultdict(lambda: 0)
+MAX_ROWS_PER_PERSONA = 400
+
+# Second pass: process data and write per-persona CSVs
+persona_writers = {}
+persona_files = {}
+
+try:
+    with open(csv_path, encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        fieldnames_global = reader.fieldnames
+
         # Open all persona CSV writers upfront
         for p in PERSONA_ORDER:
             out_path = os.path.join(out_dir, f'results_{p}.csv')
@@ -62,24 +86,30 @@ try:
             writer.writeheader()
             persona_writers[p] = writer
             persona_files[p] = file_obj
-        
+
         # Stream through CSV, collecting stats and writing to persona files
         for row in reader:
             persona = row['persona_folder']
+            
+            # Cap each persona at 400 rows
+            persona_row_count[persona] += 1
+            if persona_row_count[persona] > MAX_ROWS_PER_PERSONA:
+                continue
+            
             is_correct = row['is_correct'].strip().lower() == 'true'
             error_cat  = row.get('error_category', '').strip()
-            
+
             # fallback: infer no_extract from empty extracted_answer
             if not error_cat:
                 extracted = row.get('extracted_answer', '').strip()
                 if not extracted or extracted.lower() in ('', 'none', 'null'):
                     error_cat = 'no_number_found'
-            
+
             # Update counts
             stats = persona_stats[persona]
             stats['total'] += 1
             overall['total'] += 1
-            
+
             if is_correct:
                 stats['correct'] += 1
                 overall['correct'] += 1
@@ -89,13 +119,13 @@ try:
             if error_cat == 'truncated_output':
                 stats['truncated'] += 1
                 overall['truncated'] += 1
-                
+
             # Sum token usage
             stats['sum_prompt_tokens'] += to_int(row.get('prompt_tokens'))
             stats['sum_completion_tokens'] += to_int(row.get('completion_tokens'))
             stats['sum_reasoning_tokens'] += to_int(row.get('reasoning_tokens'))
             stats['sum_total_tokens'] += to_int(row.get('total_tokens'))
-            
+
             overall['sum_prompt_tokens'] += to_int(row.get('prompt_tokens'))
             overall['sum_completion_tokens'] += to_int(row.get('completion_tokens'))
             overall['sum_reasoning_tokens'] += to_int(row.get('reasoning_tokens'))

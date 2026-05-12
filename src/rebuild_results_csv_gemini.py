@@ -1225,7 +1225,7 @@ def main():
     if not model_name: # handle trailing slash
         model_name = os.path.basename(os.path.dirname(args.input_root))
 
-    persona_dirs = [p for p in os.listdir(args.input_root) if p in PERSONA_LIST]
+    persona_dirs = [p for p in os.listdir(args.input_root) if os.path.isdir(os.path.join(args.input_root, p)) and p != 'warmup']
     all_rows = []
     error_counter = Counter()
     persona_counter = Counter()

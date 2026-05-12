@@ -1086,7 +1086,9 @@ def is_truly_truncated(text, finish_reason, completion_tokens, max_tokens):
 def main():
     args = parse_args()
     os.makedirs(args.report_dir, exist_ok=True)
-    persona_dirs = [p for p in os.listdir(args.input_root) if p in PERSONA_LIST]
+    # Auto-detect personas from directories (not just hardcoded list)
+    all_dirs = os.listdir(args.input_root)
+    persona_dirs = [p for p in all_dirs if os.path.isdir(os.path.join(args.input_root, p)) and p != 'warmup']
     all_rows = []
     error_counter = Counter()
     persona_counter = Counter()

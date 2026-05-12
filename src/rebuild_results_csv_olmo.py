@@ -371,7 +371,7 @@ def main():
     inferred_slug = os.path.basename(os.path.normpath(args.input_root))
     model_slug = sanitize_model_slug(args.model_slug or inferred_slug)
     model_name = args.model_name or default_model_name_from_slug(model_slug)
-    persona_dirs = [p for p in os.listdir(args.input_root) if p in PERSONA_LIST]
+    persona_dirs = [p for p in os.listdir(args.input_root) if os.path.isdir(os.path.join(args.input_root, p)) and p != 'warmup']
     all_rows = []
     error_counter = Counter()
     persona_counter = Counter()
