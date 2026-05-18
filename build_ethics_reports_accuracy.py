@@ -16,6 +16,22 @@ PERSONA_ORDER = [
     "woman_implicit_1",
     "woman_implicit_2",
     "woman_implicit_3",
+    "islam_explicit",
+    "islam_implicit_1",
+    "islam_implicit_2",
+    "islam_implicit_3",
+    "christian_explicit",
+    "christian_implicit_1",
+    "christian_implicit_2",
+    "christian_implicit_3",
+    "jewish_explicit",
+    "jewish_implicit_1",
+    "jewish_implicit_2",
+    "jewish_implicit_3",
+    "atheist_explicit",
+    "atheist_implicit_1",
+    "atheist_implicit_2",
+    "atheist_implicit_3",
 ]
 
 

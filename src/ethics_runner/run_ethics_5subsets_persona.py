@@ -158,7 +158,7 @@ def load_persona_files() -> dict[str, str]:
         "islam_implicit_3": get_prompt(religion_persona,3),
         "christian_explicit": get_prompt(religion_persona,4),
         "christian_implicit_1": get_prompt(religion_persona,5),
-        "christtian_implicit_2": get_prompt(religion_persona,6),
+        "christian_implicit_2": get_prompt(religion_persona,6),
         "christian_implicit_3": get_prompt(religion_persona,7),
         "jewish_explicit":  get_prompt(religion_persona,8),
         "jewish_implicit_1":  get_prompt(religion_persona,9),
