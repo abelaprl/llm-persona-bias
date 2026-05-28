@@ -557,6 +557,12 @@ def main() -> None:
         default="",
         help="Comma-separated subset of categories to run (default: all)",
     )
+    parser.add_argument(
+        "--personas",
+        type=str,
+        default="",
+        help="Comma-separated individual persona keys to run, e.g. islam_implicit_1,christian_explicit (default: all within selected categories)",
+    )
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max_tokens", type=int, default=4096)
     parser.add_argument("--max_retries", type=int, default=8)
@@ -589,13 +595,23 @@ def main() -> None:
         if not active_categories:
             raise RuntimeError(f"No valid categories selected. Choose from: {CATEGORY_ORDER}")
 
+    # Filter individual personas (optional — further narrows within selected categories)
+    active_personas: set[str] | None = None
+    if args.personas.strip():
+        active_personas = {p.strip() for p in args.personas.split(",") if p.strip()}
+
     # Create output folders up-front
     for variant in active_variants:
         for category in active_categories:
             for _persona_key, sub_folder in PERSONA_GROUPS[category]:
+                if active_personas is not None and _persona_key not in active_personas:
+                    continue
                 persona_out_dir(base, variant, category, sub_folder).mkdir(parents=True, exist_ok=True)
 
-    total_persona_slots = sum(len(PERSONA_GROUPS[c]) for c in active_categories)
+    total_persona_slots = sum(
+        sum(1 for pk, _ in PERSONA_GROUPS[c] if active_personas is None or pk in active_personas)
+        for c in active_categories
+    )
     total_tasks = len(samples) * total_persona_slots * len(active_variants)
 
     print("=" * 80)
@@ -630,6 +646,8 @@ def main() -> None:
             print(f"\n  [CATEGORY] {category}")
 
             for persona_key, sub_folder in persona_entries:
+                if active_personas is not None and persona_key not in active_personas:
+                    continue
                 persona_text = personas[persona_key]
                 out_dir = persona_out_dir(base, prompt_variant, category, sub_folder)
 
