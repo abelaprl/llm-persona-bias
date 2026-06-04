@@ -517,7 +517,14 @@ def extract_final_answer(text):
         r'can\s+\w+|could\s+\w+|'
         r'is|are|was|were|costs?|earns?|saves?|takes?|makes?|needs?|weighs?|spends?|'
         r'pays?|paid|creates?|created|scores?|scored|spent|has|have|had|'
-        r'remains?|add\s+up\s+to'
+        r'remains?|add\s+up\s+to|'
+        r'bought|kept|uses?|used|handles?|handled|drinks?|drank|brought|'
+        r'receives?|received|responds?|responded|made|collected|collects?|'
+        r'traveled|travels?|produced?|produces?|sold|baked|reads?|read|'
+        r'drove|drives?|finished|finishes?|worked|works?|planted|planted|'
+        r'consumed|consumes?|distributed|delivers?|delivered|printed|prints?|'
+        r'carried|carries?|gathered|gathers?|processed|processes?|completed|'
+        r'completes?|answered|answers?|solved|solves?|calculated|calculates?'
         r')\b', re.I)
 
     def _extract_answer_number(sentence):
@@ -544,10 +551,20 @@ def extract_final_answer(text):
         # e.g. "10 guests. At 10 guests, both venues cost $250." -> 10
         _first_sent = sentence.split('.', 1)[0].strip()
         _first_lead_m = re.match(r'^(?:\*\*)?\s*(' + NUMBER_RE + r')\s+\w+', _first_sent)
-        if _first_lead_m and not _ANSWER_VERB_RE.search(_first_sent):
-            _n0 = normalize_number(_first_lead_m.group(1))
-            if _n0 is not None:
-                return _n0
+        if _first_lead_m:
+            # Only block the leading-number path when a predicate verb appears BEFORE the number
+            # (e.g. "The tank holds 5 gallons" → verb before 5 → let verb-path handle it)
+            # But "5 cars drove through..." → verb after 5 → return 5 directly.
+            _verb_before_num = _ANSWER_VERB_RE.search(_first_sent[:_first_lead_m.start(1)])
+            if not _verb_before_num:
+                # Extra guard: if a currency value appears after the leading number, skip it.
+                # "3 loaves cost $4 more" → $ after leading 3 → let 'cost' verb-path return 4.
+                _after_lead = _first_sent[_first_lead_m.end():]
+                _has_currency_after = bool(re.search(r'[\$€\xa3]\s*\d', _after_lead))
+                if not _has_currency_after:
+                    _n0 = normalize_number(_first_lead_m.group(1))
+                    if _n0 is not None:
+                        return _n0
         # Priority 0a: explicit total/final cues in sentence -> prefer the final quantity.
         # e.g. "both cars together cost $160", "in total ...", "overall ..."
         if re.search(r'\b(in\s+total|total|altogether|combined|together|both\s+\w+|overall)\b', sentence, re.I):
@@ -770,6 +787,24 @@ def extract_final_answer(text):
                 _n_vp = _extract_answer_number(search_text)
                 if _n_vp is not None:
                     return _n_vp, 'final_marker'
+            # FIX: word-number after strong marker — "Answer: Two good days" → 2
+            # Only fires when search_text has NO digits at all
+            if search_text.strip() and not re.search(r'\d', search_text):
+                _WORD_NUM_MAP = {
+                    'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4,
+                    'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+                    'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13,
+                    'fourteen': 14, 'fifteen': 15, 'sixteen': 16, 'seventeen': 17,
+                    'eighteen': 18, 'nineteen': 19, 'twenty': 20, 'thirty': 30,
+                    'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70,
+                    'eighty': 80, 'ninety': 90, 'hundred': 100, 'thousand': 1000,
+                }
+                _wn_pat = r'\b(' + '|'.join(_WORD_NUM_MAP.keys()) + r')\b'
+                _wn_m = re.search(_wn_pat, search_text, re.I)
+                if _wn_m:
+                    _wn_val = _WORD_NUM_MAP.get(_wn_m.group(1).lower())
+                    if _wn_val is not None:
+                        return _wn_val, 'word_number_marker'
         # FIX: when strong marker has no number in search_text, look at the next line(s) in text
         # (rev_lines[i-1] is the line immediately after the marker in canonical text order)
         # Only do this when search_text is truly empty (e.g. "### Final Answer:" with answer on next line)
@@ -1217,7 +1252,11 @@ def extract_final_answer(text):
         if len(all_nums) <= 3:
             # "There are/is N ..." or "X has/have N ..."
             m_there = re.search(
-                r'(?:There\s+(?:are|is)|\w+\s+(?:has|have|can|will|got|gets?|contains?|holds?|needs?|takes?|makes?|earns?|costs?|weighs?|measures?|equals?|totals?))\s+(' + NUMBER_RE + r')\b',
+                r'(?:There\s+(?:are|is)|\w+\s+(?:has|have|can|will|got|gets?|contains?|holds?|needs?|takes?|makes?|earns?|costs?|weighs?|measures?|equals?|totals?|'
+                r'bought|kept|uses?|used|handles?|drinks?|brought|receives?|received|responds?|'
+                r'made|collected|collects?|traveled|produced?|sold|baked|reads?|finished|worked|'
+                r'consumed|delivered|printed|carried|processed|completed|answered|solved|calculated|'
+                r'distributed|gathered|drove|planted))\s+(' + NUMBER_RE + r')\b',
                 line_s, re.I
             )
             if m_there:
@@ -1240,6 +1279,24 @@ def extract_final_answer(text):
                 num = normalize_number(m_sent.group(1))
                 if num is not None:
                     return num, 'tail_sentence'
+
+        # 5c-ordinal: "Finley finished in 6th place." — extract digit from ordinal
+        # Only when the line has 1-2 numbers total (avoids multi-step calc lines)
+        if len(all_nums) <= 2:
+            m_ord = re.search(r'\b(\d+)(?:st|nd|rd|th)\b', line_s, re.I)
+            if m_ord:
+                num = normalize_number(m_ord.group(1))
+                if num is not None:
+                    return num, 'ordinal'
+
+        # 5c-percent-start: "40% of Candy's spools are blue." — leading N% is the answer
+        # Applies when the sentence begins with a number immediately followed by %
+        if re.match(r'^\d+%\s+\w', line_s):
+            m_pct = re.match(r'^(\d+)%', line_s)
+            if m_pct:
+                num = normalize_number(m_pct.group(1))
+                if num is not None:
+                    return num, 'pct_start'
 
         # 5d: Plain number only line
         # FIX: also accept leading negative sign for plain number (e.g. "-3 °C")
@@ -1383,7 +1440,7 @@ def main():
             completion_tokens = safe_get(usage, 'completion_tokens', None)
             prompt_tokens = safe_get(usage, 'prompt_tokens', None)
             total_tokens = safe_get(usage, 'total_tokens', None)
-            reasoning_tokens = safe_get(usage, 'reasoning_tokens', None)
+            reasoning_tokens = safe_get(usage, 'reasoning_tokens', None) or safe_get(safe_get(usage, 'completion_tokens_details', {}) or {}, 'reasoning_tokens', None)
             truncated_by_metadata = (finish_reason == 'length')
             truncated_by_content = is_truly_truncated(content, finish_reason, completion_tokens, max_tokens)
             has_final = has_final_marker(content)

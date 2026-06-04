@@ -744,7 +744,7 @@ def run_model(
 
             category, sub_folder = PERSONA_CATEGORY.get(persona_key, ("unknown", ""))
             csv_rows.append({
-                "prompt_variant":     VARIANT_NAME,
+                "prompt_variant":     OUTPUT_NAME,
                 "category":           category,
                 "persona":            persona_key,
                 "sub_folder":         sub_folder,
@@ -803,7 +803,7 @@ def rebuild_pilot_csv(pilot_dir: Path, model_slug: str) -> int:
         analysis = d.get("analysis", {})
 
         rows.append({
-            "prompt_variant":     d.get("metadata", {}).get("prompt_variant", "prompt_v9"),
+            "prompt_variant":     d.get("metadata", {}).get("output_name") or OUTPUT_NAME,
             "category":           category,
             "persona":            persona,
             "sub_folder":         sub_folder,
@@ -850,6 +850,11 @@ def main() -> None:
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     parser.add_argument("--skip_existing", action="store_true")
     parser.add_argument(
+        "--rebuild_csv_only",
+        action="store_true",
+        help="Rebuild the per-model CSV from existing v9_pilot JSON files without API calls.",
+    )
+    parser.add_argument(
         "--group", type=str, default="",
         help="Run a named persona group: 'religion' or 'gender' (overrides --personas)",
     )
@@ -862,7 +867,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    run_parse_demo()
+    if args.parse_demo:
+        run_parse_demo()
 
     valid_personas = set(PERSONA_CATEGORY.keys())
     active_personas = PILOT_PERSONAS
@@ -895,7 +901,9 @@ def main() -> None:
     elif args.model_order is not None:
         models = [load_model_config(args.model_order)]
     else:
-        if not args.parse_demo:
+        if args.parse_demo:
+            return
+        if not args.rebuild_csv_only:
             print("Specify --model_order <N> or --all_pipeline. Use --parse_demo for dry run.")
         return
 
@@ -918,6 +926,13 @@ def main() -> None:
     print(f"  Total API   : {total_calls + warmup_calls}")
     print(f"  Output      : v9_pilot/")
     print()
+
+    if args.rebuild_csv_only:
+        for model_cfg in models:
+            slug = model_cfg["model_id"].replace("/", "_")
+            rebuild_pilot_csv(output_base_folder(model_cfg) / OUTPUT_NAME, slug)
+        print("\nRebuild-only mode: CSV files rebuilt, no API calls.")
+        return
 
     if args.parse_demo:
         print("(parse_demo mode - no API calls made)")

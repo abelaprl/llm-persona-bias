@@ -624,6 +624,11 @@ def main() -> None:
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     parser.add_argument("--skip_existing", action="store_true")
     parser.add_argument("--prepare_only", action="store_true")
+    parser.add_argument(
+        "--rebuild_csv_only",
+        action="store_true",
+        help="Rebuild CSV summaries from existing JSON files without API calls.",
+    )
     args = parser.parse_args()
 
     fixed_temperature = 0.0
@@ -677,6 +682,12 @@ def main() -> None:
     print(f"Categories  : {active_categories}")
     print(f"Total tasks : {total_tasks}")
     print(f"Output base : {base}")
+
+    if args.rebuild_csv_only:
+        for variant in active_variants:
+            rebuild_variant_csv(base / variant, variant, model_cfg["model_id"].replace("/", "_"))
+        print("Rebuild-only mode: CSV files rebuilt, no API calls.")
+        return
 
     if args.prepare_only:
         print("Prepare-only mode: folders created, no API calls.")

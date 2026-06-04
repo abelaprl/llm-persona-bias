@@ -13,6 +13,12 @@ parser.add_argument(
     '--out_dir',
     default=r'e:\Tugas Akhir\TugasAkhir\result\reports\arcee-ai_trinity-large-thinking_llama'
 )
+parser.add_argument(
+    '--max_rows',
+    type=int,
+    default=400,
+    help='Max rows per persona to include in accuracy calculation (default: 400)'
+)
 args = parser.parse_args()
 
 csv_path = args.csv_path
@@ -65,9 +71,9 @@ finally:
 # Use detected personas, sorted alphabetically
 PERSONA_ORDER = sorted(list(detected_personas))
 
-# Track row count per persona to cap at 400 each
+# Track row count per persona to cap at max_rows each
 persona_row_count = defaultdict(lambda: 0)
-MAX_ROWS_PER_PERSONA = 400
+MAX_ROWS_PER_PERSONA = args.max_rows
 
 # Second pass: process data and write per-persona CSVs
 persona_writers = {}

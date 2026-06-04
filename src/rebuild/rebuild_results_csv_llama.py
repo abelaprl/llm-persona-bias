@@ -1493,7 +1493,7 @@ def main():
             completion_tokens = safe_get(usage, 'completion_tokens', None)
             prompt_tokens = safe_get(usage, 'prompt_tokens', None)
             total_tokens = safe_get(usage, 'total_tokens', None)
-            reasoning_tokens = safe_get(usage, 'reasoning_tokens', None)
+            reasoning_tokens = safe_get(usage, 'reasoning_tokens', None) or safe_get(safe_get(usage, 'completion_tokens_details', {}) or {}, 'reasoning_tokens', None)
             truncated_by_metadata = (finish_reason == 'length')
             truncated_by_content = is_truly_truncated(content, finish_reason, completion_tokens, max_tokens)
             has_final = has_final_marker(content)
