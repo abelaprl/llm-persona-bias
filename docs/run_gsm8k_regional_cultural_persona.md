@@ -48,28 +48,28 @@ Copy **satu baris**, Enter, tunggu sampai muncul `Done.`, baru lanjut baris beri
 
 ```powershell
 # WESTERN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_explicit --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_implicit_1 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_implicit_2 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_implicit_3 --limit_samples 10 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_explicit --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_implicit_1 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_implicit_2 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas western_implicit_3 --limit_samples 100 --skip_existing
 
 # EAST ASIAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_explicit --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_implicit_1 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_implicit_2 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_implicit_3 --limit_samples 10 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_explicit --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_implicit_1 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_implicit_2 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas east_asian_implicit_3 --limit_samples 100 --skip_existing
 
 # SOUTH ASIAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_explicit --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_implicit_1 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_implicit_2 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_implicit_3 --limit_samples 10 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_explicit --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_implicit_1 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_implicit_2 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas south_asian_implicit_3 --limit_samples 100 --skip_existing
 
 # AFRICAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_explicit --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_implicit_1 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_implicit_2 --limit_samples 10 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_implicit_3 --limit_samples 10 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_explicit --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_implicit_1 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_implicit_2 --limit_samples 100 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas african_implicit_3 --limit_samples 100 --skip_existing
 ```
 
 ---

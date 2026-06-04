@@ -138,6 +138,14 @@ PERSONA_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("man_implicit_1", "man"),
         ("woman_implicit_1", "woman"),
     ],
+    "gender_implicit_2": [
+        ("man_implicit_2", "man"),
+        ("woman_implicit_2", "woman"),
+    ],
+    "gender_implicit_3": [
+        ("man_implicit_3", "man"),
+        ("woman_implicit_3", "woman"),
+    ],
     "religion_explicit": [
         ("islam_explicit", "islam"),
         ("christian_explicit", "christian"),
@@ -150,14 +158,58 @@ PERSONA_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("jewish_implicit_1", "jewish"),
         ("atheist_implicit_1", "atheist"),
     ],
+    "religion_implicit_2": [
+        ("islam_implicit_2", "islam"),
+        ("christian_implicit_2", "christian"),
+        ("jewish_implicit_2", "jewish"),
+        ("atheist_implicit_2", "atheist"),
+    ],
+    "religion_implicit_3": [
+        ("islam_implicit_3", "islam"),
+        ("christian_implicit_3", "christian"),
+        ("jewish_implicit_3", "jewish"),
+        ("atheist_implicit_3", "atheist"),
+    ],
+    "regional_explicit": [
+        ("western_explicit",    "western"),
+        ("east_asian_explicit", "east_asian"),
+        ("south_asian_explicit","south_asian"),
+        ("african_explicit",    "african"),
+    ],
+    "regional_implicit_1": [
+        ("western_implicit_1",    "western"),
+        ("east_asian_implicit_1", "east_asian"),
+        ("south_asian_implicit_1","south_asian"),
+        ("african_implicit_1",    "african"),
+    ],
+    "regional_implicit_2": [
+        ("western_implicit_2",    "western"),
+        ("east_asian_implicit_2", "east_asian"),
+        ("south_asian_implicit_2","south_asian"),
+        ("african_implicit_2",    "african"),
+    ],
+    "regional_implicit_3": [
+        ("western_implicit_3",    "western"),
+        ("east_asian_implicit_3", "east_asian"),
+        ("south_asian_implicit_3","south_asian"),
+        ("african_implicit_3",    "african"),
+    ],
 }
 
 CATEGORY_ORDER = [
     "neutral",
     "gender_explicit",
     "gender_implicit_1",
+    "gender_implicit_2",
+    "gender_implicit_3",
     "religion_explicit",
     "religion_implicit_1",
+    "religion_implicit_2",
+    "religion_implicit_3",
+    "regional_explicit",
+    "regional_implicit_1",
+    "regional_implicit_2",
+    "regional_implicit_3",
 ]
 
 PROMPT_VARIANT_ORDER = ["prompt_v1", "prompt_v2", "prompt_v3", "prompt_v4", "prompt_v5", "prompt_v6", "prompt_v7"]
@@ -223,23 +275,53 @@ def load_persona_files() -> dict[str, str]:
     man_explicit = read_json(PERSONA_DIR / "explicits_man_prompts.json")
     woman_explicit = read_json(PERSONA_DIR / "explicits_woman_prompts.json")
     religion = read_json(PERSONA_DIR / "religion_persona.json")
+    regional = read_json(PERSONA_DIR / "regional_cultural_persona.json")
 
     personas: dict[str, str] = {
         "neutral": DEFAULT_SYSTEM_PROMPT,
         # gender
-        "man_explicit_1": get_prompt(man_explicit, 0),
-        "man_implicit_1": get_prompt(man_implicit, 0),
+        "man_explicit_1":   get_prompt(man_explicit, 0),
+        "man_implicit_1":   get_prompt(man_implicit, 0),
+        "man_implicit_2":   get_prompt(man_implicit, 1),
+        "man_implicit_3":   get_prompt(man_implicit, 2),
         "woman_explicit_1": get_prompt(woman_explicit, 0),
         "woman_implicit_1": get_prompt(woman_implicit, 0),
-        # religion — indices match religion_persona.json order
-        "islam_explicit": get_prompt(religion, 0),
-        "islam_implicit_1": get_prompt(religion, 1),
-        "christian_explicit": get_prompt(religion, 4),
-        "christian_implicit_1": get_prompt(religion, 5),
-        "jewish_explicit": get_prompt(religion, 8),
-        "jewish_implicit_1": get_prompt(religion, 9),
-        "atheist_explicit": get_prompt(religion, 12),
-        "atheist_implicit_1": get_prompt(religion, 13),
+        "woman_implicit_2": get_prompt(woman_implicit, 1),
+        "woman_implicit_3": get_prompt(woman_implicit, 2),
+        # religion — indices: 0-3 islam, 4-7 christian, 8-11 jewish, 12-15 atheist
+        "islam_explicit":       get_prompt(religion,  0),
+        "islam_implicit_1":     get_prompt(religion,  1),
+        "islam_implicit_2":     get_prompt(religion,  2),
+        "islam_implicit_3":     get_prompt(religion,  3),
+        "christian_explicit":   get_prompt(religion,  4),
+        "christian_implicit_1": get_prompt(religion,  5),
+        "christian_implicit_2": get_prompt(religion,  6),
+        "christian_implicit_3": get_prompt(religion,  7),
+        "jewish_explicit":      get_prompt(religion,  8),
+        "jewish_implicit_1":    get_prompt(religion,  9),
+        "jewish_implicit_2":    get_prompt(religion, 10),
+        "jewish_implicit_3":    get_prompt(religion, 11),
+        "atheist_explicit":     get_prompt(religion, 12),
+        "atheist_implicit_1":   get_prompt(religion, 13),
+        "atheist_implicit_2":   get_prompt(religion, 14),
+        "atheist_implicit_3":   get_prompt(religion, 15),
+        # regional — indices: 0-3 western, 4-7 east_asian, 8-11 south_asian, 12-15 african
+        "western_explicit":     get_prompt(regional,  0),
+        "western_implicit_1":   get_prompt(regional,  1),
+        "western_implicit_2":   get_prompt(regional,  2),
+        "western_implicit_3":   get_prompt(regional,  3),
+        "east_asian_explicit":  get_prompt(regional,  4),
+        "east_asian_implicit_1":get_prompt(regional,  5),
+        "east_asian_implicit_2":get_prompt(regional,  6),
+        "east_asian_implicit_3":get_prompt(regional,  7),
+        "south_asian_explicit":  get_prompt(regional,  8),
+        "south_asian_implicit_1":get_prompt(regional,  9),
+        "south_asian_implicit_2":get_prompt(regional, 10),
+        "south_asian_implicit_3":get_prompt(regional, 11),
+        "african_explicit":      get_prompt(regional, 12),
+        "african_implicit_1":    get_prompt(regional, 13),
+        "african_implicit_2":    get_prompt(regional, 14),
+        "african_implicit_3":    get_prompt(regional, 15),
     }
 
     missing = [k for k, v in personas.items() if not v.strip()]

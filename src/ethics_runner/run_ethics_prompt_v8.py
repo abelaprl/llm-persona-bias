@@ -79,10 +79,26 @@ PERSONA_CATEGORY: dict[str, tuple[str, str]] = {
     "jewish_implicit_1":    ("religion_implicit_1","jewish"),
     "jewish_implicit_2":    ("religion_implicit_2","jewish"),
     "jewish_implicit_3":    ("religion_implicit_3","jewish"),
-    "atheist_explicit":     ("religion_explicit",  "atheist"),
-    "atheist_implicit_1":   ("religion_implicit_1","atheist"),
-    "atheist_implicit_2":   ("religion_implicit_2","atheist"),
-    "atheist_implicit_3":   ("religion_implicit_3","atheist"),
+    "atheist_explicit":      ("religion_explicit",   "atheist"),
+    "atheist_implicit_1":    ("religion_implicit_1", "atheist"),
+    "atheist_implicit_2":    ("religion_implicit_2", "atheist"),
+    "atheist_implicit_3":    ("religion_implicit_3", "atheist"),
+    "western_explicit":      ("regional_explicit",   "western"),
+    "western_implicit_1":    ("regional_implicit_1", "western"),
+    "western_implicit_2":    ("regional_implicit_2", "western"),
+    "western_implicit_3":    ("regional_implicit_3", "western"),
+    "east_asian_explicit":   ("regional_explicit",   "east_asian"),
+    "east_asian_implicit_1": ("regional_implicit_1", "east_asian"),
+    "east_asian_implicit_2": ("regional_implicit_2", "east_asian"),
+    "east_asian_implicit_3": ("regional_implicit_3", "east_asian"),
+    "south_asian_explicit":  ("regional_explicit",   "south_asian"),
+    "south_asian_implicit_1":("regional_implicit_1", "south_asian"),
+    "south_asian_implicit_2":("regional_implicit_2", "south_asian"),
+    "south_asian_implicit_3":("regional_implicit_3", "south_asian"),
+    "african_explicit":      ("regional_explicit",   "african"),
+    "african_implicit_1":    ("regional_implicit_1", "african"),
+    "african_implicit_2":    ("regional_implicit_2", "african"),
+    "african_implicit_3":    ("regional_implicit_3", "african"),
 }
 
 # V7-compatible CSV column order
@@ -107,6 +123,10 @@ PILOT_PERSONAS = [
     "christian_explicit", "christian_implicit_1", "christian_implicit_2", "christian_implicit_3",
     "jewish_explicit",    "jewish_implicit_1",    "jewish_implicit_2",    "jewish_implicit_3",
     "atheist_explicit",   "atheist_implicit_1",   "atheist_implicit_2",   "atheist_implicit_3",
+    "western_explicit",    "western_implicit_1",    "western_implicit_2",    "western_implicit_3",
+    "east_asian_explicit", "east_asian_implicit_1", "east_asian_implicit_2", "east_asian_implicit_3",
+    "south_asian_explicit","south_asian_implicit_1","south_asian_implicit_2","south_asian_implicit_3",
+    "african_explicit",    "african_implicit_1",    "african_implicit_2",    "african_implicit_3",
 ]
 
 # Pilot: only these 2 subsets
@@ -312,12 +332,14 @@ def load_persona_prompts() -> dict[str, str]:
     woman_imp  = read_json(PERSONA_DIR / "implicits_woman_prompts.json")
     man_exp    = read_json(PERSONA_DIR / "explicits_man_prompts.json")
     woman_exp  = read_json(PERSONA_DIR / "explicits_woman_prompts.json")
+    regional   = read_json(PERSONA_DIR / "regional_cultural_persona.json")
+
+    regional = read_json(PERSONA_DIR / "regional_cultural_persona.json")
 
     # religion_persona.json indices:
-    #  0=islam_explicit   1=islam_implicit_1   2=islam_implicit_2   3=islam_implicit_3
-    #  4=christian_exp    5=christian_impl_1   6=christian_impl_2   7=christian_impl_3
-    #  8=jewish_exp       9=jewish_impl_1     10=jewish_impl_2     11=jewish_impl_3
-    # 12=atheist_exp     13=atheist_impl_1    14=atheist_impl_2    15=atheist_impl_3
+    #  0-3  islam, 4-7 christian, 8-11 jewish, 12-15 atheist
+    # regional_cultural_persona.json indices:
+    #  0-3  western, 4-7 east_asian, 8-11 south_asian, 12-15 african
     prompts: dict[str, str] = {
         "neutral":              "",
         "man_explicit_1":       get_prompt(man_exp,   0),
@@ -344,6 +366,22 @@ def load_persona_prompts() -> dict[str, str]:
         "atheist_implicit_1":   get_prompt(religion, 13),
         "atheist_implicit_2":   get_prompt(religion, 14),
         "atheist_implicit_3":   get_prompt(religion, 15),
+        "western_explicit":      get_prompt(regional,  0),
+        "western_implicit_1":    get_prompt(regional,  1),
+        "western_implicit_2":    get_prompt(regional,  2),
+        "western_implicit_3":    get_prompt(regional,  3),
+        "east_asian_explicit":   get_prompt(regional,  4),
+        "east_asian_implicit_1": get_prompt(regional,  5),
+        "east_asian_implicit_2": get_prompt(regional,  6),
+        "east_asian_implicit_3": get_prompt(regional,  7),
+        "south_asian_explicit":  get_prompt(regional,  8),
+        "south_asian_implicit_1":get_prompt(regional,  9),
+        "south_asian_implicit_2":get_prompt(regional, 10),
+        "south_asian_implicit_3":get_prompt(regional, 11),
+        "african_explicit":      get_prompt(regional, 12),
+        "african_implicit_1":    get_prompt(regional, 13),
+        "african_implicit_2":    get_prompt(regional, 14),
+        "african_implicit_3":    get_prompt(regional, 15),
     }
 
     missing = [k for k, v in prompts.items() if k != "neutral" and not v]
