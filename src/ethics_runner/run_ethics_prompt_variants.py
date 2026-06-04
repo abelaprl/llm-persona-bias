@@ -138,14 +138,6 @@ PERSONA_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("man_implicit_1", "man"),
         ("woman_implicit_1", "woman"),
     ],
-    "gender_implicit_2": [
-        ("man_implicit_2", "man"),
-        ("woman_implicit_2", "woman"),
-    ],
-    "gender_implicit_3": [
-        ("man_implicit_3", "man"),
-        ("woman_implicit_3", "woman"),
-    ],
     "religion_explicit": [
         ("islam_explicit", "islam"),
         ("christian_explicit", "christian"),
@@ -158,51 +150,17 @@ PERSONA_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("jewish_implicit_1", "jewish"),
         ("atheist_implicit_1", "atheist"),
     ],
-    "religion_implicit_2": [
-        ("islam_implicit_2", "islam"),
-        ("christian_implicit_2", "christian"),
-        ("jewish_implicit_2", "jewish"),
-        ("atheist_implicit_2", "atheist"),
-    ],
-    "religion_implicit_3": [
-        ("islam_implicit_3", "islam"),
-        ("christian_implicit_3", "christian"),
-        ("jewish_implicit_3", "jewish"),
-        ("atheist_implicit_3", "atheist"),
-    ],
 }
 
 CATEGORY_ORDER = [
     "neutral",
     "gender_explicit",
     "gender_implicit_1",
-    "gender_implicit_2",
-    "gender_implicit_3",
     "religion_explicit",
     "religion_implicit_1",
-    "religion_implicit_2",
-    "religion_implicit_3",
 ]
 
 PROMPT_VARIANT_ORDER = ["prompt_v1", "prompt_v2", "prompt_v3", "prompt_v4", "prompt_v5", "prompt_v6", "prompt_v7"]
-
-CSV_FIELDNAMES = [
-    "prompt_variant",
-    "category",
-    "persona",
-    "sub_folder",
-    "id",
-    "subset",
-    "ground_truth_label",
-    "prediction_label",
-    "is_correct",
-    "parsed_answer",
-    "explanation",
-    "success",
-    "error",
-    "latency_sec",
-    "retry_count",
-]
 
 # ---------------------------------------------------------------------------
 # Utility: BPE artifact cleanup (identical to run_ethics_5subsets_persona.py)
@@ -269,31 +227,19 @@ def load_persona_files() -> dict[str, str]:
     personas: dict[str, str] = {
         "neutral": DEFAULT_SYSTEM_PROMPT,
         # gender
-        "man_explicit_1":   get_prompt(man_explicit, 0),
-        "man_implicit_1":   get_prompt(man_implicit, 0),
-        "man_implicit_2":   get_prompt(man_implicit, 1),
-        "man_implicit_3":   get_prompt(man_implicit, 2),
+        "man_explicit_1": get_prompt(man_explicit, 0),
+        "man_implicit_1": get_prompt(man_implicit, 0),
         "woman_explicit_1": get_prompt(woman_explicit, 0),
         "woman_implicit_1": get_prompt(woman_implicit, 0),
-        "woman_implicit_2": get_prompt(woman_implicit, 1),
-        "woman_implicit_3": get_prompt(woman_implicit, 2),
-        # religion — indices: 0-3 islam, 4-7 christian, 8-11 jewish, 12-15 atheist
-        "islam_explicit":       get_prompt(religion,  0),
-        "islam_implicit_1":     get_prompt(religion,  1),
-        "islam_implicit_2":     get_prompt(religion,  2),
-        "islam_implicit_3":     get_prompt(religion,  3),
-        "christian_explicit":   get_prompt(religion,  4),
-        "christian_implicit_1": get_prompt(religion,  5),
-        "christian_implicit_2": get_prompt(religion,  6),
-        "christian_implicit_3": get_prompt(religion,  7),
-        "jewish_explicit":      get_prompt(religion,  8),
-        "jewish_implicit_1":    get_prompt(religion,  9),
-        "jewish_implicit_2":    get_prompt(religion, 10),
-        "jewish_implicit_3":    get_prompt(religion, 11),
-        "atheist_explicit":     get_prompt(religion, 12),
-        "atheist_implicit_1":   get_prompt(religion, 13),
-        "atheist_implicit_2":   get_prompt(religion, 14),
-        "atheist_implicit_3":   get_prompt(religion, 15),
+        # religion — indices match religion_persona.json order
+        "islam_explicit": get_prompt(religion, 0),
+        "islam_implicit_1": get_prompt(religion, 1),
+        "christian_explicit": get_prompt(religion, 4),
+        "christian_implicit_1": get_prompt(religion, 5),
+        "jewish_explicit": get_prompt(religion, 8),
+        "jewish_implicit_1": get_prompt(religion, 9),
+        "atheist_explicit": get_prompt(religion, 12),
+        "atheist_implicit_1": get_prompt(religion, 13),
     }
 
     missing = [k for k, v in personas.items() if not v.strip()]
@@ -846,68 +792,40 @@ def main() -> None:
                     if args.sleep_sec > 0:
                         time.sleep(args.sleep_sec)
 
-    model_slug = model_cfg["model_id"].replace("/", "_")
-    for variant in active_variants:
-        rebuild_variant_csv(base / variant, variant, model_slug)
+    if csv_rows:
+        model_slug = model_cfg["model_id"].replace("/", "_")
+        fieldnames = [
+            "prompt_variant",
+            "category",
+            "persona",
+            "sub_folder",
+            "id",
+            "subset",
+            "ground_truth_label",
+            "prediction_label",
+            "is_correct",
+            "parsed_answer",
+            "explanation",
+            "success",
+            "error",
+            "latency_sec",
+            "retry_count",
+        ]
+        # Group by prompt_variant — one CSV file per variant
+        from collections import defaultdict
+        rows_by_variant: dict[str, list] = defaultdict(list)
+        for row in csv_rows:
+            rows_by_variant[row["prompt_variant"]].append(row)
+
+        for variant, rows in rows_by_variant.items():
+            csv_path = base / f"result_ethics_{variant}_{model_slug}.csv"
+            with open(csv_path, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+            print(f"\nCSV saved: {csv_path}")
 
     print("\nDone.")
-
-
-def rebuild_variant_csv(variant_dir: Path, variant: str, model_slug: str) -> int:
-    if not variant_dir.exists():
-        print(f"  [SKIP] {variant_dir} does not exist")
-        return 0
-
-    rows: list[dict[str, Any]] = []
-    for json_file in sorted(variant_dir.rglob("*.json")):
-        if "warmup" in json_file.parts:
-            continue
-        try:
-            with open(json_file, encoding="utf-8") as f:
-                d = json.load(f)
-        except Exception as e:
-            print(f"  [WARN] {json_file.name}: {e}")
-            continue
-
-        meta = d.get("metadata", {})
-        pred = d.get("prediction", {})
-        resp = d.get("response", {})
-        analysis = d.get("analysis", {})
-
-        rel_parts = json_file.relative_to(variant_dir).parts
-        category = meta.get("persona_category") or (rel_parts[0] if rel_parts else "")
-        sub_folder = rel_parts[1] if len(rel_parts) >= 3 else ""
-
-        rows.append({
-            "prompt_variant":     meta.get("prompt_variant", variant),
-            "category":           category,
-            "persona":            d.get("persona", ""),
-            "sub_folder":         sub_folder,
-            "id":                 d.get("id"),
-            "subset":             d.get("subset"),
-            "ground_truth_label": analysis.get("ground_truth_label"),
-            "prediction_label":   analysis.get("prediction_label"),
-            "is_correct":         analysis.get("is_correct"),
-            "parsed_answer":      pred.get("parsed_answer", ""),
-            "explanation":        pred.get("explanation") or pred.get("excuse", ""),
-            "success":            resp.get("success"),
-            "error":              resp.get("error") or "",
-            "latency_sec":        resp.get("latency_sec"),
-            "retry_count":        resp.get("retry_count"),
-        })
-
-    if not rows:
-        print(f"  [SKIP] No rows found for {variant}")
-        return 0
-
-    csv_path = variant_dir.parent / f"result_ethics_{variant}_{model_slug}.csv"
-    with open(csv_path, "w", newline="", encoding="utf-8-sig") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(rows)
-
-    print(f"  CSV rebuilt: {csv_path}")
-    return len(rows)
 
 
 if __name__ == "__main__":
