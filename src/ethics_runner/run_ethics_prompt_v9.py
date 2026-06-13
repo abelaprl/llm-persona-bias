@@ -26,7 +26,7 @@ Parsing logic (identical to V8):
   - parsing_failed : True if "Answer:" is not found
 
 v9_pilot spec:
-  - Subsets    : virtue + deontology (from ETHICS_test_4subsets_5each.json)
+  - Subsets    : virtue + deontology (from ETHICS_test_4subsets_10percent_from200.json)
   - Personas   : neutral, islam_explicit, christian_explicit,
                  jewish_explicit, atheist_explicit
   - Models     : all pipeline models (orders 31-47 in model_keys.json)
@@ -98,22 +98,22 @@ PERSONA_CATEGORY: dict[str, tuple[str, str]] = {
     "atheist_implicit_1":    ("religion_implicit_1", "atheist"),
     "atheist_implicit_2":    ("religion_implicit_2", "atheist"),
     "atheist_implicit_3":    ("religion_implicit_3", "atheist"),
-    "western_explicit":      ("regional_explicit",   "western"),
-    "western_implicit_1":    ("regional_implicit_1", "western"),
-    "western_implicit_2":    ("regional_implicit_2", "western"),
-    "western_implicit_3":    ("regional_implicit_3", "western"),
-    "east_asian_explicit":   ("regional_explicit",   "east_asian"),
-    "east_asian_implicit_1": ("regional_implicit_1", "east_asian"),
-    "east_asian_implicit_2": ("regional_implicit_2", "east_asian"),
-    "east_asian_implicit_3": ("regional_implicit_3", "east_asian"),
-    "south_asian_explicit":  ("regional_explicit",   "south_asian"),
-    "south_asian_implicit_1":("regional_implicit_1", "south_asian"),
-    "south_asian_implicit_2":("regional_implicit_2", "south_asian"),
-    "south_asian_implicit_3":("regional_implicit_3", "south_asian"),
-    "african_explicit":      ("regional_explicit",   "african"),
-    "african_implicit_1":    ("regional_implicit_1", "african"),
-    "african_implicit_2":    ("regional_implicit_2", "african"),
-    "african_implicit_3":    ("regional_implicit_3", "african"),
+    "north_american_explicit":      ("regional_explicit",   "north_american"),
+    "north_american_implicit_1":    ("regional_implicit_1", "north_american"),
+    "north_american_implicit_2":    ("regional_implicit_2", "north_american"),
+    "north_american_implicit_3":    ("regional_implicit_3", "north_american"),
+    "east_asian_explicit":          ("regional_explicit",   "east_asian"),
+    "east_asian_implicit_1":        ("regional_implicit_1", "east_asian"),
+    "east_asian_implicit_2":        ("regional_implicit_2", "east_asian"),
+    "east_asian_implicit_3":        ("regional_implicit_3", "east_asian"),
+    "south_asian_explicit":         ("regional_explicit",   "south_asian"),
+    "south_asian_implicit_1":       ("regional_implicit_1", "south_asian"),
+    "south_asian_implicit_2":       ("regional_implicit_2", "south_asian"),
+    "south_asian_implicit_3":       ("regional_implicit_3", "south_asian"),
+    "sub_saharan_african_explicit":      ("regional_explicit",   "sub_saharan_african"),
+    "sub_saharan_african_implicit_1":    ("regional_implicit_1", "sub_saharan_african"),
+    "sub_saharan_african_implicit_2":    ("regional_implicit_2", "sub_saharan_african"),
+    "sub_saharan_african_implicit_3":    ("regional_implicit_3", "sub_saharan_african"),
 }
 
 # V7-compatible CSV column order
@@ -138,10 +138,10 @@ PILOT_PERSONAS = [
     "christian_explicit", "christian_implicit_1", "christian_implicit_2", "christian_implicit_3",
     "jewish_explicit",    "jewish_implicit_1",    "jewish_implicit_2",    "jewish_implicit_3",
     "atheist_explicit",   "atheist_implicit_1",   "atheist_implicit_2",   "atheist_implicit_3",
-    "western_explicit",    "western_implicit_1",    "western_implicit_2",    "western_implicit_3",
-    "east_asian_explicit", "east_asian_implicit_1", "east_asian_implicit_2", "east_asian_implicit_3",
-    "south_asian_explicit","south_asian_implicit_1","south_asian_implicit_2","south_asian_implicit_3",
-    "african_explicit",    "african_implicit_1",    "african_implicit_2",    "african_implicit_3",
+    "north_american_explicit",   "north_american_implicit_1",   "north_american_implicit_2",   "north_american_implicit_3",
+    "east_asian_explicit",       "east_asian_implicit_1",       "east_asian_implicit_2",       "east_asian_implicit_3",
+    "south_asian_explicit",      "south_asian_implicit_1",      "south_asian_implicit_2",      "south_asian_implicit_3",
+    "sub_saharan_african_explicit", "sub_saharan_african_implicit_1", "sub_saharan_african_implicit_2", "sub_saharan_african_implicit_3",
 ]
 
 # Named groups for --group flag
@@ -160,10 +160,10 @@ PERSONA_GROUPS: dict[str, list[str]] = {
     ],
     "regional": [
         "neutral",
-        "western_explicit",    "western_implicit_1",    "western_implicit_2",    "western_implicit_3",
-        "east_asian_explicit", "east_asian_implicit_1", "east_asian_implicit_2", "east_asian_implicit_3",
-        "south_asian_explicit","south_asian_implicit_1","south_asian_implicit_2","south_asian_implicit_3",
-        "african_explicit",    "african_implicit_1",    "african_implicit_2",    "african_implicit_3",
+        "north_american_explicit",   "north_american_implicit_1",   "north_american_implicit_2",   "north_american_implicit_3",
+        "east_asian_explicit",       "east_asian_implicit_1",       "east_asian_implicit_2",       "east_asian_implicit_3",
+        "south_asian_explicit",      "south_asian_implicit_1",      "south_asian_implicit_2",      "south_asian_implicit_3",
+        "sub_saharan_african_explicit", "sub_saharan_african_implicit_1", "sub_saharan_african_implicit_2", "sub_saharan_african_implicit_3",
     ],
 }
 
@@ -408,22 +408,22 @@ def load_persona_prompts() -> dict[str, str]:
         "atheist_implicit_1":   get_prompt(religion, 13),
         "atheist_implicit_2":   get_prompt(religion, 14),
         "atheist_implicit_3":   get_prompt(religion, 15),
-        "western_explicit":      get_prompt(regional,  0),
-        "western_implicit_1":    get_prompt(regional,  1),
-        "western_implicit_2":    get_prompt(regional,  2),
-        "western_implicit_3":    get_prompt(regional,  3),
-        "east_asian_explicit":   get_prompt(regional,  4),
-        "east_asian_implicit_1": get_prompt(regional,  5),
-        "east_asian_implicit_2": get_prompt(regional,  6),
-        "east_asian_implicit_3": get_prompt(regional,  7),
-        "south_asian_explicit":  get_prompt(regional,  8),
-        "south_asian_implicit_1":get_prompt(regional,  9),
-        "south_asian_implicit_2":get_prompt(regional, 10),
-        "south_asian_implicit_3":get_prompt(regional, 11),
-        "african_explicit":      get_prompt(regional, 12),
-        "african_implicit_1":    get_prompt(regional, 13),
-        "african_implicit_2":    get_prompt(regional, 14),
-        "african_implicit_3":    get_prompt(regional, 15),
+        "north_american_explicit":      get_prompt(regional,  0),
+        "north_american_implicit_1":    get_prompt(regional,  1),
+        "north_american_implicit_2":    get_prompt(regional,  2),
+        "north_american_implicit_3":    get_prompt(regional,  3),
+        "east_asian_explicit":          get_prompt(regional,  4),
+        "east_asian_implicit_1":        get_prompt(regional,  5),
+        "east_asian_implicit_2":        get_prompt(regional,  6),
+        "east_asian_implicit_3":        get_prompt(regional,  7),
+        "south_asian_explicit":         get_prompt(regional,  8),
+        "south_asian_implicit_1":       get_prompt(regional,  9),
+        "south_asian_implicit_2":       get_prompt(regional, 10),
+        "south_asian_implicit_3":       get_prompt(regional, 11),
+        "sub_saharan_african_explicit":      get_prompt(regional, 12),
+        "sub_saharan_african_implicit_1":    get_prompt(regional, 13),
+        "sub_saharan_african_implicit_2":    get_prompt(regional, 14),
+        "sub_saharan_african_implicit_3":    get_prompt(regional, 15),
     }
 
     missing = [k for k, v in prompts.items() if k != "neutral" and not v]
@@ -436,10 +436,11 @@ def is_implicit(persona_key: str) -> bool:
     return "_implicit_" in persona_key
 
 
-def load_pilot_samples(path: Path) -> list[dict]:
+def load_pilot_samples(path: Path, max_per_subset: int | None = None) -> list[dict]:
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     rows = []
+    subset_counts: dict[str, int] = {}
     for row in data:
         if not isinstance(row, dict):
             continue
@@ -450,6 +451,10 @@ def load_pilot_samples(path: Path) -> list[dict]:
         scenario = str(row.get("scenario") or "").strip()
         if not sid or not scenario:
             continue
+        if max_per_subset is not None:
+            if subset_counts.get(subset, 0) >= max_per_subset:
+                continue
+            subset_counts[subset] = subset_counts.get(subset, 0) + 1
         rows.append({
             "id": sid,
             "subset": subset,
@@ -460,7 +465,7 @@ def load_pilot_samples(path: Path) -> list[dict]:
             "split": row.get("split"),
         })
     if not rows:
-        raise RuntimeError(f"No virtue/deontology samples found in {path}")
+        raise RuntimeError(f"No samples found in {path}")
     return rows
 
 
@@ -885,12 +890,14 @@ def main() -> None:
     parser.add_argument("--parse_demo", action="store_true",
                         help="Show prompt text + parsing demo, then exit (no API calls)")
     parser.add_argument("--samples_file", type=str,
-                        default="data/ETHICS_4subsets_50q.json")
+                        default="data/ETHICS_test_4subsets_10percent_from200.json")
     parser.add_argument("--max_tokens", type=int, default=4096)
     parser.add_argument("--max_retries", type=int, default=8)
     parser.add_argument("--retry_base_sec", type=float, default=8.0)
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     parser.add_argument("--skip_existing", action="store_true")
+    parser.add_argument("--max_per_subset", type=int, default=None,
+                        help="Limit number of samples per subset (default: use all)")
     parser.add_argument(
         "--rebuild_csv_only",
         action="store_true",
@@ -931,7 +938,7 @@ def main() -> None:
             print(f"[ERROR] No valid personas. Available: {sorted(valid_personas)}")
             return
 
-    samples = load_pilot_samples(Path(args.samples_file))
+    samples = load_pilot_samples(Path(args.samples_file), max_per_subset=args.max_per_subset)
     personas = load_persona_prompts()
 
     subset_counts: dict[str, int] = {}

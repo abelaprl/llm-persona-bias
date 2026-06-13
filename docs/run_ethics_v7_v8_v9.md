@@ -1,7 +1,8 @@
 # Run Commands — ETHICS Prompt V7 / V8 / V9
 
 Model: `deepseek/deepseek-r1-distill-qwen-32b` (order 43)  
-Dataset: `data/ETHICS_test_4subsets_5each.json` (20 soal, 5 per subset)  
+Dataset V7: `data/ETHICS_test_4subsets_5each.json` (20 soal, 5 per subset) — di-pass eksplisit via `--samples_file`  
+Dataset V9: `data/ETHICS_test_4subsets_10percent_from200.json` — default runner, tidak perlu `--samples_file`  
 Persona: 41 total (neutral + 8 gender + 16 religion + 16 regional)
 
 ---
