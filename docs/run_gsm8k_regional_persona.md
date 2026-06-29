@@ -104,12 +104,12 @@ foreach ($p in $personas) {
   python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py `
     --model_order $modelOrder `
     --personas $p `
-    --limit_samples 0 `
+    --limit_samples 1319 `
     --skip_existing
 }
 ```
 
-> `--limit_samples 0` artinya jalankan **semua 8819 soal** GSM8K. Ganti ke angka (mis. `100`) untuk membatasi jumlah soal.
+> `--limit_samples 1319` = jalankan 1319 soal pertama GSM8K (subset standar penelitian ini). Set ke `0` untuk semua 8819 soal.
 
 ---
 
@@ -120,28 +120,28 @@ Ganti `--model_order 31` dengan nomor model yang dipilih.
 
 ```powershell
 # NORTH AMERICAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_explicit --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_implicit_1 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_implicit_2 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_implicit_3 --limit_samples 0 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_explicit --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_implicit_1 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_implicit_2 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas north_american_implicit_3 --limit_samples 1319 --skip_existing
 
 # EAST ASIAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_explicit --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_implicit_1 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_implicit_2 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_implicit_3 --limit_samples 0 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_explicit --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_implicit_1 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_implicit_2 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas east_asian_implicit_3 --limit_samples 1319 --skip_existing
 
 # SOUTH ASIAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_explicit --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_implicit_1 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_implicit_2 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_implicit_3 --limit_samples 0 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_explicit --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_implicit_1 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_implicit_2 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas south_asian_implicit_3 --limit_samples 1319 --skip_existing
 
 # SUB-SAHARAN AFRICAN
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_explicit --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_implicit_1 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_implicit_2 --limit_samples 0 --skip_existing
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_implicit_3 --limit_samples 0 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_explicit --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_implicit_1 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_implicit_2 --limit_samples 1319 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --personas sub_saharan_african_implicit_3 --limit_samples 1319 --skip_existing
 ```
 
 ---
@@ -151,7 +151,7 @@ python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31
 Tanpa `--personas`, runner menjalankan **semua 16 persona** dari file.
 
 ```powershell
-python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --limit_samples 0 --skip_existing
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31 --limit_samples 1319 --skip_existing
 ```
 
 > Warmup implicit persona dilakukan di awal (step 1/2), baru dilanjutkan run per soal (step 2/2). Jika warmup gagal, runner berhenti otomatis untuk mencegah cascading FAIL.
