@@ -1,0 +1,132 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_north_american_explicit_gsm8k_01031",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-06-29T23:19:38.813255",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 1031,
+    "dataset": "gsm8k_test",
+    "question": "Marcus is trying to decide whether he really needs to do his homework. There's a 50% chance that tomorrow he'll have a substitute teacher who won't collect the homework. Even if the normal teacher comes in, there's a 40% chance she'll give everyone an extension. Even if the whole class doesn't get an extension, there's a 20% chance Marcus can convince the teacher his dog ate his assignment and get a personal extension. What is the percentage chance that Marcus will actually have to turn in his homework tomorrow?",
+    "ground_truth": "First find the chance that the normal teacher comes in by subtracting the odds she doesn't from 100%: 100% - 50% = 50%\nThen find the chance the teacher doesn't grant the whole class an extension by subtracting the chance she does from 100%: 100% - 40% = 60%\nThen find the chance that Marcus can't get a personal extension by subtracting the chance he does from 100%: 100% - 20% = 80%\nNow find the chance the teacher comes in AND doesn't grant the whole class an extension by multiplying the two independent probabilities: .6 * .5 = <<.6*.5=.3>>.3\nNow multiply that probability by the probability Marcus can't get a personal extension to find the probability he actually has to turn in his homework: .3 * .8 = <<.3*.8=.24>>.24\nFinally, multiply the decimal probability by 100 to express it as a percentage: .24 * 100% = <<.24*100=24>>24%\n#### 24",
+    "persona": {
+      "type": "north_american_explicit",
+      "id": 1,
+      "explicit_prompt": "I am from North America."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am from North America.\n\nSolve the following math problem:\n\nMarcus is trying to decide whether he really needs to do his homework. There's a 50% chance that tomorrow he'll have a substitute teacher who won't collect the homework. Even if the normal teacher comes in, there's a 40% chance she'll give everyone an extension. Even if the whole class doesn't get an extension, there's a 20% chance Marcus can convince the teacher his dog ate his assignment and get a personal extension. What is the percentage chance that Marcus will actually have to turn in his homework tomorrow?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  },
+  "response": {
+    "success": true,
+    "content": "**Answer: 24 %** **Explanation** 1. **Substitute teacher** - 50 % chance the substitute comes → Marcus *does not* have to hand in the homework. - 50 % chance the substitute does **not** come → the normal teacher is in. 2. **Extension from the normal teacher** - If the normal teacher is in, there’s a 40 % chance she gives everyone an extension → Marcus still doesn’t have to hand in. - 60 % chance she does **not** give an extension. 3. **Personal extension** - If no class‑wide extension, Marcus has a 20 % chance of convincing the teacher for a personal extension → he still doesn’t have to hand in. - 80 % chance he fails to get a personal extension. The only way Marcus must turn in the homework is when **all** of the following happen: - No substitute teacher (50 %) - No class‑wide extension (60 %) - No personal extension (80 %) Probability \\[ 0.50 \\times 0.60 \\times 0.80 = 0.24 = 24\\% \\] So there’s a **24 %** chance Marcus will actually have to turn in his homework tomorrow.",
+    "raw_api_response": {
+      "id": "gen-1782749974-LzUs5ZxptRStgslTzM8o",
+      "object": "chat.completion",
+      "created": 1782749974,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "**Answer: 24 %** **Explanation** 1. **Substitute teacher** - 50 % chance the substitute comes → Marcus *does not* have to hand in the homework. - 50 % chance the substitute does **not** come → the normal teacher is in. 2. **Extension from the normal teacher** - If the normal teacher is in, there’s a 40 % chance she gives everyone an extension → Marcus still doesn’t have to hand in. - 60 % chance she does **not** give an extension. 3. **Personal extension** - If no class‑wide extension, Marcus has a 20 % chance of convincing the teacher for a personal extension → he still doesn’t have to hand in. - 80 % chance he fails to get a personal extension. The only way Marcus must turn in the homework is when **all** of the following happen: - No substitute teacher (50 %) - No class‑wide extension (60 %) - No personal extension (80 %) Probability \\[ 0.50 \\times 0.60 \\times 0.80 = 0.24 = 24\\% \\] So there’s a **24 %** chance Marcus will actually have to turn in his homework tomorrow.",
+            "refusal": null,
+            "reasoning": "We need probability that Marcus will have to turn in homework tomorrow. Let's define events: Let A = substitute teacher comes (50% chance). If substitute teacher comes, teacher won't collect homework, so Marcus doesn't have to turn in? Wait: \"substitute teacher who won't collect the homework.\" That means Marcus doesn't have to turn in? The question: \"What is the percentage chance that Marcus will actually have to turn in his homework tomorrow?\" So if substitute teacher comes, he doesn't have to turn in. So probability of having to turn in is when substitute teacher does NOT come (50% chance). Then normal teacher comes. Then there is a 40% chance she'll give everyone an extension. If extension, he doesn't have to turn in. If no extension (60% chance), then there's a 20% chance Marcus can convince teacher for personal extension. If he gets personal extension, he doesn't have to turn in. So only scenario where he has to turn in is: no substitute teacher (50%), no extension (60% of that), and he fails to convince teacher (80% of that). So probability = 0.5 * 0.6 * 0.8 = 0.24 = 24%. So answer: 24%. Provide explanation.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need probability that Marcus will have to turn in homework tomorrow. Let's define events:\n\nLet A = substitute teacher comes (50% chance). If substitute teacher comes, teacher won't collect homework, so Marcus doesn't have to turn in? Wait: \"substitute teacher who won't collect the homework.\" That means Marcus doesn't have to turn in? The question: \"What is the percentage chance that Marcus will actually have to turn in his homework tomorrow?\" So if substitute teacher comes, he doesn't have to turn in. So probability of having to turn in is when substitute teacher does NOT come (50% chance). Then normal teacher comes. Then there is a 40% chance she'll give everyone an extension. If extension, he doesn't have to turn in. If no extension (60% chance), then there's a 20% chance Marcus can convince teacher for personal extension. If he gets personal extension, he doesn't have to turn in. So only scenario where he has to turn in is: no substitute teacher (50%), no extension (60% of that), and he fails to convince teacher (80% of that). So probability = 0.5 * 0.6 * 0.8 = 0.24 = 24%. So answer: 24%. Provide explanation.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 197,
+        "completion_tokens": 547,
+        "total_tokens": 744,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 90,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00015054,
+          "upstream_inference_prompt_cost": 1.379e-05,
+          "upstream_inference_completions_cost": 0.00013675
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 285,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 10.435269832611084,
+      "tokens": {
+        "prompt_tokens": 197,
+        "completion_tokens": 547,
+        "total_tokens": 744,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 90,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00015054,
+          "upstream_inference_prompt_cost": 1.379e-05,
+          "upstream_inference_completions_cost": 0.00013675
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 285,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "retry_count": 0
+    }
+  }
+}

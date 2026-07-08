@@ -1,0 +1,132 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_north_american_explicit_gsm8k_00079",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-06-29T14:30:51.918870",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 79,
+    "dataset": "gsm8k_test",
+    "question": "Vincent can buy flowers in packages of 3 for $2.50 or in packages of 2 for $1. How much money does he save by buying 18 flowers at the better price?",
+    "ground_truth": "Find how many packages of 3 would be needed which is 18 ÷ 3 = <<18/3=6>>6.\nThe cost of using packages of 3 is 6 × $2.50 = $<<6*2.5=15>>15.\nFind how many packages of 2 would be needed which is 18 ÷ 2 = <<18/2=9>>9.\nThe cost of using packages of 2 is 9 × $1 = $<<9*1=9>>9.\nVincent would save $15 - $9 = $<<15-9=6>>6.\n#### 6",
+    "persona": {
+      "type": "north_american_explicit",
+      "id": 1,
+      "explicit_prompt": "I am from North America."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am from North America.\n\nSolve the following math problem:\n\nVincent can buy flowers in packages of 3 for $2.50 or in packages of 2 for $1. How much money does he save by buying 18 flowers at the better price?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  },
+  "response": {
+    "success": true,
+    "content": "Vincent’s cheaper option is the 2‑flower package, which costs \\$1 each (i.e. \\$0.50 per flower). For 18 flowers: * **Using only 3‑flower packages**: \\(18 ÷ 3 = 6\\) packages → \\(6 × \\$2.50 = \\$15\\). * **Using the better 2‑flower packages**: \\(18 ÷ 2 = 9\\) packages → \\(9 × \\$1 = \\$9\\). The savings are \\[ \\$15 - \\$9 = \\$6. \\] **Answer: \\$6.**",
+    "raw_api_response": {
+      "id": "gen-1782718244-dv9uRND9DUOh9B4lc5ts",
+      "object": "chat.completion",
+      "created": 1782718244,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "Vincent’s cheaper option is the 2‑flower package, which costs \\$1 each (i.e. \\$0.50 per flower). For 18 flowers: * **Using only 3‑flower packages**: \\(18 ÷ 3 = 6\\) packages → \\(6 × \\$2.50 = \\$15\\). * **Using the better 2‑flower packages**: \\(18 ÷ 2 = 9\\) packages → \\(9 × \\$1 = \\$9\\). The savings are \\[ \\$15 - \\$9 = \\$6. \\] **Answer: \\$6.**",
+            "refusal": null,
+            "reasoning": "We need to interpret the problem: Vincent can buy flowers in packages of 3 for $2.50 or in packages of 2 for $1. He wants to buy 18 flowers. He can choose combination of packages to minimize cost. Then compute savings relative to some baseline? \"How much money does he save by buying 18 flowers at the better price?\" Likely compare cost of buying 18 flowers using only 2-pack deals vs using the better price (optimal combination). Or maybe compare to buying 18 flowers at the worse price? Let's parse: \"Vincent can buy flowers in packages of 3 for $2.50 or in packages of 2 for $1. How much money does he save by buying 18 flowers at the better price?\" So he can choose either package type. The better price per flower is the cheaper per flower cost. Let's compute: 3-pack: $2.50 / 3 = $0.8333 per flower. 2-pack: $1 / 2 = $0.5 per flower. So 2-pack is cheaper per flower. But maybe he can mix packages to get exactly 18 flowers. The better price overall might be using 2-packs exclusively: 18/2 = 9 packages, cost = 9 * $1 = $9. But maybe using 3-packs could be cheaper? Let's check: 18/3 = 6 packages, cost = 6 * $2.50 = $15. So 2-packs cheaper. So the better price is $9. But maybe the question: \"How much money does he save by buying 18 flowers at the better price?\" Might refer to saving relative to buying 18 flowers at the worse price (i.e., using 3-packs). So savings = $15 - $9 = $6. But maybe they want savings relative to buying 18 flowers at the worse price per flower? Let's confirm: The better price per flower is $0.5. The worse price per flower is $0.8333. For 18 flowers, cost at worse price: 18 * $0.8333 = $15. So savings = $6. So answer: $6. But maybe they want \"How much money does he save by buying 18 flowers at the better price?\" So answer: $6. Let's double-check if any nuance: Could he mix packages to get 18 flowers cheaper than $9? Let's try combinations: Suppose he uses some 3-packs and some 2-packs. Let x = number of 3-packs, y = number of 2-packs. 3x + 2y = 18. Solve integer solutions. Let's find minimal cost: cost = 2.5x + 1y. We want minimize cost. Solve for integer solutions: 3x + 2y = 18. Solve for y: y = (18 - 3x)/2. y must be integer >=0. So 18 - 3x must be even. 3x mod 2 = x mod 2. So 18 - x must be even => x even. So x = 0,2,4,6. For each: x=0 => y=9 => cost=9*1=9 x=2 => y=(18-6)/2=6 => cost=2*2.5+6*1=5+6=11 x=4 => y=(18-12)/2=3 => cost=4*2.5+3=10+3=13 x=6 => y=0 => cost=6*2.5=15 So minimal cost is $9. So indeed 2-packs only. So savings relative to 3-packs only: $15 - $9 = $6. So answer: $6. But maybe they want \"How much money does he save by buying 18 flowers at the better price?\" So answer: $6. Let's produce final answer.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to interpret the problem: Vincent can buy flowers in packages of 3 for $2.50 or in packages of 2 for $1. He wants to buy 18 flowers. He can choose combination of packages to minimize cost. Then compute savings relative to some baseline? \"How much money does he save by buying 18 flowers at the better price?\" Likely compare cost of buying 18 flowers using only 2-pack deals vs using the better price (optimal combination). Or maybe compare to buying 18 flowers at the worse price? Let's parse: \"Vincent can buy flowers in packages of 3 for $2.50 or in packages of 2 for $1. How much money does he save by buying 18 flowers at the better price?\" So he can choose either package type. The better price per flower is the cheaper per flower cost. Let's compute: 3-pack: $2.50 / 3 = $0.8333 per flower. 2-pack: $1 / 2 = $0.5 per flower. So 2-pack is cheaper per flower. But maybe he can mix packages to get exactly 18 flowers. The better price overall might be using 2-packs exclusively: 18/2 = 9 packages, cost = 9 * $1 = $9. But maybe using 3-packs could be cheaper? Let's check: 18/3 = 6 packages, cost = 6 * $2.50 = $15. So 2-packs cheaper. So the better price is $9. But maybe the question: \"How much money does he save by buying 18 flowers at the better price?\" Might refer to saving relative to buying 18 flowers at the worse price (i.e., using 3-packs). So savings = $15 - $9 = $6. But maybe they want savings relative to buying 18 flowers at the worse price per flower? Let's confirm: The better price per flower is $0.5. The worse price per flower is $0.8333. For 18 flowers, cost at worse price: 18 * $0.8333 = $15. So savings = $6. So answer: $6. But maybe they want \"How much money does he save by buying 18 flowers at the better price?\" So answer: $6. Let's double-check if any nuance: Could he mix packages to get 18 flowers cheaper than $9? Let's try combinations: Suppose he uses some 3-packs and some 2-packs. Let x = number of 3-packs, y = number of 2-packs. 3x + 2y = 18. Solve integer solutions. Let's find minimal cost: cost = 2.5x + 1y. We want minimize cost. Solve for integer solutions: 3x + 2y = 18. Solve for y: y = (18 - 3x)/2. y must be integer >=0. So 18 - 3x must be even. 3x mod 2 = x mod 2. So 18 - x must be even => x even. So x = 0,2,4,6. For each:\n\nx=0 => y=9 => cost=9*1=9\nx=2 => y=(18-6)/2=6 => cost=2*2.5+6*1=5+6=11\nx=4 => y=(18-12)/2=3 => cost=4*2.5+3=10+3=13\nx=6 => y=0 => cost=6*2.5=15\n\nSo minimal cost is $9. So indeed 2-packs only. So savings relative to 3-packs only: $15 - $9 = $6. So answer: $6. But maybe they want \"How much money does he save by buying 18 flowers at the better price?\" So answer: $6. Let's produce final answer.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 136,
+        "completion_tokens": 981,
+        "total_tokens": 1117,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 90,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00025477,
+          "upstream_inference_prompt_cost": 9.52e-06,
+          "upstream_inference_completions_cost": 0.00024525
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 676,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 20.59643268585205,
+      "tokens": {
+        "prompt_tokens": 136,
+        "completion_tokens": 981,
+        "total_tokens": 1117,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 90,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00025477,
+          "upstream_inference_prompt_cost": 9.52e-06,
+          "upstream_inference_completions_cost": 0.00024525
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 676,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "retry_count": 0
+    }
+  }
+}
