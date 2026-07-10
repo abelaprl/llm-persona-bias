@@ -111,7 +111,7 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
     payload = {
         "model": model_cfg["model_id"],
         "messages": messages,
-        "temperature": 0.2,
+        "temperature": 0.0,
         "max_tokens": 4096,
     }
 
@@ -215,7 +215,7 @@ def ensure_warmup(model_cfg: dict, persona_name: str, persona_cfg: dict, force: 
         "request": {
             "messages": messages,
             "parameters": {
-                "temperature": 0.2,
+                "temperature": 0.0,
                 "max_tokens": 4096,
                 "model": model_cfg["model_id"],
             },
@@ -333,7 +333,7 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_cfg: dict, sa
         "request": {
             "messages": messages,
             "parameters": {
-                "temperature": 0.2,
+                "temperature": 0.0,
                 "max_tokens": 4096,
                 "model": model_cfg["model_id"],
             },

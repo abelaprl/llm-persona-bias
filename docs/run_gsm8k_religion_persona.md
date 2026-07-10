@@ -1,6 +1,7 @@
 # Cara Menjalankan — GSM8K Religion Persona
 
 Runner: `src/gsm8k_runner/run_gsm8k_religion_personas.py`
+Temperature: **0.0**, max_tokens **4096**.
 Output: `result/GMS8K/Religion_Persona/{model_slug}/{persona}/gsm8k_NNNNN.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
@@ -74,6 +75,30 @@ Ganti angka `--model_order` di perintah di bawah untuk memilih model yang diingi
 ```powershell
 .venv\Scripts\activate
 ```
+
+---
+
+## Rerun yang kurang dari 1318
+
+Hasil cek `result/GMS8K/Religion_Persona` menemukan 2 folder persona yang belum lengkap.
+Jalankan command berikut dari `D:\TugasAkhir`. Flag `--skip_existing` akan melewati file yang sudah ada dan hanya mengisi `gsm8k_*.json` yang missing sampai `--limit_samples 1319`.
+
+```powershell
+# mistralai_ministral-8b-2512/islam_explicit
+# Saat dicek: 1260 file, missing 59 file di rentang akhir/sparse.
+python src/gsm8k_runner/run_gsm8k_religion_personas.py --model_order 41 --personas islam_explicit --limit_samples 1319 --skip_existing
+
+# openai_gpt-oss-20b/christian_explicit
+# Saat dicek: 227 file, lanjut dari missing 228..1319.
+python src/gsm8k_runner/run_gsm8k_religion_personas.py --model_order 31 --personas christian_explicit --limit_samples 1319 --skip_existing
+```
+
+Ringkasan target:
+
+| Model slug | model_order | Persona | Count saat dicek | Target |
+|---|---:|---|---:|---:|
+| `mistralai_ministral-8b-2512` | 41 | `islam_explicit` | 1260 | 1319 |
+| `openai_gpt-oss-20b` | 31 | `christian_explicit` | 227 | 1319 |
 
 ---
 

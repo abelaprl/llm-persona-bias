@@ -1,7 +1,7 @@
 # Cara Menjalankan — GSM8K Regional Cultural Persona
 
 Runner: `src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py`
-Model default: order **43** (DeepSeek R1 Distill Qwen 32B), temperature **0.2**, max_tokens **4096**.
+Model default: order **43** (DeepSeek R1 Distill Qwen 32B), temperature **0.0**, max_tokens **4096**.
 Output: `result/GMS8K/regional_cultural_persona/deepseek_deepseek-r1-distill-qwen-32b/<persona>/gsm8k_NNNNN.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
@@ -13,6 +13,35 @@ Output: `result/GMS8K/regional_cultural_persona/deepseek_deepseek-r1-distill-qwe
 ```powershell
 .venv\Scripts\activate
 ```
+
+---
+
+## Rerun yang kurang dari 1318
+
+Hasil cek `result/GMS8K/regional_cultural_persona` menemukan 3 folder persona yang belum lengkap, semuanya untuk model `allenai_olmo-3.1-32b-instruct`.
+Jalankan command berikut dari `D:\TugasAkhir`. Flag `--skip_existing` akan melewati file yang sudah ada dan hanya mengisi `gsm8k_*.json` yang missing sampai `--limit_samples 1319`.
+
+```powershell
+# allenai_olmo-3.1-32b-instruct/north_american_implicit_1
+# Saat dicek: 1178 file, lanjut dari missing 1179..1319.
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 42 --personas north_american_implicit_1 --limit_samples 1319 --skip_existing
+
+# allenai_olmo-3.1-32b-instruct/north_american_implicit_2
+# Saat dicek: 249 file, lanjut dari missing 250..1319.
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 42 --personas north_american_implicit_2 --limit_samples 1319 --skip_existing
+
+# allenai_olmo-3.1-32b-instruct/north_american_implicit_3
+# Saat dicek: 42 file, lanjut dari missing 43..1319.
+python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 42 --personas north_american_implicit_3 --limit_samples 1319 --skip_existing
+```
+
+Ringkasan target:
+
+| Model slug | model_order | Persona | Count saat dicek | Target |
+|---|---:|---|---:|---:|
+| `allenai_olmo-3.1-32b-instruct` | 42 | `north_american_implicit_1` | 1178 | 1319 |
+| `allenai_olmo-3.1-32b-instruct` | 42 | `north_american_implicit_2` | 249 | 1319 |
+| `allenai_olmo-3.1-32b-instruct` | 42 | `north_american_implicit_3` | 42 | 1319 |
 
 ---
 
