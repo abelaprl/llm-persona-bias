@@ -62,6 +62,13 @@ from run_ethics_prompt_v9 import (  # noqa: E402
 MODEL_ORDER = 32
 MODEL_ID = "qwen/qwen3-next-80b-a3b-thinking"
 MODEL_SLUG = "qwen_qwen3-next-80b-a3b-thinking"
+MODEL_LABEL = "Qwen3 Next 80B"
+RUNNER_DESCRIPTION = __doc__
+RERUN_TAG_PREFIX = "qwen3_next_80b"
+NONREGIONAL_EXPECTED_COUNT = 8290
+REGIONAL_EXPECTED_COUNT = 5631
+NONREGIONAL_SCOPE_DIRECTORY = "qwen3_next_80b_nonregional"
+REGIONAL_SCOPE_DIRECTORY = "qwen3_next_80b_regional"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 NONREGIONAL_MANIFEST = (
     REPO_ROOT
@@ -158,7 +165,7 @@ def repo_path(value: str | Path) -> Path:
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=RUNNER_DESCRIPTION)
     parser.add_argument(
         "--scope",
         choices=("nonregional", "regional"),
@@ -236,12 +243,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("timeouts must be greater than 0")
     if args.scope == "nonregional":
         default_manifest = NONREGIONAL_MANIFEST
-        default_expected_count = 8290
-        scope_directory = "qwen3_next_80b_nonregional"
+        default_expected_count = NONREGIONAL_EXPECTED_COUNT
+        scope_directory = NONREGIONAL_SCOPE_DIRECTORY
     else:
         default_manifest = REGIONAL_MANIFEST
-        default_expected_count = 5631
-        scope_directory = "qwen3_next_80b_regional"
+        default_expected_count = REGIONAL_EXPECTED_COUNT
+        scope_directory = REGIONAL_SCOPE_DIRECTORY
     args.manifest = repo_path(args.manifest or default_manifest)
     if args.expected_count is None:
         args.expected_count = default_expected_count
@@ -295,6 +302,22 @@ def read_json(path: Path) -> dict[str, Any]:
         raise RuntimeError(f"Cannot read valid JSON from {path}: {exc}") from exc
     if not isinstance(payload, dict):
         raise RuntimeError(f"JSON must contain an object: {path}")
+    return payload
+
+
+def read_json_prefix(path: Path) -> dict[str, Any]:
+    """Recover one complete JSON object followed by corrupt trailing bytes."""
+    try:
+        text = path.read_text(encoding="utf-8-sig").lstrip()
+        payload, end = json.JSONDecoder().raw_decode(text)
+    except FileNotFoundError as exc:
+        raise RuntimeError(f"Required file is missing: {path}") from exc
+    except (OSError, ValueError) as exc:
+        raise RuntimeError(f"Cannot recover JSON object prefix from {path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"Recovered JSON prefix must contain an object: {path}")
+    if not text[end:].strip():
+        raise RuntimeError(f"JSON-prefix recovery was unnecessary for valid JSON: {path}")
     return payload
 
 
@@ -471,6 +494,12 @@ def load_targets(manifest: Path, expected_count: int, scope: str) -> list[Target
         )
         if source_state == "valid":
             recovery_mode = "valid_json"
+        elif (
+            source_state == "truncated"
+            and template_relative is None
+            and question_relative is None
+        ):
+            recovery_mode = "valid_json_prefix"
         elif dataset == "GSM8K" and source_state in {
             "empty",
             "truncated",
@@ -510,23 +539,41 @@ def hydrate_target(target: Target) -> Target:
     """Load one target only when a worker actually needs it."""
     if target.payload is not None:
         return target
+    hydrated_source_state = target.source_state
     if target.source_state == "valid":
         payload = read_json(target.path)
     else:
-        if (
-            target.template_relative_path is None
-            or target.question_source_relative_path is None
-        ):
-            raise RuntimeError(f"Recovery sources missing for {target.path}")
-        root = dataset_root(target.dataset)
-        payload = rebuild_gsm8k_payload(
-            target.path,
-            target.question_id,
-            target.persona,
-            safe_path(root, target.template_relative_path),
-            safe_path(root, target.question_source_relative_path),
-        )
-    hydrated = replace(target, payload=payload)
+        # A prior successful rerun may already have created/replaced a target
+        # whose immutable manifest row still says missing/truncated. Prefer the
+        # current valid result so resume can skip it correctly.
+        payload = None
+        if target.path.is_file():
+            try:
+                payload = read_json(target.path)
+                hydrated_source_state = "valid"
+            except RuntimeError:
+                payload = None
+        if payload is None and target.recovery_mode == "valid_json_prefix":
+            payload = read_json_prefix(target.path)
+        elif payload is None:
+            if (
+                target.template_relative_path is None
+                or target.question_source_relative_path is None
+            ):
+                raise RuntimeError(f"Recovery sources missing for {target.path}")
+            root = dataset_root(target.dataset)
+            payload = rebuild_gsm8k_payload(
+                target.path,
+                target.question_id,
+                target.persona,
+                safe_path(root, target.template_relative_path),
+                safe_path(root, target.question_source_relative_path),
+            )
+    hydrated = replace(
+        target,
+        payload=payload,
+        source_state=hydrated_source_state,
+    )
     validate_payload(hydrated)
     return hydrated
 
@@ -710,7 +757,7 @@ def auth_headers(api_key: str) -> dict[str, str]:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://localhost",
-        "X-Title": "TA Qwen selective rerun",
+        "X-Title": f"TA {MODEL_LABEL} selective rerun",
     }
 
 
@@ -938,7 +985,7 @@ def update_ethics_payload(
     metadata = payload.setdefault("metadata", {})
     metadata.update(
         {
-            "rerun": f"qwen3_next_80b_{args.scope}_openrouter",
+            "rerun": f"{RERUN_TAG_PREFIX}_{args.scope}_openrouter",
             "rerun_timestamp": datetime.now().astimezone().isoformat(),
             "rerun_manifest": str(args.manifest),
             "rerun_endpoint": args.endpoint_url,
@@ -1006,7 +1053,7 @@ def update_gsm8k_payload(
     )
     metadata.update(
         {
-            "rerun": f"qwen3_next_80b_{args.scope}_openrouter",
+            "rerun": f"{RERUN_TAG_PREFIX}_{args.scope}_openrouter",
             "rerun_timestamp": datetime.now().astimezone().isoformat(),
             "rerun_manifest": str(args.manifest),
             "rerun_source_recovery_mode": target.recovery_mode,
@@ -1100,7 +1147,7 @@ def print_plan(
     already_fixed_checked: int,
 ) -> None:
     print("=" * 80)
-    print(f"Qwen3 Next 80B {args.scope} selective rerun via OpenRouter")
+    print(f"{MODEL_LABEL} {args.scope} selective rerun via OpenRouter")
     print("=" * 80)
     print(f"Model          : {MODEL_ID}")
     print(f"Endpoint       : {args.endpoint_url}")

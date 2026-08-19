@@ -59,6 +59,7 @@ import json
 import random
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -70,6 +71,7 @@ PERSONA_DIR = Path("inputs")
 DEFAULT_SYSTEM_PROMPT = "You are a helpful AI assistant."
 VARIANT_NAME = "prompt_v9"
 OUTPUT_NAME = "v9_pilot"
+OUTPUT_ROOT = Path("result") / "ETHICS" / OUTPUT_NAME
 
 PIPELINE_MODEL_ORDERS = list(range(31, 48))  # orders 31-47 inclusive
 
@@ -647,12 +649,13 @@ def call_openrouter(
     retry_count: int = 0,
     max_retries: int = 8,
     retry_base_sec: float = 8.0,
+    request_timeout_sec: float = 120.0,
 ) -> dict:
     endpoint = model_cfg.get("endpoint_url") or OPENROUTER_URL
-    headers = {
-        "Authorization": f"Bearer {model_cfg['api_key_alias']}",
-        "Content-Type": "application/json",
-    }
+    headers = {"Content-Type": "application/json"}
+    api_key = str(model_cfg.get("api_key_alias") or "").strip()
+    if model_cfg.get("auth_required", True) and api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
     payload = {
         "model": model_cfg["model_id"],
         "messages": messages,
@@ -662,7 +665,7 @@ def call_openrouter(
 
     start = time.time()
     try:
-        resp = requests.post(endpoint, headers=headers, json=payload, timeout=120)
+        resp = requests.post(endpoint, headers=headers, json=payload, timeout=request_timeout_sec)
         latency = time.time() - start
 
         if resp.status_code == 200:
@@ -677,7 +680,8 @@ def call_openrouter(
             wait = max(base * (2 ** retry_count), safe_float(retry_after)) + random.uniform(0.0, 0.8)
             time.sleep(wait)
             return call_openrouter(model_cfg, messages, temperature, max_tokens,
-                                   retry_count + 1, max_retries, retry_base_sec)
+                                   retry_count + 1, max_retries, retry_base_sec,
+                                   request_timeout_sec)
 
         return {
             "success": False, "api_response": None, "latency": latency,
@@ -688,7 +692,8 @@ def call_openrouter(
         if retry_count < max_retries:
             time.sleep(max(5.0, retry_base_sec / 2.0) * (2 ** retry_count) + random.uniform(0.0, 0.8))
             return call_openrouter(model_cfg, messages, temperature, max_tokens,
-                                   retry_count + 1, max_retries, retry_base_sec)
+                                   retry_count + 1, max_retries, retry_base_sec,
+                                   request_timeout_sec)
         return {
             "success": False, "api_response": None, "latency": time.time() - start,
             "error": "Timeout after retries", "retry_count": retry_count,
@@ -698,7 +703,8 @@ def call_openrouter(
         if retry_count < max_retries:
             time.sleep(max(3.0, retry_base_sec / 2.0) * (2 ** retry_count) + random.uniform(0.0, 0.8))
             return call_openrouter(model_cfg, messages, temperature, max_tokens,
-                                   retry_count + 1, max_retries, retry_base_sec)
+                                   retry_count + 1, max_retries, retry_base_sec,
+                                   request_timeout_sec)
         return {
             "success": False, "api_response": None, "latency": time.time() - start,
             "error": str(exc), "retry_count": retry_count,
@@ -709,6 +715,15 @@ def call_openrouter(
 # Warmup (implicit personas only)
 # ---------------------------------------------------------------------------
 
+def is_valid_warmup_result(payload: object) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    response = payload.get("response")
+    if not isinstance(response, dict) or response.get("success") is not True:
+        return False
+    return bool(str(response.get("content") or "").strip())
+
+
 def run_persona_warmup(
     model_cfg: dict,
     out_dir: Path,
@@ -717,8 +732,19 @@ def run_persona_warmup(
     max_retries: int,
     retry_base_sec: float,
     max_tokens: int,
+    request_timeout_sec: float,
+    force: bool = False,
 ) -> dict:
     warmup_path = out_dir / "warmup" / "persona_warmup.json"
+
+    if warmup_path.is_file() and not force:
+        try:
+            with open(warmup_path, encoding="utf-8") as f:
+                existing = json.load(f)
+            if is_valid_warmup_result(existing):
+                return existing
+        except (OSError, ValueError, TypeError):
+            pass
 
     messages = [
         {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
@@ -731,6 +757,7 @@ def run_persona_warmup(
         max_tokens=max_tokens,
         max_retries=max_retries,
         retry_base_sec=retry_base_sec,
+        request_timeout_sec=request_timeout_sec,
     )
 
     raw_api = clean_api_response(api_result["api_response"]) if api_result["success"] else None
@@ -797,6 +824,25 @@ def save_json(path: Path, payload: dict) -> None:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
 
+def result_file_has_successful_response(path: Path) -> bool:
+    """Return True only for a readable result whose API request succeeded.
+
+    A wrong answer or parsing failure is still a completed model response and
+    must not be sampled again. Invalid JSON and technical API failures are safe
+    to overwrite on resume.
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError, TypeError):
+        return False
+
+    if not isinstance(payload, dict):
+        return False
+    response = payload.get("response")
+    return isinstance(response, dict) and response.get("success") is True
+
+
 def model_csv_dir(model_slug: str) -> Path:
     return Path("result") / "ETHICS" / model_slug
 
@@ -809,7 +855,7 @@ def persona_group_folder(persona_key: str) -> str:
 
 def persona_out_dir(model_cfg: dict, persona_key: str) -> Path:
     slug = model_cfg["model_id"].replace("/", "_")
-    return Path("result") / "ETHICS" / OUTPUT_NAME / persona_group_folder(persona_key) / slug / persona_key
+    return OUTPUT_ROOT / persona_group_folder(persona_key) / slug / persona_key
 
 
 def csv_row_from_result(d: dict) -> dict:
@@ -866,21 +912,33 @@ def run_model(
     max_tokens: int,
     max_retries: int,
     retry_base_sec: float,
+    request_timeout_sec: float,
+    concurrency: int,
     sleep_sec: float,
     skip_existing: bool,
+    force_warmup: bool = False,
+    json_only: bool = False,
+    rerun_targets: set[tuple[str, str]] | None = None,
     temperature: float = 0.0,
 ) -> list[dict[str, Any]]:
     persona_list = active_personas if active_personas is not None else PILOT_PERSONAS
     csv_rows: list[dict[str, Any]] = []
 
-    total = len(samples) * len(persona_list)
+    total = len(rerun_targets) if rerun_targets is not None else len(samples) * len(persona_list)
     task_i = 0
     warmup_cache: dict[str, dict] = {}
 
     print(f"\n  Model : {model_cfg['name']} ({model_cfg['model_id']})")
-    print(f"  Output: result/ETHICS/{OUTPUT_NAME}/<Group Persona>/<model_slug>/<persona>/")
+    print(f"  Output: {OUTPUT_ROOT}/<Group Persona>/<model_slug>/<persona>/")
 
     for persona_key in persona_list:
+        persona_samples = [
+            sample for sample in samples
+            if rerun_targets is None or (persona_key, sample["id"]) in rerun_targets
+        ]
+        if not persona_samples:
+            continue
+
         persona_text = personas[persona_key]
         out_dir = persona_out_dir(model_cfg, persona_key)
 
@@ -897,25 +955,50 @@ def run_model(
                     max_retries=max_retries,
                     retry_base_sec=retry_base_sec,
                     max_tokens=max_tokens,
+                    request_timeout_sec=request_timeout_sec,
+                    force=force_warmup,
                 )
-                ok = warmup_cache[persona_key].get("response", {}).get("success")
+                ok = is_valid_warmup_result(warmup_cache[persona_key])
                 print(f"      Warmup: {'[OK]' if ok else '[FAIL]'}")
             else:
                 print("      Warmup: [CACHED]")
             warmup = warmup_cache[persona_key]
+            if not is_valid_warmup_result(warmup):
+                raise RuntimeError(
+                    f"Warmup generation failed or returned empty content for "
+                    f"{persona_key}; aborting before main ETHICS requests"
+                )
         else:
             print("      Warmup: [SKIP]")
 
-        for sample in samples:
+        pending: list[tuple[int, dict]] = []
+        retry_existing = 0
+        for sample in persona_samples:
             task_i += 1
             sample_id = sample["id"]
             out_path = out_dir / f"{sample_id}.json"
 
-            print(f"      [{task_i}/{total}] {sample_id} ...", end=" ", flush=True)
+            # Manifest targets are explicitly authorized for replacement. In a
+            # normal resume, only a readable successful API response is final.
+            if rerun_targets is None and skip_existing and out_path.exists():
+                if result_file_has_successful_response(out_path):
+                    continue
+                retry_existing += 1
 
-            if skip_existing and out_path.exists():
-                print("[SKIP]")
-                continue
+            pending.append((task_i, sample))
+
+        skipped = len(persona_samples) - len(pending)
+        if skipped:
+            print(f"      Existing: {skipped} [SKIP]")
+        if retry_existing:
+            print(f"      Failed/invalid existing: {retry_existing} [RERUN]")
+        if not pending:
+            continue
+
+        def run_sample(task: tuple[int, dict]) -> tuple[int, str, dict, bool, bool]:
+            task_number, sample = task
+            sample_id = sample["id"]
+            out_path = out_dir / f"{sample_id}.json"
 
             instruction = PROMPT_V9.format(scenario=sample["scenario"])
             messages = build_messages(persona_key, persona_text, instruction, warmup)
@@ -927,6 +1010,7 @@ def run_model(
                 max_tokens=max_tokens,
                 max_retries=max_retries,
                 retry_base_sec=retry_base_sec,
+                request_timeout_sec=request_timeout_sec,
             )
 
             raw_api = clean_api_response(api_result["api_response"]) if api_result["success"] else None
@@ -994,17 +1078,30 @@ def run_model(
 
             save_json(out_path, result_json)
 
-            status = "[OK]" if api_result["success"] else "[FAIL]"
-            pf_tag = " [PARSE_FAIL]" if parsing_failed else ""
-            print(f"{status}{pf_tag}")
-
-            csv_rows.append(csv_row_from_result(result_json))
-
             if sleep_sec > 0:
                 time.sleep(sleep_sec)
 
-    slug = model_cfg["model_id"].replace("/", "_")
-    rebuild_pilot_csv(slug)
+            return task_number, sample_id, result_json, api_result["success"], parsing_failed
+
+        def record_result(result: tuple[int, str, dict, bool, bool]) -> None:
+            task_number, sample_id, result_json, success, parsing_failed = result
+            status = "[OK]" if success else "[FAIL]"
+            pf_tag = " [PARSE_FAIL]" if parsing_failed else ""
+            print(f"      [{task_number}/{total}] {sample_id} {status}{pf_tag}")
+            csv_rows.append(csv_row_from_result(result_json))
+
+        if concurrency == 1:
+            for task in pending:
+                record_result(run_sample(task))
+        else:
+            with ThreadPoolExecutor(max_workers=concurrency) as executor:
+                futures = [executor.submit(run_sample, task) for task in pending]
+                for future in as_completed(futures):
+                    record_result(future.result())
+
+    if not json_only:
+        slug = model_cfg["model_id"].replace("/", "_")
+        rebuild_pilot_csv(slug)
 
     return csv_rows
 
@@ -1025,7 +1122,7 @@ def rebuild_pilot_csv(model_slug: str) -> int:
     Re-parses any answer the strict runtime parser missed (see reparse_ethics_answer)
     so the CSV doesn't silently lose coverage for thinking models.
     """
-    pilot_root = Path("result") / "ETHICS" / OUTPUT_NAME
+    pilot_root = OUTPUT_ROOT
     json_files = sorted(pilot_root.glob(f"*/{model_slug}/**/*.json"))
     if not json_files:
         print(f"  [SKIP] No JSON files found for {model_slug} under {pilot_root}")
@@ -1065,6 +1162,7 @@ def rebuild_pilot_csv(model_slug: str) -> int:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    global OUTPUT_ROOT
     parser = argparse.ArgumentParser(description="ETHICS prompt_v9 pilot runner")
     parser.add_argument("--model_order", type=int, default=None,
                         help="Run a single model by order number")
@@ -1077,8 +1175,42 @@ def main() -> None:
     parser.add_argument("--max_tokens", type=int, default=4096)
     parser.add_argument("--max_retries", type=int, default=8)
     parser.add_argument("--retry_base_sec", type=float, default=8.0)
+    parser.add_argument("--request_timeout_sec", type=float, default=120.0)
+    parser.add_argument("--concurrency", type=int, default=1)
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     parser.add_argument("--skip_existing", action="store_true")
+    parser.add_argument("--force_warmup", action="store_true")
+    parser.add_argument(
+        "--output_root",
+        type=str,
+        default=str(OUTPUT_ROOT),
+        help="Root containing the persona-group folders.",
+    )
+    parser.add_argument(
+        "--endpoint_url",
+        type=str,
+        default="",
+        help="Override the model endpoint, e.g. a local SSH tunnel to vLLM.",
+    )
+    parser.add_argument(
+        "--json_only",
+        action="store_true",
+        help="Write per-question JSON files only; do not rebuild or write CSV files.",
+    )
+    parser.add_argument(
+        "--rerun_manifest",
+        type=str,
+        default="",
+        help=(
+            "CSV manifest of exact JSON targets to rerun. Requires --model_order; "
+            "uses persona_folder and question_id columns and replaces only those targets."
+        ),
+    )
+    parser.add_argument(
+        "--dry_run_targets",
+        action="store_true",
+        help="Validate and summarize --rerun_manifest targets, then exit without API calls or writes.",
+    )
     parser.add_argument("--max_per_subset", type=int, default=None,
                         help="Limit number of samples per subset (default: use all)")
     parser.add_argument(
@@ -1098,6 +1230,21 @@ def main() -> None:
         ),
     )
     args = parser.parse_args()
+    OUTPUT_ROOT = Path(args.output_root)
+
+    if args.concurrency < 1:
+        parser.error("--concurrency must be at least 1")
+    if args.request_timeout_sec <= 0:
+        parser.error("--request_timeout_sec must be greater than 0")
+
+    if args.rerun_manifest and args.all_pipeline:
+        parser.error("--rerun_manifest requires one --model_order, not --all_pipeline")
+    if args.rerun_manifest and args.model_order is None:
+        parser.error("--rerun_manifest requires --model_order")
+    if args.rerun_manifest and args.rebuild_csv_only:
+        parser.error("--rerun_manifest cannot be combined with --rebuild_csv_only")
+    if args.dry_run_targets and not args.rerun_manifest:
+        parser.error("--dry_run_targets requires --rerun_manifest")
 
     if args.parse_demo:
         run_parse_demo()
@@ -1139,8 +1286,60 @@ def main() -> None:
             print("Specify --model_order <N> or --all_pipeline. Use --parse_demo for dry run.")
         return
 
+    if args.endpoint_url.strip():
+        models = [
+            {
+                **model_cfg,
+                "endpoint_url": args.endpoint_url.strip(),
+                "auth_required": False,
+                "provider": "vllm",
+            }
+            for model_cfg in models
+        ]
+
+    rerun_targets: set[tuple[str, str]] | None = None
+    if args.rerun_manifest:
+        manifest_path = Path(args.rerun_manifest)
+        if not manifest_path.is_file():
+            parser.error(f"Rerun manifest not found: {manifest_path}")
+        with open(manifest_path, newline="", encoding="utf-8-sig") as f:
+            manifest_rows = list(csv.DictReader(f))
+        required = {"persona_folder", "question_id"}
+        if not manifest_rows:
+            parser.error("Rerun manifest is empty")
+        if not required.issubset(manifest_rows[0]):
+            parser.error(f"Rerun manifest requires columns: {sorted(required)}")
+
+        selected_slug = models[0]["model_id"].replace("/", "_")
+        manifest_slugs = {
+            str(row.get("model_slug", "")).strip()
+            for row in manifest_rows if str(row.get("model_slug", "")).strip()
+        }
+        if manifest_slugs and manifest_slugs != {selected_slug}:
+            parser.error(
+                f"Manifest model_slug {sorted(manifest_slugs)} does not match selected {selected_slug}"
+            )
+
+        rerun_targets = {
+            (str(row["persona_folder"]).strip(), str(row["question_id"]).strip())
+            for row in manifest_rows
+        }
+        if len(rerun_targets) != len(manifest_rows):
+            parser.error("Rerun manifest contains duplicate persona_folder + question_id rows")
+
+        unknown_personas = sorted({p for p, _ in rerun_targets if p not in valid_personas})
+        if unknown_personas:
+            parser.error(f"Unknown persona(s) in rerun manifest: {unknown_personas}")
+        known_ids = {sample["id"] for sample in samples}
+        unknown_ids = sorted({qid for _, qid in rerun_targets if qid not in known_ids})
+        if unknown_ids:
+            preview = unknown_ids[:10]
+            parser.error(f"Unknown question_id(s) in rerun manifest: {preview}")
+
+        active_personas = sorted({p for p, _ in rerun_targets})
+
     implicit_count = sum(1 for p in active_personas if is_implicit(p))
-    total_calls = len(models) * len(active_personas) * len(samples)
+    total_calls = len(rerun_targets) if rerun_targets is not None else len(models) * len(active_personas) * len(samples)
     warmup_calls = len(models) * implicit_count
 
     print("=" * 72)
@@ -1156,8 +1355,15 @@ def main() -> None:
     print(f"  Main calls  : {total_calls}")
     print(f"  Warmup      : {warmup_calls}")
     print(f"  Total API   : {total_calls + warmup_calls}")
-    print(f"  Output      : v9_pilot/")
+    print(f"  Output      : {OUTPUT_ROOT}")
+    print(f"  Concurrency : {args.concurrency}")
+    if rerun_targets is not None:
+        print(f"  Manifest    : {args.rerun_manifest} ({len(rerun_targets)} exact targets)")
     print()
+
+    if args.dry_run_targets:
+        print("Dry-run target validation complete: no API calls or files written.")
+        return
 
     if args.rebuild_csv_only:
         for model_cfg in models:
@@ -1180,16 +1386,24 @@ def main() -> None:
             max_tokens=args.max_tokens,
             max_retries=args.max_retries,
             retry_base_sec=args.retry_base_sec,
+            request_timeout_sec=args.request_timeout_sec,
+            concurrency=args.concurrency,
             sleep_sec=args.sleep_sec,
             skip_existing=args.skip_existing,
+            force_warmup=args.force_warmup,
+            json_only=args.json_only,
+            rerun_targets=rerun_targets,
         )
         all_rows.extend(rows)
 
-    if all_rows:
+    if all_rows and not args.json_only:
         combined_path = Path("result") / "ETHICS" / f"combined_{OUTPUT_NAME}.csv"
         _write_csv(combined_path, all_rows)
         print(f"\nCombined CSV : {combined_path}")
         print(f"Total rows   : {len(all_rows)}")
+
+    if args.json_only:
+        print(f"\nJSON-only mode: wrote {len(all_rows)} per-question result(s); no CSV files written.")
 
     print("\nDone.")
 

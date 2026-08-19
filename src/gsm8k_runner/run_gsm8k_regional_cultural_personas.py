@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 
@@ -77,6 +78,28 @@ def output_base_folder(model_cfg: dict) -> Path:
     return OUTPUT_ROOT / model_slug(model_cfg)
 
 
+def api_endpoint(model_cfg: dict) -> str:
+    return model_cfg.get("endpoint_url") or OPENROUTER_URL
+
+
+def backend_provider(model_cfg: dict) -> str:
+    if model_cfg.get("provider"):
+        return str(model_cfg["provider"])
+    endpoint = api_endpoint(model_cfg).lower()
+    if "localhost" in endpoint or "127.0.0.1" in endpoint:
+        return "vllm"
+    return "openrouter"
+
+
+def build_api_headers(model_cfg: dict) -> dict:
+    headers = {"Content-Type": "application/json"}
+    auth_required = model_cfg.get("auth_required", True)
+    api_key = str(model_cfg.get("api_key_alias") or "").strip()
+    if auth_required and api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    return headers
+
+
 def load_gsm8k_samples(limit_samples: int) -> list[dict]:
     with open("data/gsm8k_test.json", "r", encoding="utf-8") as f:
         rows = json.load(f)
@@ -142,27 +165,41 @@ def load_regional_personas(path: str) -> dict[str, dict]:
     return personas
 
 
-def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int = 0, max_retries: int = 3) -> dict:
-    headers = {
-        "Authorization": f"Bearer {model_cfg['api_key_alias']}",
-        "Content-Type": "application/json",
-    }
+def call_openrouter_api(
+    model_cfg: dict,
+    messages: list[dict],
+    retry_count: int = 0,
+    max_retries: int = 3,
+    request_timeout_sec: float = 60.0,
+) -> dict:
+    endpoint = api_endpoint(model_cfg)
+    headers = build_api_headers(model_cfg)
     payload = {
         "model": model_cfg["model_id"],
         "messages": messages,
-        "temperature": 0.2,
+        "temperature": 0.0,
         "max_tokens": 4096,
     }
 
     start = time.time()
     try:
-        resp = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=60)
+        resp = requests.post(endpoint, headers=headers, json=payload, timeout=request_timeout_sec)
         latency = time.time() - start
 
         if resp.status_code == 200:
+            try:
+                api_response = resp.json()
+            except ValueError as exc:
+                return {
+                    "success": False,
+                    "api_response": None,
+                    "latency": latency,
+                    "error": f"Invalid JSON response: {exc}",
+                    "retry_count": retry_count,
+                }
             return {
                 "success": True,
-                "api_response": resp.json(),
+                "api_response": api_response,
                 "latency": latency,
                 "error": None,
                 "retry_count": retry_count,
@@ -170,7 +207,9 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
 
         if resp.status_code in [429, 500, 502, 503, 504] and retry_count < max_retries:
             time.sleep(3 * (2 ** retry_count))
-            return call_openrouter_api(model_cfg, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(
+                model_cfg, messages, retry_count + 1, max_retries, request_timeout_sec
+            )
 
         return {
             "success": False,
@@ -182,7 +221,9 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
     except requests.exceptions.Timeout:
         if retry_count < max_retries:
             time.sleep(5 * (2 ** retry_count))
-            return call_openrouter_api(model_cfg, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(
+                model_cfg, messages, retry_count + 1, max_retries, request_timeout_sec
+            )
         return {
             "success": False,
             "api_response": None,
@@ -193,7 +234,9 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
     except Exception as exc:
         if retry_count < max_retries:
             time.sleep(3 * (2 ** retry_count))
-            return call_openrouter_api(model_cfg, messages, retry_count + 1, max_retries)
+            return call_openrouter_api(
+                model_cfg, messages, retry_count + 1, max_retries, request_timeout_sec
+            )
         return {
             "success": False,
             "api_response": None,
@@ -203,7 +246,14 @@ def call_openrouter_api(model_cfg: dict, messages: list[dict], retry_count: int 
         }
 
 
-def ensure_warmup(model_cfg: dict, persona_name: str, persona_cfg: dict, force: bool = False) -> Path:
+def ensure_warmup(
+    model_cfg: dict,
+    persona_name: str,
+    persona_cfg: dict,
+    force: bool = False,
+    max_retries: int = 3,
+    request_timeout_sec: float = 60.0,
+) -> Path:
     if persona_cfg.get("type") != "implicit":
         raise RuntimeError(f"Warmup is only defined for implicit personas: {persona_name}")
 
@@ -223,7 +273,12 @@ def ensure_warmup(model_cfg: dict, persona_name: str, persona_cfg: dict, force: 
         {"role": "user", "content": seed_prompt},
     ]
 
-    api_result = call_openrouter_api(model_cfg, messages)
+    api_result = call_openrouter_api(
+        model_cfg,
+        messages,
+        max_retries=max_retries,
+        request_timeout_sec=request_timeout_sec,
+    )
     response_content = ""
     raw_api = None
 
@@ -240,10 +295,10 @@ def ensure_warmup(model_cfg: dict, persona_name: str, persona_cfg: dict, force: 
             "experiment_type": "warmup_persona",
             "timestamp": datetime.now().isoformat(),
             "model_info": {
-                "provider": "openrouter",
+                "provider": backend_provider(model_cfg),
                 "model_id": model_cfg["model_id"],
                 "model_name": model_cfg.get("name", ""),
-                "api_endpoint": OPENROUTER_URL,
+                "api_endpoint": api_endpoint(model_cfg),
             },
         },
         "input": {
@@ -254,7 +309,7 @@ def ensure_warmup(model_cfg: dict, persona_name: str, persona_cfg: dict, force: 
         "request": {
             "messages": messages,
             "parameters": {
-                "temperature": 0.2,
+                "temperature": 0.0,
                 "max_tokens": 4096,
                 "model": model_cfg["model_id"],
             },
@@ -282,15 +337,22 @@ def load_warmup(model_cfg: dict, persona_name: str) -> dict | None:
     warmup_file = output_base_folder(model_cfg) / persona_name / "warmup" / "persona_warmup.json"
     if not warmup_file.exists():
         return None
-    with open(warmup_file, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(warmup_file, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError, TypeError):
+        return None
+    return payload if isinstance(payload, dict) else None
 
 
 def is_valid_warmup_data(warmup_data: dict | None) -> bool:
     if not isinstance(warmup_data, dict):
         return False
+    response = warmup_data.get("response")
+    if not isinstance(response, dict) or response.get("success") is not True:
+        return False
     warmup_q = (warmup_data.get("input", {}) or {}).get("prompt", "")
-    warmup_a = (warmup_data.get("response", {}) or {}).get("content", "")
+    warmup_a = response.get("content", "")
     return bool(str(warmup_q).strip()) and bool(str(warmup_a).strip())
 
 
@@ -356,10 +418,10 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_cfg: dict, sa
             "scenario": "A",
             "timestamp": datetime.now().isoformat(),
             "model_info": {
-                "provider": "openrouter",
+                "provider": backend_provider(model_cfg),
                 "model_id": model_cfg["model_id"],
                 "model_name": model_cfg.get("name", ""),
-                "api_endpoint": OPENROUTER_URL,
+                "api_endpoint": api_endpoint(model_cfg),
             },
         },
         "input": {
@@ -372,7 +434,7 @@ def create_result_json(model_cfg: dict, persona_name: str, persona_cfg: dict, sa
         "request": {
             "messages": messages,
             "parameters": {
-                "temperature": 0.2,
+                "temperature": 0.0,
                 "max_tokens": 4096,
                 "model": model_cfg["model_id"],
             },
@@ -424,6 +486,20 @@ def save_result_json(model_cfg: dict, persona_name: str, question_id: int, resul
     return out_path
 
 
+def result_file_has_successful_response(path: Path) -> bool:
+    """Treat only readable, technically successful responses as complete."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError, TypeError):
+        return False
+
+    if not isinstance(payload, dict):
+        return False
+    response = payload.get("response")
+    return isinstance(response, dict) and response.get("success") is True
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run GSM8K test for regional cultural personas on a single model")
     parser.add_argument("--model_order", type=int, default=43)
@@ -438,6 +514,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--persona_file", type=str, default="inputs/regional_cultural_persona.json")
     parser.add_argument("--skip_existing", action="store_true", help="Skip GSM8K files that already exist")
     parser.add_argument("--output_root", type=str, default="result/GMS8K/regional_cultural_persona")
+    parser.add_argument(
+        "--endpoint_url",
+        type=str,
+        default="",
+        help="Override the model endpoint, e.g. a local SSH tunnel to vLLM.",
+    )
+    parser.add_argument("--concurrency", type=int, default=1)
+    parser.add_argument("--request_timeout_sec", type=float, default=60.0)
+    parser.add_argument("--max_retries", type=int, default=3)
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     return parser.parse_args()
 
@@ -447,7 +532,21 @@ def main() -> None:
     args = parse_args()
     OUTPUT_ROOT = Path(args.output_root)
 
+    if args.concurrency < 1:
+        raise RuntimeError("--concurrency must be at least 1")
+    if args.request_timeout_sec <= 0:
+        raise RuntimeError("--request_timeout_sec must be greater than 0")
+    if args.max_retries < 0:
+        raise RuntimeError("--max_retries cannot be negative")
+
     model_cfg = load_model_config(args.model_order)
+    if args.endpoint_url.strip():
+        model_cfg = {
+            **model_cfg,
+            "endpoint_url": args.endpoint_url.strip(),
+            "auth_required": False,
+            "provider": "vllm",
+        }
     personas = load_regional_personas(args.persona_file)
     samples = load_gsm8k_samples(args.limit_samples)
 
@@ -467,16 +566,31 @@ def main() -> None:
     print(f"Model: [{args.model_order}] {model_cfg['name']} ({model_cfg['model_id']})")
     print(f"Samples: {len(samples)}")
     print(f"Personas: {len(selected)}")
+    print(f"Concurrency: {args.concurrency}")
     print(f"Output base: {output_base_folder(model_cfg)}")
 
     print("\n[1/2] Generating warmup for implicit personas only...")
     for persona_name in implicit_personas:
         p_cfg = personas[persona_name]
-        warmup_path = ensure_warmup(model_cfg, persona_name, p_cfg, force=args.force_warmup)
+        warmup_path = ensure_warmup(
+            model_cfg,
+            persona_name,
+            p_cfg,
+            force=args.force_warmup,
+            max_retries=args.max_retries,
+            request_timeout_sec=args.request_timeout_sec,
+        )
         warmup_data = load_warmup(model_cfg, persona_name)
         if not is_valid_warmup_data(warmup_data):
             print(f"  [WARN] {persona_name} warmup invalid, regenerating...")
-            warmup_path = ensure_warmup(model_cfg, persona_name, p_cfg, force=True)
+            warmup_path = ensure_warmup(
+                model_cfg,
+                persona_name,
+                p_cfg,
+                force=True,
+                max_retries=args.max_retries,
+                request_timeout_sec=args.request_timeout_sec,
+            )
             warmup_data = load_warmup(model_cfg, persona_name)
             if not is_valid_warmup_data(warmup_data):
                 raise RuntimeError(f"Warmup generation failed for {persona_name}; stop to avoid cascading FAIL files")
@@ -491,25 +605,47 @@ def main() -> None:
         warmup = load_warmup(model_cfg, persona_name) if p_cfg["type"] == "implicit" else None
         if p_cfg["type"] == "implicit" and not is_valid_warmup_data(warmup):
             print(f"[WARN] {persona_name} warmup missing/invalid during run, regenerating...")
-            ensure_warmup(model_cfg, persona_name, p_cfg, force=True)
+            ensure_warmup(
+                model_cfg,
+                persona_name,
+                p_cfg,
+                force=True,
+                max_retries=args.max_retries,
+                request_timeout_sec=args.request_timeout_sec,
+            )
             warmup = load_warmup(model_cfg, persona_name)
             if not is_valid_warmup_data(warmup):
                 raise RuntimeError(f"Warmup still invalid for {persona_name}; aborting run")
         print(f"\n[PERSONA] {persona_name} ({p_cfg['type']})")
 
+        pending: list[tuple[int, dict]] = []
+        retry_existing = 0
         for sample in samples:
             task_i += 1
             qid = int(sample.get("idx") or sample.get("_qid") or 0)
-            print(f"  [{task_i}/{total}] gsm8k_{qid:05d} ...", end=" ", flush=True)
 
             out_path = output_base_folder(model_cfg) / persona_name / f"gsm8k_{qid:05d}.json"
             if args.skip_existing and out_path.exists():
-                print("[SKIP] exists")
-                continue
+                if result_file_has_successful_response(out_path):
+                    continue
+                retry_existing += 1
+
+            pending.append((task_i, sample))
+
+        skipped = len(samples) - len(pending)
+        if skipped:
+            print(f"  Existing: {skipped} [SKIP]")
+        if retry_existing:
+            print(f"  Failed/invalid existing: {retry_existing} [RERUN]")
+        if not pending:
+            continue
+
+        def run_sample(task: tuple[int, dict]) -> tuple[int, int, Path, bool]:
+            task_number, sample = task
+            qid = int(sample.get("idx") or sample.get("_qid") or 0)
 
             messages = build_messages(persona_name, p_cfg, sample.get("question", ""), warmup)
             if not messages:
-                print("[FAIL] cannot build messages")
                 fail_result = create_result_json(
                     model_cfg=model_cfg,
                     persona_name=persona_name,
@@ -525,19 +661,34 @@ def main() -> None:
                     },
                 )
                 out_path = save_result_json(model_cfg, persona_name, qid, fail_result)
-                print(f"-> {out_path}")
-                continue
+                return task_number, qid, out_path, False
 
-            api_result = call_openrouter_api(model_cfg, messages)
+            api_result = call_openrouter_api(
+                model_cfg,
+                messages,
+                max_retries=args.max_retries,
+                request_timeout_sec=args.request_timeout_sec,
+            )
             result_json = create_result_json(model_cfg, persona_name, p_cfg, sample, messages, api_result)
             out_path = save_result_json(model_cfg, persona_name, qid, result_json)
 
-            if api_result["success"]:
-                print(f"[OK] -> {out_path}")
-            else:
-                print(f"[FAIL] -> {out_path}")
-
             time.sleep(max(args.sleep_sec, 0.0))
+
+            return task_number, qid, out_path, api_result["success"]
+
+        def record_result(result: tuple[int, int, Path, bool]) -> None:
+            task_number, qid, out_path, success = result
+            status = "[OK]" if success else "[FAIL]"
+            print(f"  [{task_number}/{total}] gsm8k_{qid:05d} {status} -> {out_path}")
+
+        if args.concurrency == 1:
+            for task in pending:
+                record_result(run_sample(task))
+        else:
+            with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
+                futures = [executor.submit(run_sample, task) for task in pending]
+                for future in as_completed(futures):
+                    record_result(future.result())
 
     print("\nDone.")
 

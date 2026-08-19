@@ -116,6 +116,35 @@ terpisah. Validasi dahulu:
 python scripts/rerun_qwen3_next_80b_openrouter.py --scope regional
 ```
 
+### Health-check memakai skenario asli ETHICS v9 Regional Persona
+
+Skenario pada `docs/run_ethics_v9_regional_persona.md` memakai runner eksperimen
+asli. Gunakan skenario ini untuk memastikan model, key, prompt, dan parser bekerja
+sebelum rerun manifest. Ini bukan pemilih file gagal.
+
+Perintah berikut mengambil dua soal dari masing-masing empat subset ETHICS untuk
+satu persona explicit, sehingga ada tepat 8 API call. Output sengaja diarahkan ke
+folder smoke terpisah dan tidak menyentuh hasil utama:
+
+```powershell
+python ".\src\ethics_runner\run_ethics_prompt_v9.py" --model_order 32 --personas north_american_explicit --max_per_subset 2 --output_root "result\_smoke\qwen3_next_80b_regional" --json_only --skip_existing --concurrency 1
+```
+
+Di shell Linux/Vast.ai, gunakan bentuk satu baris ini:
+
+```bash
+python src/ethics_runner/run_ethics_prompt_v9.py --model_order 32 --personas north_american_explicit --max_per_subset 2 --output_root 'result/_smoke/qwen3_next_80b_regional' --json_only --skip_existing --concurrency 1
+```
+
+Runner asli membutuhkan repo lengkap, termasuk data, input persona, dan
+`config/model_keys.json` dengan key order 32 yang sudah dirotasi. Jangan arahkan
+`--output_root` ke `result/ETHICS/v9 [THIS IS THE MAIN]`: runner asli tetap
+menulis JSON kegagalan jika request ulang gagal.
+
+Setelah 8 hasil smoke valid, kembali ke runner selektif di bawah. Runner selektif
+hanya mengambil target pada manifest audit, membuat backup, mendukung resume,
+dan tidak mengganti JSON sumber ketika respons baru gagal atau kosong.
+
 Smoke test Regional Cultural:
 
 ```bash

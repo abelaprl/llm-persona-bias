@@ -73,6 +73,31 @@ ETHICS v9 dirancang untuk model pipeline (order **31–47**). Ganti `--model_ord
 python src/ethics_runner/run_ethics_prompt_v9.py --parse_demo
 ```
 
+## 0c. Health-check Qwen3 Next 80B (order 32) sebelum rerun
+
+Gunakan runner skenario asli ini hanya untuk memastikan model, API key, prompt,
+dan parser bekerja. Dua soal diambil dari masing-masing subset ETHICS untuk satu
+persona explicit: 2 x 4 subset = 8 API call. Output diarahkan ke folder smoke
+terpisah agar hasil utama tidak tersentuh.
+
+```powershell
+python ".\src\ethics_runner\run_ethics_prompt_v9.py" --model_order 32 --personas north_american_explicit --max_per_subset 2 --output_root "result\_smoke\qwen3_next_80b_regional" --json_only --skip_existing --concurrency 1
+```
+
+Versi Linux/Vast.ai:
+
+```bash
+python src/ethics_runner/run_ethics_prompt_v9.py --model_order 32 --personas north_american_explicit --max_per_subset 2 --output_root 'result/_smoke/qwen3_next_80b_regional' --json_only --skip_existing --concurrency 1
+```
+
+Jalankan hanya setelah API key order 32 yang sempat terekspos sudah dicabut dan
+diganti. Runner ini membaca key dari `config/model_keys.json`. Jangan mengarahkan
+`--output_root` ke `result/ETHICS/v9 [THIS IS THE MAIN]`, karena runner eksperimen
+asli tetap dapat menulis JSON berisi kegagalan ketika request gagal.
+
+Setelah health-check berhasil, rerun hanya file audit yang gagal dengan panduan
+`docs/run_qwen3_next_80b_nonregional_openrouter_vast.md`.
+
 ---
 
 ## ⚠️ Catatan paste di PowerShell
