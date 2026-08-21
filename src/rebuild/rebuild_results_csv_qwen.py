@@ -486,6 +486,35 @@ def extract_final_answer(text):
         if num is not None:
             return num, 'boxed'
 
+    # A generation can exhaust its token budget immediately after printing a
+    # terminal "Final Answer:" heading. Recover the result only when a nearby
+    # preceding line is a complete equation whose right-hand side is also the
+    # final content on that line. This deliberately avoids a general
+    # last-number fallback for truncated reasoning.
+    terminal_marker = re.search(
+        r'(?:Final\s+Answer|Answer)\s*:\s*(?:\*|#|[-\u2013\u2014]|\u2705|\s)*$',
+        tail,
+        re.I,
+    )
+    if terminal_marker:
+        prior_lines = tail[:terminal_marker.start()].splitlines()
+        checked_nonempty = 0
+        for prior_line in reversed(prior_lines):
+            prior_line = prior_line.strip()
+            if not prior_line or re.fullmatch(r'[-_*#\s]+', prior_line):
+                continue
+            checked_nonempty += 1
+            eq_matches = list(re.finditer(r'=\s*(' + NUMBER_RE + r')', prior_line))
+            if eq_matches:
+                last_eq = eq_matches[-1]
+                suffix = prior_line[last_eq.end():]
+                if re.fullmatch(r'[\s$\\\[\]().,;:*]*', suffix):
+                    num = normalize_number(last_eq.group(1))
+                    if num is not None:
+                        return num, 'terminal_marker_previous_equation'
+            if checked_nonempty >= 3:
+                break
+
     # ── Inline bold-number extractor used in Rule 3 (before full helper defined) ──────────
     def _simple_bold_extract(ln):
         """Simplified early bold extractor for Rule 3 marker/next-line use."""
@@ -1477,6 +1506,13 @@ def run_unit_tests():
         ("answer_and_sum_next_line", "### Final Answer:\nTim has **4 blue** and **6 red** shoe boxes left.\n\n✅ **Answer: 4 blue and 6 red shoe boxes are left.**", 10),
         # gsm8k_01018: selfies/portraits on sep bullet lines → sum = 45
         ("selfies_portraits_sep_lines", "### Final Answer:\n- **Selfies:** 27\n- **Portraits:** 18\n\n✅ **Answer: 27 selfies and 18 portraits.**", 45),
+        # Token budget ended just after the terminal marker; the preceding
+        # equation is complete and has an unambiguous right-hand side.
+        (
+            "terminal_marker_previous_equation",
+            "So:\n$$\\text{Kelsie} = 2 \\times 9 = 18$$\n---\n### Final Answer:",
+            18,
+        ),
     ]
     for entry in efa_cases:
         # FIX: support both 2-tuple (text, expected) and 3-tuple (name, text, expected) entries

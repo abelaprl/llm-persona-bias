@@ -48,6 +48,7 @@ class QwenOpenRouterRerunTests(unittest.TestCase):
         execute: bool,
         limit: int | None = None,
         scope: str = "nonregional",
+        success_root: Path | None = None,
     ):
         values = [
             "--scope",
@@ -64,6 +65,8 @@ class QwenOpenRouterRerunTests(unittest.TestCase):
             "1",
             "--skip-preflight",
         ]
+        if success_root is not None:
+            values.extend(["--success-root", str(success_root)])
         if limit is not None:
             values.extend(["--limit", str(limit)])
         if execute:
@@ -185,6 +188,52 @@ class QwenOpenRouterRerunTests(unittest.TestCase):
         self.assertEqual(len(backups), 1)
         self.assertEqual(json.loads(backups[0].read_text(encoding="utf-8")), original)
 
+    def test_isolated_success_does_not_modify_or_backup_source(self) -> None:
+        manifest, target, _ = self.ethics_fixture()
+        before = target.read_bytes()
+        success_root = self.root / "isolated-success"
+        ethics_patch, gsm_patch = self.roots()
+        with (
+            ethics_patch,
+            gsm_patch,
+            mock.patch.object(runner, "load_api_key", return_value=("fake", "test")),
+            mock.patch.object(
+                runner, "post_chat", return_value=self.successful_api("Explanation\nAnswer: 1")
+            ) as post,
+        ):
+            args = self.args(
+                manifest,
+                execute=True,
+                success_root=success_root,
+            )
+            exit_code = runner.run(args)
+        self.assertEqual(exit_code, 0)
+        post.assert_called_once()
+        self.assertEqual(target.read_bytes(), before)
+        self.assertFalse(self.backup_root.exists())
+        isolated = (
+            success_root
+            / "ethics"
+            / "Religion Persona"
+            / runner.MODEL_SLUG
+            / "atheist_explicit_1"
+            / "ethics_justice_0263.json"
+        )
+        self.assertTrue(isolated.is_file())
+        updated = json.loads(isolated.read_text(encoding="utf-8"))
+        self.assertTrue(updated["response"]["success"])
+
+        ethics_patch, gsm_patch = self.roots()
+        with (
+            ethics_patch,
+            gsm_patch,
+            mock.patch.object(runner, "load_api_key", return_value=("fake", "test")),
+            mock.patch.object(runner, "post_chat") as resumed_post,
+        ):
+            exit_code = runner.run(args)
+        self.assertEqual(exit_code, 0)
+        resumed_post.assert_not_called()
+
     def test_failed_api_keeps_original_and_writes_attempt(self) -> None:
         manifest, target, _ = self.ethics_fixture()
         before = target.read_bytes()
@@ -230,7 +279,7 @@ class QwenOpenRouterRerunTests(unittest.TestCase):
         attempts = list(self.attempt_root.rglob(target.name))
         self.assertEqual(len(attempts), 1)
         attempt = json.loads(attempts[0].read_text(encoding="utf-8"))
-        self.assertIn("No final assistant content", attempt["failure_reason"])
+        self.assertIn("Abnormal finish_reason=length", attempt["failure_reason"])
 
     def test_resume_skips_successful_target_without_backup_or_api(self) -> None:
         manifest, target, payload = self.ethics_fixture()
@@ -255,6 +304,233 @@ class QwenOpenRouterRerunTests(unittest.TestCase):
         post.assert_not_called()
         self.assertFalse(self.backup_root.exists())
         self.assertFalse(self.attempt_root.exists())
+
+    def test_choice_level_error_with_partial_content_is_not_resolved(self) -> None:
+        payload = {
+            "response": {
+                "success": True,
+                "content": "partial generation",
+                "raw_api_response": {
+                    "choices": [
+                        {
+                            "finish_reason": "error",
+                            "error": {"code": 500, "message": "Internal Server Error"},
+                            "message": {"content": "partial generation"},
+                        }
+                    ]
+                },
+            }
+        }
+        target = runner.Target(
+            row_number=2,
+            dataset="GSM8K",
+            group="Religion_Persona",
+            persona="atheist_explicit",
+            question_id="gsm8k_00199",
+            issue_category="provider_server_500_partial",
+            audited_http_code=500,
+            audited_error_message="Internal Server Error",
+            source_state="valid",
+            relative_path=Path("Religion_Persona/model/persona/gsm8k_00199.json"),
+            path=self.root / "gsm8k_00199.json",
+            template_relative_path=None,
+            question_source_relative_path=None,
+            recovery_mode="valid_json",
+            payload=payload,
+        )
+        self.assertFalse(runner.is_resolved(target))
+
+    def test_finish_error_without_error_object_is_not_resolved(self) -> None:
+        payload = {
+            "response": {
+                "success": True,
+                "content": "partial generation",
+                "raw_api_response": {
+                    "choices": [{
+                        "finish_reason": "error",
+                        "message": {"content": "partial generation"},
+                    }]
+                },
+            }
+        }
+        target = runner.Target(
+            row_number=2,
+            dataset="GSM8K",
+            group="Religion_Persona",
+            persona="atheist_explicit",
+            question_id="gsm8k_00199",
+            issue_category="provider_server_500_partial",
+            audited_http_code=500,
+            audited_error_message="Internal Server Error",
+            source_state="valid",
+            relative_path=Path("Religion_Persona/model/persona/gsm8k_00199.json"),
+            path=self.root / "gsm8k_00199.json",
+            template_relative_path=None,
+            question_source_relative_path=None,
+            recovery_mode="valid_json",
+            payload=payload,
+        )
+        self.assertFalse(runner.is_resolved(target))
+
+    def test_finish_length_with_partial_content_is_not_resolved(self) -> None:
+        payload = {
+            "response": {
+                "success": True,
+                "content": "partial generation",
+                "raw_api_response": {
+                    "choices": [{
+                        "finish_reason": "length",
+                        "message": {"content": "partial generation"},
+                    }]
+                },
+            }
+        }
+        target = runner.Target(
+            row_number=2,
+            dataset="GSM8K",
+            group="Religion_Persona",
+            persona="atheist_explicit",
+            question_id="gsm8k_00199",
+            issue_category="finish_reason_length",
+            audited_http_code=None,
+            audited_error_message="token budget exhausted",
+            source_state="valid",
+            relative_path=Path("Religion_Persona/model/persona/gsm8k_00199.json"),
+            path=self.root / "gsm8k_00199.json",
+            template_relative_path=None,
+            question_source_relative_path=None,
+            recovery_mode="valid_json",
+            payload=payload,
+        )
+        self.assertFalse(runner.is_resolved(target))
+
+    def test_finish_error_without_error_object_is_failed_api_result(self) -> None:
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = {
+            "choices": [{
+                "finish_reason": "error",
+                "message": {"content": "partial generation"},
+            }]
+        }
+        with mock.patch.object(runner.requests, "post", return_value=response):
+            result = runner.post_chat(
+                endpoint_url="https://example.invalid/chat",
+                api_key="fake",
+                messages=[{"role": "user", "content": "test"}],
+                temperature=0,
+                max_tokens=4096,
+                max_retries=0,
+                retry_base_sec=0.01,
+                timeout_sec=1,
+            )
+        self.assertFalse(result["success"])
+        self.assertIn("finish_reason=error", result["error"])
+
+    def test_finish_length_is_failed_api_result(self) -> None:
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = {
+            "choices": [{
+                "finish_reason": "length",
+                "message": {"content": "partial generation"},
+            }]
+        }
+        with mock.patch.object(runner.requests, "post", return_value=response):
+            result = runner.post_chat(
+                endpoint_url="https://example.invalid/chat",
+                api_key="fake",
+                messages=[{"role": "user", "content": "test"}],
+                temperature=0,
+                max_tokens=4096,
+                max_retries=0,
+                retry_base_sec=0.01,
+                timeout_sec=1,
+            )
+        self.assertFalse(result["success"])
+        self.assertIn("finish_reason=length", result["error"])
+
+    def test_reasoning_effort_is_sent_without_changing_token_budget(self) -> None:
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = {
+            "choices": [{
+                "finish_reason": "stop",
+                "message": {"content": "Final Answer: 42"},
+            }]
+        }
+        with mock.patch.object(
+            runner.requests, "post", return_value=response
+        ) as post:
+            result = runner.post_chat(
+                endpoint_url="https://example.invalid/chat",
+                api_key="fake",
+                messages=[{"role": "user", "content": "test"}],
+                temperature=0,
+                max_tokens=4096,
+                max_retries=0,
+                retry_base_sec=0.01,
+                timeout_sec=1,
+                reasoning_effort="low",
+            )
+        self.assertTrue(result["success"])
+        sent = post.call_args.kwargs["json"]
+        self.assertEqual(sent["max_tokens"], 4096)
+        self.assertEqual(sent["reasoning"], {"effort": "low"})
+
+    def test_reasoning_token_budget_is_nested_inside_output_budget(self) -> None:
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = {
+            "choices": [{
+                "finish_reason": "stop",
+                "message": {"content": "Final Answer: 42"},
+            }]
+        }
+        with mock.patch.object(
+            runner.requests, "post", return_value=response
+        ) as post:
+            result = runner.post_chat(
+                endpoint_url="https://example.invalid/chat",
+                api_key="fake",
+                messages=[{"role": "user", "content": "test"}],
+                temperature=0,
+                max_tokens=4096,
+                max_retries=0,
+                retry_base_sec=0.01,
+                timeout_sec=1,
+                reasoning_max_tokens=1024,
+            )
+        self.assertTrue(result["success"])
+        sent = post.call_args.kwargs["json"]
+        self.assertEqual(sent["max_tokens"], 4096)
+        self.assertEqual(sent["reasoning"], {"max_tokens": 1024})
+
+    def test_choice_level_provider_error_is_failed_api_result(self) -> None:
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = {
+            "choices": [
+                {
+                    "finish_reason": "error",
+                    "error": {"code": 500, "message": "Internal Server Error"},
+                    "message": {"content": "partial generation"},
+                }
+            ]
+        }
+        with mock.patch.object(runner.requests, "post", return_value=response):
+            result = runner.post_chat(
+                endpoint_url="https://example.invalid/chat",
+                api_key="fake",
+                messages=[{"role": "user", "content": "test"}],
+                temperature=0.2,
+                max_tokens=4096,
+                max_retries=0,
+                retry_base_sec=0.01,
+                timeout_sec=1,
+            )
+        self.assertFalse(result["success"])
+        self.assertIn("500", result["error"])
 
     def test_missing_gsm8k_is_rebuilt_from_manifest_sources(self) -> None:
         target_relative = Path(

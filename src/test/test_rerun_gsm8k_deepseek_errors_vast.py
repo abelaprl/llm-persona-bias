@@ -213,6 +213,37 @@ class RerunGsm8kDeepSeekErrorsVastTest(unittest.TestCase):
         attempt = json.loads(attempts[0].read_text(encoding="utf-8"))
         self.assertIn("reasoning was present", attempt["failure_reason"])
 
+    def test_length_finish_reason_preserves_source(self) -> None:
+        original = self.target_path.read_bytes()
+        truncated = {
+            "success": True,
+            "api_response": {
+                "choices": [
+                    {
+                        "finish_reason": "length",
+                        "message": {
+                            "role": "assistant",
+                            "content": "The unfinished answer is 4",
+                        },
+                    }
+                ]
+            },
+            "error": None,
+            "http_status": 200,
+            "retry_count": 0,
+            "latency_sec": 0.5,
+        }
+        with patch.object(rerun, "check_endpoint"), patch.object(
+            rerun, "post_chat", return_value=truncated
+        ):
+            result = rerun.run(self._args(execute=True))
+        self.assertEqual(result, 1)
+        self.assertEqual(self.target_path.read_bytes(), original)
+        attempts = list(self.attempt_root.rglob("gsm8k_00001.json"))
+        self.assertEqual(len(attempts), 1)
+        attempt = json.loads(attempts[0].read_text(encoding="utf-8"))
+        self.assertIn("finish_reason is length", attempt["failure_reason"])
+
     def test_truncated_implicit_request_is_rebuilt_from_input(self) -> None:
         self.relative = Path(
             "Gender_Persona"

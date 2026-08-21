@@ -65,11 +65,22 @@ MODEL_SLUG = "qwen_qwen3-next-80b-a3b-thinking"
 MODEL_LABEL = "Qwen3 Next 80B"
 RUNNER_DESCRIPTION = __doc__
 RERUN_TAG_PREFIX = "qwen3_next_80b"
+PROVIDER_LABEL = "openrouter"
+TRANSPORT_LABEL = "openrouter"
+API_SERVICE_LABEL = "OpenRouter"
+AUTH_REQUIRED = True
+# A wrapper may use another entry that belongs to the same OpenRouter account
+# when the model's catalog entry is intentionally unauthenticated (for example
+# a local Vast endpoint). None preserves the model-specific entry.
+CREDENTIAL_ORDER: int | None = None
+CREDENTIAL_MODEL_ID: str | None = None
 NONREGIONAL_EXPECTED_COUNT = 8290
 REGIONAL_EXPECTED_COUNT = 5631
 NONREGIONAL_SCOPE_DIRECTORY = "qwen3_next_80b_nonregional"
 REGIONAL_SCOPE_DIRECTORY = "qwen3_next_80b_regional"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+DEFAULT_ENDPOINT_URL = OPENROUTER_URL
+ENDPOINT_ENV_VAR = "OPENROUTER_ENDPOINT_URL"
 NONREGIONAL_MANIFEST = (
     REPO_ROOT
     / "result"
@@ -191,15 +202,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--backup-root", default=None)
     parser.add_argument("--attempt-root", default=None)
+    parser.add_argument(
+        "--success-root",
+        default=None,
+        help=(
+            "Optional isolated output root. Successful JSON is written below "
+            "<root>/<dataset>/<relative_path> and source JSON is never replaced."
+        ),
+    )
     parser.add_argument("--config", default=str(REPO_ROOT / "config" / "model_keys.json"))
     parser.add_argument(
         "--endpoint-url",
-        default=os.environ.get("OPENROUTER_ENDPOINT_URL", OPENROUTER_URL),
+        default=os.environ.get(ENDPOINT_ENV_VAR, DEFAULT_ENDPOINT_URL),
     )
     parser.add_argument(
         "--execute",
         action="store_true",
-        help="Call OpenRouter and replace only successful targets.",
+        help=f"Call {API_SERVICE_LABEL} and replace only successful targets.",
     )
     parser.add_argument(
         "--force",
@@ -225,6 +244,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Override the stored temperature; default preserves each target.",
     )
+    parser.add_argument(
+        "--reasoning-effort",
+        choices=("minimal", "low", "medium", "high"),
+        default=None,
+        help=(
+            "Optional OpenRouter reasoning effort. Default sends no override; "
+            "use low for reasoning-first responses truncated at max_tokens."
+        ),
+    )
+    parser.add_argument(
+        "--reasoning-max-tokens",
+        type=positive_int,
+        default=None,
+        help=(
+            "Optional reasoning-token sub-budget inside max_tokens. Mutually "
+            "exclusive with --reasoning-effort."
+        ),
+    )
     parser.add_argument("--max-retries", type=nonnegative_int, default=4)
     parser.add_argument("--retry-base-sec", type=float, default=4.0)
     parser.add_argument("--request-timeout-sec", type=float, default=600.0)
@@ -232,11 +269,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--skip-preflight",
         action="store_true",
-        help="Skip the read-only OpenRouter key status check.",
+        help=f"Skip the read-only {API_SERVICE_LABEL} status check.",
     )
     args = parser.parse_args(argv)
     if args.temperature is not None and args.temperature < 0:
         parser.error("--temperature must be zero or greater")
+    if args.reasoning_effort and args.reasoning_max_tokens is not None:
+        parser.error(
+            "--reasoning-effort and --reasoning-max-tokens are mutually exclusive"
+        )
+    if (args.max_tokens is not None and args.reasoning_max_tokens is not None
+            and args.reasoning_max_tokens >= args.max_tokens):
+        parser.error("--reasoning-max-tokens must be smaller than --max-tokens")
     if args.retry_base_sec <= 0:
         parser.error("--retry-base-sec must be greater than 0")
     if args.request_timeout_sec <= 0 or args.preflight_timeout_sec <= 0:
@@ -260,6 +304,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.attempt_root
         or REPO_ROOT / "result" / "_rerun_attempts" / scope_directory
     )
+    args.success_root = repo_path(args.success_root) if args.success_root else None
     args.config = repo_path(args.config)
     return args
 
@@ -611,7 +656,7 @@ def raw_api_error(payload: dict[str, Any]) -> object | None:
     response = payload.get("response")
     response = response if isinstance(response, dict) else {}
     raw = response.get("raw_api_response")
-    return raw.get("error") if isinstance(raw, dict) else None
+    return api_response_error(raw)
 
 
 def current_content(payload: dict[str, Any]) -> str:
@@ -634,11 +679,14 @@ def is_resolved(target: Target) -> bool:
     if target.source_state != "valid":
         return False
     response = target.payload.get("response")
+    raw = response.get("raw_api_response") if isinstance(response, dict) else None
+    _, _, finish_reason = response_texts(raw) if isinstance(raw, dict) else ("", "", "")
     return bool(
         isinstance(response, dict)
         and response.get("success") is True
         and current_content(target.payload)
         and raw_api_error(target.payload) is None
+        and finish_reason not in {"error", "content_filter", "length"}
     )
 
 
@@ -732,16 +780,26 @@ def load_api_key(config_path: Path) -> tuple[str, str]:
         ) from exc
     if not isinstance(entries, list):
         raise RuntimeError(f"Model config must contain a list: {config_path}")
+    credential_order = MODEL_ORDER if CREDENTIAL_ORDER is None else CREDENTIAL_ORDER
+    credential_model_id = (
+        MODEL_ID if CREDENTIAL_MODEL_ID is None else CREDENTIAL_MODEL_ID
+    )
     for entry in entries:
-        if not isinstance(entry, dict) or int(entry.get("order", -1)) != MODEL_ORDER:
+        if not isinstance(entry, dict) or int(entry.get("order", -1)) != credential_order:
             continue
-        if str(entry.get("model_id") or "") != MODEL_ID:
-            raise RuntimeError(f"Model order {MODEL_ORDER} has an unexpected model ID")
+        if str(entry.get("model_id") or "") != credential_model_id:
+            raise RuntimeError(
+                f"Credential order {credential_order} has an unexpected model ID"
+            )
         key = str(entry.get("api_key_alias") or "").strip()
         if not key:
-            raise RuntimeError(f"Model order {MODEL_ORDER} has no configured key")
+            raise RuntimeError(
+                f"Credential order {credential_order} has no configured key"
+            )
         return key, str(config_path)
-    raise RuntimeError(f"Model order {MODEL_ORDER} is missing from {config_path}")
+    raise RuntimeError(
+        f"Credential order {credential_order} is missing from {config_path}"
+    )
 
 
 def openrouter_auth_url(chat_url: str) -> str:
@@ -753,12 +811,14 @@ def openrouter_auth_url(chat_url: str) -> str:
 
 
 def auth_headers(api_key: str) -> dict[str, str]:
-    return {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://localhost",
-        "X-Title": f"TA {MODEL_LABEL} selective rerun",
-    }
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers.update({
+            "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": "https://localhost",
+            "X-Title": f"TA {MODEL_LABEL} selective rerun",
+        })
+    return headers
 
 
 def check_openrouter_key(
@@ -791,10 +851,19 @@ def sanitize_error(value: object) -> str:
     return text[:1000]
 
 
-def api_error_code(raw_api: object) -> int | None:
+def api_response_error(raw_api: object) -> object | None:
     if not isinstance(raw_api, dict):
         return None
     error = raw_api.get("error")
+    if error is None:
+        choices = raw_api.get("choices")
+        if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+            error = choices[0].get("error")
+    return error
+
+
+def api_error_code(raw_api: object) -> int | None:
+    error = api_response_error(raw_api)
     if not isinstance(error, dict):
         return None
     try:
@@ -813,13 +882,21 @@ def post_chat(
     max_retries: int,
     retry_base_sec: float,
     timeout_sec: float,
+    reasoning_effort: str | None = None,
+    reasoning_max_tokens: int | None = None,
 ) -> dict[str, Any]:
+    if reasoning_effort and reasoning_max_tokens is not None:
+        raise ValueError("reasoning effort and max_tokens cannot both be set")
     request_payload = {
         "model": MODEL_ID,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if reasoning_effort:
+        request_payload["reasoning"] = {"effort": reasoning_effort}
+    elif reasoning_max_tokens is not None:
+        request_payload["reasoning"] = {"max_tokens": reasoning_max_tokens}
     total_latency = 0.0
     last_error = "request did not run"
     last_raw: dict[str, Any] | None = None
@@ -841,9 +918,16 @@ def post_chat(
                 last_raw = decoded if isinstance(decoded, dict) else None
             except ValueError:
                 last_raw = None
+            body_error = api_response_error(last_raw)
             structured_code = api_error_code(last_raw)
-            has_error = isinstance(last_raw, dict) and last_raw.get("error") is not None
-            if 200 <= response.status_code < 300 and last_raw is not None and not has_error:
+            has_error = body_error is not None
+            _, _, finish_reason = (
+                response_texts(last_raw) if isinstance(last_raw, dict)
+                else ("", "", "")
+            )
+            abnormal_finish = finish_reason in {"error", "content_filter", "length"}
+            if (200 <= response.status_code < 300 and last_raw is not None
+                    and not has_error and not abnormal_finish):
                 return {
                     "success": True,
                     "api_response": last_raw,
@@ -853,10 +937,13 @@ def post_chat(
                     "latency_sec": total_latency,
                 }
             if has_error:
-                last_error = f"API body contains error: {sanitize_error(last_raw.get('error'))}"
+                last_error = f"API body contains error: {sanitize_error(body_error)}"
                 retryable = structured_code == 429 or (
                     structured_code is not None and structured_code >= 500
                 )
+            elif abnormal_finish:
+                last_error = f"API body has abnormal finish_reason={finish_reason}"
+                retryable = finish_reason in {"error", "length"}
             else:
                 last_error = f"HTTP {response.status_code}: {sanitize_error(response.text)}"
                 retryable = response.status_code in {408, 409, 429} or response.status_code >= 500
@@ -913,6 +1000,35 @@ def attempt_path(root: Path, run_id: str, target: Target) -> Path:
     )
 
 
+def success_path(args: argparse.Namespace, target: Target) -> Path:
+    """Return the selected success destination without changing source paths."""
+    if args.success_root is None:
+        return target.path
+    dataset_output_root = args.success_root / target.dataset.lower()
+    return safe_path(dataset_output_root, target.relative_path)
+
+
+def isolated_success_is_resolved(
+    args: argparse.Namespace,
+    target: Target,
+) -> bool:
+    if args.success_root is None:
+        return False
+    destination = success_path(args, target)
+    if not destination.is_file():
+        return False
+    payload = read_json(destination)
+    isolated = replace(
+        target,
+        path=destination,
+        payload=payload,
+        source_state="valid",
+        recovery_mode="valid_json",
+    )
+    validate_payload(isolated)
+    return is_resolved(isolated)
+
+
 def write_failed_attempt(
     target: Target,
     args: argparse.Namespace,
@@ -933,6 +1049,8 @@ def write_failed_attempt(
         "audited_error_message": target.audited_error_message,
         "attempt_timestamp": datetime.now().astimezone().isoformat(),
         "failure_reason": reason,
+        "reasoning_effort": args.reasoning_effort,
+        "reasoning_max_tokens": args.reasoning_max_tokens,
         "response": {
             "success": api_result.get("success"),
             "http_status": api_result.get("http_status"),
@@ -966,6 +1084,10 @@ def update_ethics_payload(
     parameters.update(
         {"temperature": temperature, "max_tokens": max_tokens, "model": MODEL_ID}
     )
+    if args.reasoning_effort:
+        parameters["reasoning"] = {"effort": args.reasoning_effort}
+    elif args.reasoning_max_tokens is not None:
+        parameters["reasoning"] = {"max_tokens": args.reasoning_max_tokens}
     request["parameters"] = parameters
     payload["request"] = request
     payload["prediction"] = {
@@ -985,7 +1107,7 @@ def update_ethics_payload(
     metadata = payload.setdefault("metadata", {})
     metadata.update(
         {
-            "rerun": f"{RERUN_TAG_PREFIX}_{args.scope}_openrouter",
+            "rerun": f"{RERUN_TAG_PREFIX}_{args.scope}_{TRANSPORT_LABEL}",
             "rerun_timestamp": datetime.now().astimezone().isoformat(),
             "rerun_manifest": str(args.manifest),
             "rerun_endpoint": args.endpoint_url,
@@ -1026,6 +1148,10 @@ def update_gsm8k_payload(
     parameters.update(
         {"temperature": temperature, "max_tokens": max_tokens, "model": MODEL_ID}
     )
+    if args.reasoning_effort:
+        parameters["reasoning"] = {"effort": args.reasoning_effort}
+    elif args.reasoning_max_tokens is not None:
+        parameters["reasoning"] = {"max_tokens": args.reasoning_max_tokens}
     request["parameters"] = parameters
     payload["request"] = request
     usage = raw_api.get("usage")
@@ -1046,14 +1172,14 @@ def update_gsm8k_payload(
     model_info = metadata.setdefault("model_info", {})
     model_info.update(
         {
-            "provider": "openrouter",
+            "provider": PROVIDER_LABEL,
             "model_id": MODEL_ID,
             "api_endpoint": args.endpoint_url,
         }
     )
     metadata.update(
         {
-            "rerun": f"{RERUN_TAG_PREFIX}_{args.scope}_openrouter",
+            "rerun": f"{RERUN_TAG_PREFIX}_{args.scope}_{TRANSPORT_LABEL}",
             "rerun_timestamp": datetime.now().astimezone().isoformat(),
             "rerun_manifest": str(args.manifest),
             "rerun_source_recovery_mode": target.recovery_mode,
@@ -1072,7 +1198,11 @@ def process_target(
     target = hydrate_target(target)
     if not args.force and is_resolved(target):
         return "skipped", target.question_id, "already contains a successful response"
-    backup_target(target, args.backup_root, run_id)
+    if not args.force and isolated_success_is_resolved(args, target):
+        return "skipped", target.question_id, "isolated success already exists"
+    destination = success_path(args, target)
+    if args.success_root is None:
+        backup_target(target, args.backup_root, run_id)
     assert target.payload is not None
     payload = copy.deepcopy(target.payload)
     request = payload.get("request")
@@ -1094,20 +1224,26 @@ def process_target(
         max_retries=args.max_retries,
         retry_base_sec=args.retry_base_sec,
         timeout_sec=args.request_timeout_sec,
+        reasoning_effort=args.reasoning_effort,
+        reasoning_max_tokens=args.reasoning_max_tokens,
     )
     raw_api = api_result.get("api_response")
     raw_api = raw_api if isinstance(raw_api, dict) else {}
     final_content, reasoning, finish_reason = response_texts(raw_api)
     if not api_result.get("success"):
         reason = sanitize_error(api_result.get("error") or "API request failed")
-    elif raw_api.get("error") is not None:
-        reason = f"API body contains error: {sanitize_error(raw_api.get('error'))}"
+    elif api_response_error(raw_api) is not None:
+        reason = f"API body contains error: {sanitize_error(api_response_error(raw_api))}"
+    elif finish_reason in {"error", "content_filter", "length"}:
+        reason = f"Abnormal finish_reason={finish_reason}"
     elif not final_content:
         detail = "reasoning present" if reasoning else "no reasoning"
         reason = f"No final assistant content ({detail}; finish_reason={finish_reason})"
     else:
         reason = ""
     if reason:
+        retry_count = int(api_result.get("retry_count") or 0)
+        reason = f"{reason}; attempts={retry_count + 1} (retries={retry_count})"
         failed_path = write_failed_attempt(target, args, run_id, api_result, reason)
         return "failed", target.question_id, f"{reason}; attempt={failed_path}"
 
@@ -1136,8 +1272,8 @@ def process_target(
             temperature,
             args,
         )
-    atomic_write_json(target.path, payload)
-    return "saved", target.question_id, f"{target.dataset}/{target.relative_path.as_posix()}"
+    atomic_write_json(destination, payload)
+    return "saved", target.question_id, str(destination)
 
 
 def print_plan(
@@ -1147,7 +1283,7 @@ def print_plan(
     already_fixed_checked: int,
 ) -> None:
     print("=" * 80)
-    print(f"{MODEL_LABEL} {args.scope} selective rerun via OpenRouter")
+    print(f"{MODEL_LABEL} {args.scope} selective rerun via {API_SERVICE_LABEL}")
     print("=" * 80)
     print(f"Model          : {MODEL_ID}")
     print(f"Endpoint       : {args.endpoint_url}")
@@ -1173,9 +1309,21 @@ def print_plan(
     )
     print(f"Token budget   : {token_setting}")
     print(f"Temperature    : {temperature_setting}")
+    if args.reasoning_effort:
+        reasoning_setting = f"effort={args.reasoning_effort}"
+    elif args.reasoning_max_tokens is not None:
+        reasoning_setting = f"max_tokens={args.reasoning_max_tokens}"
+    else:
+        reasoning_setting = "provider default"
+    print(f"Reasoning      : {reasoning_setting}")
     print(f"Concurrency    : {args.concurrency}")
     print(f"Opposite scope : forbidden by validation ({args.scope})")
     print("Result scan    : disabled; only manifest/recovery paths are opened")
+    if args.success_root is None:
+        print("Success writes : replace only selected source JSON after backup")
+    else:
+        print(f"Success writes : isolated under {args.success_root}")
+        print("Source writes  : disabled")
     print()
 
 
@@ -1189,7 +1337,7 @@ def run(args: argparse.Namespace) -> int:
         selected = []
         for target in targets:
             hydrated = hydrate_target(target)
-            if is_resolved(hydrated):
+            if is_resolved(hydrated) or isolated_success_is_resolved(args, hydrated):
                 already_fixed_checked += 1
                 continue
             prepare_messages(hydrated)
@@ -1209,10 +1357,19 @@ def run(args: argparse.Namespace) -> int:
         print("Nothing to rerun: every selected manifest target is resolved.")
         return 0
 
-    api_key, key_source = load_api_key(args.config)
-    print(f"[AUTH] OpenRouter key loaded from {key_source}; key value is not logged")
-    if not args.skip_preflight:
-        check_openrouter_key(args.endpoint_url, api_key, args.preflight_timeout_sec)
+    if AUTH_REQUIRED:
+        api_key, key_source = load_api_key(args.config)
+        print(
+            f"[AUTH] {API_SERVICE_LABEL} key loaded from {key_source}; "
+            "key value is not logged"
+        )
+        if not args.skip_preflight:
+            check_openrouter_key(
+                args.endpoint_url, api_key, args.preflight_timeout_sec
+            )
+    else:
+        api_key = ""
+        print(f"[AUTH] {API_SERVICE_LABEL} is configured without authentication")
     run_id = timestamp_slug()
     counts: Counter[str] = Counter()
     print_lock = threading.Lock()
@@ -1239,7 +1396,11 @@ def run(args: argparse.Namespace) -> int:
 
     print("=" * 80)
     print(f"Completed: {dict(sorted(counts.items()))}")
-    print(f"Backup   : {args.backup_root / run_id}")
+    if args.success_root is None:
+        print(f"Backup   : {args.backup_root / run_id}")
+    else:
+        print(f"Success  : {args.success_root}")
+        print("Sources  : unchanged (isolated-output mode)")
     if counts["failed"] or counts["exception"]:
         print(f"Attempts : {args.attempt_root / run_id}")
         print("Failed/empty attempts did not replace their source JSON.")

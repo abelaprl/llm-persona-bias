@@ -1,5 +1,9 @@
 # Implementation Plan — GSM8K Runner: Regional Cultural Persona
 
+> **Catatan 14 Agustus 2026:** status parsing terbaru dan perintah operasional
+> berada di `docs/plan_parsing_gsm8k_regional_cultural_persona.md`. OLMo tidak
+> termasuk enam model utama dan tidak masuk laporan atau agregasi.
+
 > Status: **PLAN / REVIEW ONLY — belum ada kode yang ditulis.**
 > Tujuan dokumen ini: review desain dan menangkap masalah *sebelum* development dimulai.
 > Disusun mengikuti alur spec-driven: **SPEC → DESIGN → IMPL → CHECKLIST → TEST → INTEGRATION**.

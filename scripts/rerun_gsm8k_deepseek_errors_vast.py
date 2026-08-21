@@ -73,7 +73,6 @@ REQUIRED_COLUMNS = {
     "issue_category",
     "http_code",
     "error_message",
-    "json_invalid",
     "relative_path",
 }
 
@@ -465,6 +464,13 @@ def raw_response_texts(raw_api: dict[str, Any]) -> tuple[str, str]:
     return content, reasoning
 
 
+def raw_finish_reason(raw_api: dict[str, Any]) -> str:
+    choices = raw_api.get("choices")
+    choice = choices[0] if isinstance(choices, list) and choices else {}
+    choice = choice if isinstance(choice, dict) else {}
+    return str(choice.get("finish_reason") or "").strip()
+
+
 def current_content(payload: dict[str, Any]) -> str:
     response = payload.get("response")
     response = response if isinstance(response, dict) else {}
@@ -761,6 +767,7 @@ def process_target(
     raw_api = api_result.get("api_response")
     raw_api = raw_api if isinstance(raw_api, dict) else {}
     final_content, reasoning = raw_response_texts(raw_api)
+    finish_reason = raw_finish_reason(raw_api)
 
     if not api_result.get("success"):
         reason = str(api_result.get("error") or "API request failed")
@@ -769,6 +776,8 @@ def process_target(
     elif not final_content:
         suffix = " (reasoning was present)" if reasoning else ""
         reason = "Response has no final assistant content" + suffix
+    elif finish_reason != "stop":
+        reason = f"Response finish_reason is {finish_reason or 'missing'}, not stop"
     else:
         reason = ""
 
@@ -830,8 +839,7 @@ def process_target(
     return "saved", target.question_id, target.relative_path.as_posix()
 
 
-def run(args: argparse.Namespace) -> int:
-    targets = load_targets(args.manifest, args.output_root, args.expected_count)
+def run_targets(args: argparse.Namespace, targets: list[Target]) -> int:
     pending = targets if args.force else [
         target for target in targets if not is_resolved(target.payload)
     ]
@@ -883,6 +891,11 @@ def run(args: argparse.Namespace) -> int:
         print("Failed/empty attempts did not replace their source JSON.")
         return 1
     return 0
+
+
+def run(args: argparse.Namespace) -> int:
+    targets = load_targets(args.manifest, args.output_root, args.expected_count)
+    return run_targets(args, targets)
 
 
 def main() -> int:
