@@ -1,5 +1,8 @@
 # MAIN_PARSING / ETHICS
 
+Untuk memilih skrip analisis dan visualisasi, buka
+[panduan kode dan entry point](SOURCE_GUIDE.md).
+
 Penilaian jawaban benchmark ETHICS v9 berbasis aturan program. Tidak ada LLM
 yang dipakai untuk menentukan benar/salah.
 
