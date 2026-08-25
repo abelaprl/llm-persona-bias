@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 import matplotlib as mpl
@@ -25,6 +26,7 @@ REPORT_DIR = (
 )
 TABLE_PATH = REPORT_DIR / "tables" / "gender_paired_effects_significance.csv"
 FIGURE_DIR = REPORT_DIR / "figures"
+DEFAULT_OUTPUT = FIGURE_DIR / "24_gender_effect_holm_single_portrait_heatmap.png"
 
 MODEL_ORDER = [
     "Qwen3 Next 80B-A3B",
@@ -76,7 +78,23 @@ def format_effect(value: float, significant: bool) -> str:
     return text + ("*" if significant else "")
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUTPUT,
+        help="PNG output path; an SVG pair is written beside it.",
+    )
+    parser.add_argument("--dpi", type=int, default=320)
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
+    if args.dpi < 300:
+        raise ValueError("DPI output harus minimal 300")
+
     source = pd.read_csv(TABLE_PATH)
     comparison_order = [comparison for comparison, _ in COMPARISONS]
     row_labels = [label for _, label in COMPARISONS]
@@ -135,7 +153,7 @@ def main() -> None:
         vmax=0.15,
         linewidths=1.1,
         linecolor="#FCFBF8",
-        annot_kws={"fontsize": 15, "fontweight": "bold"},
+        annot_kws={"fontsize": 15, "fontweight": "normal"},
         cbar_kws={
             "label": "Cohen's h (kondisi pertama dikurangi kondisi pembanding)",
             "orientation": "horizontal",
@@ -145,8 +163,15 @@ def main() -> None:
     )
 
     # White annotation text on saturated cells keeps the larger numbers legible.
-    for text_artist, value in zip(ax.texts, effects.to_numpy().ravel()):
+    for text_artist, value, is_significant in zip(
+        ax.texts,
+        effects.to_numpy().ravel(),
+        significant.to_numpy().ravel(),
+    ):
         text_artist.set_color("white" if abs(float(value)) >= 0.075 else "#262626")
+        text_artist.set_fontweight(
+            "bold" if bool(is_significant) else "normal"
+        )
 
     ax.set_yticklabels(row_labels, rotation=0, fontsize=13.2)
     ax.set_xticklabels(
@@ -154,7 +179,7 @@ def main() -> None:
         rotation=0,
         ha="center",
         fontsize=12.2,
-        fontweight="bold",
+        fontweight="normal",
     )
     ax.xaxis.tick_top()
     ax.tick_params(axis="x", length=0, pad=10)
@@ -176,7 +201,7 @@ def main() -> None:
             "C. Laki-laki dibandingkan\ndengan perempuan",
         ],
         fontsize=12.2,
-        fontweight="bold",
+        fontweight="normal",
         ha="center",
     )
     group_axis.tick_params(axis="y", length=0, pad=50)
@@ -190,13 +215,14 @@ def main() -> None:
     colorbar.set_label(
         "Cohen's h (kondisi pertama dikurangi kondisi pembanding)",
         fontsize=13,
+        fontweight="normal",
         labelpad=8,
     )
 
     fig.suptitle(
         "Ukuran Efek dan Hasil Koreksi Holm pada Domain Gender",
         fontsize=21,
-        fontweight="bold",
+        fontweight="normal",
         y=0.985,
     )
     fig.text(
@@ -211,8 +237,9 @@ def main() -> None:
         color="#3F3F3F",
         wrap=True,
     )
-    stem = FIGURE_DIR / "24_gender_effect_holm_single_portrait_heatmap"
-    fig.savefig(stem.with_suffix(".png"), dpi=220, bbox_inches="tight")
+    stem = args.output.with_suffix("")
+    stem.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(stem.with_suffix(".png"), dpi=args.dpi, bbox_inches="tight")
     fig.savefig(stem.with_suffix(".svg"), bbox_inches="tight")
     plt.close(fig)
 
