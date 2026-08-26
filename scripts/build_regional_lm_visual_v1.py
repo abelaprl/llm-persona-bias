@@ -266,13 +266,22 @@ def _style() -> None:
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
-            "font.size": 9.5,
-            "axes.titlesize": 11,
-            "axes.labelsize": 9.5,
+            "font.size": 14.5,
+            "axes.titlesize": 18,
+            "axes.labelsize": 17.5,
+            "axes.titlepad": 10,
+            "axes.labelpad": 9,
+            "xtick.labelsize": 15.5,
+            "ytick.labelsize": 15.5,
             "axes.spines.top": False,
             "axes.spines.right": False,
-            "figure.titlesize": 15,
+            "figure.titlesize": 20,
             "legend.frameon": False,
+            "legend.fontsize": 18,
+            "legend.markerscale": 1.25,
+            "legend.handlelength": 1.8,
+            "legend.handletextpad": 0.6,
+            "legend.columnspacing": 1.4,
         }
     )
 
@@ -342,7 +351,7 @@ def _plot_coverage(coverage: pd.DataFrame, image_dir: Path) -> Path:
     table = table.reindex(index=MODEL_ORDER, columns=REGIONAL_PERSONAS)
     target = coverage.pivot(index="model_id", columns="persona", values="target").reindex_like(table)
     rates = table / target
-    fig, ax = plt.subplots(figsize=(21, 5.7))
+    fig, ax = plt.subplots(figsize=(21, 8.2))
     image = ax.imshow(rates.to_numpy(float), cmap="YlGnBu", vmin=0.80, vmax=1.0, aspect="auto")
     for row in range(len(table.index)):
         for column in range(len(table.columns)):
@@ -350,11 +359,17 @@ def _plot_coverage(coverage: pd.DataFrame, image_dir: Path) -> Path:
             expected = target.iloc[row, column]
             ax.text(
                 column, row, f"{int(value):,}\n/{int(expected):,}",
-                ha="center", va="center", fontsize=6.6,
+                ha="center", va="center", fontsize=12.5,
                 color="white" if rates.iloc[row, column] >= 0.91 else "#0F172A",
             )
-    ax.set_xticks(range(len(table.columns)), [PERSONA_LABELS[p] for p in table.columns], rotation=45, ha="right")
-    ax.set_yticks(range(len(table.index)), [MODEL_LABELS[m] for m in table.index])
+    ax.set_xticks(
+        range(len(table.columns)),
+        [PERSONA_LABELS[p] for p in table.columns],
+        rotation=45,
+        ha="right",
+        fontsize=14.5,
+    )
+    ax.set_yticks(range(len(table.index)), [MODEL_LABELS[m] for m in table.index], fontsize=15)
     ax.set_title("Cakupan teks tersedia per model × 17 kondisi persona", fontweight="bold")
     ax.set_xlabel("N = Neutral; NA/EA/SA/SSA = kawasan; E/I1/I2/I3 = kondisi")
     colorbar = fig.colorbar(image, ax=ax, fraction=0.018, pad=0.012)
@@ -366,7 +381,7 @@ def _plot_coverage(coverage: pd.DataFrame, image_dir: Path) -> Path:
 def _plot_verbosity(descriptives: pd.DataFrame, image_dir: Path) -> Path:
     data = descriptives[descriptives["outcome_id"].eq("word_count")].copy()
     x_lookup = {condition: index for index, condition in enumerate(CONDITIONS)}
-    fig, axes = plt.subplots(2, 2, figsize=(14.5, 10), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharex=True)
     for ax, identity in zip(axes.flat, IDENTITIES):
         panel = data[data["identity"].eq(identity)]
         for model in MODEL_ORDER:
@@ -376,22 +391,22 @@ def _plot_verbosity(descriptives: pd.DataFrame, image_dir: Path) -> Path:
                 ax.errorbar(
                     x, point["median"],
                     yerr=np.array([[point["median"] - point["q1"]], [point["q3"] - point["median"]]]),
-                    fmt="o", ms=4.3, capsize=1.8, color=MODEL_COLORS[model], alpha=0.72,
+                    fmt="o", ms=7.5, capsize=3.0, color=MODEL_COLORS[model], alpha=0.88,
                 )
         medians = panel.groupby("condition")["median"].median()
         for condition, value in medians.items():
-            ax.scatter(x_lookup[condition], value, marker="D", s=46, color="#111827", zorder=5)
+            ax.scatter(x_lookup[condition], value, marker="D", s=82, color="#111827", zorder=5)
         ax.set_title(IDENTITY_LABELS[identity], fontweight="bold")
-        ax.set_ylabel("Median jumlah kata (garis = IQR)")
         ax.grid(axis="y", color="#E2E8F0", linewidth=0.6)
     for ax in axes[-1]:
         ax.set_xticks(range(len(CONDITIONS)), [CONDITION_LABELS[c] for c in CONDITIONS])
-        ax.set_xlabel("Kondisi persona")
+    fig.supxlabel("Kondisi persona", y=0.115)
+    fig.supylabel("Median jumlah kata (garis = IQR)", x=0.012)
     handles = [Line2D([0], [0], marker="o", linestyle="", color=MODEL_COLORS[m], label=MODEL_LABELS[m]) for m in MODEL_ORDER]
     handles.append(Line2D([0], [0], marker="D", linestyle="", color="#111827", label="Median 6 model"))
-    fig.legend(handles=handles, loc="lower center", ncol=4)
+    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 0.012), ncol=4)
     fig.suptitle("Verbosity respons untuk setiap identitas dan kondisi", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.10, 1, 0.96))
+    fig.tight_layout(rect=(0.055, 0.18, 0.99, 0.95), h_pad=2.0, w_pad=1.5)
     return _save(fig, image_dir, "02_verbosity_by_identity_condition.png")
 
 
@@ -416,7 +431,7 @@ def _marker_prevalence(frame: pd.DataFrame) -> pd.DataFrame:
 
 
 def _plot_aligned_mentions(prevalence: pd.DataFrame, image_dir: Path) -> Path:
-    fig, axes = plt.subplots(2, 2, figsize=(14, 9.5), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=(16, 11.5), sharex=True)
     x_lookup = {condition: index for index, condition in enumerate(PAIR_CONDITIONS)}
     for ax, identity in zip(axes.flat, IDENTITIES):
         marker = ALIGNED_MARKER[identity]
@@ -429,28 +444,28 @@ def _plot_aligned_mentions(prevalence: pd.DataFrame, image_dir: Path) -> Path:
             group = panel[panel["model_id"].eq(model)]
             ax.scatter(
                 [x_lookup[c] for c in group["condition"]], group["prevalence_pp"],
-                s=34, color=MODEL_COLORS[model], alpha=0.78,
+                s=70, color=MODEL_COLORS[model], alpha=0.90,
             )
         medians = panel.groupby("condition")["prevalence_pp"].median()
         for condition, value in medians.items():
-            ax.scatter(x_lookup[condition], value, marker="D", s=52, color="#111827", zorder=5)
+            ax.scatter(x_lookup[condition], value, marker="D", s=90, color="#111827", zorder=5)
         ax.set_title(f"{IDENTITY_LABELS[identity]}: {REGIONAL_MARKER_LABELS[marker]}", fontweight="bold")
-        ax.set_ylabel("Respons dengan penyebutan (%)")
         ax.grid(axis="y", color="#E2E8F0", linewidth=0.6)
     for ax in axes[-1]:
         ax.set_xticks(range(len(PAIR_CONDITIONS)), [CONDITION_LABELS[c] for c in PAIR_CONDITIONS])
-        ax.set_xlabel("Kondisi persona")
+    fig.supxlabel("Kondisi persona", y=0.115)
+    fig.supylabel("Respons dengan penyebutan (%)", x=0.012)
     handles = [Line2D([0], [0], marker="o", linestyle="", color=MODEL_COLORS[m], label=MODEL_LABELS[m]) for m in MODEL_ORDER]
     handles.append(Line2D([0], [0], marker="D", linestyle="", color="#111827", label="Median 6 model"))
-    fig.legend(handles=handles, loc="lower center", ncol=4)
+    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 0.012), ncol=4)
     fig.suptitle("Penyebutan identitas yang selaras dengan persona", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.11, 1, 0.96))
+    fig.tight_layout(rect=(0.055, 0.18, 0.99, 0.95), h_pad=2.0, w_pad=1.5)
     return _save(fig, image_dir, "03_aligned_identity_mentions.png")
 
 
 def _plot_accommodation_explicit(prevalence: pd.DataFrame, image_dir: Path) -> Path:
     y_lookup = {marker: len(ACCOMMODATION_MARKERS) - 1 - index for index, marker in enumerate(ACCOMMODATION_MARKERS)}
-    fig, axes = plt.subplots(2, 2, figsize=(16, 10.5), sharex=False, sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=(17, 12.5), sharex=False, sharey=True)
     for ax, identity in zip(axes.flat, IDENTITIES):
         panel = prevalence[
             prevalence["identity"].eq(identity)
@@ -460,13 +475,12 @@ def _plot_accommodation_explicit(prevalence: pd.DataFrame, image_dir: Path) -> P
         for _, point in panel.iterrows():
             ax.scatter(
                 point["prevalence_pp"], y_lookup[point["marker_id"]],
-                s=33, color=MODEL_COLORS[point["model_id"]], alpha=0.76,
+                s=70, color=MODEL_COLORS[point["model_id"]], alpha=0.90,
             )
         medians = panel.groupby("marker_id")["prevalence_pp"].median()
         for marker, value in medians.items():
-            ax.scatter(value, y_lookup[marker], marker="D", s=48, color="#111827", zorder=5)
+            ax.scatter(value, y_lookup[marker], marker="D", s=90, color="#111827", zorder=5)
         ax.set_title(IDENTITY_LABELS[identity], fontweight="bold")
-        ax.set_xlabel("Prevalence respons (%)")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
     axes[0, 0].set_yticks(
         [y_lookup[m] for m in ACCOMMODATION_MARKERS],
@@ -474,9 +488,10 @@ def _plot_accommodation_explicit(prevalence: pd.DataFrame, image_dir: Path) -> P
     )
     handles = [Line2D([0], [0], marker="o", linestyle="", color=MODEL_COLORS[m], label=MODEL_LABELS[m]) for m in MODEL_ORDER]
     handles.append(Line2D([0], [0], marker="D", linestyle="", color="#111827", label="Median 6 model"))
-    fig.legend(handles=handles, loc="lower center", ncol=4)
+    fig.supxlabel("Prevalensi respons (%)", y=0.115)
+    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 0.012), ncol=4)
     fig.suptitle("Akomodasi bahasa regional-budaya pada persona Explicit", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.11, 1, 0.96))
+    fig.tight_layout(rect=(0.01, 0.18, 0.99, 0.95), h_pad=2.0, w_pad=1.5)
     return _save(fig, image_dir, "04_regional_accommodation_explicit.png")
 
 
@@ -521,20 +536,20 @@ def _plot_term_lollipop(term_table: pd.DataFrame, image_dir: Path) -> Path:
         data.groupby(["identity", "term"], as_index=False)
         .agg(weight=("occurrences_per_10k_words", "mean"), prevalence=("response_prevalence_pp", "mean"))
     )
-    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    fig, axes = plt.subplots(2, 2, figsize=(17, 14))
     for ax, identity in zip(axes.flat, IDENTITIES):
         panel = aggregate[
             aggregate["identity"].eq(identity) & aggregate["weight"].gt(0)
         ].nlargest(12, "weight").sort_values("weight")
-        ax.hlines(panel["term"], 0, panel["weight"], color="#CBD5E1", linewidth=1.4)
-        ax.scatter(panel["weight"], panel["term"], s=55, color=IDENTITY_COLORS[identity])
+        ax.hlines(panel["term"], 0, panel["weight"], color="#CBD5E1", linewidth=2.2)
+        ax.scatter(panel["weight"], panel["term"], s=85, color=IDENTITY_COLORS[identity])
         for _, point in panel.iterrows():
-            ax.text(point["weight"], point["term"], f"  {point['weight']:.2f}", va="center", fontsize=8)
+            ax.text(point["weight"], point["term"], f"  {point['weight']:.2f}", va="center", fontsize=14)
         ax.set_title(IDENTITY_LABELS[identity], fontweight="bold")
-        ax.set_xlabel("Rerata setara antar-model per 10.000 kata")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
+    fig.supxlabel("Rerata setara antar-model per 10.000 kata", y=0.025)
     fig.suptitle("Istilah regional-budaya pada E, I1, I2, dan I3", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.tight_layout(rect=(0.02, 0.065, 0.99, 0.95), h_pad=2.0, w_pad=1.8)
     return _save(fig, image_dir, "05_regional_terms_ranked.png")
 
 
@@ -559,7 +574,7 @@ def _draw_cloud(ax: plt.Axes, weights: dict[str, float], title: str, seed: int) 
     rng = np.random.default_rng(seed)
     palette = ("#0F766E", "#2563EB", "#7C3AED", "#D97706", "#BE123C")
     for index, ((term, value), (x, y)) in enumerate(zip(positive, positions)):
-        size = 9 + 23 * math.sqrt(value / maximum)
+        size = 13 + 30 * math.sqrt(value / maximum)
         ax.text(
             x, y, term, ha="center", va="center", fontsize=size,
             color=palette[index % len(palette)], rotation=float(rng.choice((0, 0, 0, 0, 10, -10))),
@@ -570,7 +585,7 @@ def _draw_cloud(ax: plt.Axes, weights: dict[str, float], title: str, seed: int) 
 def _plot_term_cloud(term_table: pd.DataFrame, image_dir: Path) -> Path:
     non_neutral = term_table[~term_table["condition"].eq("neutral")]
     aggregate = non_neutral.groupby(["identity", "term"])["occurrences_per_10k_words"].mean().reset_index()
-    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(16, 11))
     for index, (ax, identity) in enumerate(zip(axes.flat, IDENTITIES)):
         panel = aggregate[aggregate["identity"].eq(identity)]
         _draw_cloud(ax, dict(zip(panel["term"], panel["occurrences_per_10k_words"])), IDENTITY_LABELS[identity], 1822 + index)
@@ -596,7 +611,7 @@ def _plot_within_regional_forest(binary: pd.DataFrame, image_dir: Path, identity
     data["low_pp"] = 100 * data["ci_low"]
     data["high_pp"] = 100 * data["ci_high"]
     y_lookup = {marker: len(REGIONAL_MARKERS) - 1 - index for index, marker in enumerate(REGIONAL_MARKERS)}
-    fig, axes = plt.subplots(1, 4, figsize=(23, 10.5), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(23, 12.5), sharex=True, sharey=True)
     low = float(np.nanmin(data["low_pp"].to_numpy(float))) if len(data) else 0.0
     high = float(np.nanmax(data["high_pp"].to_numpy(float))) if len(data) else 0.0
     span = max(high - low, 0.1)
@@ -608,26 +623,26 @@ def _plot_within_regional_forest(binary: pd.DataFrame, image_dir: Path, identity
             ax.errorbar(
                 effect, y_lookup[point["outcome_id"]],
                 xerr=np.array([[max(effect - point["low_pp"], 0)], [max(point["high_pp"] - effect, 0)]]),
-                fmt="o", ms=4.0, capsize=1.4, color=MODEL_COLORS[point["model_id"]],
-                alpha=0.82 if point["p_holm"] < 0.05 else 0.28,
+                fmt="o", ms=7.5, capsize=3.0, color=MODEL_COLORS[point["model_id"]],
+                alpha=0.95 if point["p_holm"] < 0.05 else 0.55,
             )
         medians = panel.groupby("outcome_id")["effect_pp"].median()
         for marker, value in medians.items():
-            ax.scatter(value, y_lookup[marker], marker="D", s=35, color="#111827", zorder=5)
+            ax.scatter(value, y_lookup[marker], marker="D", s=75, color="#111827", zorder=5)
         ax.axvline(0, color="#334155", linewidth=0.8)
         ax.set_xlim(*common_xlim)
         condition = contrast.replace("_vs_neutral", "")
         ax.set_title(f"{CONDITION_LABELS[condition]} − N", fontweight="bold")
-        ax.set_xlabel("Δ prevalence (poin persentase)")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
     axes[0].set_yticks(
         [y_lookup[m] for m in REGIONAL_MARKERS],
         [REGIONAL_MARKER_LABELS[m] for m in REGIONAL_MARKERS],
-        fontsize=8.4,
+        fontsize=15,
     )
-    fig.legend(handles=_model_legend(), loc="lower center", ncol=4)
+    fig.supxlabel("Δ prevalensi (poin persentase)", y=0.105)
+    fig.legend(handles=_model_legend(), loc="lower center", bbox_to_anchor=(0.5, 0.012), ncol=4)
     fig.suptitle(f"Efek persona {IDENTITY_LABELS[identity]} terhadap Neutral: marker budaya", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.10, 1, 0.96), w_pad=1.0)
+    fig.tight_layout(rect=(0.01, 0.18, 0.99, 0.95), w_pad=1.2)
     return _save(fig, image_dir, f"07_{identity}_regional_marker_forest_vs_neutral.png")
 
 
@@ -638,36 +653,36 @@ def _plot_general_effects(numeric: pd.DataFrame, image_dir: Path, identity: str)
         & numeric["contrast_id"].isin(NEUTRAL_CONTRASTS)
     ].copy()
     y_lookup = {outcome: len(GENERAL_OUTCOMES) - 1 - index for index, outcome in enumerate(GENERAL_OUTCOMES)}
-    fig, axes = plt.subplots(1, 4, figsize=(22, 11), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(23, 13), sharex=True, sharey=True)
     for ax, contrast in zip(axes, NEUTRAL_CONTRASTS):
         panel = data[data["contrast_id"].eq(contrast)]
         for _, point in panel.iterrows():
             ax.scatter(
                 point["rank_biserial"], y_lookup[point["outcome_id"]],
-                s=11 + 7 * math.log10(float(point["n_nonzero"]) + 1),
+                s=42 + 22 * math.log10(float(point["n_nonzero"]) + 1),
                 color=MODEL_COLORS[point["model_id"]],
-                alpha=0.84 if point["p_holm"] < 0.05 else 0.24,
-                edgecolors="white", linewidths=0.3,
+                alpha=0.95 if point["p_holm"] < 0.05 else 0.50,
+                edgecolors="white", linewidths=0.6,
             )
         medians = panel.groupby("outcome_id")["rank_biserial"].median()
         for outcome, value in medians.items():
-            ax.scatter(value, y_lookup[outcome], marker="D", s=35, color="#111827", zorder=5)
+            ax.scatter(value, y_lookup[outcome], marker="D", s=75, color="#111827", zorder=5)
         ax.axvline(0, color="#334155", linewidth=0.8)
         ax.axvline(-0.3, color="#CBD5E1", linestyle="--", linewidth=0.6)
         ax.axvline(0.3, color="#CBD5E1", linestyle="--", linewidth=0.6)
         condition = contrast.replace("_vs_neutral", "")
         ax.set_title(f"{CONDITION_LABELS[condition]} − N", fontweight="bold")
-        ax.set_xlabel("Rank-biserial")
         ax.set_xlim(-1.03, 1.03)
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
     axes[0].set_yticks(
         [y_lookup[o] for o in GENERAL_OUTCOMES],
         [OUTCOME_LABELS[o] for o in GENERAL_OUTCOMES],
-        fontsize=8.2,
+        fontsize=15,
     )
-    fig.legend(handles=_model_legend(), loc="lower center", ncol=4)
+    fig.supxlabel("Rank-biserial", y=0.105)
+    fig.legend(handles=_model_legend(), loc="lower center", bbox_to_anchor=(0.5, 0.012), ncol=4)
     fig.suptitle(f"Efek persona {IDENTITY_LABELS[identity]} terhadap Neutral: marker linguistik umum", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.10, 1, 0.96), w_pad=1.0)
+    fig.tight_layout(rect=(0.01, 0.18, 0.99, 0.95), w_pad=1.2)
     return _save(fig, image_dir, f"08_{identity}_general_effects_vs_neutral.png")
 
 
@@ -681,7 +696,7 @@ def _plot_direct_regional_forest(binary: pd.DataFrame, image_dir: Path, conditio
     data["high_pp"] = 100 * data["ci_high"]
     y_lookup = {marker: len(REGIONAL_MARKERS) - 1 - index for index, marker in enumerate(REGIONAL_MARKERS)}
     pairs = [f"{left}_vs_{right}" for left, right in DIRECT_IDENTITY_PAIRS]
-    fig, axes = plt.subplots(3, 2, figsize=(18, 18), sharex=True, sharey=True)
+    fig, axes = plt.subplots(3, 2, figsize=(17, 20), sharex=True, sharey=True)
     low = float(np.nanmin(data["low_pp"].to_numpy(float))) if len(data) else 0.0
     high = float(np.nanmax(data["high_pp"].to_numpy(float))) if len(data) else 0.0
     span = max(high - low, 0.1)
@@ -693,26 +708,26 @@ def _plot_direct_regional_forest(binary: pd.DataFrame, image_dir: Path, conditio
             ax.errorbar(
                 effect, y_lookup[point["outcome_id"]],
                 xerr=np.array([[max(effect - point["low_pp"], 0)], [max(point["high_pp"] - effect, 0)]]),
-                fmt="o", ms=4.0, capsize=1.3, color=MODEL_COLORS[point["model_id"]],
-                alpha=0.84 if point["p_holm"] < 0.05 else 0.25,
+                fmt="o", ms=7.5, capsize=3.0, color=MODEL_COLORS[point["model_id"]],
+                alpha=0.95 if point["p_holm"] < 0.05 else 0.55,
             )
         medians = panel.groupby("outcome_id")["effect_pp"].median()
         for marker, value in medians.items():
-            ax.scatter(value, y_lookup[marker], marker="D", s=36, color="#111827", zorder=5)
+            ax.scatter(value, y_lookup[marker], marker="D", s=75, color="#111827", zorder=5)
         ax.axvline(0, color="#334155", linewidth=0.8)
         ax.set_xlim(*common_xlim)
         ax.set_title(PAIR_LABELS[pair], fontweight="bold")
-        ax.set_xlabel("Δ prevalence (poin persentase)")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
     for ax in axes[:, 0]:
         ax.set_yticks(
             [y_lookup[m] for m in REGIONAL_MARKERS],
             [REGIONAL_MARKER_LABELS[m] for m in REGIONAL_MARKERS],
-            fontsize=8.2,
+            fontsize=15,
         )
-    fig.legend(handles=_model_legend(), loc="lower center", ncol=4)
+    fig.supxlabel("Δ prevalensi (poin persentase)", y=0.055)
+    fig.legend(handles=_model_legend(), loc="lower center", bbox_to_anchor=(0.5, 0.005), ncol=4)
     fig.suptitle(f"Perbandingan langsung antaridentitas pada kondisi {CONDITION_LABELS[condition]}", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.06, 1, 0.97), h_pad=1.5)
+    fig.tight_layout(rect=(0.01, 0.10, 0.99, 0.96), h_pad=2.0, w_pad=1.6)
     return _save(fig, image_dir, f"09_direct_identity_regional_forest_{condition}.png")
 
 
@@ -758,24 +773,30 @@ def _sensitivity_tables(primary: pd.DataFrame, sensitivity: pd.DataFrame, direct
 
 
 def _plot_sensitivity(within: pd.DataFrame, direct: pd.DataFrame, image_dir: Path) -> Path:
-    fig, axes = plt.subplots(1, 2, figsize=(13.5, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(15, 8))
     for ax, data, title in (
         (axes[0], within, "Persona vs pembanding"),
         (axes[1], direct, "Direct antaridentitas"),
     ):
         selected = data[data["analysis_role"].eq("primary") & data["supported_both"]]
-        ax.scatter(selected["effect_all"], selected["effect_both_correct"], s=11, alpha=0.25, color="#2563EB")
+        ax.scatter(
+            selected["effect_all"],
+            selected["effect_both_correct"],
+            s=48,
+            alpha=0.50,
+            color="#2563EB",
+        )
         ax.axline((0, 0), slope=1, color="#111827", linewidth=0.8)
         ax.axhline(0, color="#94A3B8", linewidth=0.6)
         ax.axvline(0, color="#94A3B8", linewidth=0.6)
         ax.set_xlim(-1.02, 1.02)
         ax.set_ylim(-1.02, 1.02)
-        ax.set_xlabel("Rank-biserial seluruh pasangan")
-        ax.set_ylabel("Rank-biserial kedua respons benar")
         ax.set_title(title, fontweight="bold")
         ax.grid(color="#E2E8F0", linewidth=0.5)
+    fig.supxlabel("Rank-biserial seluruh pasangan", y=0.035)
+    fig.supylabel("Rank-biserial kedua respons benar", x=0.01)
     fig.suptitle("Sensitivitas effect size terhadap correctness", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0, 1, 0.96))
+    fig.tight_layout(rect=(0.055, 0.09, 0.99, 0.93), w_pad=1.8)
     return _save(fig, image_dir, "10_correctness_sensitivity.png")
 
 
@@ -808,7 +829,7 @@ def _plot_opening_composition(composition: pd.DataFrame, image_dir: Path) -> Pat
         category for category in OPENING_CATEGORIES
         if composition["opening_category"].eq(category).any()
     ]
-    fig, axes = plt.subplots(2, 2, figsize=(15, 10), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=(17, 13.5), sharex=True)
     for ax, identity in zip(axes.flat, IDENTITIES):
         panel = aggregate[aggregate["identity"].eq(identity)]
         bottoms = np.zeros(len(CONDITIONS))
@@ -823,36 +844,44 @@ def _plot_opening_composition(composition: pd.DataFrame, image_dir: Path) -> Pat
         ax.set_ylim(0, 1)
         ax.set_yticks(np.linspace(0, 1, 6), [f"{int(value * 100)}%" for value in np.linspace(0, 1, 6)])
         ax.set_xticks(range(len(CONDITIONS)), [CONDITION_LABELS[c] for c in CONDITIONS])
-        ax.set_xlabel("Kondisi")
+    fig.supxlabel("Kondisi", y=0.16)
+    fig.supylabel("Proporsi respons", x=0.012)
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=4, fontsize=8)
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.012),
+        ncol=4,
+        fontsize=14,
+    )
     fig.suptitle("Komposisi opening respons (rerata setara antar-model)", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.12, 1, 0.96))
+    fig.tight_layout(rect=(0.055, 0.22, 0.99, 0.95), h_pad=2.0, w_pad=1.5)
     return _save(fig, image_dir, "11_opening_composition_100pct.png")
 
 
 def _plot_direct_opening(opening: pd.DataFrame, image_dir: Path) -> Path:
     pairs = [f"{left}_vs_{right}" for left, right in DIRECT_IDENTITY_PAIRS]
     y_lookup = {pair: len(pairs) - 1 - index for index, pair in enumerate(pairs)}
-    fig, axes = plt.subplots(1, 4, figsize=(20, 6.5), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(20, 9), sharex=True, sharey=True)
     for ax, condition in zip(axes, PAIR_CONDITIONS):
         panel = opening[opening["condition"].eq(condition)]
         for _, point in panel.iterrows():
             ax.scatter(
                 100 * point["marginal_total_variation"], y_lookup[point["identity_contrast"]],
-                s=34, color=MODEL_COLORS[point["model_id"]],
-                alpha=0.86 if point["p_holm"] < 0.05 else 0.28,
+                s=75, color=MODEL_COLORS[point["model_id"]],
+                alpha=0.95 if point["p_holm"] < 0.05 else 0.55,
             )
         medians = panel.groupby("identity_contrast")["marginal_total_variation"].median()
         for pair, value in medians.items():
-            ax.scatter(100 * value, y_lookup[pair], marker="D", s=42, color="#111827", zorder=5)
+            ax.scatter(100 * value, y_lookup[pair], marker="D", s=82, color="#111827", zorder=5)
         ax.set_title(CONDITION_LABELS[condition], fontweight="bold")
-        ax.set_xlabel("Marginal total variation (%)")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
     axes[0].set_yticks([y_lookup[p] for p in pairs], [PAIR_LABELS[p] for p in pairs])
-    fig.legend(handles=_model_legend(), loc="lower center", ncol=4)
+    fig.supxlabel("Marginal total variation (%)", y=0.105)
+    fig.legend(handles=_model_legend(), loc="lower center", bbox_to_anchor=(0.5, 0.012), ncol=4)
     fig.suptitle("Perbedaan komposisi opening antaridentitas", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.15, 1, 0.95))
+    fig.tight_layout(rect=(0.01, 0.18, 0.99, 0.93), w_pad=1.2)
     return _save(fig, image_dir, "12_direct_identity_opening.png")
 
 
@@ -863,7 +892,7 @@ def _plot_availability(availability: pd.DataFrame, image_dir: Path) -> Path:
     data["high_pp"] = 100 * data["ci_high"]
     pairs = [f"{left}_vs_{right}" for left, right in DIRECT_IDENTITY_PAIRS]
     y_lookup = {pair: len(pairs) - 1 - index for index, pair in enumerate(pairs)}
-    fig, axes = plt.subplots(1, 4, figsize=(20, 6.5), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(20, 9), sharex=True, sharey=True)
     for ax, condition in zip(axes, PAIR_CONDITIONS):
         panel = data[data["condition"].eq(condition)]
         for _, point in panel.iterrows():
@@ -871,17 +900,22 @@ def _plot_availability(availability: pd.DataFrame, image_dir: Path) -> Path:
             ax.errorbar(
                 effect, y_lookup[point["identity_contrast"]],
                 xerr=np.array([[max(effect - point["low_pp"], 0)], [max(point["high_pp"] - effect, 0)]]),
-                fmt="o", ms=4.1, capsize=1.4, color=MODEL_COLORS[point["model_id"]],
-                alpha=0.85 if point["p_holm"] < 0.05 else 0.28,
+                fmt="o", ms=7.5, capsize=3.0, color=MODEL_COLORS[point["model_id"]],
+                alpha=0.95 if point["p_holm"] < 0.05 else 0.55,
             )
         ax.axvline(0, color="#334155", linewidth=0.8)
         ax.set_title(CONDITION_LABELS[condition], fontweight="bold")
-        ax.set_xlabel("Δ teks tersedia (poin persentase)")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
     axes[0].set_yticks([y_lookup[p] for p in pairs], [PAIR_LABELS[p] for p in pairs])
-    fig.legend(handles=_model_legend()[:-1], loc="lower center", ncol=3)
+    fig.supxlabel("Δ teks tersedia (poin persentase)", y=0.105)
+    fig.legend(
+        handles=_model_legend()[:-1],
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.012),
+        ncol=3,
+    )
     fig.suptitle("Differential availability pada perbandingan antaridentitas", y=0.995, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.15, 1, 0.95))
+    fig.tight_layout(rect=(0.01, 0.18, 0.99, 0.93), w_pad=1.2)
     return _save(fig, image_dir, "13_direct_identity_availability.png")
 
 
@@ -898,6 +932,88 @@ def _top_tables(tables: dict[str, pd.DataFrame], output_dir: Path) -> None:
     direct.sort_values(["p_holm", "abs_delta_pp"], ascending=[True, False]).to_csv(
         output_dir / "regional_marker_direct_identity_tests.csv", index=False
     )
+
+
+def refresh_figures(
+    bundle_dir: Path,
+    image_dir: Path | None = None,
+) -> tuple[Path, ...]:
+    """Redraw every figure from existing result tables without rerunning tests."""
+
+    bundle_dir = bundle_dir.resolve()
+    manifest_path = bundle_dir / "manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    run_dir = Path(manifest["source_run"]).resolve()
+    image_dir = image_dir.resolve() if image_dir is not None else bundle_dir / "images"
+    image_dir.mkdir(parents=True, exist_ok=True)
+
+    bundle_tables = {
+        "coverage": bundle_dir / "response_counts_model_persona.csv",
+        "prevalence": bundle_dir / "regional_marker_prevalence_model_persona.csv",
+        "terms": bundle_dir / "regional_term_prevalence_model_persona.csv",
+        "opening_composition": bundle_dir / "opening_composition_model_identity_condition.csv",
+        "within_sensitivity": bundle_dir / "correctness_sensitivity_within_comparison.csv",
+        "direct_sensitivity": bundle_dir / "correctness_sensitivity_direct_comparison.csv",
+    }
+    run_table_paths = {
+        "descriptives": run_dir / "condition_descriptives.csv",
+        "paired_numeric": run_dir / "paired_numeric.csv",
+        "paired_binary": run_dir / "paired_binary.csv",
+        "direct_binary": run_dir / "direct_identity_binary.csv",
+        "direct_opening": run_dir / "direct_identity_opening_multinomial.csv",
+        "direct_availability": run_dir / "direct_identity_availability.csv",
+    }
+    missing = [
+        path
+        for path in (*bundle_tables.values(), *run_table_paths.values())
+        if not path.is_file()
+    ]
+    if missing:
+        raise FileNotFoundError(
+            "Cannot refresh regional figures; missing tables: "
+            + ", ".join(str(path) for path in missing)
+        )
+
+    _style()
+    tables = {
+        name: pd.read_csv(path)
+        for name, path in {**bundle_tables, **run_table_paths}.items()
+    }
+    figures: list[Path] = [
+        _plot_coverage(tables["coverage"], image_dir),
+        _plot_verbosity(tables["descriptives"], image_dir),
+        _plot_aligned_mentions(tables["prevalence"], image_dir),
+        _plot_accommodation_explicit(tables["prevalence"], image_dir),
+        _plot_term_lollipop(tables["terms"], image_dir),
+        _plot_term_cloud(tables["terms"], image_dir),
+    ]
+    figures.extend(
+        _plot_within_regional_forest(tables["paired_binary"], image_dir, identity)
+        for identity in IDENTITIES
+    )
+    figures.extend(
+        _plot_general_effects(tables["paired_numeric"], image_dir, identity)
+        for identity in IDENTITIES
+    )
+    figures.extend(
+        _plot_direct_regional_forest(tables["direct_binary"], image_dir, condition)
+        for condition in PAIR_CONDITIONS
+    )
+    figures.extend(
+        (
+            _plot_sensitivity(
+                tables["within_sensitivity"],
+                tables["direct_sensitivity"],
+                image_dir,
+            ),
+            _plot_opening_composition(tables["opening_composition"], image_dir),
+            _plot_direct_opening(tables["direct_opening"], image_dir),
+            _plot_availability(tables["direct_availability"], image_dir),
+        )
+    )
+    return tuple(figures)
 
 
 def build_bundle(run_dir: Path, output_dir: Path) -> Path:

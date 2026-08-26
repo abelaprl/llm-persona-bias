@@ -213,12 +213,23 @@ def _plot_style() -> None:
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
-            "font.size": 9.5,
-            "axes.titlesize": 11,
-            "axes.labelsize": 9.5,
+            # Readable after the wide figures are scaled inside a notebook or
+            # thesis page, without letting labels dominate the data marks.
+            # Calibrated for figures that are reduced from 15--20 inches to
+            # roughly A4 text width. These values print at about 8--11 pt.
+            "font.size": 14.5,
+            "axes.titlesize": 18,
+            "axes.labelsize": 17.5,
+            "xtick.labelsize": 15.5,
+            "ytick.labelsize": 15.5,
             "axes.spines.top": False,
             "axes.spines.right": False,
-            "figure.titlesize": 16,
+            "figure.titlesize": 20,
+            "legend.fontsize": 18,
+            "legend.markerscale": 1.25,
+            "legend.handlelength": 2.1,
+            "legend.handletextpad": 0.7,
+            "legend.columnspacing": 1.45,
             "legend.frameon": False,
         }
     )
@@ -502,7 +513,7 @@ def _plot_coverage(coverage: pd.DataFrame, figure_dir: Path) -> Path:
                 if gap or unavailable:
                     label += f"\n−{gap + unavailable:,}"
             color = "white" if values[row, column] >= 0.985 else "#172033"
-            ax.text(column, row, label, ha="center", va="center", fontsize=8.3, color=color)
+            ax.text(column, row, label, ha="center", va="center", fontsize=14, color=color)
     ax.set_xticks(range(len(persona_order)), [PERSONA_LABELS[p] for p in persona_order])
     ax.set_yticks(range(len(MODEL_ORDER)), [MODEL_LABELS[m] for m in MODEL_ORDER])
     ax.set_xlabel("Persona (N = neutral; E = explicit; I1/I2/I3 = proxy implicit terpisah)")
@@ -519,7 +530,7 @@ def _plot_coverage(coverage: pd.DataFrame, figure_dir: Path) -> Path:
         "Sel berlabel gap menunjukkan respons missing, technical-only, atau think block yang tidak dapat dipisahkan.",
         ha="center",
         color="#475569",
-        fontsize=9,
+        fontsize=14,
     )
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     return _save(fig, figure_dir, "01_coverage_model_persona.png")
@@ -545,9 +556,9 @@ def _plot_word_count(descriptives: pd.DataFrame, figure_dir: Path) -> Path:
                 median,
                 yerr=np.vstack((median - q1, q3 - median)),
                 fmt="o-",
-                markersize=5,
-                linewidth=1.2,
-                capsize=3,
+                markersize=8,
+                linewidth=1.8,
+                capsize=4,
                 color=IDENTITY_COLORS[identity],
                 label=identity.title(),
             )
@@ -585,17 +596,17 @@ def _volcano_panel(
     )
     data = data.assign(y=(-np.log10(p_values)).clip(upper=y_cap))
     for family, family_data in data.groupby("outcome_family", sort=True):
-        support_size = 11 + 7 * np.log10(
+        support_size = 42 + 22 * np.log10(
             pd.to_numeric(family_data["n_nonzero"], errors="coerce").fillna(0) + 1
         )
         ax.scatter(
             family_data["rank_biserial"],
             family_data["y"],
             s=support_size,
-            alpha=np.where(family_data["p_holm"].lt(0.05), 0.82, 0.22),
+            alpha=np.where(family_data["p_holm"].lt(0.05), 0.95, 0.55),
             color=FAMILY_COLORS.get(family, "#64748B"),
             edgecolors="white",
-            linewidths=0.35,
+            linewidths=0.75,
         )
     ax.axvline(0, color="#334155", linewidth=0.8)
     ax.axhline(-math.log10(0.05), color="#94A3B8", linewidth=0.8, linestyle="--")
@@ -627,10 +638,11 @@ def _plot_volcano_group(
                 selected,
                 title=f"{identity.title()} · {CONTRAST_LABELS[contrast_id]}",
             )
-            if column == 0:
-                axes[row, column].set_ylabel("−log₁₀(p Holm), dipotong pada 50")
-            if row == 1:
-                axes[row, column].set_xlabel("Rank-biserial (arah: kondisi kiri − pembanding)")
+    fig.supylabel("−log₁₀(p Holm), dipotong pada 50", x=0.006)
+    fig.supxlabel(
+        "Rank-biserial (arah: kondisi kiri − pembanding)",
+        y=0.075,
+    )
     legend_families = [
         family for family in FAMILY_COLORS if family in set(data["outcome_family"])
     ]
@@ -642,18 +654,23 @@ def _plot_volcano_group(
             linestyle="",
             color=FAMILY_COLORS[family],
             label=FAMILY_LABELS.get(family, family),
-            markersize=6,
+            markersize=12,
         )
         for family in legend_families
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=min(4, len(handles)))
+    fig.legend(
+        handles=handles,
+        loc="lower center",
+        ncol=len(handles),
+        bbox_to_anchor=(0.5, 0.004),
+    )
     fig.suptitle(
         title
         + "\nEfek besar tampak jauh dari nol; ukuran titik mengikuti jumlah pasangan yang berubah (nonzero)",
         y=0.995,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.08, 0.99, 0.94), h_pad=2.0, w_pad=1.4)
+    fig.tight_layout(rect=(0.035, 0.15, 0.99, 0.94), h_pad=2.0, w_pad=1.4)
     return _save(fig, figure_dir, filename)
 
 
@@ -707,9 +724,9 @@ def _plot_proxy_presence_forest(
                     y,
                     xerr=np.array([[max(lower, 0)], [max(upper, 0)]]),
                     fmt="o",
-                    markersize=4.8,
-                    capsize=2.2,
-                    elinewidth=1.0,
+                    markersize=8,
+                    capsize=3.5,
+                    elinewidth=1.45,
                     color=IDENTITY_COLORS[row["identity"]],
                     alpha=0.9,
                 )
@@ -723,13 +740,15 @@ def _plot_proxy_presence_forest(
                 ax.set_yticks(
                     [y_lookup[key] for key in row_order],
                     [f"{MODEL_LABELS[m]} · {i.title()}" for m, i in row_order],
-                    fontsize=7.5,
+                    fontsize=14.5,
                 )
                 ax.set_ylabel(OUTCOME_LABELS.get(outcome_id, outcome_id), fontweight="bold")
             else:
                 ax.set_yticks([])
-            if outcome_row == len(outcomes) - 1:
-                ax.set_xlabel("Δ respons yang memuat marker (pp), 95% bootstrap CI")
+    fig.supxlabel(
+        "Δ respons yang memuat marker (pp), 95% bootstrap CI",
+        y=0.052,
+    )
     handles = [
         Line2D(
             [0],
@@ -741,13 +760,18 @@ def _plot_proxy_presence_forest(
         )
         for identity in IDENTITIES
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=2)
+    fig.legend(
+        handles=handles,
+        loc="lower center",
+        ncol=2,
+        bbox_to_anchor=(0.5, 0.003),
+    )
     fig.suptitle(
         title + "\nSetiap kolom adalah proxy yang berbeda; sumbu sama hanya di dalam satu baris marker",
         y=0.998,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.055, 0.99, 0.955), h_pad=2.0, w_pad=1.1)
+    fig.tight_layout(rect=(0.01, 0.12, 0.99, 0.955), h_pad=2.0, w_pad=1.1)
     return _save(fig, figure_dir, filename)
 
 
@@ -771,11 +795,11 @@ def _plot_correctness_sensitivity(
                 ax.scatter(
                     family_data["rank_biserial_all_responses"],
                     family_data["rank_biserial_both_correct"],
-                    s=24,
+                    s=64,
                     color=FAMILY_COLORS.get(family, "#64748B"),
-                    alpha=0.68,
+                    alpha=0.88,
                     edgecolors="white",
-                    linewidths=0.35,
+                    linewidths=0.7,
                 )
             ax.plot((-1, 1), (-1, 1), color="#475569", linewidth=0.8, linestyle="--")
             ax.axhline(0, color="#CBD5E1", linewidth=0.7)
@@ -799,7 +823,7 @@ def _plot_correctness_sensitivity(
                     ),
                     transform=ax.transAxes,
                     va="top",
-                    fontsize=7.5,
+                    fontsize=13.5,
                     bbox={"boxstyle": "round,pad=.25", "facecolor": "white", "alpha": 0.82, "edgecolor": "#CBD5E1"},
                 )
             reversals = panel[panel["material_sign_reversal"]]
@@ -813,13 +837,11 @@ def _plot_correctness_sensitivity(
                     ),
                     xytext=(3, 3),
                     textcoords="offset points",
-                    fontsize=6.5,
+                    fontsize=12.5,
                     color="#B91C1C",
                 )
-            if row_index == 1:
-                ax.set_xlabel("Rank-biserial · semua respons (analisis utama)")
-            if column_index == 0:
-                ax.set_ylabel("Rank-biserial · pasangan keduanya benar")
+    fig.supxlabel("Rank-biserial · semua respons (analisis utama)", y=0.072)
+    fig.supylabel("Rank-biserial · pasangan keduanya benar", x=0.006)
     fig.suptitle(
         "Analisis sensitivitas correctness: apakah arah efek bertahan?\n"
         "Filter diterapkan setelah pairing; hanya soal yang benar pada kedua kondisi dipertahankan",
@@ -833,7 +855,7 @@ def _plot_correctness_sensitivity(
         ha="center",
         color="#475569",
     )
-    fig.tight_layout(rect=(0.01, 0.055, 0.99, 0.94), h_pad=1.7, w_pad=1.2)
+    fig.tight_layout(rect=(0.035, 0.13, 0.99, 0.94), h_pad=1.7, w_pad=1.2)
     return _save(fig, figure_dir, "07_correctness_sensitivity_effect_concordance.png")
 
 
@@ -887,7 +909,7 @@ def _plot_opening_composition(composition: pd.DataFrame, figure_dir: Path) -> Pa
             if model_row == len(MODEL_ORDER) - 1:
                 ax.set_xlabel("Proporsi opening (jumlah = 100%)")
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=4, bbox_to_anchor=(0.5, 0.012))
+    fig.legend(handles, labels, loc="lower center", ncol=len(handles), bbox_to_anchor=(0.5, 0.012))
     fig.suptitle(
         "Komposisi kategori pembukaan respons\n"
         "Setiap bar menunjukkan distribusi seluruh kategori yang berjumlah 100%",
@@ -961,17 +983,17 @@ def _plot_lexical_group(
                 0,
                 panel["mean_model_delta_pp"],
                 color=colors,
-                linewidth=1.4,
-                alpha=0.78,
+                linewidth=2.2,
+                alpha=0.92,
             )
             ax.scatter(
                 panel["mean_model_delta_pp"],
                 positions,
                 color=colors,
-                s=42,
+                s=85,
                 zorder=3,
                 edgecolors="white",
-                linewidths=0.5,
+                linewidths=0.85,
             )
             for position, value in enumerate(panel["mean_model_delta_pp"]):
                 horizontal = "left" if value >= 0 else "right"
@@ -983,11 +1005,11 @@ def _plot_lexical_group(
                     textcoords="offset points",
                     ha=horizontal,
                     va="center",
-                    fontsize=7.2,
+                    fontsize=13,
                     color="#334155",
                 )
             ax.axvline(0, color="#334155", linewidth=0.8)
-            ax.set_yticks(positions, panel["token"], fontsize=8.5)
+            ax.set_yticks(positions, panel["token"], fontsize=15)
             ax.set_xlim(-max_effect, max_effect)
             ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
             ax.set_title(
@@ -995,8 +1017,10 @@ def _plot_lexical_group(
                 loc="left",
                 fontweight="bold",
             )
-            if row == len(contrast_ids) - 1:
-                ax.set_xlabel("Rata-rata setara per model: Δ prevalensi token per respons (pp)")
+    fig.supxlabel(
+        "Rata-rata setara per model: Δ prevalensi token per respons (pp)",
+        y=0.055,
+    )
     fig.suptitle(
         title + "\nTop-5 tiap arah; paired by question; token hadir/tidak hadir per respons; arah stabil pada ≥4/6 model",
         y=0.998,
@@ -1009,7 +1033,7 @@ def _plot_lexical_group(
         ha="center",
         color="#475569",
     )
-    fig.tight_layout(rect=(0.01, 0.05, 0.99, 0.945), h_pad=2.0, w_pad=2.2)
+    fig.tight_layout(rect=(0.01, 0.105, 0.99, 0.945), h_pad=2.0, w_pad=2.2)
     return _save(fig, figure_dir, filename)
 
 

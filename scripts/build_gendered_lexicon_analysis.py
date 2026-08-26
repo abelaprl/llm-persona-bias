@@ -422,7 +422,7 @@ def _draw_gender_cloud(
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
-    ax.set_title(title, fontsize=11, fontweight="bold", pad=3)
+    ax.set_title(title, fontsize=18, fontweight="bold", pad=5)
     terms = terms[terms["mean_model_occurrences_per_10k_words"] > 0].nlargest(
         16, "mean_model_occurrences_per_10k_words"
     )
@@ -521,12 +521,18 @@ def _plot_gender_clouds(aggregated: pd.DataFrame, figure_dir: Path) -> Path:
         Line2D([0], [0], marker="o", linestyle="", color=COLORS["masculine"], label="Masculine terms"),
         Line2D([0], [0], marker="o", linestyle="", color=COLORS["feminine"], label="Feminine terms"),
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.022))
+    fig.legend(
+        handles=handles,
+        loc="lower center",
+        ncol=2,
+        bbox_to_anchor=(0.5, 0.022),
+        fontsize=18,
+    )
     fig.suptitle(
         "Penyebutan gender dalam respons model per persona\n"
         "Ukuran kata = rata-rata setara antar-model dari kemunculan per 10.000 kata",
         y=0.995,
-        fontsize=17,
+        fontsize=20,
         fontweight="bold",
     )
     fig.text(
@@ -535,7 +541,7 @@ def _plot_gender_clouds(aggregated: pd.DataFrame, figure_dir: Path) -> Path:
         "Dari leksikon 52 kata gender, tiap panel menampilkan 16 yang paling sering muncul. Panel N memakai baseline neutral yang sama.",
         ha="center",
         color="#475569",
-        fontsize=9,
+        fontsize=14,
     )
     fig.tight_layout(rect=(0.02, 0.075, 0.98, 0.955), h_pad=1.7, w_pad=1.5)
     path = figure_dir / "11_gendered_terms_wordcloud_by_persona.png"
@@ -565,22 +571,29 @@ def _plot_model_pronoun_prevalence(class_table: pd.DataFrame, figure_dir: Path) 
                     x,
                     values,
                     marker="o",
-                    linewidth=1.35,
-                    markersize=4.2,
+                    linewidth=2,
+                    markersize=7.5,
                     linestyle=linestyle,
                     color=color,
                     label=f"{class_label} · {identity.title()}",
                 )
-        ax.set_xticks(x, ("N", "E", "I1", "I2", "I3"), fontsize=8)
-        ax.set_ylabel("Respons yang memuat pronoun (%)")
+        ax.set_xticks(x, ("N", "E", "I1", "I2", "I3"), fontsize=15)
         ax.set_title(MODEL_LABELS[model_id], loc="left", fontweight="bold")
         ax.grid(axis="y", color="#E2E8F0", linewidth=0.6)
+    fig.supylabel("Respons yang memuat pronoun (%)", x=0.012)
     handles, labels = axes.flat[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 0.94))
+    fig.legend(
+        handles,
+        labels,
+        loc="upper center",
+        ncol=4,
+        bbox_to_anchor=(0.5, 0.94),
+        fontsize=18,
+    )
     fig.suptitle(
         "Pemakaian pronoun gender pada setiap model × persona",
         y=0.985,
-        fontsize=17,
+        fontsize=20,
         fontweight="bold",
     )
     fig.text(
@@ -589,9 +602,9 @@ def _plot_model_pronoun_prevalence(class_table: pd.DataFrame, figure_dir: Path) 
         "Garis utuh = persona Man; garis putus-putus = persona Woman. Keduanya berawal dari baseline neutral yang sama.",
         ha="center",
         color="#475569",
-        fontsize=9,
+        fontsize=14,
     )
-    fig.tight_layout(rect=(0.02, 0.055, 0.98, 0.925), h_pad=2.0, w_pad=1.5)
+    fig.tight_layout(rect=(0.065, 0.055, 0.98, 0.925), h_pad=2.0, w_pad=1.5)
     path = figure_dir / "12_gender_pronoun_prevalence_by_model_persona.png"
     fig.savefig(path, dpi=230, bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -627,9 +640,9 @@ def _plot_pronoun_gender_forest(paired: pd.DataFrame, figure_dir: Path) -> Path:
                         [[max(effect - point["ci_low_pp"], 0)], [max(point["ci_high_pp"] - effect, 0)]]
                     ),
                     fmt="o",
-                    markersize=4.7,
-                    capsize=2.2,
-                    elinewidth=1,
+                    markersize=8,
+                    capsize=3.5,
+                    elinewidth=1.45,
                     color=COLORS["masculine"] if class_id == "masculine_pronoun" else COLORS["feminine"],
                 )
             ax.axvline(0, color="#334155", linewidth=0.8)
@@ -642,7 +655,7 @@ def _plot_pronoun_gender_forest(paired: pd.DataFrame, figure_dir: Path) -> Path:
                 ax.set_yticks(
                     [y_lookup[model_id] for model_id in MODEL_ORDER],
                     [MODEL_LABELS[model_id] for model_id in MODEL_ORDER],
-                    fontsize=8,
+                    fontsize=15,
                 )
                 ax.set_ylabel(
                     "Masculine pronouns" if class_id == "masculine_pronoun" else "Feminine pronouns",
@@ -650,27 +663,33 @@ def _plot_pronoun_gender_forest(paired: pd.DataFrame, figure_dir: Path) -> Path:
                 )
             else:
                 ax.set_yticks([])
-            if row == 1:
-                ax.set_xlabel("Man − Woman (pp), 95% paired bootstrap CI")
+    fig.supxlabel("Man − Woman (pp), 95% paired bootstrap CI", y=0.03)
     fig.suptitle(
         "Perbedaan langsung pemakaian pronoun: persona Man minus Woman\n"
         "Setiap titik dipasangkan pada model dan pertanyaan yang sama",
         y=0.995,
-        fontsize=17,
+        fontsize=20,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.04, 0.99, 0.91), h_pad=2.0, w_pad=1.2)
+    fig.tight_layout(rect=(0.01, 0.08, 0.99, 0.91), h_pad=2.0, w_pad=1.2)
     path = figure_dir / "13_gender_pronoun_direct_man_vs_woman_forest.png"
     fig.savefig(path, dpi=230, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     return path
 
 
-def refresh_gendered_lexicon_figures(bundle_dir: Path) -> tuple[Path, ...]:
+def refresh_gendered_lexicon_figures(
+    bundle_dir: Path,
+    figure_dir: Path | None = None,
+) -> tuple[Path, ...]:
     """Redraw the three gender-lexicon figures from their existing CSV tables."""
 
     bundle_dir = bundle_dir.resolve()
-    figure_dir = bundle_dir / "images"
+    figure_dir = (
+        figure_dir.resolve()
+        if figure_dir is not None
+        else bundle_dir / "images"
+    )
     required = (
         bundle_dir / "gendered_term_persona_aggregate.csv",
         bundle_dir / "gender_pronoun_class_prevalence.csv",

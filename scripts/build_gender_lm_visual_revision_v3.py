@@ -23,13 +23,22 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts.build_gender_lm_visual_revision_v2 import (
     CONDITION_LABELS,
+    EXPLICIT_COMPARATOR_CONTRASTS,
     FAMILY_COLORS,
     FAMILY_LABELS,
     MODEL_LABELS,
     MODEL_ORDER,
+    NEUTRAL_CONTRASTS,
     OUTCOME_LABELS,
     _load_analysis_frame,
+    _plot_correctness_sensitivity,
+    _plot_coverage,
+    _plot_lexical_group,
+    _plot_opening_composition,
+    _plot_proxy_presence_forest,
     _plot_style,
+    _plot_volcano_group,
+    _plot_word_count,
     build_revision_bundle,
 )
 from scripts.build_gendered_lexicon_analysis import (
@@ -88,6 +97,7 @@ def _prepare_from_base(base_bundle: Path, output_dir: Path, bootstrap_resamples:
             "gendered_lexicon_metadata.json",
         ),
     )
+    _plot_style()
     refresh_gendered_lexicon_figures(output_dir)
     prevalence = pd.read_csv(output_dir / "gender_pronoun_class_prevalence.csv")
     n_available = int(
@@ -206,30 +216,30 @@ def _plot_direct_numeric_volcano(numeric: pd.DataFrame, figure_dir: Path) -> Pat
     )
     data["neg_log10_p_holm"] = -np.log10(p_values)
     y_cap = 50.0
-    fig, axes = plt.subplots(1, 4, figsize=(20, 5.7), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(20, 7.2), sharex=True, sharey=True)
     for ax, condition in zip(axes, GENDER_DIRECT_CONDITIONS):
         panel = data[data["condition"].eq(condition)]
         for family, group in panel.groupby("outcome_family", sort=True):
-            sizes = 11 + 7 * np.log10(
+            sizes = 42 + 22 * np.log10(
                 pd.to_numeric(group["n_nonzero"], errors="coerce").fillna(0) + 1
             )
             ax.scatter(
                 group["rank_biserial"],
                 group["neg_log10_p_holm"].clip(upper=y_cap),
                 s=sizes,
-                alpha=np.where(group["p_holm"].lt(0.05), 0.82, 0.22),
+                alpha=np.where(group["p_holm"].lt(0.05), 0.95, 0.55),
                 color=FAMILY_COLORS.get(family, "#64748B"),
                 edgecolors="white",
-                linewidths=0.35,
+                linewidths=0.75,
             )
         ax.axvline(0, color="#334155", linewidth=0.8)
         ax.axhline(-math.log10(0.05), color="#94A3B8", linestyle="--", linewidth=0.8)
         ax.set_xlim(-1.02, 1.02)
         ax.set_ylim(-0.2, y_cap + 1)
         ax.set_title(CONDITION_LABELS[condition], fontweight="bold")
-        ax.set_xlabel("Rank-biserial Man − Woman")
         ax.grid(color="#E2E8F0", linewidth=0.55)
-    axes[0].set_ylabel("−log₁₀(p Holm), ditampilkan sampai 50")
+    fig.supxlabel("Rank-biserial Man − Woman", y=0.095)
+    fig.supylabel("−log₁₀(p Holm), ditampilkan sampai 50", x=0.006)
     families = [f for f in FAMILY_COLORS if f in set(data["outcome_family"])]
     handles = [
         Line2D(
@@ -239,18 +249,23 @@ def _plot_direct_numeric_volcano(numeric: pd.DataFrame, figure_dir: Path) -> Pat
             linestyle="",
             color=FAMILY_COLORS[family],
             label=FAMILY_LABELS.get(family, family),
-            markersize=6,
+            markersize=12,
         )
         for family in families
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=min(4, len(handles)))
+    fig.legend(
+        handles=handles,
+        loc="lower center",
+        ncol=len(handles),
+        bbox_to_anchor=(0.5, 0.005),
+    )
     fig.suptitle(
         "Uji langsung marker numerik: persona Man minus Woman\n"
         "Tiap titik = satu model × marker; ukuran menunjukkan jumlah pasangan yang berubah",
         y=0.995,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.11, 0.99, 0.90), w_pad=1.2)
+    fig.tight_layout(rect=(0.04, 0.17, 0.99, 0.90), w_pad=1.2)
     return _save(fig, figure_dir, "14_direct_gender_numeric_volcano.png")
 
 
@@ -285,29 +300,29 @@ def _plot_direct_effect_consistency(numeric: pd.DataFrame, figure_dir: Path) -> 
             outcome = point["outcome_id"]
             if outcome not in y_lookup:
                 continue
-            size = 10 + 7 * math.log10(float(point["n_nonzero"]) + 1)
+            size = 36 + 18 * math.log10(float(point["n_nonzero"]) + 1)
             ax.scatter(
                 point["rank_biserial"],
                 y_lookup[outcome],
                 s=size,
                 color=model_colors[point["model_id"]],
-                alpha=0.85 if point["p_holm"] < 0.05 else 0.24,
+                alpha=0.97 if point["p_holm"] < 0.05 else 0.55,
                 edgecolors="white",
-                linewidths=0.35,
+                linewidths=0.7,
             )
         medians = panel.groupby("outcome_id")["rank_biserial"].median()
         for outcome, value in medians.items():
             if outcome in y_lookup:
-                ax.scatter(value, y_lookup[outcome], marker="D", s=27, color="#111827", zorder=4)
+                ax.scatter(value, y_lookup[outcome], marker="D", s=70, color="#111827", zorder=4)
         ax.axvline(0, color="#334155", linewidth=0.8)
         ax.set_xlim(-1.02, 1.02)
         ax.set_title(CONDITION_LABELS[condition], fontweight="bold")
-        ax.set_xlabel("Rank-biserial Man − Woman")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
+    fig.supxlabel("Rank-biserial Man − Woman", y=0.075)
     axes[0].set_yticks(
         [y_lookup[outcome] for outcome in outcomes],
         [OUTCOME_LABELS.get(outcome, outcome) for outcome in outcomes],
-        fontsize=8,
+        fontsize=15,
     )
     handles = [
         Line2D([0], [0], marker="o", linestyle="", color=model_colors[m], label=MODEL_LABELS[m])
@@ -315,14 +330,19 @@ def _plot_direct_effect_consistency(numeric: pd.DataFrame, figure_dir: Path) -> 
     ] + [
         Line2D([0], [0], marker="D", linestyle="", color="#111827", label="Median 6 model")
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=4)
+    fig.legend(
+        handles=handles,
+        loc="lower center",
+        ncol=len(handles),
+        bbox_to_anchor=(0.5, 0.003),
+    )
     fig.suptitle(
         "Konsistensi arah efek Man minus Woman pada enam model\n"
         "Titik pudar = p Holm ≥ 0,05; ukuran menunjukkan pasangan nonzero",
         y=0.995,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.09, 0.99, 0.93), w_pad=1.0)
+    fig.tight_layout(rect=(0.01, 0.14, 0.99, 0.93), w_pad=1.0)
     return _save(fig, figure_dir, "15_direct_gender_effect_consistency.png")
 
 
@@ -358,9 +378,9 @@ def _plot_direct_availability(availability: pd.DataFrame, figure_dir: Path) -> P
                     ),
                     fmt="o",
                     color=colors[outcome],
-                    alpha=0.95 if point["p_holm"] < 0.05 else 0.38,
-                    capsize=2.2,
-                    markersize=5,
+                    alpha=0.95 if point["p_holm"] < 0.05 else 0.55,
+                    capsize=3.5,
+                    markersize=8,
                 )
             ax.axvline(0, color="#334155", linewidth=0.8)
             ax.set_xlim(-bound, bound)
@@ -371,20 +391,19 @@ def _plot_direct_availability(availability: pd.DataFrame, figure_dir: Path) -> P
                 ax.set_yticks(
                     [y_lookup[m] for m in MODEL_ORDER],
                     [MODEL_LABELS[m] for m in MODEL_ORDER],
-                    fontsize=8,
+                    fontsize=15,
                 )
                 ax.set_ylabel(labels[outcome], fontweight="bold")
             else:
                 ax.set_yticks([])
-            if row == 1:
-                ax.set_xlabel("Man − Woman (pp), 95% paired CI")
+    fig.supxlabel("Man − Woman (pp), 95% paired CI", y=0.03)
     fig.suptitle(
         "Audit differential availability sebelum menafsirkan efek gender\n"
         "Nilai negatif pada teks tersedia berarti coverage persona Man lebih rendah",
         y=0.995,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.04, 0.99, 0.91), h_pad=1.8, w_pad=1.1)
+    fig.tight_layout(rect=(0.01, 0.08, 0.99, 0.91), h_pad=1.8, w_pad=1.1)
     return _save(fig, figure_dir, "16_direct_gender_availability_forest.png")
 
 
@@ -393,22 +412,22 @@ def _plot_direct_opening(opening: pd.DataFrame, figure_dir: Path) -> Path:
     data["tv_pp"] = 100 * data["marginal_total_variation"]
     y_lookup = {model: len(MODEL_ORDER) - 1 - i for i, model in enumerate(MODEL_ORDER)}
     xmax = max(1.0, float(data["tv_pp"].max()) * 1.18)
-    fig, axes = plt.subplots(1, 4, figsize=(20, 5.8), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(20, 7.2), sharex=True, sharey=True)
     for ax, condition in zip(axes, GENDER_DIRECT_CONDITIONS):
         panel = data[data["condition"].eq(condition)]
         for _, point in panel.iterrows():
             y = y_lookup[point["model_id"]]
             color = "#7C3AED" if point["p_holm"] < 0.05 else "#94A3B8"
-            ax.hlines(y, 0, point["tv_pp"], color=color, linewidth=1.6)
-            ax.scatter(point["tv_pp"], y, color=color, s=42, zorder=3)
+            ax.hlines(y, 0, point["tv_pp"], color=color, linewidth=2.5)
+            ax.scatter(point["tv_pp"], y, color=color, s=85, zorder=3)
         ax.set_xlim(0, xmax)
         ax.set_title(CONDITION_LABELS[condition], fontweight="bold")
-        ax.set_xlabel("Marginal total variation (pp)")
         ax.grid(axis="x", color="#E2E8F0", linewidth=0.6)
+    fig.supxlabel("Marginal total variation (pp)", y=0.03)
     axes[0].set_yticks(
         [y_lookup[m] for m in MODEL_ORDER],
         [MODEL_LABELS[m] for m in MODEL_ORDER],
-        fontsize=8,
+        fontsize=15,
     )
     fig.suptitle(
         "Perbedaan langsung komposisi opening: Man vs Woman\n"
@@ -416,8 +435,130 @@ def _plot_direct_opening(opening: pd.DataFrame, figure_dir: Path) -> Path:
         y=0.995,
         fontweight="bold",
     )
-    fig.tight_layout(rect=(0.01, 0.04, 0.99, 0.90), w_pad=1.2)
+    fig.tight_layout(rect=(0.01, 0.08, 0.99, 0.90), w_pad=1.2)
     return _save(fig, figure_dir, "17_direct_gender_opening_composition.png")
+
+
+def refresh_v3_figures(
+    bundle_dir: Path,
+    figure_dir: Path | None = None,
+) -> tuple[Path, ...]:
+    """Redraw all notebook figures from existing tables without recomputing tests."""
+
+    bundle_dir = bundle_dir.resolve()
+    manifest_path = bundle_dir / "manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    run_dir = Path(manifest["source_run"]).resolve()
+    figure_dir = (
+        figure_dir.resolve()
+        if figure_dir is not None
+        else bundle_dir / "images"
+    )
+    figure_dir.mkdir(parents=True, exist_ok=True)
+
+    bundle_tables = {
+        "coverage": bundle_dir / "response_counts_model_persona.csv",
+        "sensitivity": bundle_dir / "correctness_sensitivity_comparison.csv",
+        "sensitivity_summary": bundle_dir / "correctness_sensitivity_summary.csv",
+        "opening": bundle_dir / "opening_composition.csv",
+        "lexical": bundle_dir / "lexical_contrast_token_weights.csv",
+        "direct_numeric": bundle_dir / "direct_gender_paired_numeric.csv",
+        "direct_availability": bundle_dir / "direct_gender_availability.csv",
+        "direct_opening": bundle_dir / "direct_gender_opening_multinomial.csv",
+    }
+    source_tables = {
+        "descriptives": run_dir / "condition_descriptives.csv",
+        "numeric": run_dir / "paired_numeric.csv",
+        "presence": run_dir / "paired_binary.csv",
+    }
+    missing = [
+        path
+        for path in (*bundle_tables.values(), *source_tables.values())
+        if not path.is_file()
+    ]
+    if missing:
+        raise FileNotFoundError(
+            "Cannot refresh figures; missing tables: "
+            + ", ".join(str(path) for path in missing)
+        )
+
+    _plot_style()
+    tables = {
+        name: pd.read_csv(path)
+        for name, path in {**bundle_tables, **source_tables}.items()
+    }
+    figures: list[Path] = [
+        _plot_coverage(tables["coverage"], figure_dir),
+        _plot_word_count(tables["descriptives"], figure_dir),
+        _plot_volcano_group(
+            tables["numeric"],
+            NEUTRAL_CONTRASTS,
+            figure_dir,
+            "03_numeric_effect_volcano_vs_neutral.png",
+            "Effect map marker numerik terhadap baseline neutral",
+        ),
+        _plot_volcano_group(
+            tables["numeric"],
+            EXPLICIT_COMPARATOR_CONTRASTS,
+            figure_dir,
+            "04_numeric_effect_volcano_implicit_vs_explicit.png",
+            "Effect map tiga proxy implicit terhadap explicit",
+        ),
+        _plot_proxy_presence_forest(
+            tables["presence"],
+            (
+                "organization_explicit_step",
+                "connective_causal",
+                "math_latex_display",
+            ),
+            figure_dir,
+            "05_proxy_presence_forest_structure_logic.png",
+            "Forest plot proxy implicit: struktur, koneksi logis, dan format matematis",
+        ),
+        _plot_proxy_presence_forest(
+            tables["presence"],
+            (
+                "stance_hedge",
+                "stance_self_correction",
+                "self_reference_inclusive_we",
+            ),
+            figure_dir,
+            "06_proxy_presence_forest_stance_voice.png",
+            "Forest plot proxy implicit: stance dan suara penalaran",
+        ),
+        _plot_correctness_sensitivity(
+            tables["sensitivity"],
+            tables["sensitivity_summary"],
+            figure_dir,
+        ),
+        _plot_opening_composition(tables["opening"], figure_dir),
+        _plot_lexical_group(
+            tables["lexical"],
+            NEUTRAL_CONTRASTS,
+            figure_dir,
+            "09_ranked_lexical_lollipop_vs_neutral.png",
+            "Token distingtif persona terhadap neutral",
+        ),
+        _plot_lexical_group(
+            tables["lexical"],
+            EXPLICIT_COMPARATOR_CONTRASTS,
+            figure_dir,
+            "10_ranked_lexical_lollipop_implicit_vs_explicit.png",
+            "Token distingtif tiga proxy implicit terhadap explicit",
+        ),
+    ]
+    figures.extend(refresh_gendered_lexicon_figures(bundle_dir, figure_dir))
+    figures.extend(
+        (
+            _plot_direct_numeric_volcano(tables["direct_numeric"], figure_dir),
+            _plot_direct_effect_consistency(tables["direct_numeric"], figure_dir),
+            _plot_direct_availability(tables["direct_availability"], figure_dir),
+            _plot_direct_opening(tables["direct_opening"], figure_dir),
+        )
+    )
+    return tuple(figures)
 
 
 def build_v3(
