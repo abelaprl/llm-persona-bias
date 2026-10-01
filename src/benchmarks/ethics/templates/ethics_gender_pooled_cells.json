@@ -1,0 +1,217 @@
+[
+  {
+    "cell_type": "markdown",
+    "id": "ethics-gabungan",
+    "metadata": {},
+    "source": [
+      "## ETHICS Gabungan\n",
+      "\n",
+      "Empat subset digabung pada tingkat respons, dengan bobot yang sama untuk setiap respons. Model dan skenario tetap dipisahkan. Density per 100 kata diringkas dari nilai setiap respons, bukan dari jumlah hit dibagi seluruh kata. P-value dan effect size dihitung ulang, bukan dirata-ratakan dari tabel per subset.\n",
+      "\n",
+      "Pasangan berasal dari soal dan subset asal yang sama. Semua teks penjelasan yang tersedia, termasuk abstain, masuk analisis utama; teks yang tidak tersedia tetap NA. Tabel bobot menunjukkan kontribusi masing-masing subset. Hasil masih candidate dan bukan akurasi ETHICS gabungan.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-setup",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "from pathlib import Path\n",
+      "import hashlib\n",
+      "import json\n",
+      "import pandas as pd\n",
+      "from IPython.display import display, Image, Markdown\n",
+      "\n",
+      "POOL_ROOT = next(p for p in [Path.cwd().resolve(), *Path.cwd().resolve().parents]\n",
+      "                 if (p / \"src\").is_dir() and (p / \"result\").is_dir())\n",
+      "POOLED = POOL_ROOT / \"__POOLED_RELATIVE__\"\n",
+      "pool_manifest = json.loads((POOLED / \"manifest.json\").read_text(encoding=\"utf-8\"))\n",
+      "pool_validation = json.loads((POOLED / \"validation.json\").read_text(encoding=\"utf-8\"))\n",
+      "assert pool_validation[\"valid\"] and pool_manifest[\"result_status\"] == \"candidate\"\n",
+      "for pool_name, pool_expected in json.loads((POOLED / \"artifact_hashes.json\").read_text(encoding=\"utf-8\")).items():\n",
+      "    with (POOLED / pool_name).open(\"rb\") as pool_handle:\n",
+      "        assert hashlib.file_digest(pool_handle, \"sha256\").hexdigest() == pool_expected, pool_name\n",
+      "\n",
+      "def pooled_table(name):\n",
+      "    return pd.read_csv(POOLED / (name + \".csv\"))\n",
+      "\n",
+      "def pooled_results(name):\n",
+      "    frame = pooled_table(name)\n",
+      "    columns = [c for c in (\"model_id\", \"identity\", \"condition\", \"outcome_id\", \"contrast_id\",\n",
+      "        \"n_pairs\", \"n_nonzero\", \"test_used\", \"median_paired_delta\", \"rank_biserial\",\n",
+      "        \"prevalence_delta\", \"ci_low\", \"ci_high\", \"marginal_total_variation\",\n",
+      "        \"raw_count_sum_left\", \"raw_count_sum_right\", \"p_raw\", \"p_holm\") if c in frame]\n",
+      "    display(frame[columns].head(24))\n",
+      "    display(Markdown(f\"Tabel lengkap: {name}.csv ({len(frame):,} baris)\"))\n",
+      "\n",
+      "def pooled_figure(name):\n",
+      "    display(Image(filename=str(POOLED / \"images\" / name), width=1500))\n",
+      "\n",
+      "print(f\"{pool_manifest['rows']:,} respons | {pool_manifest['questions']:,} soal | \"\n",
+      "      f\"{pool_manifest['models']} model | {pool_manifest['personas']} skenario\")\n",
+      "display(Markdown(\"**Jumlah respons dan coverage**\"))\n",
+      "display(pooled_table(\"coverage\"))\n",
+      "pool_weights = pooled_table(\"subset_weights\").groupby(\"source_subset\")[[\"total\", \"available\"]].sum()\n",
+      "pool_weights[\"response_share\"] = pool_weights.total / pool_weights.total.sum()\n",
+      "pool_weights[\"visible_share\"] = pool_weights.available / pool_weights.available.sum()\n",
+      "display(Markdown(\"**Bobot subset**\"))\n",
+      "display(pool_weights)\n",
+      "display(Markdown(\"**Jumlah dan density marker**\"))\n",
+      "display(pooled_table(\"marker_descriptives\").head(27))\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-neutral-title",
+    "metadata": {},
+    "source": [
+      "### Terhadap Netral\n",
+      "\n",
+      "E, I1, I2, dan I3 dibandingkan dengan N, masing-masing untuk Man dan Woman. Titik pekat menunjukkan p Holm < 0,05; titik pudar tidak melewati ambang tersebut. Berlian hitam adalah median deskriptif effect size, bukan hasil uji gabungan lintas model.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-neutral",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "pooled_results(\"numeric_vs_neutral_all_text\")\n",
+      "pooled_figure(\"01_terhadap_netral.png\")\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-explicit-title",
+    "metadata": {},
+    "source": [
+      "### Implisit dan Eksplisit\n",
+      "\n",
+      "Arah selisih adalah I1/I2/I3 dikurangi E. Perbandingan ini juga memuat perbedaan warmup dan riwayat dialog. Sumbu grafik menunjukkan rank-biserial; CI pada tabel berlaku untuk median selisih berpasangan, bukan rank-biserial.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-explicit",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "pooled_results(\"numeric_vs_explicit_all_text\")\n",
+      "pooled_figure(\"02_implisit_eksplisit.png\")\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-direct-title",
+    "metadata": {},
+    "source": [
+      "### Laki-laki dan Perempuan\n",
+      "\n",
+      "Arah selisih adalah Man dikurangi Woman pada E, I1, I2, dan I3. Nilai positif berarti ukuran tersebut lebih tinggi pada Man. Baca jumlah pasangan nonzero bersama effect size, terutama pada marker yang jarang muncul.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-direct",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "pooled_results(\"numeric_direct_all_text\")\n",
+      "pooled_figure(\"03_laki_laki_perempuan.png\")\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-gender-title",
+    "metadata": {},
+    "source": [
+      "### Marker Gender\n",
+      "\n",
+      "Sebelas marker gender dibandingkan melalui selisih prevalensi respons yang memuat marker. Grafik memakai poin persentase; selisih dan CI pada CSV memakai proporsi. Empat marker juga mempunyai pengukuran density. Jumlah mentah tersedia pada tabel deskriptif dan tabel pasangan density. Kamus tidak diubah; audit semantik marker tetap diperlukan.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-gender",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "for pool_stem, pool_image in (\n",
+      "    (\"vs_neutral\", \"04_gender_vs_neutral.png\"),\n",
+      "    (\"vs_explicit\", \"05_gender_vs_explicit.png\"),\n",
+      "    (\"direct\", \"06_gender_direct.png\"),\n",
+      "):\n",
+      "    pooled_results(f\"gender_presence_{pool_stem}_all_text\")\n",
+      "    pooled_results(f\"gender_density_{pool_stem}_all_text\")\n",
+      "    pooled_figure(pool_image)\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-opening-title",
+    "metadata": {},
+    "source": [
+      "### Pembuka Respons\n",
+      "\n",
+      "Komposisi kategori pembuka diuji dengan Stuart–Maxwell. Besar perbedaannya disajikan sebagai marginal total variation, bersama jumlah pasangan dan p Holm.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-opening",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "pooled_results(\"opening_within_all_text\")\n",
+      "pooled_results(\"opening_direct_all_text\")\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-sensitivity-title",
+    "metadata": {},
+    "source": [
+      "### Sensitivitas\n",
+      "\n",
+      "Analisis kedua hanya memakai pasangan yang keduanya committed. Tabel berikut menunjukkan pasangan yang bertahan dan pembalikan arah effect size. Ini merupakan sampel terseleksi, bukan pengganti seluruh teks. Komposisi pasangan Man–Woman pada E ditampilkan sebagai contoh; seluruh perbandingan tersedia pada pair_composition.csv.\n"
+    ]
+  },
+  {
+    "cell_type": "code",
+    "execution_count": null,
+    "id": "pooled-sensitivity",
+    "metadata": {},
+    "outputs": [],
+    "source": [
+      "pool_sensitivity = pooled_table(\"sensitivity\")\n",
+      "display(pool_sensitivity.groupby([\"family\", \"comparison\"]).agg(\n",
+      "    comparisons=(\"direction_reversed\", \"size\"),\n",
+      "    direction_reversed=(\"direction_reversed\", \"sum\"),\n",
+      "    mean_pair_retention=(\"pair_retention\", \"mean\")))\n",
+      "display(pooled_table(\"pair_composition\").query(\n",
+      "    \"left_persona == 'man_explicit_1' and right_persona == 'woman_explicit_1' and outcome_id == 'available'\"))\n",
+      "print(\"Validasi gabungan:\", pool_validation[\"valid\"])\n"
+    ]
+  },
+  {
+    "cell_type": "markdown",
+    "id": "pooled-notes",
+    "metadata": {},
+    "source": [
+      "### Catatan Agregasi\n",
+      "\n",
+      "Gabungan dapat menutupi arah yang berbeda antar-subset. Bobot dapat berubah antarperbandingan ketika jumlah pasangan tersedia berbeda. TTR-300 dapat tidak tersedia walaupun teks tersedia; dukungan pasangan ukuran ini dihitung terpisah. Hasil per subset di atas tetap menjadi pembanding saat membaca grafik gabungan.\n",
+      "\n",
+      "Metode mengikuti implementasi sebelumnya: sign test dapat dipilih sebagai uji utama ketika selisih sangat jarang atau tidak simetris. Perbedaannya dengan Bab IV belum diselesaikan. Holm diterapkan atas tujuh kontras per model, identitas, dan marker untuk perbandingan antarskenario; empat kontras per model dan marker untuk Man–Woman. Pengujian pembuka memakai keluarga tujuh atau empat kontras. Koreksi bagian gabungan tidak digabung dengan pengujian per subset yang sudah ada.\n",
+      "\n",
+      "Bagian ini ditambahkan setelah hasil per subset tersedia. Semua hasil masih candidate; audit manusia dan keterbatasan prompt deontology/virtue tetap berlaku.\n"
+    ]
+  }
+]
