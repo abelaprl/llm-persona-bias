@@ -3,7 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 
 REPORT = Path('apply_extractor34_report.json')
-OUT = Path('scripts') / 'analyze_apply_report.json'
+OUT = Path('.codex_tmp') / 'analyze_apply_report.json'
 
 with open(REPORT, 'r', encoding='utf-8') as f:
     report = json.load(f)

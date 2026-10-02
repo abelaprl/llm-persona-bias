@@ -135,7 +135,7 @@ for r in results[:50]:
     print(f"  json={r['json_path']}")
 
 # write detailed CSV
-out = Path('scripts/reextract_analysis_output.csv')
+out = Path('.codex_tmp/reextract_analysis_output.csv')
 with out.open('w', encoding='utf-8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(['index','question_id','status','csv_extracted','reextracted','ground_truth','json_path','note'])

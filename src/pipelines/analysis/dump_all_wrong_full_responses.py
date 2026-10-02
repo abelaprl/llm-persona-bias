@@ -5,7 +5,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[3]
 result_dir = root / 'result'
-out_file = root / 'scripts' / 'all_mismatches_full_responses.json'
+out_file = root / '.codex_tmp' / 'all_mismatches_full_responses.json'
 
 mismatches = []
 count = 0

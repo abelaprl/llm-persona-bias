@@ -30,9 +30,9 @@ from matplotlib.markers import MarkerStyle
 from matplotlib.text import Text
 import numpy as np
 import pandas as pd
-from scripts import build_gender_lm_visual_revision_v2 as v2
-from scripts import build_gender_lm_visual_revision_v3 as v3
-from scripts import build_gendered_lexicon_analysis as lex
+from src.pipelines.analysis.gender_visuals import revision_v2 as v2
+from src.pipelines.analysis.gender_visuals import revision_v3 as v3
+from src.pipelines.analysis.gender_visuals import lexicon_analysis as lex
 from src.benchmarks.ethics.gender_lm_terminology import display_text, model_display, MODEL_NAMES
 from src.benchmarks.ethics import build_gender_ethics_lm_print as ethics
 

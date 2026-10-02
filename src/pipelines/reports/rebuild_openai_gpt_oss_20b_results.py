@@ -6,7 +6,7 @@ import importlib.util
 script_dir = os.path.dirname(os.path.abspath(__file__))
 repo_root = os.path.abspath(os.path.join(script_dir, '..', '..', '..'))
 sys.path.insert(0, repo_root)
-from scripts.rebuild_results_csv import extract_final_answer, get_response_text
+from src.core.extract.rebuild_results_csv_root import extract_final_answer, get_response_text
 
 RESULT_ROOT = os.path.join(repo_root, 'result', 'openai_gpt-oss-20b')
 OUTPUT_CSV = os.path.join(repo_root, 'apply_extractor_openai_gpt_oss_20b.csv')

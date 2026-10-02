@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 from src.benchmarks.ethics.gender_lm_v2 import reporting as report
 
 BUNDLE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
-REFERENCE = ROOT / "scripts/build_gender_lm_visual_revision_v2.py"
+REFERENCE = ROOT / "src/tools/build_gender_lm_visual_revision_v2.py"
 STYLE_VERSION = "gender-ethics-gsm8k-presentation-v1"
 
 LABELS = {

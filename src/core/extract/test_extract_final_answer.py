@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, '.')
-from scripts.rebuild_results_csv import extract_final_answer, normalize_number
+from src.core.extract.rebuild_results_csv_root import extract_final_answer, normalize_number
 
 def test_extract():
     tests = [

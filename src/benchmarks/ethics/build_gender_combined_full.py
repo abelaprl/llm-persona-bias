@@ -1,7 +1,7 @@
 """Build an audited full-text ETHICS CSV for Gender plus Neutral personas.
 
 This is the ETHICS counterpart of
-``scripts/build_gsm8k_regional_combined_full.py``.  It preserves every column
+``src/tools/build_gsm8k_regional_combined_full.py``.  It preserves every column
 from the canonical model-level report CSVs and only concatenates rows; answers
 are never reparsed or rescored here.
 

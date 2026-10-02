@@ -4,7 +4,7 @@ import unittest
 
 import pandas as pd
 
-from scripts.build_gendered_lexicon_analysis import (
+from src.pipelines.analysis.gender_visuals.lexicon_analysis import (
     _paired_pronoun_classes,
     _paired_pronoun_gender_direct,
     tokenize_gender_terms,

@@ -3,8 +3,8 @@ import csv
 import re
 import os
 
-INFILE = os.path.join('scripts', 'all_mismatches_full_responses.json')
-OUTFILE = os.path.join('scripts', 'all_mismatches_compact.csv')
+INFILE = os.path.join('.codex_tmp', 'all_mismatches_full_responses.json')
+OUTFILE = os.path.join('.codex_tmp', 'all_mismatches_compact.csv')
 
 def extract_persona(path):
     if not path:

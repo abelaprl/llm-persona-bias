@@ -2,8 +2,9 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-SRC = ROOT / 'scripts' / 'all_mismatches_full_responses.json'
-OUT = ROOT / 'scripts' / 'mismatch_examples_full_responses.json'
+ARTIFACT_ROOT = ROOT / '.codex_tmp'
+SRC = ARTIFACT_ROOT / 'all_mismatches_full_responses.json'
+OUT = ARTIFACT_ROOT / 'mismatch_examples_full_responses.json'
 
 def to_review_entry(item):
     f = item.get('file', '')
