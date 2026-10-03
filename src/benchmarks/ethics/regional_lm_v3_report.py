@@ -27,14 +27,14 @@ BOOTSTRAP_RESAMPLES = 10_000
 RANDOM_SEED = 18_222_008
 CONSTRUCT_VALID_SUBSETS = {"commonsense", "justice"}
 LEGACY_ANALYSIS = Path(
-    "result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers/analysis/"
+    "result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers/analysis/"
     "regional_lm_v2_0_1_complete_20260828"
 )
 CANONICAL_SCORING = Path(
-    "result/ETHICS/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv"
+    "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv"
 )
 AI_DIAGNOSTIC = Path(
-    "result/ETHICS/reports/regional_lm_v3_ai_diagnostic_20260916_r1/diagnostic_labels.json"
+    "result/benchmarks/ethics/reports/regional_lm_v3_ai_diagnostic_20260916_r1/diagnostic_labels.json"
 )
 
 
@@ -558,7 +558,7 @@ def _pair_statistics(candidate: pd.DataFrame, baseline_equal: bool, root: Path) 
     enable_marker_imports()
     from src.benchmarks.ethics import regional_cultural_ethics_linguistic_markers_v2 as v2
 
-    registry = pd.read_csv(root / "result/ETHICS/reports/Regional_Cultural_Persona/"
+    registry = pd.read_csv(root / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/"
                            "linguistic_markers_regional_cultural_candidate_20260822_v1_0_16/marker_registry.csv")
     _, outcomes = v2.build_outcome_dictionary(registry)
     selected = tuple(spec for spec in outcomes if spec.outcome_id in CHANGED_MARKERS)

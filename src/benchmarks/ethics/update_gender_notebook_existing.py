@@ -65,7 +65,7 @@ from IPython.display import Image, Markdown, display
 
 def find_root():
     for path in [Path.cwd(), *Path.cwd().parents]:
-        if (path / "result/ETHICS").is_dir() and (path / "notebooks").is_dir():
+        if (path / "result/benchmarks/ethics/runs").is_dir() and (path / "notebooks").is_dir():
             return path
     raise FileNotFoundError("Root repositori tidak ditemukan")
 
@@ -79,7 +79,7 @@ REVISION_DIR = NOTEBOOK_DIR
 FIGURE_DIR = REVISION_DIR / "figures"
 TABLE_DIR = REVISION_DIR / "tables"
 CHILD_DIR = NOTEBOOK_DIR / "per_subset"
-SOURCE = ROOT / "result/ETHICS/reports/Gender_Persona/_combined/persona_publication_analysis_v2_readable_paired_holm_six_models"
+SOURCE = ROOT / "result/benchmarks/ethics/reports/Gender_Persona/_combined/persona_publication_analysis_v2_readable_paired_holm_six_models"
 manifest = json.loads((REVISION_DIR / "bundle_manifest.json").read_text(encoding="utf-8"))
 source_manifest_path = SOURCE / "metadata/analysis_manifest.json"
 source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))

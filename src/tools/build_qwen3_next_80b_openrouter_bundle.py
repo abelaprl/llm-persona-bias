@@ -126,9 +126,9 @@ def collect_files() -> tuple[dict[str, Path], dict[str, Any]]:
             )
         root = ETHICS_ROOT if dataset == "ETHICS" else GSM8K_ROOT
         archive_root = (
-            PurePosixPath("result/ETHICS/v9 [THIS IS THE MAIN]")
+            PurePosixPath("result/benchmarks/ethics/runs/v9_main")
             if dataset == "ETHICS"
-            else PurePosixPath("result/GMS8K")
+            else PurePosixPath("result/benchmarks/gsm8k")
         )
         target = root.joinpath(*relative.parts)
         if target.is_file():
@@ -146,9 +146,9 @@ def collect_files() -> tuple[dict[str, Path], dict[str, Any]]:
     for dataset, relative in recovery_sources:
         root = ETHICS_ROOT if dataset == "ETHICS" else GSM8K_ROOT
         archive_root = (
-            PurePosixPath("result/ETHICS/v9 [THIS IS THE MAIN]")
+            PurePosixPath("result/benchmarks/ethics/runs/v9_main")
             if dataset == "ETHICS"
-            else PurePosixPath("result/GMS8K")
+            else PurePosixPath("result/benchmarks/gsm8k")
         )
         include(root.joinpath(*relative.parts), (archive_root / relative).as_posix())
 

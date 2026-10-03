@@ -22,7 +22,7 @@ from src.core.linguistic_markers.regional_registry import (  # noqa: E402
 
 RUN_DIR = (
     REPO_ROOT
-    / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers"
+    / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers"
     / "regional_gsm8k_full_source_aligned_v1_1_20260818"
 )
 OUTPUT_DIR = RUN_DIR / "audit_codex_contextual_review_20260818"

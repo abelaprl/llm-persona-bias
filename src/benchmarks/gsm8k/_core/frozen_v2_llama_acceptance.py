@@ -125,10 +125,10 @@ def check_semantic_replay(path):
 
 def main():
     lock = verify_source_lock()
-    base = Path(r"result\GMS8K\reports_parser_v2\Religion_Persona") / MODEL
-    audit = Path(r"result\GMS8K\audit\frozen_llama33")
+    base = Path(r"result/benchmarks/gsm8k\reports_parser_v2\Religion_Persona") / MODEL
+    audit = Path(r"result/benchmarks/gsm8k\audit\frozen_llama33")
     model_path, core_path = base / "results.csv", base / "results_core.csv"
-    replay_path = Path(r"result\GMS8K\audit\frozen_v2_semantic_replay.csv")
+    replay_path = Path(r"result/benchmarks/gsm8k\audit\frozen_v2_semantic_replay.csv")
     check_semantic_replay(replay_path)
     model_before = hashlib.sha256(model_path.read_bytes()).hexdigest()
     model = validate_one(model_path, True)
@@ -140,7 +140,7 @@ def main():
     errors = [r for r in tech if r["finish_reason"] == "error"]
     lengths = [r for r in tech if r["finish_reason"] == "length"]
     assert len(errors) == 202 and len(lengths) == 23
-    raw_root = Path(r"result\GMS8K\Religion_Persona") / MODEL
+    raw_root = Path(r"result/benchmarks/gsm8k\Religion_Persona") / MODEL
     technical_units = []
     for r in tech:
         raw_path = raw_root / Path(r["file"])
@@ -202,7 +202,7 @@ def main():
     tmp = audit / ".technical_rerun_manifest.json.tmp"
     tmp.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
     os.replace(tmp, audit / "technical_rerun_manifest.json")
-    atomic_csv(Path(r"result\GMS8K\audit\religion_persona_technical_rerun_manifest.csv"),
+    atomic_csv(Path(r"result/benchmarks/gsm8k\audit\religion_persona_technical_rerun_manifest.csv"),
                TECHNICAL_FIELDS, technical_units)
     n_audit = blind_audit(model, audit / "extraction_audit_blind_pilot.csv")
     rows = [{"gate": "model_rows", "value": len(model), "pass": True},

@@ -17,12 +17,12 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[3]
-GSM_RUN = (ROOT / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers"
+GSM_RUN = (ROOT / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers"
            / "regional_gsm8k_full_source_aligned_v1_1_20260818")
-GSM_VISUAL = (ROOT / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/visual"
+GSM_VISUAL = (ROOT / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/visual"
               / "regional_gsm8k_bab4_visual_v1_1_0_20260818")
-ETHICS_BUNDLE = ROOT / "result/ETHICS/reports/regional_ethics_presentation_20260919_r2"
-ETHICS_CANONICAL = (ROOT / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+ETHICS_BUNDLE = ROOT / "result/benchmarks/ethics/reports/regional_ethics_presentation_20260919_r2"
+ETHICS_CANONICAL = (ROOT / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
                     / "all_models_results_full.csv")
 
 MODELS = [
@@ -430,10 +430,10 @@ def _ethics_example_rows() -> pd.DataFrame:
     paths = []
     for row in rows.itertuples(index=False):
         if row.persona == "neutral":
-            path = (ROOT / "result/ETHICS/v9 [THIS IS THE MAIN]/Neutral Persona"
+            path = (ROOT / "result/benchmarks/ethics/runs/v9_main/Neutral Persona"
                     / row.model_id / row.file)
         else:
-            path = (ROOT / "result/ETHICS/v9 [THIS IS THE MAIN]/Regional Cultural Persona"
+            path = (ROOT / "result/benchmarks/ethics/runs/v9_main/Regional Cultural Persona"
                     / row.model_id / row.persona / row.file)
         paths.append(str(path))
     rows["source_path"] = paths

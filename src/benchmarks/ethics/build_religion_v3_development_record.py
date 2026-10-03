@@ -10,7 +10,7 @@ from src.benchmarks.ethics.religion_lm_v3_registry import registry_rows,FAMILIES
 from src.benchmarks.ethics.religion_lm_v3_extract import extract_final
 
 def main():
-    base = ROOT/'result/ETHICS/reports'
+    base = ROOT/'result/benchmarks/ethics/reports'
     prep = base/'religion_lm_v3_preparation_20260915_r1'
     out = create_run_directory(base/'religion_lm_v3_development_review_20260915_r1')
     files = [(prep/'targeted_full_responses.json','D'),(prep/'open_discovery_round_1.json','O1-'),

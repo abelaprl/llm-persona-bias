@@ -6,7 +6,7 @@ Benchmark all GSM8K rebuild pipelines against the Religion Persona dataset
 For each rebuild script:
   1. Run it with --input_root / --report_dir to produce results.csv
   2. Run calc_accuracy.py to produce accuracy.csv
-  3. Copy outputs to result/reports/GSM8K/ with the required filename format
+  3. Copy outputs to result/archive/reports_mixed_legacy/GSM8K/ with the required filename format
 
 Outputs:
   deepseek_deepseek-r1-distill-qwen-32b_religion_persona_<rebuild_name>.csv

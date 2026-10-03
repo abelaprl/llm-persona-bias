@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 # =======================
 # Konstanta & Fallback Mapping
 # =======================
-DEFAULT_MODEL_DIR = r'K:\Tugas Akhir\TugasAkhir\result\reports\allenai_olmo-3-32b-think'
+DEFAULT_MODEL_DIR = r'K:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\allenai_olmo-3-32b-think'
 DEFAULT_MAX_TOKENS = 2048
 DEFAULT_TOP_K = 50
 

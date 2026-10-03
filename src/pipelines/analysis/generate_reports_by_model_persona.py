@@ -1,6 +1,6 @@
 """
 Generate CSV reports organized by model and persona
-Output structure: result/reports/{model_name}/{persona_name}/results.csv
+Output structure: result/archive/reports_mixed_legacy/{model_name}/{persona_name}/results.csv
 Each CSV contains all 1319 GSM8K questions for one model-persona combination
 
 Format baseline:
@@ -475,7 +475,7 @@ def main():
     for persona_folder in sorted(persona_folders):
         persona_name = persona_folder.name
         
-        # Output path: result/reports/model_name/persona_name/results.csv
+        # Output path: result/archive/reports_mixed_legacy/model_name/persona_name/results.csv
         output_path = reports_dir / model_name / persona_name / "results.csv"
         
         # Skip if already exists unless --force

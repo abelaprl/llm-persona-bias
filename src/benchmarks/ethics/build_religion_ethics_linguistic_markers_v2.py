@@ -3,7 +3,7 @@
 Example
 -------
 python -m src.benchmarks.ethics.build_religion_ethics_linguistic_markers_v2 \
-  --output-dir result/ETHICS/reports/Religion_Persona/linguistic_markers/analysis/religion_ethics_linguistic_markers_v2_candidate_20260827
+  --output-dir result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers/analysis/religion_ethics_linguistic_markers_v2_candidate_20260827
 
 The command performs no model inference, answer reparsing, or paid API call.
 """

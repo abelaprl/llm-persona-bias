@@ -4,16 +4,16 @@ Tanggal build: 17 Agustus 2026
 
 ## Keputusan sumber
 
-Combined baru tidak memakai `result/reports/all_results_combined.csv` karena
+Combined baru tidak memakai `result/archive/reports_mixed_legacy/all_results_combined.csv` karena
 file tersebut tidak mempunyai teks respons lengkap untuk lima dari enam model
 utama dan key-nya tidak stabil. Sumber dipilih mengikuti provenance analisis
 publikasi v5:
 
 - Gender: 54 assignment report tingkat pertanyaan di
-  `result/reports/<model>/`; GPT-OSS Neutral berasal dari aggregate model karena
+  `result/archive/reports_mixed_legacy/<model>/`; GPT-OSS Neutral berasal dari aggregate model karena
   `results_neutral.csv` tidak tersedia.
 - Religion: enam report kanonis
-  `result/GMS8K/reports/Religion_Persona/<model>/results.csv`.
+  `result/benchmarks/gsm8k/reports/Religion_Persona/<model>/results.csv`.
 - Path dan SHA-256 setiap sumber harus sama dengan
   `persona_publication_analysis_v5_paired_significance_six_models/tables/source_manifest.csv`.
 
@@ -23,9 +23,9 @@ diturunkan dari filename `gsm8k_XXXXX.json`.
 ## Output
 
 - Gender: 71.215 baris tersedia di
-  `result/GMS8K/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/`.
+  `result/benchmarks/gsm8k/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/`.
 - Religion: 126.624 baris (termasuk baris missing-content eksplisit) tersedia di
-  `result/GMS8K/reports/Religion_Persona/publication_source_aligned_v1_20260817/_combined/`.
+  `result/benchmarks/gsm8k/reports/Religion_Persona/publication_source_aligned_v1_20260817/_combined/`.
 
 Setiap folder memuat:
 

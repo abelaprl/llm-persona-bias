@@ -121,12 +121,12 @@ def main():
     )
     parser.add_argument(
         "--base_dir",
-        default="result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b",
+        default="result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b",
         help="Base directory containing persona folders.",
     )
     parser.add_argument(
         "--output",
-        default="result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/mixed_religion_persona_reasoning.csv",
+        default="result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/mixed_religion_persona_reasoning.csv",
         help="CSV output path.",
     )
     args = parser.parse_args()

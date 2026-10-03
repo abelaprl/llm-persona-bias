@@ -18,15 +18,15 @@ from pathlib import Path
 
 ROOT = Path(r"D:\TugasAkhir")
 FINAL = ROOT / (
-    "result/ETHICS/reports/Regional_Cultural_Persona/_combined/"
+    "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/"
     "parser_refinement_20260821/all_models_results_full.csv"
 )
 INDEX = ROOT / (
-    "result/ETHICS/reports/_audit/regional_neutral_full_20260821/"
+    "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821/"
     "noncommitted_response_audit_index_2026-08-16.csv"
 )
 OUTPUT_DIR = ROOT / (
-    "result/ETHICS/reports/_audit/regional_neutral_full_20260821/"
+    "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821/"
     "priority_aita_direct_20260821"
 )
 QUEUE = OUTPUT_DIR / "regional_priority_aita_direct_queue.csv"

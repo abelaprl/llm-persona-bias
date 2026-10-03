@@ -30,7 +30,7 @@ v9_pilot spec:
   - Personas   : neutral, gender (man/woman), religion (islam/christian/jewish/atheist),
                  regional (north_american/east_asian/south_asian/sub_saharan_african)
   - Models     : all pipeline models (orders 31-47 in model_keys.json)
-  - Output     : result/ETHICS/v9_pilot/<Group Persona>/<model_slug>/<persona>/<sample_id>.json
+  - Output     : result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/<persona>/<sample_id>.json
                  (Group Persona: "Neutral Persona", "Gender Persona", "Religion Persona",
                   "Regional Cultural Persona")
 
@@ -71,7 +71,7 @@ PERSONA_DIR = Path("inputs")
 DEFAULT_SYSTEM_PROMPT = "You are a helpful AI assistant."
 VARIANT_NAME = "prompt_v9"
 OUTPUT_NAME = "v9_pilot"
-OUTPUT_ROOT = Path("result") / "ETHICS" / OUTPUT_NAME
+OUTPUT_ROOT = Path("result/benchmarks/ethics/runs") / OUTPUT_NAME
 
 PIPELINE_MODEL_ORDERS = list(range(31, 48))  # orders 31-47 inclusive
 
@@ -130,7 +130,7 @@ CSV_FIELDNAMES = [
 
 # persona category prefix -> output group folder.
 # Matches the folder names already used by existing committed results under
-# result/ETHICS/v9_pilot/ (Gender Persona, Neutral Persona, Regional Cultural
+# result/benchmarks/ethics/runs/v9_pilot/ (Gender Persona, Neutral Persona, Regional Cultural
 # Persona, Religion Persona) — do not rename these without migrating the data.
 GROUP_FOLDER_BY_PREFIX = {
     "neutral":  "Neutral Persona",
@@ -844,7 +844,7 @@ def result_file_has_successful_response(path: Path) -> bool:
 
 
 def model_csv_dir(model_slug: str) -> Path:
-    return Path("result") / "ETHICS" / model_slug
+    return Path("result/benchmarks/ethics/runs") / model_slug
 
 
 def persona_group_folder(persona_key: str) -> str:
@@ -1117,7 +1117,7 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
 
 
 def rebuild_pilot_csv(model_slug: str) -> int:
-    """Scan result/ETHICS/v9_pilot/<Group Persona>/<model_slug>/**/*.json and rebuild the CSV.
+    """Scan result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/**/*.json and rebuild the CSV.
 
     Re-parses any answer the strict runtime parser missed (see reparse_ethics_answer)
     so the CSV doesn't silently lose coverage for thinking models.
@@ -1397,7 +1397,7 @@ def main() -> None:
         all_rows.extend(rows)
 
     if all_rows and not args.json_only:
-        combined_path = Path("result") / "ETHICS" / f"combined_{OUTPUT_NAME}.csv"
+        combined_path = Path("result/benchmarks/ethics/runs") / f"combined_{OUTPUT_NAME}.csv"
         _write_csv(combined_path, all_rows)
         print(f"\nCombined CSV : {combined_path}")
         print(f"Total rows   : {len(all_rows)}")

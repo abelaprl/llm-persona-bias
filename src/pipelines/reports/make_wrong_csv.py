@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 
-df = pd.read_csv('result/reports/meta-llama_llama-3.3-70b-instruct/results.csv')
+df = pd.read_csv('result/archive/reports_mixed_legacy/meta-llama_llama-3.3-70b-instruct/results.csv')
 
 # Extract qid from file column e.g. "man_explicit_1\gsm8k_00001.json"
 df['qid'] = df['file'].str.extract(r'(gsm8k_\d+)', expand=False)

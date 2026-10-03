@@ -110,7 +110,7 @@ def reparse_base(raw):
     return None, None  # don't apply _pv here — we test both variants below
 
 # ── Scan ──────────────────────────────────────────────────────────────────────
-base = r'D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
+base = r'D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
 
 counts = Counter()
 ex_new = []       # newly recovered by tail approach

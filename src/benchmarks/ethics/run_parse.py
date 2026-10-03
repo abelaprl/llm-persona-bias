@@ -8,7 +8,7 @@ Usage (from D:\\TugasAkhir):
     python "src/benchmarks/ethics/run_parse.py" --all
 
 Output:
-    result/parsing/v9_main/<Group Persona>/<model>/<persona>.jsonl
+    result/benchmarks/ethics/parsed/legacy_parsing/v9_main/<Group Persona>/<model>/<persona>.jsonl
 
 Splitting parse from CSV assembly is deliberate: reading 72,671 JSON files
 takes minutes, so trying a new rule should not mean re-walking the tree.

@@ -245,7 +245,7 @@ def main():
     args=parser.parse_args()
     if not args.run_id.replace("_","").replace("-","").isalnum():
         raise ValueError("Use a simple run ID")
-    build(d.ROOT / "result/ETHICS/reports" / ("gender_lm_reference_presentation_"+args.run_id))
+    build(d.ROOT / "result/benchmarks/ethics/reports" / ("gender_lm_reference_presentation_"+args.run_id))
 
 
 if __name__ == "__main__":

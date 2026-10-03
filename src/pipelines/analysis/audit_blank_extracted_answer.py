@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 
-RESULTS_PATH = r"E:\Tugas Akhir\TugasAkhir\result\reports\deepseek_deepseek-v3.2\results.csv"
-CSV_BLANK_PATH = r"E:\Tugas Akhir\TugasAkhir\result\reports\deepseek_deepseek-v3.2\csv_blank_extracted.csv"
+RESULTS_PATH = r"E:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\deepseek_deepseek-v3.2\results.csv"
+CSV_BLANK_PATH = r"E:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\deepseek_deepseek-v3.2\csv_blank_extracted.csv"
 
 # Read CSV
 # Use dtype=str to preserve all as string, na_values for null/None

@@ -20,7 +20,7 @@ import pandas as pd
 
 
 REPORT_DIR = Path(
-    "D:/TugasAkhir/result/GMS8K/reports/"
+    "D:/TugasAkhir/result/benchmarks/gsm8k/reports/"
     "persona_publication_analysis_v5_paired_significance_six_models"
 )
 SOURCE = REPORT_DIR / "tables" / "regional_accuracy_and_deltas.csv"

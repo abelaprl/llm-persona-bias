@@ -255,7 +255,7 @@ def main():
         "--model_dir",
         type=str,
         default=default_model_dir(),
-        help="ELI5 model result folder, e.g. result/ELI5/allenai_olmo-3.1-32b-instruct",
+        help="ELI5 model result folder, e.g. result/benchmarks/eli5/allenai_olmo-3.1-32b-instruct",
     )
     parser.add_argument(
         "--save_csv",

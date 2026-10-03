@@ -106,16 +106,16 @@ HTTP 403.
 
 JSON invalid:
 
-- [`woman_implicit_2/gsm8k_00325.json`](../result/GMS8K/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/woman_implicit_2/gsm8k_00325.json)
+- [`woman_implicit_2/gsm8k_00325.json`](../result/benchmarks/gsm8k/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/woman_implicit_2/gsm8k_00325.json)
   terpotong pada `input.persona.warmup_response`, sebelum request dan respons
   model ditulis;
-- [`woman_implicit_2/gsm8k_00718.json`](../result/GMS8K/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/woman_implicit_2/gsm8k_00718.json)
+- [`woman_implicit_2/gsm8k_00718.json`](../result/benchmarks/gsm8k/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/woman_implicit_2/gsm8k_00718.json)
   berukuran 0 byte.
 
 File yang belum ada:
 
 ```text
-result/GMS8K/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/neutral/gsm8k_01319.json
+result/benchmarks/gsm8k/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/neutral/gsm8k_01319.json
 ```
 
 ## GSM8K Religion Persona
@@ -143,20 +143,20 @@ result/GMS8K/Gender_Persona/qwen_qwen3-next-80b-a3b-thinking/neutral/gsm8k_01319
 Selain 5.336 error teknis pada tabel, satu file berikut berukuran 0 byte dan
 memerlukan model call baru:
 
-[`christian_implicit_3/gsm8k_01282.json`](../result/GMS8K/Religion_Persona/qwen_qwen3-next-80b-a3b-thinking/christian_implicit_3/gsm8k_01282.json)
+[`christian_implicit_3/gsm8k_01282.json`](../result/benchmarks/gsm8k/Religion_Persona/qwen_qwen3-next-80b-a3b-thinking/christian_implicit_3/gsm8k_01282.json)
 
 ## Contoh bukti
 
 - HTTP 403 key-limit:
-  [`ethics_commonsense_0230.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Gender%20Persona/qwen_qwen3-next-80b-a3b-thinking/man_implicit_1/ethics_commonsense_0230.json)
+  [`ethics_commonsense_0230.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Gender%20Persona/qwen_qwen3-next-80b-a3b-thinking/man_implicit_1/ethics_commonsense_0230.json)
 - TLS/SSL terputus:
-  [`ethics_commonsense_0107.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Gender%20Persona/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/ethics_commonsense_0107.json)
+  [`ethics_commonsense_0107.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Gender%20Persona/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/ethics_commonsense_0107.json)
 - DNS gagal:
-  [`ethics_commonsense_0288.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Gender%20Persona/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/ethics_commonsense_0288.json)
+  [`ethics_commonsense_0288.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Gender%20Persona/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/ethics_commonsense_0288.json)
 - remote connection reset:
-  [`gsm8k_00927.json`](../result/GMS8K/Religion_Persona/qwen_qwen3-next-80b-a3b-thinking/atheist_explicit/gsm8k_00927.json)
+  [`gsm8k_00927.json`](../result/benchmarks/gsm8k/Religion_Persona/qwen_qwen3-next-80b-a3b-thinking/atheist_explicit/gsm8k_00927.json)
 - koneksi dibatalkan host:
-  [`gsm8k_01259.json`](../result/GMS8K/Religion_Persona/qwen_qwen3-next-80b-a3b-thinking/atheist_explicit/gsm8k_01259.json)
+  [`gsm8k_01259.json`](../result/benchmarks/gsm8k/Religion_Persona/qwen_qwen3-next-80b-a3b-thinking/atheist_explicit/gsm8k_01259.json)
 
 ## Temuan terpisah: field `prediction`
 

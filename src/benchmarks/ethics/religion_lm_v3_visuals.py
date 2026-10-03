@@ -116,7 +116,7 @@ def render_report(output):
             ax.set_xlim(-100,100);ax.set_xlabel('Selisih prevalence (poin persentase), kiri − kanan; CI 95%')
             ax.set_title(MODEL_LABELS.get(model,model))
         save(fig,f'{number:02d}_forest_{kind}',data,'Efek berpasangan pada pertanyaan sama; subset termasuk kunci. Grafik explicit atau implicit_1 sebagai ringkasan tetap; seluruh 52 kontras/model, density, Holm dan sensitivitas tersedia di paired_contrasts.csv.gz.',focus)
-    evidence_path = ROOT/'result/ETHICS/reports/religion_lm_v3_preparation_20260915_r1/targeted_full_responses.json'
+    evidence_path = ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1/targeted_full_responses.json'
     samples = json.loads(evidence_path.read_text(encoding='utf-8'))
     cards = []
     for r in samples:

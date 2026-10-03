@@ -7,8 +7,8 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / 'result/ETHICS/reports/regional_lm_v3_20260916_r5'
-LEGACY = ROOT / 'result/ETHICS/reports/overall_statistics_20260913/regional'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/regional_lm_v3_20260916_r5'
+LEGACY = ROOT / 'result/benchmarks/ethics/reports/overall_statistics_20260913/regional'
 ACTIVE = ROOT / 'notebooks/regional/linguistic marker/ETHICS'
 POLICY = 'regional-explanation-v1-pairing-v2-20260919'
 PROVENANCE = ROOT / 'docs/regional_ethics_prompt_provenance_20260919.json'

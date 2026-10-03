@@ -21,7 +21,7 @@ from config import REPO_ROOT  # noqa: E402
 
 REFINEMENT_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+    / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
     / "parser_refinement_20260821"
 )
 CHANGES = REFINEMENT_DIR / "changed_rows_full.csv"

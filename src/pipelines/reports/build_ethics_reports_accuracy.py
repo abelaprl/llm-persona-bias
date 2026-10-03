@@ -413,7 +413,7 @@ def main():
     parser.add_argument(
         "--result_csv",
         type=str,
-        default=r"result\ETHICS\deepseek_deepseek-v3.2\result_ethics_deepseek_deepseek-v3.2.csv",
+        default=r"result/benchmarks/ethics/runs\deepseek_deepseek-v3.2\result_ethics_deepseek_deepseek-v3.2.csv",
         help="Path to source result_ethics_<model>.csv",
     )
     parser.add_argument(

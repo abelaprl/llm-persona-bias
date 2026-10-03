@@ -32,8 +32,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--model_workers', type=positive, default=1)
     parser.add_argument('--read_workers', type=positive, default=64)
     parser.add_argument('--rules', choices=('model', 'core'), default='model')
-    parser.add_argument('--input_root', default=r'result\GMS8K\regional_cultural_persona')
-    parser.add_argument('--out_root', default=r'result\GMS8K\reports')
+    parser.add_argument('--input_root', default=r'result/benchmarks/gsm8k\regional_cultural_persona')
+    parser.add_argument('--out_root', default=r'result/benchmarks/gsm8k\reports')
     parser.add_argument('--limit', type=positive)
     return parser.parse_args()
 

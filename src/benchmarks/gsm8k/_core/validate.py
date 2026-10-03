@@ -132,8 +132,8 @@ if __name__ == '__main__':
     ap.add_argument('--v2', action='store_true')
     ap.add_argument('--v3', action='store_true')
     ap.add_argument('--limit', type=int, default=200)
-    ap.add_argument('--input_root', default=r'result\GMS8K\Religion_Persona')
-    ap.add_argument('--out_root', default=r'result\GMS8K\reports')
+    ap.add_argument('--input_root', default=r'result/benchmarks/gsm8k\Religion_Persona')
+    ap.add_argument('--out_root', default=r'result/benchmarks/gsm8k\reports')
     args = ap.parse_args()
 
     from ..Religion_Persona.personas import MODELS, PERSONAS, PERSONA_GROUP

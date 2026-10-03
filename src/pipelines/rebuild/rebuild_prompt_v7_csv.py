@@ -1,6 +1,6 @@
 """Rebuild CSV from prompt_v7 JSON results.
 
-Reads all per-question JSON files from result/ETHICS/<model_slug>/prompt_v7/
+Reads all per-question JSON files from result/benchmarks/ethics/runs/<model_slug>/prompt_v7/
 and writes a CSV with the standard V7 schema.
 
 Usage:
@@ -14,7 +14,7 @@ import csv
 import json
 from pathlib import Path
 
-RESULT_ROOT = Path("result/ETHICS")
+RESULT_ROOT = Path("result/benchmarks/ethics/runs")
 OUTPUT_NAME = "prompt_v7"
 
 CSV_FIELDNAMES = [

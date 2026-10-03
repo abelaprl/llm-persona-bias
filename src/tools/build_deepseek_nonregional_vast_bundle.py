@@ -144,17 +144,17 @@ def collect_files() -> tuple[dict[str, Path], dict[str, object]]:
     for relative in ethics_paths:
         include(
             ETHICS_ROOT.joinpath(*relative.parts),
-            (PurePosixPath("result/ETHICS/v9 [THIS IS THE MAIN]") / relative).as_posix(),
+            (PurePosixPath("result/benchmarks/ethics/runs/v9_main") / relative).as_posix(),
         )
     for relative in WARMUP_RELATIVE_PATHS:
         include(
             ETHICS_ROOT.joinpath(*relative.parts),
-            (PurePosixPath("result/ETHICS/v9 [THIS IS THE MAIN]") / relative).as_posix(),
+            (PurePosixPath("result/benchmarks/ethics/runs/v9_main") / relative).as_posix(),
         )
     for relative in gsm8k_paths:
         include(
             GSM8K_ROOT.joinpath(*relative.parts),
-            (PurePosixPath("result/GMS8K") / relative).as_posix(),
+            (PurePosixPath("result/benchmarks/gsm8k") / relative).as_posix(),
         )
 
     inventory: dict[str, object] = {

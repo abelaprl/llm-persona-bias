@@ -13,7 +13,7 @@ ketiga, dan self-correction generik. Aturan sudah diperbaiki sebagai
 
 ## Cakupan data
 
-- Input: `result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`
+- Input: `result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`
 - SHA-256 input: `9a442ffeda5b3308b21fd9c398ab2633e3ad835d41346f5fc1d4ed302b5ee5a4`
 - Respons unik: 81.756
 - Teks tersedia: 80.840
@@ -88,9 +88,9 @@ false negative.
 
 ## Artefak utama
 
-- Audit v1.5 final: `result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_5_0/audit_codex_r1_20260822_v6_final/`
+- Audit v1.5 final: `result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_5_0/audit_codex_r1_20260822_v6_final/`
 - Regresi v1.6 final: `docs/audit_artifacts_ethics_gender_v16_20260822_v8_final/`
-- Full run v1.6: `result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/`
+- Full run v1.6: `result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/`
 
 ## Batas klaim
 

@@ -35,8 +35,8 @@ def pairing_evidence(dimension):
     model='meta-llama_llama-3.1-8b-instruct'
     identity='islam' if dimension=='religion' else 'north_american'
     folder='Religion_Persona' if dimension=='religion' else 'regional_cultural_persona'
-    paths=[ROOT/'result/GMS8K/Gender_Persona'/model/'neutral/gsm8k_00511.json']
-    paths.extend(ROOT/'result/GMS8K'/folder/model/(identity+'_'+c)/'gsm8k_00511.json'
+    paths=[ROOT/'result/benchmarks/gsm8k/Gender_Persona'/model/'neutral/gsm8k_00511.json']
+    paths.extend(ROOT/'result/benchmarks/gsm8k'/folder/model/(identity+'_'+c)/'gsm8k_00511.json'
                  for c in ['explicit','implicit_1'])
     records=[]
     for condition,path in zip(['N','E','I1'],paths):

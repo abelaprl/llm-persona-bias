@@ -9,7 +9,7 @@ import pandas as pd
 from .regional_ethics_presentation_data import ROOT, IDENTITIES, regional_marker_ids, sha256, write_json, load_provenance
 from .regional_ethics_presentation_view import iter_surfaces
 
-RAW_ROOT = ROOT / 'result/ETHICS/v9 [THIS IS THE MAIN]'
+RAW_ROOT = ROOT / 'result/benchmarks/ethics/runs/v9_main'
 ASSIGNMENTS = [('east_asian', 'implicit_1'), ('north_american', 'implicit_2'),
                ('south_asian', 'implicit_3'), ('sub_saharan_african', 'implicit_1'),
                ('east_asian', 'implicit_2'), ('sub_saharan_african', 'implicit_3')]

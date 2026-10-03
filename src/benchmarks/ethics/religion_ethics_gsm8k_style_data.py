@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / 'result/ETHICS/reports/religion_lm_v3_candidate_20260916_r4_overall'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_candidate_20260916_r4_overall'
 NOTEBOOK = ROOT / 'notebooks/religion/linguistic marker/ETHICS/linguistic_marker_religion_ethics_v3_candidate_20260916_r4_overall.ipynb'
 IDENTITIES = ['islam', 'christian', 'jewish', 'atheist']
 IDENTITY_LABELS = dict(zip(IDENTITIES, ['Islam', 'Christian', 'Jewish', 'Atheist']))

@@ -58,7 +58,7 @@ def locate_repo_root() -> Path:
 
 
 REPO_ROOT = locate_repo_root()
-REPORT_ROOT = REPO_ROOT / "result/ETHICS/reports/Gender_Persona"
+REPORT_ROOT = REPO_ROOT / "result/benchmarks/ethics/reports/Gender_Persona"
 MARKER_DIR = REPORT_ROOT / "linguistic_markers_gender_candidate_20260821_v1_6_0"
 AUDIT_DIR = MARKER_DIR / "audit_codex_r1_20260822_final"
 LEGACY_DIR = REPORT_ROOT / "notebook_ethics_gender_lm_v1_assets"

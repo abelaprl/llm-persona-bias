@@ -269,7 +269,7 @@ def write_csv_manifest(path: Path, rows: list[dict[str, object]]) -> None:
 
 def invalid_relative_path(path: str) -> str:
     normalized = Path(path).as_posix()
-    prefix = "result/GMS8K/"
+    prefix = "result/benchmarks/gsm8k/"
     return normalized[len(prefix):] if normalized.startswith(prefix) else normalized
 
 
@@ -525,7 +525,7 @@ def audit_git_head(args: argparse.Namespace) -> dict[str, Any]:
     """Audit current tracked results as sequential per-persona Git streams."""
     expected_names = {f"gsm8k_{index:05d}.json" for index in range(1, EXPECTED_COUNT + 1)}
     prefixes = [
-        f"result/GMS8K/{group}/{MODEL_SLUG}/{persona}"
+        f"result/benchmarks/gsm8k/{group}/{MODEL_SLUG}/{persona}"
         for group in args.groups
         for persona in GROUPS[group]
     ]
@@ -571,7 +571,7 @@ def audit_git_head(args: argparse.Namespace) -> dict[str, Any]:
             if not member.isfile() or not member.name.lower().endswith(".json"):
                 continue
             parts = Path(member.name).as_posix().split("/")
-            # result/GMS8K/<group>/<model>/<persona>/<file>
+            # result/benchmarks/gsm8k/<group>/<model>/<persona>/<file>
             if len(parts) < 6 or parts[:2] != ["result", "GMS8K"]:
                 continue
             group, model_slug, persona = parts[2], parts[3], parts[4]

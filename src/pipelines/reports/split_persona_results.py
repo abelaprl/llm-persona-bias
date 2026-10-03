@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 
-input_csv = r'e:/Tugas Akhir/TugasAkhir/result/reports/allenai_olmo-3-32b-think/results.csv'
-output_base = r'e:/Tugas Akhir/TugasAkhir/result/reports/allenai_olmo-3-32b-think'
+input_csv = r'e:/Tugas Akhir/TugasAkhir/result/archive/reports_mixed_legacy/allenai_olmo-3-32b-think/results.csv'
+output_base = r'e:/Tugas Akhir/TugasAkhir/result/archive/reports_mixed_legacy/allenai_olmo-3-32b-think'
 
 def main():
     df = pd.read_csv(input_csv)

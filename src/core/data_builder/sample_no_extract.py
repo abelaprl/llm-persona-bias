@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 
-csv_path = r'E:\Tugas Akhir\TugasAkhir\result\reports\google_gemma-2-9b-it\results.csv'
+csv_path = r'E:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\google_gemma-2-9b-it\results.csv'
 df = pd.read_csv(csv_path)
 no_extract = df[df['error_category'] == 'no_number_found']
 

@@ -1,12 +1,12 @@
 """
 Rebuild a single CSV from all per-question JSON files under
-result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/prompt_v7_exploratory/
+result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/prompt_v7_exploratory/
 """
 import json
 import pathlib
 import pandas as pd
 
-ROOT = pathlib.Path(r"D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\prompt_v7_exploratory")
+ROOT = pathlib.Path(r"D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\prompt_v7_exploratory")
 OUTPUT = ROOT / "result_ethics_deepseek_r1_distill_qwen_32b_prompt_v7_exploratory.csv"
 
 rows = []

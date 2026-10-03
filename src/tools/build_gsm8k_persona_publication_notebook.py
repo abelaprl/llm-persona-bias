@@ -41,8 +41,8 @@ Notebook ini hanya menggunakan enam model utama:
 
 Sumber Gender dan Religion berasal dari dua CSV agregat berikut:
 
-- `result/GMS8K/reports/akurasi gender&neutral persona.csv`
-- `result/GMS8K/reports/akurasi religion persona.csv`
+- `result/benchmarks/gsm8k/reports/akurasi gender&neutral persona.csv`
+- `result/benchmarks/gsm8k/reports/akurasi religion persona.csv`
 
 Regional Cultural menggunakan enam `results.csv` tingkat pertanyaan dari report canonical
 Regional Cultural yang sudah tervalidasi di `reports/`.

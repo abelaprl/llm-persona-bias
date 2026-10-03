@@ -36,8 +36,8 @@ def finalize(report):
     intro='## Membaca hasil kandidat\n\n154.428 respons, 59 marker, enam model dan 17 persona; empat subset digabung untuk marker. Sebanyak 46.052 respons abstain berteks tetap masuk analisis. Ini belum precision/recall tervalidasi.\n\n'
     for title,path in [('Laporan hasil dan keterbatasan',ROOT/'docs/religion_lm_v3_results.md'),
         ('Definisi dan seluruh pola marker',ROOT/'docs/religion_lm_v3_codebook.md'),
-        ('Paket precision held-out independen',ROOT/'result/ETHICS/reports/religion_lm_v3_precision_heldout_20260916_r1/manifest.json'),
-        ('Paket recall tanpa anchor',ROOT/'result/ETHICS/reports/religion_lm_v3_human_audit_20260916_r2/manifest.json')]:
+        ('Paket precision held-out independen',ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_precision_heldout_20260916_r1/manifest.json'),
+        ('Paket recall tanpa anchor',ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_human_audit_20260916_r2/manifest.json')]:
         intro+='['+title+']('+os.path.relpath(path,report).replace('\\','/')+')\n\n'
     intro+='Pakai PDF A4 untuk ekspor tesis. Forest enam model adalah overview; plot implicit memakai I1 − explicit. I2/I3 tetap tersedia terpisah pada penjelajah. Marker lexical mention tidak otomatis menunjukkan adopsi agama atau endorsement. Sembilan gap discovery masih terbuka.\n'
     cell=nbformat.v4.new_markdown_cell(intro);cell.id='reviewed-reading-guide'

@@ -114,7 +114,7 @@ pisahkan implicit vs explicit
 | Komponen | Perubahan |
 |---|---|
 | `load_religion_personas` → `load_regional_personas` | Logika sama, tapi: (a) ganti nama; (b) **verifikasi penentuan tipe** — saat ini berbasis substring `"implicit"`. Aman bila penamaan regional mengikuti konvensi `*_implicit_*` / `*_explicit`. |
-| `parse_args` | Ubah default: `--model_order=43`, `--persona_file=inputs/regional_cultural_persona.json`, `--output_root=result/GMS8K/regional_cultural_persona`. |
+| `parse_args` | Ubah default: `--model_order=43`, `--persona_file=inputs/regional_cultural_persona.json`, `--output_root=result/benchmarks/gsm8k/regional_cultural_persona`. |
 | Banner cetak (`print`) | Ganti label "RELIGION" → "REGIONAL CULTURAL". |
 
 ### 2.3 Perlu LOGIKA BARU (minimal)
@@ -169,7 +169,7 @@ Aturan kompatibilitas (diturunkan dari `load_religion_personas`):
 ### 4.1 Struktur FINAL (Q2 = samakan dengan religion runner)
 
 ```
-result/GMS8K/regional_cultural_persona/
+result/benchmarks/gsm8k/regional_cultural_persona/
 └── deepseek_deepseek-r1-distill-qwen-32b/          ← <model_slug> #43
     ├── western_explicit/
     │   ├── gsm8k_00001.json                         ← 1 file per soal
@@ -260,7 +260,7 @@ Folder `<model>` = `deepseek_deepseek-r1-distill-qwen-32b`. Tiap folder explicit
 4. Reuse tanpa ubah: util string, `load_model_config`, `model_slug`, `call_openrouter_api`, warmup helpers, `build_messages`, `load_gsm8k_samples` (§2.1).
 5. Rename `load_religion_personas` → `load_regional_personas`; tambahkan: **warning** untuk item yang dibuang (atasi R3), validasi tipe eksplisit (atasi R2), dan **pembersihan artefak encoding** pada `prompt` (atasi R10 — bersihkan `â€"`/mojibake jadi karakter benar).
 6. Ubah konstanta/`parse_args` default:
-   - `OUTPUT_ROOT = result/GMS8K/regional_cultural_persona`
+   - `OUTPUT_ROOT = result/benchmarks/gsm8k/regional_cultural_persona`
    - `--model_order=43`, `--persona_file=inputs/regional_cultural_persona.json`
    - `temperature=0.2`, `max_tokens=4096` (dikunci).
 
@@ -279,4 +279,4 @@ Folder `<model>` = `deepseek_deepseek-r1-distill-qwen-32b`. Tiap folder explicit
 
 ## 7. Catatan untuk Pipeline Hilir
 
-✅ Karena Q2 = struktur **identik religion runner** (1 JSON per soal), output regional **kompatibel** dengan `src/rebuild/*` dan `src/analysis/calc_accuracy.py` tanpa adapter — cukup arahkan ke `result/GMS8K/regional_cultural_persona/<model_slug>/`. Tidak ada trade-off pipeline yang tersisa.
+✅ Karena Q2 = struktur **identik religion runner** (1 JSON per soal), output regional **kompatibel** dengan `src/rebuild/*` dan `src/analysis/calc_accuracy.py` tanpa adapter — cukup arahkan ke `result/benchmarks/gsm8k/regional_cultural_persona/<model_slug>/`. Tidak ada trade-off pipeline yang tersisa.

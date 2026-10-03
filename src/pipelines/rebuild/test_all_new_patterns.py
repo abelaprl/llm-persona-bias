@@ -91,7 +91,7 @@ NEW_PATTERNS = [
     ('was_right_to',       re.compile(r'(?i)\b(?:was|is|were|are)\s+right\s+to\b'),             'pos', None),
 ]
 
-base = r'D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
+base = r'D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
 counts = Counter()
 examples = {name: [] for name, *_ in NEW_PATTERNS}
 MAX_EX = 4

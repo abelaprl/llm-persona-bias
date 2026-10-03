@@ -92,7 +92,7 @@ def verify_bundle(bundle):
 def build(run_id, source=SOURCE, stage='all'):
     if not re.fullmatch(r'[A-Za-z0-9_-]+', run_id):
         raise ValueError('Unsafe run ID')
-    output = ROOT / f'result/ETHICS/reports/regional_ethics_presentation_{run_id}'
+    output = ROOT / f'result/benchmarks/ethics/reports/regional_ethics_presentation_{run_id}'
     if stage == 'verify':
         print(json.dumps(verify_bundle(output), indent=2), flush=True)
         return output
@@ -134,7 +134,7 @@ def build(run_id, source=SOURCE, stage='all'):
     manifest['artifact_hashes'] = {str(p.relative_to(staging)): sha256(p) for p in staging.rglob('*') if p.is_file() and p != staging / 'manifest.json'}
     write_json(staging / 'manifest.json', manifest)
     verify_bundle(staging)
-    if output.exists() or not output.resolve().is_relative_to((ROOT / 'result/ETHICS/reports').resolve()):
+    if output.exists() or not output.resolve().is_relative_to((ROOT / 'result/benchmarks/ethics/reports').resolve()):
         raise ValueError('Unsafe publication target')
     staging.rename(output)
     print(f'[published] {output}', flush=True)

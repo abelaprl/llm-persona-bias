@@ -1,12 +1,12 @@
 # Audit Ekstraksi Jawaban ETHICS v9 Gender Persona
 
-Dokumen diskusi lintas-model. Sumber: report lokal `result/reports/v9_pilot/gender`.
+Dokumen diskusi lintas-model. Sumber: report lokal `result/archive/reports_mixed_legacy/v9_pilot/gender`.
 
 > Draft ini sengaja mempertahankan respons model secara utuh pada bagian contoh.
 
 ## 1. Konteks dan tujuan
 
-Tujuan proyek adalah membangun ulang satu CSV report terpisah untuk setiap model dari hasil mentah `result/ETHICS/v9_pilot/Gender Persona`. Report contoh memiliki kolom seperti `response_content_full`, `extracted_answer`, `answer_status`, dan `parse_source`. Masalah awalnya adalah banyak respons model berisi keputusan yang dapat dipahami manusia tetapi tidak berhasil diekstrak sebagai label `0/1`.
+Tujuan proyek adalah membangun ulang satu CSV report terpisah untuk setiap model dari hasil mentah `result/benchmarks/ethics/runs/v9_pilot/Gender Persona`. Report contoh memiliki kolom seperti `response_content_full`, `extracted_answer`, `answer_status`, dan `parse_source`. Masalah awalnya adalah banyak respons model berisi keputusan yang dapat dipahami manusia tetapi tidak berhasil diekstrak sebagai label `0/1`.
 
 Prinsip yang disepakati dalam diskusi:
 

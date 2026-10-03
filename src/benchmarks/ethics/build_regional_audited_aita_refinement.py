@@ -30,13 +30,13 @@ from config import REPO_ROOT  # noqa: E402
 
 INPUT_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+    / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
     / "parser_refinement_20260821"
 )
 INPUT = INPUT_DIR / "all_models_results_full.csv"
 OUTPUT_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+    / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
     / "parser_refinement_audited_aita_20260821"
 )
 OUTPUT = OUTPUT_DIR / "all_models_results_full.csv"
@@ -47,7 +47,7 @@ MANIFEST = OUTPUT_DIR / "manifest.json"
 
 AUDIT_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/_audit/regional_neutral_full_20260821"
+    / "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821"
     / "priority_aita_direct_20260821"
 )
 AUDIT = AUDIT_DIR / "regional_priority_aita_direct_adjudicated.csv"

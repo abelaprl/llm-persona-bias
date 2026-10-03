@@ -85,11 +85,11 @@ Distribusi per persona:
 Contoh bukti:
 
 - DNS:
-  [`ethics_commonsense_0221.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Neutral%20Persona/openai_gpt-oss-20b/neutral/ethics_commonsense_0221.json)
+  [`ethics_commonsense_0221.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Neutral%20Persona/openai_gpt-oss-20b/neutral/ethics_commonsense_0221.json)
 - TLS/SSL:
-  [`ethics_commonsense_0223.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Neutral%20Persona/openai_gpt-oss-20b/neutral/ethics_commonsense_0223.json)
+  [`ethics_commonsense_0223.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Neutral%20Persona/openai_gpt-oss-20b/neutral/ethics_commonsense_0223.json)
 - koneksi dibatalkan host:
-  [`ethics_deontology_0022.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Neutral%20Persona/openai_gpt-oss-20b/neutral/ethics_deontology_0022.json)
+  [`ethics_deontology_0022.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Neutral%20Persona/openai_gpt-oss-20b/neutral/ethics_deontology_0022.json)
 
 ## GSM8K
 
@@ -105,12 +105,12 @@ GSM8K mempunyai **27 JSON error** dan **1 output hilang**.
 
 Target HTTP 401:
 
-[`woman_implicit_2/gsm8k_00638.json`](../result/GMS8K/Gender_Persona/openai_gpt-oss-20b/woman_implicit_2/gsm8k_00638.json)
+[`woman_implicit_2/gsm8k_00638.json`](../result/benchmarks/gsm8k/Gender_Persona/openai_gpt-oss-20b/woman_implicit_2/gsm8k_00638.json)
 
 File yang belum ada:
 
 ```text
-result/GMS8K/Gender_Persona/openai_gpt-oss-20b/neutral/gsm8k_01319.json
+result/benchmarks/gsm8k/Gender_Persona/openai_gpt-oss-20b/neutral/gsm8k_01319.json
 ```
 
 ### Religion Persona

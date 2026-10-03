@@ -13,11 +13,11 @@ from rebuild_results_csv_llama import extract_final_answer
 
 MODELS = {
     '8b': {
-        'csv': r'result\reports\meta-llama_llama-3.1-8b-instruct\results.csv',
+        'csv': r'result/archive/reports_mixed_legacy\meta-llama_llama-3.1-8b-instruct\results.csv',
         'root': r'result\meta-llama_llama-3.1-8b-instruct',
     },
     '70b': {
-        'csv': r'result\reports\meta-llama_llama-3.3-70b-instruct\results.csv',
+        'csv': r'result/archive/reports_mixed_legacy\meta-llama_llama-3.3-70b-instruct\results.csv',
         'root': r'result\meta-llama_llama-3.3-70b-instruct',
     },
 }

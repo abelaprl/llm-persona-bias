@@ -25,7 +25,7 @@ Kuota tidak boleh dikurangi.
 python "src/MAIN_PARSING/ETHICS/audit_sampler.py" --group gender
 ```
 
-Buka `result/reports/v9_main/gender/_audit/audit_gender_<rule>.csv`, isi kolom
+Buka `result/archive/reports_mixed_legacy/v9_main/gender/_audit/audit_gender_<rule>.csv`, isi kolom
 `audit_verdict` dengan `ok`, `wrong`, atau `unclear`, lalu catat hasilnya di
 tabel §2 dokumen ini.
 
@@ -105,7 +105,7 @@ semantik lepas dan akurasinya **45,4%** — di bawah tebak koin
 
 **Metode**: sampel acak gabungan (bukan per aturan) dari 9.365 baris
 `semantic_unaudited` di keempat kelompok persona. Lembar: 200 baris di
-`result/reports/v9_main/_audit/audit_semantic_200.csv`, tanpa kolom kunci
+`result/archive/reports_mixed_legacy/v9_main/_audit/audit_semantic_200.csv`, tanpa kolom kunci
 jawaban. **110 baris pertama dinilai.**
 
 **Penilai**: Claude (agen yang menulis parser ini). Ini kelemahan yang harus

@@ -28,8 +28,8 @@ from src.benchmarks.ethics.gender_lm_diagnostic_data import direct_rows, support
 
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
-DEFAULT_OUTPUT = ROOT / "result/ETHICS/reports/gender_lm_bab6_viz_20261002_r5"
+SOURCE = ROOT / "result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"
+DEFAULT_OUTPUT = ROOT / "result/benchmarks/ethics/reports/gender_lm_bab6_viz_20261002_r5"
 MODELS = data_contract.MODELS
 MODEL_LABELS = data_contract.MODEL_LABELS
 COLORS = data_contract.COLORS

@@ -5,8 +5,8 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-CSV  = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/result_ethics_v9_pilot_deepseek_deepseek-r1-distill-qwen-32b.csv")
-ROOT = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/v9_pilot")
+CSV  = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/result_ethics_v9_pilot_deepseek_deepseek-r1-distill-qwen-32b.csv")
+ROOT = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/v9_pilot")
 df   = pd.read_csv(CSV)
 none_df = df[df["parse_source"] == "none"].reset_index(drop=True)
 

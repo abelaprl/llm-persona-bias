@@ -25,8 +25,8 @@ from src.benchmarks.ethics.gender_lm_diagnostic_data import (
     direct_rows, support_summary, PERSONAS, CONDITIONS, INDICATORS,
 )
 
-SOURCE = ROOT / 'result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3'
-DIAGNOSTICS = ROOT / 'result/ETHICS/reports/gender_lm_diagnostics_20260919_r1'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3'
+DIAGNOSTICS = ROOT / 'result/benchmarks/ethics/reports/gender_lm_diagnostics_20260919_r1'
 ACTIVE = ROOT / 'notebooks/gender/linguistic marker/ETHICS'
 
 
@@ -117,7 +117,7 @@ def interaction_figure(data, registry):
 def package(writer, registry, protected):
     output = writer.output
     appendix = []
-    for index_name, bundle in [('figure_index.csv', ROOT / 'result/ETHICS/reports/gender_lm_gsm8k_style_20260918_final'),
+    for index_name, bundle in [('figure_index.csv', ROOT / 'result/benchmarks/ethics/reports/gender_lm_gsm8k_style_20260918_final'),
                                ('diagnostic_figure_index.csv', DIAGNOSTICS)]:
         index = pd.read_csv(ACTIVE / index_name)
         for row in index.to_dict('records'):
@@ -182,7 +182,7 @@ def package(writer, registry, protected):
             + links + '</ul></details><p><a href="tables/comparisons.csv">Seluruh perbandingan asli</a> · '
             '<a href="registry.json">Registry dan sumber kamus</a> · <a href="README.md">Metode & reproduksi</a></p></body></html>')
     (output / 'preview.html').write_text(page, encoding='utf-8')
-    command = 'python -X utf8 -B -m src.benchmarks.ethics.build_gender_lm_compact_preview --output result/ETHICS/reports/NAMA_BARU'
+    command = 'python -X utf8 -B -m src.benchmarks.ethics.build_gender_lm_compact_preview --output result/benchmarks/ethics/reports/NAMA_BARU'
     report = intro + '\n## Reproduksi\n\nDari D:/TugasAkhir:\n\n```powershell\n' + command + '\n```\n\n'
     report += ('## Batas dan pemetaan\n\nSPEC: peringkasan presentasi, tanpa mengubah ekstraksi/statistik.\n\n'
                'DESIGN: 2 cakupan/dukungan, 3 profil, 3 efek gender, 1 konteks, 2 subset, 2 normalisasi, 1 interaksi. '

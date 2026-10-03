@@ -5,13 +5,13 @@ Usage (from D:\\TugasAkhir):
     python "src/benchmarks/ethics/build_csv.py" --group gender
     python "src/benchmarks/ethics/build_csv.py" --all
 
-Output, mirroring the shape of result/reports/v9_pilot/:
+Output, mirroring the shape of result/archive/reports_mixed_legacy/v9_pilot/:
 
-    result/reports/v9_main/<slug>/<model>/results_<slug>_<model>.csv
+    result/archive/reports_mixed_legacy/v9_main/<slug>/<model>/results_<slug>_<model>.csv
         one row per question per persona - Gender = 8 x 1,514 = 12,112 rows
-    result/reports/v9_main/<slug>/<model>/summary_<slug>_<model>.csv
+    result/archive/reports_mixed_legacy/v9_main/<slug>/<model>/summary_<slug>_<model>.csv
         one row per (persona x subset)
-    result/reports/v9_main/summary_all_models.csv
+    result/archive/reports_mixed_legacy/v9_main/summary_all_models.csv
 
 Accuracy is reported per subset only. There is no pooled ETHICS accuracy,
 because `deontology` and `virtue` do not measure moral judgement (findings T2

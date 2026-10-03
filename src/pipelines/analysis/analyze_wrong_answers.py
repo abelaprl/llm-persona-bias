@@ -2,10 +2,10 @@ import pandas as pd
 import random
 
 persona_paths = [
-    "result/reports/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/results.csv",
-    "result/reports/qwen_qwen3-next-80b-a3b-thinking/woman_explicit_1/results.csv",
-    "result/reports/qwen_qwen3-next-80b-a3b-thinking/man_implicit_1/results.csv",
-    "result/reports/qwen_qwen3-next-80b-a3b-thinking/woman_implicit_1/results.csv"
+    "result/archive/reports_mixed_legacy/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/results.csv",
+    "result/archive/reports_mixed_legacy/qwen_qwen3-next-80b-a3b-thinking/woman_explicit_1/results.csv",
+    "result/archive/reports_mixed_legacy/qwen_qwen3-next-80b-a3b-thinking/man_implicit_1/results.csv",
+    "result/archive/reports_mixed_legacy/qwen_qwen3-next-80b-a3b-thinking/woman_implicit_1/results.csv"
 ]
 
 def analyze_wrong_answers():

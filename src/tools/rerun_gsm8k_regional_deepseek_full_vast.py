@@ -2,7 +2,7 @@
 
 This launcher intentionally writes raw JSON and reports to an isolated rerun
 tree.  It never overwrites the canonical experiment that produced the current
-``result/GMS8K/reports/Regional_Cultural_Persona/.../results.csv``.
+``result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/.../results.csv``.
 
 Progress through plan -> preflight -> smoke -> pilot -> full -> verify -> report.
 All generation modes use the existing regional GSM8K runner and a vLLM endpoint
@@ -146,12 +146,12 @@ def ensure_isolated_paths(output_root: Path, report_root: Path) -> None:
     if output_root == CANONICAL_RAW_ROOT or CANONICAL_RAW_ROOT in output_root.parents:
         raise RuntimeError(
             "Fresh rerun output cannot be the canonical raw tree; choose an isolated "
-            f"path under result/GMS8K/reruns: {output_root}"
+            f"path under result/benchmarks/gsm8k/reruns: {output_root}"
         )
     if report_root == CANONICAL_REPORT_ROOT or CANONICAL_REPORT_ROOT in report_root.parents:
         raise RuntimeError(
             "Fresh rerun reports cannot overwrite canonical reports; choose an "
-            f"isolated path under result/GMS8K/reruns: {report_root}"
+            f"isolated path under result/benchmarks/gsm8k/reruns: {report_root}"
         )
     if output_root == report_root or output_root in report_root.parents or report_root in output_root.parents:
         raise RuntimeError("raw output and report roots must be separate sibling trees")

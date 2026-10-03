@@ -27,7 +27,7 @@ from src.benchmarks.ethics.religion_ethics_expression import (
 )
 from src.benchmarks.ethics.religion_ethics_expression_plots import render_expression
 
-RAW_SOURCE = ROOT / 'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv'
+RAW_SOURCE = ROOT / 'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv'
 KEYS = ['model_id', 'persona', 'subset', 'question_id']
 
 
@@ -40,7 +40,7 @@ def extend_notebook(notebook, run_id):
 Empat heatmap menampilkan seluruh 20 marker agama pada enam model dan skenario N/E/I1/I2/I3. Warna memakai **prevalence respons berteks (%)** dengan skala identik 0–100, bukan jumlah istilah unik atau skor kekayaan bahasa. N yang sama diulang pada setiap identitas. Termasuk abstain berteks; respons kosong dan label-only tetap ada dalam total tetapi tidak masuk denominator teks. Nol dibedakan dari NA.
 
 Tabel setiap gambar menyimpan count mentah, denominator, dan rata-rata density per respons per 100 kata. Nama marker adalah definisi operasional **kandidat**, bukan bukti keyakinan atau fungsi wacana yang telah tervalidasi. Grafik ini deskriptif; effect size, CI dan koreksi Holm tetap dibaca dari bagian inferensial notebook.'''),
-             nbformat.v4.new_code_cell(f'''SUPPLEMENT = ROOT / 'result/ETHICS/reports/religion_ethics_expression_{run_id}'
+             nbformat.v4.new_code_cell(f'''SUPPLEMENT = ROOT / 'result/benchmarks/ethics/reports/religion_ethics_expression_{run_id}'
 SUPPLEMENT_LOCAL = ACTIVE_DIR / 'figures/expression_{run_id}'
 supplement_manifest = json.loads((SUPPLEMENT / 'manifest.json').read_text(encoding='utf-8'))
 supplement_index = pd.read_csv(SUPPLEMENT / 'figure_index.csv')
@@ -280,7 +280,7 @@ def main():
     args = parser.parse_args()
     if not re.fullmatch(r'[A-Za-z0-9_-]+', args.run_id):
         parser.error('Invalid run-id')
-    output = ROOT / 'result/ETHICS/reports' / f'religion_ethics_expression_{args.run_id}'
+    output = ROOT / 'result/benchmarks/ethics/reports' / f'religion_ethics_expression_{args.run_id}'
     if args.install:
         install(args.run_id, output)
     else:

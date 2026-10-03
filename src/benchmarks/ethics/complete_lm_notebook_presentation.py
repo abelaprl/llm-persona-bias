@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-REPORTS = ROOT / "result/ETHICS/reports"
+REPORTS = ROOT / "result/benchmarks/ethics/reports"
 SUBSETS = ["commonsense", "deontology", "justice", "virtue"]
 CONDITIONS = ["explicit", "implicit_1", "implicit_2", "implicit_3"]
 CONFIG = {

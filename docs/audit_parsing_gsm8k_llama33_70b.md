@@ -2,7 +2,7 @@
 
 Tanggal audit: 13 Agustus 2026  
 Model: `meta-llama_llama-3.3-70b-instruct`  
-Hasil final untuk model ini: `result/GMS8K/reports_parser_v2_iter7/Religion_Persona/meta-llama_llama-3.3-70b-instruct`
+Hasil final untuk model ini: `result/benchmarks/gsm8k/reports_parser_v2_iter7/Religion_Persona/meta-llama_llama-3.3-70b-instruct`
 
 ## 1. Ruang lingkup dan aturan metodologis
 
@@ -111,7 +111,7 @@ Dua candidate kebetulan sama dengan ground truth. Kesamaan itu tidak dipakai unt
 
 Direktori final:
 
-`result/GMS8K/reports_parser_v2_iter7/Religion_Persona/meta-llama_llama-3.3-70b-instruct/`
+`result/benchmarks/gsm8k/reports_parser_v2_iter7/Religion_Persona/meta-llama_llama-3.3-70b-instruct/`
 
 Berkas utama:
 
@@ -124,11 +124,11 @@ Berkas utama:
 
 Hasil no-gold terpisah:
 
-`result/GMS8K/reports_parser_v2_iter7_nogold/Religion_Persona/meta-llama_llama-3.3-70b-instruct/`
+`result/benchmarks/gsm8k/reports_parser_v2_iter7_nogold/Religion_Persona/meta-llama_llama-3.3-70b-instruct/`
 
 Uji V3:
 
-`result/GMS8K/reports_parser_v2_iter7/Religion_Persona/_combined/v3_abstain_vs_persona.csv`
+`result/benchmarks/gsm8k/reports_parser_v2_iter7/Religion_Persona/_combined/v3_abstain_vs_persona.csv`
 
 ## 8. Perintah reproduksi lokal
 
@@ -145,8 +145,8 @@ Parsing ulang lokal dari CSV yang sudah menyimpan content utuh, tanpa API:
 $env:PYTHONUTF8='1'
 python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run `
   --model meta-llama_llama-3.3-70b-instruct `
-  --reparse_results result\GMS8K\reports_parser_v2_iter7\Religion_Persona\meta-llama_llama-3.3-70b-instruct\results.csv `
-  --out_root result\GMS8K\reports_parser_v2_recheck
+  --reparse_results result/benchmarks/gsm8k\reports_parser_v2_iter7\Religion_Persona\meta-llama_llama-3.3-70b-instruct\results.csv `
+  --out_root result/benchmarks/gsm8k\reports_parser_v2_recheck
 ```
 
 Core sensitivity memakai perintah yang sama dengan tambahan `--rules core --no_split`.

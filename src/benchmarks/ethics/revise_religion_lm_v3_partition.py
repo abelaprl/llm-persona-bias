@@ -14,7 +14,7 @@ from src.benchmarks.ethics.religion_lm_v3_surface import prepare_final_surface
 
 def revise(previous, output):
     output = create_run_directory(output)
-    source = ROOT/'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv'
+    source = ROOT/'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv'
     rows = load_final_rows(source)
     old = pd.read_csv(previous/'question_split.csv')
     forced = set(old.loc[old.partition.eq('development'),['subset','question_id']].itertuples(index=False,name=None))
@@ -48,4 +48,4 @@ def revise(previous, output):
 
 
 if __name__=='__main__':
-    revise(ROOT/'result/ETHICS/reports/religion_lm_v3_preparation_20260915_r1',ROOT/'result/ETHICS/reports/religion_lm_v3_partition_revision_20260915_r1')
+    revise(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1',ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_partition_revision_20260915_r1')

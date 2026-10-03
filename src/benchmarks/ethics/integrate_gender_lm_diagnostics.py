@@ -18,7 +18,7 @@ def selected_bundle(root, notebook_dir):
     if not config.exists():
         return None
     bundle = (root / json.loads(config.read_text(encoding="utf-8"))["diagnostic_bundle"]).resolve()
-    if not bundle.is_relative_to((root / "result/ETHICS/reports").resolve()):
+    if not bundle.is_relative_to((root / "result/benchmarks/ethics/reports").resolve()):
         raise ValueError("Diagnostic bundle must remain within ETHICS reports")
     manifest = json.loads((bundle / "diagnostic_manifest.json").read_text(encoding="utf-8"))
     if not manifest["complete_registry"] or not manifest["source_files_unchanged"]:

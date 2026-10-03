@@ -55,12 +55,12 @@ def run_pipeline(source,output,seed=18222008,workers=1,resamples=10000,expected_
     output = create_run_directory(output)
     for sub in ('registry','response_level','occurrences','audit','inventory','statistics','comparison_with_baseline'):
         (output/sub).mkdir()
-    baseline = ROOT/'result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
+    baseline = ROOT/'result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
     paths = [source,baseline] + sorted((ROOT/'src/benchmarks/ethics').glob('*religion_lm_v3*.py'))
     paths += sorted((ROOT/'src/core/linguistic_markers').glob('*.py'))
     write_json(output/'source_manifest.json',build_source_manifest(paths))
     write_json(output/'registry/markers.json',registry_rows())
-    partition = ROOT/'result/ETHICS/reports/religion_lm_v3_partition_revision_20260915_r1'
+    partition = ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_partition_revision_20260915_r1'
     write_json(output/'audit/design_manifest.json',dict(effective_partition=str(partition),
         hashes=build_source_manifest([partition/'question_split.csv',partition/'human_recall_key.csv',partition/'human_recall_blind.json']),
         human_reviewers_completed=0,precision_sample_unit='rule occurrence; repeated response clusters must be retained in audit',
@@ -175,7 +175,7 @@ def statistics_batch(args):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--source',type=Path,default=ROOT/'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv')
+    parser.add_argument('--source',type=Path,default=ROOT/'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv')
     parser.add_argument('--stage',choices=('candidates','all'),default='candidates')
     parser.add_argument('--audit-bundle',type=Path)
     parser.add_argument('--run-id',required=True)
@@ -189,7 +189,7 @@ def main():
         parser.error('Run ID must contain only letters, digits, underscores and hyphens')
     if args.stage=='all':
         verify_audit_bundle(args.audit_bundle)
-    output = ROOT/f'result/ETHICS/reports/religion_lm_v3_candidate_{args.run_id}'
+    output = ROOT/f'result/benchmarks/ethics/reports/religion_lm_v3_candidate_{args.run_id}'
     print(run_pipeline(args.source,output,args.seed,args.workers,args.bootstrap_resamples,
         expected_rows=25738*len(args.models) if args.models else 154428,render=not args.no_render,only_models=args.models),flush=True)
 

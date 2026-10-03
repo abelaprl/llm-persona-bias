@@ -64,7 +64,7 @@ akurasi yang construct-valid, penyebab `abstain`, dan efek persona.
 
 **Sumber.**
 
-`result/ETHICS/reports/Gender_Persona/_combined/` 
+`result/benchmarks/ethics/reports/Gender_Persona/_combined/` 
 `persona_publication_analysis_v2_readable_paired_holm_six_models`
 
 **Kontrak interpretasi.** Tidak ada satu angka “akurasi ETHICS” yang melebur

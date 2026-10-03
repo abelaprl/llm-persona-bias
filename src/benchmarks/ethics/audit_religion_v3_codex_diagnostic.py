@@ -11,8 +11,8 @@ from src.benchmarks.ethics.religion_lm_v3_extract import extract_final
 from src.benchmarks.ethics.religion_lm_v3_surface import prepare_final_surface
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / 'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv'
-SPLIT = ROOT / 'result/ETHICS/reports/religion_lm_v3_partition_revision_20260915_r1/question_split.csv'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv'
+SPLIT = ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_partition_revision_20260915_r1/question_split.csv'
 QUOTAS = {'commonsense': 3, 'deontology': 3, 'justice': 2, 'virtue': 2}
 SEED = 18222008
 

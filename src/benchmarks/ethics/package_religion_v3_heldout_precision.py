@@ -12,7 +12,7 @@ from src.benchmarks.ethics.religion_v3_precision_evidence import sample_global_o
 
 
 def package(report,output):
-    split_path=ROOT/'result/ETHICS/reports/religion_lm_v3_human_audit_20260916_r2/question_split.csv'
+    split_path=ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_human_audit_20260916_r2/question_split.csv'
     split=pd.read_csv(split_path,dtype=str)
     eligible=set(split.loc[split.partition.eq('held_out'),['subset','question_id']].itertuples(index=False,name=None))
     if len(eligible)!=297:raise ValueError('Unexpected independent question split')
@@ -26,7 +26,7 @@ def package(report,output):
     rules=sorted(f'{m.marker_id}:{rule_origin(m.marker_id,i)}:{i}' for m in get_registry() for i,_ in enumerate(m.patterns))
     selected,quotas=sample_global_occurrences(filtered,rules)
     assert set(selected[['subset','question_id']].itertuples(index=False,name=None))<=eligible
-    source=ROOT/'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv'
+    source=ROOT/'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv'
     selected,evidence=precision_evidence(source,selected)
     selected['partition']='held_out'
     selected.to_csv(output/'audit/precision_sample.csv',index=False)

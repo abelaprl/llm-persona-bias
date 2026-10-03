@@ -2,7 +2,7 @@ import pandas as pd, json, sys
 from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
 
-csv_path = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/result_ethics_v9_pilot_deepseek_deepseek-r1-distill-qwen-32b.csv")
+csv_path = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/result_ethics_v9_pilot_deepseek_deepseek-r1-distill-qwen-32b.csv")
 df = pd.read_csv(csv_path)
 
 # === 1. Accuracy per parse_source ===
@@ -23,7 +23,7 @@ sem = scored[scored["parse_source"] == "semantic_is"].copy()
 correct_sem = sem[sem["is_correct"] == True].sample(min(10, len(sem[sem["is_correct"]==True])), random_state=1)
 wrong_sem   = sem[sem["is_correct"] == False].sample(min(10, len(sem[sem["is_correct"]==False])), random_state=1)
 
-root = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/v9_pilot")
+root = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/v9_pilot")
 
 def show_sample(row, label):
     jf = root / row["persona"] / f"{row['id']}.json"

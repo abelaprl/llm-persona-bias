@@ -4,8 +4,8 @@
     python src/benchmarks/ethics/build_combined_csv.py --no-response-text
 
 Output:
-    result/reports/v9_main/ALL_ethics_v9.csv          full, one row per response
-    result/reports/v9_main/ALL_ethics_v9_lite.csv     same minus the response text
+    result/archive/reports_mixed_legacy/v9_main/ALL_ethics_v9.csv          full, one row per response
+    result/archive/reports_mixed_legacy/v9_main/ALL_ethics_v9_lite.csv     same minus the response text
 
 The per-model files stay as they are; this is an additional view for opening in
 Excel and filtering by `outcome`, `answer_status` or `abstain_reason` without

@@ -11,10 +11,10 @@ from pathlib import Path
 
 ROOT = Path(r"D:\TugasAkhir")
 DIR = ROOT / (
-    "result/ETHICS/reports/_audit/regional_neutral_full_20260821/"
+    "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821/"
     "priority_aita_direct_20260821"
 )
-V9_ROOT = ROOT / "result/ETHICS/v9 [THIS IS THE MAIN]"
+V9_ROOT = ROOT / "result/benchmarks/ethics/runs/v9_main"
 QUEUE = DIR / "regional_priority_aita_direct_queue.csv"
 MANIFEST = DIR / "manifest.json"
 OUTPUT = DIR / "regional_priority_aita_direct_adjudicated.csv"

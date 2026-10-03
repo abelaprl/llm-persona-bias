@@ -107,7 +107,7 @@ Tabel 2. Definisi operasional dan provenance enam marker dari registry frozen; p
 ## TESTING
 
 1. Jalankan `python -m unittest src.benchmarks.ethics.tests.test_gender_lm_presentation_v2 -v` dari akar repositori.
-2. Untuk reproduksi, gunakan direktori baru: `python -m src.benchmarks.ethics.build_gender_lm_presentation_v2_preview --output result/ETHICS/reports/gender_lm_presentation_v2_preview_<tanggal>_<versi-baru>`. Path existing, termasuk direktori kosong, ditolak.
+2. Untuk reproduksi, gunakan direktori baru: `python -m src.benchmarks.ethics.build_gender_lm_presentation_v2_preview --output result/benchmarks/ethics/reports/gender_lm_presentation_v2_preview_<tanggal>_<versi-baru>`. Path existing, termasuk direktori kosong, ditolak.
 3. Baca `verification.json` dan `source_hashes.json`; periksa PNG pada lebar fisik 16 cm dan bandingkan titik/CI dengan kolom `display_*` dalam CSV.
 
 ## INTEGRATION dan keterbatasan

@@ -197,9 +197,9 @@ def build_bundle(output):
 
 `python -m unittest src.benchmarks.ethics.tests.test_gender_lm_presentation_v2_bundle -v`
 
-Reproduksi pada path baru: `python -m src.benchmarks.ethics.build_gender_lm_presentation_v2_bundle --output result/ETHICS/reports/<nama-baru>`.
+Reproduksi pada path baru: `python -m src.benchmarks.ethics.build_gender_lm_presentation_v2_bundle --output result/benchmarks/ethics/reports/<nama-baru>`.
 
-Ekspor tambahan: `python -m src.benchmarks.ethics.build_gender_lm_presentation_v2_bundle --output result/ETHICS/reports/<nama-baru> --group B08 --mode neutral --persona Woman --scope overall`.
+Ekspor tambahan: `python -m src.benchmarks.ethics.build_gender_lm_presentation_v2_bundle --output result/benchmarks/ethics/reports/<nama-baru> --group B08 --mode neutral --persona Woman --scope overall`.
 Untuk profile gunakan `--mode profile --scenario E`; scope dapat overall/commonsense/deontology/justice/virtue. Direktori existing ditolak.
 
 ## INTEGRATION

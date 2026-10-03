@@ -96,7 +96,7 @@ Kelengkapan 23 kategori bukan bukti seluruh cara budaya diungkapkan sudah tertan
 Bangun ulang pada run ID baru:
 
 ```powershell
-python -X utf8 -m src.benchmarks.ethics.build_regional_ethics_presentation --run-id reproduksi_regional_01 --source result/ETHICS/reports/regional_lm_v3_20260916_r5 --stage all
+python -X utf8 -m src.benchmarks.ethics.build_regional_ethics_presentation --run-id reproduksi_regional_01 --source result/benchmarks/ethics/reports/regional_lm_v3_20260916_r5 --stage all
 ```
 ''')]
     return nbformat.v4.new_notebook(cells=cells, metadata={'kernelspec': dict(name='python3', display_name='Python 3', language='python'),

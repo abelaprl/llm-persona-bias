@@ -1,9 +1,9 @@
 import csv
 import random
 
-IN_CSV = r'result/reports/openai_gpt-oss-20b/wrong_answers_only.csv'
-OUT_SAMPLE = r'result/reports/openai_gpt-oss-20b/wrong_answers_sample_50.csv'
-OUT_PREVIEW = r'result/reports/openai_gpt-oss-20b/wrong_answers_preview.csv'
+IN_CSV = r'result/archive/reports_mixed_legacy/openai_gpt-oss-20b/wrong_answers_only.csv'
+OUT_SAMPLE = r'result/archive/reports_mixed_legacy/openai_gpt-oss-20b/wrong_answers_sample_50.csv'
+OUT_PREVIEW = r'result/archive/reports_mixed_legacy/openai_gpt-oss-20b/wrong_answers_preview.csv'
 SAMPLE_N = 50
 PREVIEW_LEN = 300
 

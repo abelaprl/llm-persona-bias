@@ -14,14 +14,14 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[3]
-GSM_RUN = (ROOT / "result/GMS8K/reports/Religion_Persona/linguistic_markers"
+GSM_RUN = (ROOT / "result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers"
            / "religion_gsm8k_full_source_aligned_v1_3_20260818")
-GSM_VISUAL = (ROOT / "result/GMS8K/reports/Religion_Persona/linguistic_markers/visual"
+GSM_VISUAL = (ROOT / "result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/visual"
               / "religion_gsm8k_bab4_visual_v1_3_1_volcano_20260825")
-ETH_SOURCE = ROOT / "result/ETHICS/reports/religion_lm_v3_candidate_20260916_r4_overall"
-ETH_STYLE = ROOT / "result/ETHICS/reports/religion_ethics_gsm8k_style_20260918_r2"
-ETH_EXPRESSION = ROOT / "result/ETHICS/reports/religion_ethics_expression_20260919_r1"
-ETH_PRINT = ROOT / "result/ETHICS/reports/religion_ethics_print_20260919_r2"
+ETH_SOURCE = ROOT / "result/benchmarks/ethics/reports/religion_lm_v3_candidate_20260916_r4_overall"
+ETH_STYLE = ROOT / "result/benchmarks/ethics/reports/religion_ethics_gsm8k_style_20260918_r2"
+ETH_EXPRESSION = ROOT / "result/benchmarks/ethics/reports/religion_ethics_expression_20260919_r1"
+ETH_PRINT = ROOT / "result/benchmarks/ethics/reports/religion_ethics_print_20260919_r2"
 
 MODEL_IDS = [
     "meta-llama_llama-3.1-8b-instruct",
@@ -90,9 +90,9 @@ ETH_FILES = {
     "diversity": ETH_PRINT / "tables/diversity_summary.csv",
 }
 GSM_EXAMPLE_RAW = {
-    "N": ROOT / "result/GMS8K/Gender_Persona/deepseek_deepseek-r1-distill-qwen-32b/neutral/gsm8k_00001.json",
-    "E": ROOT / "result/GMS8K/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_explicit/gsm8k_00001.json",
-    "I1": ROOT / "result/GMS8K/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_implicit_1/gsm8k_00001.json",
+    "N": ROOT / "result/benchmarks/gsm8k/Gender_Persona/deepseek_deepseek-r1-distill-qwen-32b/neutral/gsm8k_00001.json",
+    "E": ROOT / "result/benchmarks/gsm8k/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_explicit/gsm8k_00001.json",
+    "I1": ROOT / "result/benchmarks/gsm8k/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_implicit_1/gsm8k_00001.json",
 }
 
 

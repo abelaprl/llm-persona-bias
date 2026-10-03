@@ -2,7 +2,7 @@
 
 **Tanggal:** 2026-06-26
 **Model:** `deepseek_deepseek-r1-distill-qwen-32b`
-**Scope:** `result/ETHICS/v9_pilot/{Gender,Neutral,Religion} Persona/`
+**Scope:** `result/benchmarks/ethics/runs/v9_pilot/{Gender,Neutral,Religion} Persona/`
 **Parser dianalisis:** `src/rebuild/rebuild_ethics_csv_reparse.py` (`reparse_ethics_answer`)
 **Builder CSV:** `src/rebuild/build_v9_csv_per_group.py`
 
@@ -124,7 +124,7 @@ Ditambah ~4.672 kasus hedged/"depends" yang memang non-komital.
 ## 7. Rekomendasi Perbaikan (urut prioritas)
 
 ### A. Re-run 676 kasus infrastruktur — *prioritas tertinggi, recovery paling bersih*
-- Daftar file tersimpan: `result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/v9_infra_rerun_files.txt` (675 path).
+- Daftar file tersimpan: `result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/v9_infra_rerun_files.txt` (675 path).
 - Naikkan `max_tokens` ke **12.000–16.000** (reasoning R1 teramati sampai >8k) khusus untuk kasus ini.
 - Setelah re-run, jalankan ulang `build_v9_csv_per_group.py` untuk merefresh CSV.
 
@@ -185,5 +185,5 @@ Artefak analisis: `scratchpad/dump_none_cache.py`, `scratchpad/analyze_patterns.
 ## 8. Artefak
 
 - Skrip diagnosis (read-only): `scratchpad/diag_none.py`, `scratchpad/diag2.py`
-- Daftar file re-run infra: `result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/v9_infra_rerun_files.txt`
+- Daftar file re-run infra: `result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/v9_infra_rerun_files.txt`
 - Belum ada data atau parser yang diubah dalam diagnosis ini.

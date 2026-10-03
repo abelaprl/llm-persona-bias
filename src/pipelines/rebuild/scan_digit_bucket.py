@@ -13,7 +13,7 @@ sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rebuild_ethics_csv_reparse import reparse_ethics_answer  # noqa: E402
 
-BASE = Path("result/ETHICS/v9_pilot")
+BASE = Path("result/benchmarks/ethics/runs/v9_pilot")
 GROUPS = ["Gender Persona", "Neutral Persona", "Religion Persona"]
 DIGIT = re.compile(r"(?<!\d)[01](?!\d)")
 # contraction-aware verdict probes (just for counting potential)

@@ -162,7 +162,7 @@ HIDDEN = [
 ]
 
 # ── Scan ──────────────────────────────────────────────────────────────────────
-base = r'D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
+base = r'D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
 
 counts = Counter()
 examples = defaultdict(list)  # name -> [(snippet, gt, blocked)]

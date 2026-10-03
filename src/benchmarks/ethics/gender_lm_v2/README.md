@@ -7,7 +7,7 @@ Pipeline **candidate** untuk seluruh respons sumber, dengan 41 marker dan perban
 Pakai nama output baru yang belum ada:
 
 ```powershell
-.venv/Scripts/python.exe -m src.benchmarks.ethics.gender_lm_v2.run --output-dir result/ETHICS/reports/gender_lm_v2_candidate_run_baru --mode candidate --workers 4 --bootstrap-resamples 5000 --permutations 10000
+.venv/Scripts/python.exe -m src.benchmarks.ethics.gender_lm_v2.run --output-dir result/benchmarks/ethics/reports/gender_lm_v2_candidate_run_baru --mode candidate --workers 4 --bootstrap-resamples 5000 --permutations 10000
 ```
 
 Sumber default dikunci dalam `source_config.json`: 81.756 respons, enam model, sembilan persona, empat subset. Satu perintah menjalankan ekstraksi, paket audit, statistik, dan laporan. Untuk eksekusi bertahap, gunakan `--stage extract`, lalu `--stage analyze`, lalu `--stage report` pada direktori yang sama. Tahap yang sudah menghasilkan artefak tidak boleh diulang dengan menimpa file. Percobaan yang gagal dipertahankan; gunakan direktori baru untuk eksekusi ulang lengkap.

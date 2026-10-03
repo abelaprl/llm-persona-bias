@@ -73,7 +73,7 @@ def replay(report_root, summary_path):
 
 
 if __name__ == '__main__':
-    root = Path(r'result\GMS8K\reports_parser_v2\Religion_Persona')
-    out = Path(r'result\GMS8K\audit\frozen_v2_semantic_replay.csv')
+    root = Path(r'result/benchmarks/gsm8k\reports_parser_v2\Religion_Persona')
+    out = Path(r'result/benchmarks/gsm8k\audit\frozen_v2_semantic_replay.csv')
     rows = replay(root, out)
     raise SystemExit(0 if all(r['match'] for r in rows) else 1)

@@ -32,7 +32,7 @@ def main(argv=None):
         import sys
         argv = sys.argv[1:]
     if '--out_root' not in argv:
-        argv = [*argv, '--out_root', r'result\GMS8K\reports_parser_frozen_v2']
+        argv = [*argv, '--out_root', r'result/benchmarks/gsm8k\reports_parser_frozen_v2']
     return run.main(argv)
 
 

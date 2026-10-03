@@ -17,8 +17,8 @@ from scipy.stats import chi2
 from .regional_ethics_presentation_data import ROOT, MODELS, load_bundle, sha256
 from .regional_lm_v3_extract import extract_response
 
-PRESENTATION = ROOT / 'result/ETHICS/reports/regional_ethics_presentation_20260919_r2'
-OLD_AUDIT = ROOT / 'result/ETHICS/reports/regional_lm_v3_ai_diagnostic_20260916_r1'
+PRESENTATION = ROOT / 'result/benchmarks/ethics/reports/regional_ethics_presentation_20260919_r2'
+OLD_AUDIT = ROOT / 'result/benchmarks/ethics/reports/regional_lm_v3_ai_diagnostic_20260916_r1'
 SEED = 'regional-self-audit-20260919-v1'
 
 
@@ -97,9 +97,9 @@ def select_responses(view, regional_ids, old_keys):
 
 def run(output):
     output = Path(output).resolve()
-    allowed = (ROOT / 'result/ETHICS/reports').resolve()
+    allowed = (ROOT / 'result/benchmarks/ethics/reports').resolve()
     if not output.is_relative_to(allowed) or output == allowed:
-        raise ValueError('Audit output must be a new child directory of result/ETHICS/reports')
+        raise ValueError('Audit output must be a new child directory of result/benchmarks/ethics/reports')
     if output.exists():
         raise FileExistsError('Refusing to overwrite an existing audit')
     bundle = load_bundle()
@@ -110,7 +110,7 @@ def run(output):
     old_keys = {r['model_id'] + '|' + r['persona'] + '|' + r['question_id'] for r in old_rows}
     selected = select_responses(view, regional_ids, old_keys)
     # Explicit allow-list keeps answer labels, ground truth, and correctness out of the readback.
-    canonical_path = ROOT / 'result/ETHICS/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv'
+    canonical_path = ROOT / 'result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv'
     canonical = pd.read_csv(canonical_path, usecols=['model', 'persona_folder', 'question_id', 'response_content_full'],
                             keep_default_na=False)
     canonical['response_key'] = canonical.model + '|' + canonical.persona_folder + '|' + canonical.question_id

@@ -104,7 +104,7 @@ def _ranking_check(comb):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('--out_root', default=r'result\GMS8K\reports')
+    ap.add_argument('--out_root', default=r'result/benchmarks/gsm8k\reports')
     ap.add_argument('--group', default='Religion_Persona')
     args = ap.parse_args()
     if args.group == 'Regional_Cultural_Persona':

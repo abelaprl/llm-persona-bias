@@ -19,8 +19,8 @@ def main() -> None:
     args = parser.parse_args()
     output = args.output_dir
     output.mkdir(parents=True, exist_ok=False)
-    source = Path("result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv")
-    baseline = Path("result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0")
+    source = Path("result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv")
+    baseline = Path("result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0")
     registry = pd.read_csv(baseline / "marker_registry.csv")
     marker_path = baseline / "response_level_markers.csv.gz"
     registry_path = baseline / "marker_registry.csv"

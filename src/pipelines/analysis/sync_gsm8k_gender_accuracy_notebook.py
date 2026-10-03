@@ -49,7 +49,7 @@ def synchronize():
     for old, new in zip(previous.cells, generated.cells):
         new.id = old.id
     figures = NOTEBOOK_DIR / "figures"
-    bundle = REPO_ROOT / "result/GMS8K/reports/persona_publication_analysis_v5_paired_significance_six_models_bar3_compact_smalllabels_heatmap3_sigbold"
+    bundle = REPO_ROOT / "result/benchmarks/gsm8k/reports/persona_publication_analysis_v5_paired_significance_six_models_bar3_compact_smalllabels_heatmap3_sigbold"
     protected = {str(folder): snapshot(folder) for folder in (figures, bundle)}
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     archive = NOTEBOOK_DIR / "_arsip" / ("sinkronisasi_" + stamp)

@@ -5,7 +5,7 @@ Categorize by tail pattern to identify what rules are missing.
 import csv, re
 from collections import Counter
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b\results.csv'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\openai_gpt-oss-20b\results.csv'
 
 cases = []
 with open(csv_path, encoding='utf-8') as f:

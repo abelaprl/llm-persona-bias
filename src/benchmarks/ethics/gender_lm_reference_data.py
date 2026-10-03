@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
-DIAGNOSTICS = ROOT / "result/ETHICS/reports/gender_lm_diagnostics_20260919_r1"
+SOURCE = ROOT / "result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"
+DIAGNOSTICS = ROOT / "result/benchmarks/ethics/reports/gender_lm_diagnostics_20260919_r1"
 ACTIVE = ROOT / "notebooks/gender/linguistic marker/ETHICS"
 NOTEBOOK = "ETHICS_Gender_Linguistic_Markers_Analysis_v1_5_candidate.ipynb"
 MODELS = ["meta-llama_llama-3.1-8b-instruct", "meta-llama_llama-3.3-70b-instruct",

@@ -21,7 +21,7 @@ audit dua manusia, penyelesaian disagreement, dan inter-rater agreement selesai.
 
 Input kanonik yang dipakai:
 
-`result/ETHICS/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv`
+`result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv`
 
 - Dibuat 2026-08-22 00:45:46 +07:00; lebih baru daripada
   `parser_refinement_20260821/` dan
@@ -159,15 +159,15 @@ label itu bukan bukti kausal bahwa persona menghasilkan kata tersebut.
 ## Artefak utama
 
 - Full extraction:
-  `result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16/`
+  `result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16/`
 - Workbook audit manual dasar:
   `audit_manual_regional_cultural.xlsx` di folder full extraction
 - Audit Codex R1 dan workbook berisi seluruh anchor form:
-  `result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_codex_audit_r1/`
+  `result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_codex_audit_r1/`
 - Exhaustive queue dengan label manusia tetap kosong:
-  `result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_exhaustive_review_queue_v1/`
+  `result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_exhaustive_review_queue_v1/`
 - Catatan keputusan cluster Codex AI (bukan manusia):
-  `result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_codex_ai_manual_cluster_review_r2/`
+  `result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_codex_ai_manual_cluster_review_r2/`
 
 Workbook Codex berisi sheet `README`, `audit_summary`, `precision_codex`,
 `recall_codex`, `unmatched_codex`, `anchor_forms_codex`, dan

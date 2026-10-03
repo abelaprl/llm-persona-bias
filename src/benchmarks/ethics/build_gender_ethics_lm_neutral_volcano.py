@@ -23,7 +23,7 @@ from src.benchmarks.ethics.build_gender_ethics_lm_bab6_viz import sha256, _style
 
 ROOT = contract.ROOT
 SOURCE = contract.SOURCE
-DEFAULT_OUTPUT = ROOT / "result/ETHICS/reports/gender_lm_neutral_volcano_20261002_r1"
+DEFAULT_OUTPUT = ROOT / "result/benchmarks/ethics/reports/gender_lm_neutral_volcano_20261002_r1"
 FAMILIES = {
     "reasoning_organization": ("Organisasi", "#B8860B"),
     "epistemic_stance": ("Sikap epistemik", "#E76F51"),
@@ -190,7 +190,7 @@ Seluruh 30 marker density ditampilkan melalui tiga kelompok: 14 bahasa umum, 12 
 """
     notebook.cells[4:4] = [nbformat.v4.new_markdown_cell(introduction),
                            nbformat.v4.new_code_cell("\n".join(f"show('{name}')" for name in new_index.figure_id))]
-    notebook.cells[-1].source += "\n\nReproduksi grafik terhadap netral ke direktori baru:\n\n```powershell\n.\\.venv\\Scripts\\python.exe -X utf8 src/benchmarks/ethics/build_gender_ethics_lm_neutral_volcano.py --output result/ETHICS/reports/gender_lm_neutral_volcano_reproduction_01\n```"
+    notebook.cells[-1].source += "\n\nReproduksi grafik terhadap netral ke direktori baru:\n\n```powershell\n.\\.venv\\Scripts\\python.exe -X utf8 src/benchmarks/ethics/build_gender_ethics_lm_neutral_volcano.py --output result/benchmarks/ethics/reports/gender_lm_neutral_volcano_reproduction_01\n```"
     index = pd.concat([old_index.iloc[:2], new_index, old_index.iloc[2:]], ignore_index=True)
     backup = active / "_arsip" / ("sebelum_netral_bab6_" + datetime.now().strftime("%Y%m%d_%H%M%S"))
     backup.mkdir(parents=True, exist_ok=False)

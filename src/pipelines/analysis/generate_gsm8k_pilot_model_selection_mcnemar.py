@@ -104,7 +104,7 @@ PERSONA_SHORT = {
     "woman_implicit_3": "W:I3",
 }
 
-# These twelve models have rebuilt GSM8K reports under result/reports. Ten expose
+# These twelve models have rebuilt GSM8K reports under result/archive/reports_mixed_legacy. Ten expose
 # one file per persona, while two expose all nine personas in one combined file.
 REBUILT_REPORT_MODELS = {
     "allenai_olmo-3-32b-think",
@@ -1089,7 +1089,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--output-dir",
-        default="result/GMS8K/reports/gsm8k_full_1319_delta_exact_mcnemar_14_models",
+        default="result/benchmarks/gsm8k/reports/gsm8k_full_1319_delta_exact_mcnemar_14_models",
     )
     args = parser.parse_args()
 

@@ -2,7 +2,7 @@
 
 **Periode**: 13–16 Agustus 2026
 **Kode**: `src/MAIN_PARSING/ETHICS/`
-**Keluaran**: `result/reports/v9_main/`
+**Keluaran**: `result/archive/reports_mixed_legacy/v9_main/`
 **Dokumen terkait**: `AGENT.md`, `docs/plan_parsing_ethics.md`, `docs/audit_parsing_ethics_rules.md`
 
 Dokumen ini merangkum seluruh pekerjaan: apa yang dibangun, masalah apa yang
@@ -194,7 +194,7 @@ Model yang sama, benchmark yang sama, **parser yang sama**, prompt berbeda:
 | ministral-8b | **99,9%** | 64,1% | −35,8 |
 | deepseek-r1-distill | **97,0%** | 46,4% | −50,6 |
 
-Diukur pada 44.356 respons v7 di `result/ETHICS/pilot test/`.
+Diukur pada 44.356 respons v7 di `result/benchmarks/ethics/runs/pilot_test/`.
 
 Yang hilang di v9:
 
@@ -608,7 +608,7 @@ bahwa akurasi `deontology`/`virtue` mengukur penilaian moral.
 ## 10. Lokasi berkas
 
 ```
-result/reports/v9_main/
+result/archive/reports_mixed_legacy/v9_main/
 ├── ALL_ethics_v9_lite.csv          372.444 baris, tanpa teks respons (184 MB)
 ├── ALL_ethics_v9.csv               + kolom response_content_full (699 MB)
 ├── summary_all_models.csv          984 baris ringkasan akurasi
@@ -618,12 +618,12 @@ result/reports/v9_main/
 ├── neutral/<model>/                1.514 baris per model
 └── gender/persona_gap_gender.csv   analisis berpasangan
 
-result/reports/v9_main/_audit/
+result/archive/reports_mixed_legacy/v9_main/_audit/
 ├── abstain_coverage_audit_2026-08-16.json
 └── abstain_review_samples_2026-08-16.csv   36 sampel blind, tanpa ground truth
 
-result/parsing/v9_main/             cache antara per persona (246 JSONL, ~936 MB)
-result/reports/v9_pilot/            report lama, TIDAK disentuh
+result/benchmarks/ethics/parsed/legacy_parsing/v9_main/             cache antara per persona (246 JSONL, ~936 MB)
+result/archive/reports_mixed_legacy/v9_pilot/            report lama, TIDAK disentuh
 ```
 
 Kolom untuk memfilter: **`outcome`** (satu label datar) dan

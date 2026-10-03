@@ -36,8 +36,8 @@ from src.pipelines.analysis.gender_visuals import lexicon_analysis as lex
 from src.benchmarks.ethics.gender_lm_terminology import display_text, model_display, MODEL_NAMES
 from src.benchmarks.ethics import build_gender_ethics_lm_print as ethics
 
-SOURCE = ROOT / "result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
-OUTPUT = ROOT / "result/ETHICS/reports/gender_gsm8k_lm_consistent_20261002_r4"
+SOURCE = ROOT / "result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
+OUTPUT = ROOT / "result/benchmarks/ethics/reports/gender_gsm8k_lm_consistent_20261002_r4"
 TITLES = {
     "01": "Ketersediaan teks respons menurut persona",
     "02": "Panjang respons menurut skenario",

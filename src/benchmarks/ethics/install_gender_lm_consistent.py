@@ -15,9 +15,9 @@ sys.path.insert(0, str(ROOT))
 from src.benchmarks.ethics.gender_lm_terminology import display_text
 
 THESIS = Path("D:/ProposalTA-18222008")
-ETHICS = ROOT / "result/ETHICS/reports/gender_lm_print_20261002_r8"
-GSM = ROOT / "result/ETHICS/reports/gender_gsm8k_lm_consistent_20261002_r4"
-STAGE = ROOT / "result/ETHICS/reports/gender_lm_integration_20261002_r3"
+ETHICS = ROOT / "result/benchmarks/ethics/reports/gender_lm_print_20261002_r8"
+GSM = ROOT / "result/benchmarks/ethics/reports/gender_gsm8k_lm_consistent_20261002_r4"
+STAGE = ROOT / "result/benchmarks/ethics/reports/gender_lm_integration_20261002_r3"
 NOTEBOOK = ROOT / "notebooks/gender/linguistic marker/linguistic_marker_gender_gsm8k_direct_gender_v3.ipynb"
 GSM_PREFIX = "image/BabVI/gsm8k/gender/consistent_20261002"
 ETHICS_PREFIX = "image/BabVI/ethics/gender/linguistic_marker_20261002"
@@ -218,7 +218,7 @@ def install():
     for record in files:
         target, staged = Path(record["target"]).resolve(), Path(record["staged"]).resolve()
         assert target.is_relative_to(THESIS.resolve()) or target == NOTEBOOK.resolve()
-        assert staged.is_relative_to(ROOT/"result/ETHICS/reports")
+        assert staged.is_relative_to(ROOT/"result/benchmarks/ethics/reports")
         assert sha(staged) == record["after"]
         assert (sha(target) if target.exists() else None) == record["before"], f"Changed since staging: {target}"
     backup = THESIS/"_arsip"/("gender_lm_consistent_"+datetime.now().strftime("%Y%m%d_%H%M%S"))

@@ -11,7 +11,7 @@ from urllib.parse import unquote
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-BUNDLE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
+BUNDLE = ROOT / "result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"
 KEY = ["model_id", "scope", "marker_id", "measurement", "contrast_id"]
 
 

@@ -1,6 +1,6 @@
 """Rebuild V7-compatible CSV from existing v9_pilot JSON files.
 
-Reads all per-question JSON files from result/ETHICS/<model_slug>/v9_pilot/
+Reads all per-question JSON files from result/benchmarks/ethics/runs/<model_slug>/v9_pilot/
 and writes TWO CSVs with the V7 schema — one for gender personas and one for
 religion personas (each includes the neutral control rows).
 
@@ -19,7 +19,7 @@ import csv
 import json
 from pathlib import Path
 
-RESULT_ROOT = Path("result/ETHICS")
+RESULT_ROOT = Path("result/benchmarks/ethics/runs")
 OUTPUT_NAME = "v9_pilot"
 
 PERSONA_CATEGORY: dict[str, tuple[str, str]] = {

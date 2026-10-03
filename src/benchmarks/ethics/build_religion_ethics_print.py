@@ -27,8 +27,8 @@ from src.benchmarks.ethics.religion_ethics_print import (
     PrintRenderer, diversity_rows, diversity_tables, render_expression_print, render_diversity, audit_svg,
 )
 
-BASE = ROOT / 'result/ETHICS/reports/religion_ethics_gsm8k_style_20260918_r2'
-EXPRESSION = ROOT / 'result/ETHICS/reports/religion_ethics_expression_20260919_r1'
+BASE = ROOT / 'result/benchmarks/ethics/reports/religion_ethics_gsm8k_style_20260918_r2'
+EXPRESSION = ROOT / 'result/benchmarks/ethics/reports/religion_ethics_expression_20260919_r1'
 
 
 def choose_figure(local, bundle, expected):
@@ -255,7 +255,7 @@ def main():
     args = parser.parse_args()
     if not re.fullmatch(r'[A-Za-z0-9_-]+', args.run_id):
         parser.error('Invalid run ID')
-    output = ROOT / 'result/ETHICS/reports' / ('religion_ethics_print_' + args.run_id)
+    output = ROOT / 'result/benchmarks/ethics/reports' / ('religion_ethics_print_' + args.run_id)
     build(args.run_id, output, args.base_notebook, args.main_cache)
 
 

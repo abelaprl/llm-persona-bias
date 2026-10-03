@@ -11,7 +11,7 @@ import re
 import shutil
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / 'result/ETHICS/reports/gender_lm_compact_preview_20260920_r3'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/gender_lm_compact_preview_20260920_r3'
 TARGET = ROOT / 'notebooks/gender/linguistic marker/ETHICS'
 
 

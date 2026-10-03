@@ -36,8 +36,8 @@ def run_rebuild(method, model_num):
     model_info = MODELS[model_num]
     folder = model_info["folder"]
 
-    input_root = f"result/GMS8K/{folder}"
-    report_dir = f"result/reports/{folder}_{method}"
+    input_root = f"result/benchmarks/gsm8k/{folder}"
+    report_dir = f"result/archive/reports_mixed_legacy/{folder}_{method}"
 
     script = f"src/pipelines/rebuild/rebuild_results_csv_{method}.py"
 

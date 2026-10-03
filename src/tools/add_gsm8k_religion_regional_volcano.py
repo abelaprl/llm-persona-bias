@@ -108,10 +108,10 @@ SPECS = (
         dataset_id="religion",
         display_name="agama",
         source_bundle=REPO_ROOT
-        / "result/GMS8K/reports/Religion_Persona/linguistic_markers/visual/"
+        / "result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/visual/"
         "religion_gsm8k_bab4_visual_v1_3_0_20260818",
         output_bundle=REPO_ROOT
-        / "result/GMS8K/reports/Religion_Persona/linguistic_markers/visual/"
+        / "result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/visual/"
         "religion_gsm8k_bab4_visual_v1_3_1_volcano_20260825",
         source_notebook=REPO_ROOT
         / "notebooks/religion/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb",
@@ -132,10 +132,10 @@ SPECS = (
         dataset_id="regional",
         display_name="regional-kultural",
         source_bundle=REPO_ROOT
-        / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/visual/"
+        / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/visual/"
         "regional_gsm8k_bab4_visual_v1_1_0_20260818",
         output_bundle=REPO_ROOT
-        / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/visual/"
+        / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/visual/"
         "regional_gsm8k_bab4_visual_v1_1_1_volcano_20260825",
         source_notebook=REPO_ROOT
         / "notebooks/regional cultural/"

@@ -62,7 +62,7 @@ Get-Process -Id $suspectPid -ErrorAction SilentlyContinue |
     Select-Object Id, StartTime, CPU, Responding |
     Format-List
 
-$report = 'D:\TugasAkhir\result\GMS8K\reports\Religion_Persona\meta-llama_llama-3.1-8b-instruct\results.csv'
+$report = 'D:\TugasAkhir\result/benchmarks/gsm8k\reports\Religion_Persona\meta-llama_llama-3.1-8b-instruct\results.csv'
 Get-Item -LiteralPath $report |
     Select-Object Length, LastWriteTime |
     Format-List
@@ -72,7 +72,7 @@ $env:PYTHONIOENCODING = 'utf-8'
 import csv
 from pathlib import Path
 
-p = Path(r'D:\TugasAkhir\result\GMS8K\reports\Religion_Persona\meta-llama_llama-3.1-8b-instruct\results.csv')
+p = Path(r'D:\TugasAkhir\result/benchmarks/gsm8k\reports\Religion_Persona\meta-llama_llama-3.1-8b-instruct\results.csv')
 with p.open(encoding='utf-8-sig', newline='') as f:
     rows = list(csv.DictReader(f))
 print('rows:', len(rows))
@@ -166,7 +166,7 @@ DeepSeek kehilangan QID berikut karena JSON Extra data:
 - jewish_implicit_2: 1068;
 - jewish_implicit_3: 883, 1051.
 
-Raw JSON di result\GMS8K\Religion_Persona adalah sumber utama. Jangan mempercayai report lama setelah pukul 09:30.
+Raw JSON di result/benchmarks/gsm8k\Religion_Persona adalah sumber utama. Jangan mempercayai report lama setelah pukul 09:30.
 
 ## 5. Perbaikan wajib
 
@@ -410,13 +410,13 @@ python src\test\test_gsm8k_parsing.py
 Jangan tulis ke:
 
 ~~~text
-D:\TugasAkhir\result\GMS8K\reports\Religion_Persona
+D:\TugasAkhir\result/benchmarks/gsm8k\reports\Religion_Persona
 ~~~
 
 Gunakan:
 
 ~~~text
-D:\TugasAkhir\result\GMS8K\reports_parser_v2\Religion_Persona
+D:\TugasAkhir\result/benchmarks/gsm8k\reports_parser_v2\Religion_Persona
 ~~~
 
 ### Smoke test
@@ -426,10 +426,10 @@ Jalankan setelah test lulus:
 ~~~powershell
 Set-Location -LiteralPath 'D:\TugasAkhir'
 $env:PYTHONIOENCODING = 'utf-8'
-python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules model --limit 20 --out_root 'result\GMS8K\reports_parser_v2_smoke'
-python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules core --limit 20 --out_root 'result\GMS8K\reports_parser_v2_smoke'
+python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules model --limit 20 --out_root 'result/benchmarks/gsm8k\reports_parser_v2_smoke'
+python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules core --limit 20 --out_root 'result/benchmarks/gsm8k\reports_parser_v2_smoke'
 
-$smoke = 'D:\TugasAkhir\result\GMS8K\reports_parser_v2_smoke\Religion_Persona\meta-llama_llama-3.3-70b-instruct'
+$smoke = 'D:\TugasAkhir\result/benchmarks/gsm8k\reports_parser_v2_smoke\Religion_Persona\meta-llama_llama-3.3-70b-instruct'
 Get-ChildItem -LiteralPath $smoke -File |
     Select-Object Name, Length, LastWriteTime |
     Sort-Object Name |
@@ -445,8 +445,8 @@ Jalankan hanya setelah smoke test dan seluruh test lulus:
 ~~~powershell
 Set-Location -LiteralPath 'D:\TugasAkhir'
 $env:PYTHONIOENCODING = 'utf-8'
-python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules model --out_root 'result\GMS8K\reports_parser_v2'
-python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules core --out_root 'result\GMS8K\reports_parser_v2'
+python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules model --out_root 'result/benchmarks/gsm8k\reports_parser_v2'
+python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run --model meta-llama_llama-3.3-70b-instruct --rules core --out_root 'result/benchmarks/gsm8k\reports_parser_v2'
 ~~~
 
 Ini parsing lokal. Pastikan tidak ada kode jalur ini yang memanggil OpenRouter. Jangan jalankan combine dan jangan lanjut ke model lain.
@@ -478,7 +478,7 @@ import csv
 from collections import Counter
 from pathlib import Path
 
-d = Path(r'D:\TugasAkhir\result\GMS8K\reports_parser_v2\Religion_Persona\meta-llama_llama-3.3-70b-instruct')
+d = Path(r'D:\TugasAkhir\result/benchmarks/gsm8k\reports_parser_v2\Religion_Persona\meta-llama_llama-3.3-70b-instruct')
 for filename in ('results.csv', 'results_core.csv'):
     p = d / filename
     if not p.exists():
@@ -504,7 +504,7 @@ for filename in ('results.csv', 'results_core.csv'):
 Buat tanpa menjalankan API:
 
 ~~~text
-result\GMS8K\audit\religion_persona_technical_rerun_manifest.csv
+result/benchmarks/gsm8k\audit\religion_persona_technical_rerun_manifest.csv
 ~~~
 
 Kolom minimum:

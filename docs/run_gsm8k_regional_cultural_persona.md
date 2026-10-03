@@ -2,7 +2,7 @@
 
 Runner: `src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py`
 Model default: order **43** (DeepSeek R1 Distill Qwen 32B), temperature **0.0**, max_tokens **4096**.
-Output: `result/GMS8K/regional_cultural_persona/deepseek_deepseek-r1-distill-qwen-32b/<persona>/gsm8k_NNNNN.json`
+Output: `result/benchmarks/gsm8k/regional_cultural_persona/deepseek_deepseek-r1-distill-qwen-32b/<persona>/gsm8k_NNNNN.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
 
@@ -18,7 +18,7 @@ Output: `result/GMS8K/regional_cultural_persona/deepseek_deepseek-r1-distill-qwe
 
 ## Rerun yang kurang dari 1318
 
-Hasil cek `result/GMS8K/regional_cultural_persona` menemukan 3 folder persona yang belum lengkap, semuanya untuk model `allenai_olmo-3.1-32b-instruct`.
+Hasil cek `result/benchmarks/gsm8k/regional_cultural_persona` menemukan 3 folder persona yang belum lengkap, semuanya untuk model `allenai_olmo-3.1-32b-instruct`.
 Jalankan command berikut dari `D:\TugasAkhir`. Flag `--skip_existing` akan melewati file yang sudah ada dan hanya mengisi `gsm8k_*.json` yang missing sampai `--limit_samples 1319`.
 
 ```powershell
@@ -118,7 +118,7 @@ python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas afric
 | `--skip_existing` | off | Lewati file yang sudah ada (resume) |
 | `--model_order` | 43 | Pilih model dari `config/model_keys.json` |
 | `--force_warmup` | off | Regenerate warmup walau sudah ada |
-| `--output_root` | `result/GMS8K/regional_cultural_persona` | Folder output |
+| `--output_root` | `result/benchmarks/gsm8k/regional_cultural_persona` | Folder output |
 | `--sleep_sec` | 1.0 | Jeda antar call (detik) |
 
 ---
@@ -128,7 +128,7 @@ python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --personas afric
 Hitung jumlah file & deteksi kegagalan:
 
 ```powershell
-$root = "result/GMS8K/regional_cultural_persona/deepseek_deepseek-r1-distill-qwen-32b"
+$root = "result/benchmarks/gsm8k/regional_cultural_persona/deepseek_deepseek-r1-distill-qwen-32b"
 Get-ChildItem $root -Recurse -Filter "gsm8k_*.json" | Measure-Object | Select-Object -ExpandProperty Count
 ```
 

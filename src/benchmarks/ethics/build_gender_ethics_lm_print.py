@@ -29,7 +29,7 @@ from src.benchmarks.ethics import build_gender_ethics_lm_neutral_volcano as neut
 from src.benchmarks.ethics.gender_lm_terminology import display_text, model_display
 
 ROOT, ACTIVE = data.ROOT, data.ACTIVE
-DEFAULT_OUTPUT = ROOT / "result/ETHICS/reports/gender_lm_print_20261002_r8"
+DEFAULT_OUTPUT = ROOT / "result/benchmarks/ethics/reports/gender_lm_print_20261002_r8"
 WIDTH_CM = 14
 LABELS = {**old.LABELS,
     "organization_bullet": "Daftar berpoin", "organization_section_header": "Subjudul",

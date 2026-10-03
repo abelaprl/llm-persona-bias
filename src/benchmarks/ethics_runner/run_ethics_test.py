@@ -4,7 +4,7 @@ ETHICS test runner: 1 scenario x 9 personas.
 - Uses model order 42 from config/model_keys.json
 - Uses only first sample from data/ethics_sample_20.json (expected ethics_0001)
 - Writes one JSON per persona to:
-  result/ETHICS/<model_slug>/<persona>/ethics_0001.json
+  result/benchmarks/ethics/runs/<model_slug>/<persona>/ethics_0001.json
 """
 
 from __future__ import annotations
@@ -373,7 +373,7 @@ def build_result_json(model_cfg: dict, sample: dict, persona_name: str, persona_
 
 def output_base_folder(model_cfg: dict) -> Path:
     model_slug = model_cfg["model_id"].replace("/", "_")
-    return Path("result") / "ETHICS" / model_slug
+    return Path("result/benchmarks/ethics/runs") / model_slug
 
 
 def save_result_json(base_folder: Path, persona_name: str, sample_id: str, result_json: dict) -> Path:

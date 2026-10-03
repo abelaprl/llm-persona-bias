@@ -3,7 +3,7 @@ ETHICS persona-bias runner on combined test dataset.
 
 Key behavior:
 - Uses prebuilt combined dataset JSON (default: data/ETHICS_test_4subsets_800.json)
-- Creates ETHICS output folders per persona under result/ETHICS/<model_slug>/
+- Creates ETHICS output folders per persona under result/benchmarks/ethics/runs/<model_slug>/
 - Runs one warmup request per persona (SYSTEM=persona text, USER="Hello", temperature=0.0)
 - Evaluates each scenario with deterministic generation (temperature=0.0)
 - Saves one JSON per sample per persona, plus optional CSV summary
@@ -119,7 +119,7 @@ def load_model_config(order: int) -> dict:
 
 def output_base_folder(model_cfg: dict) -> Path:
     model_slug = model_cfg["model_id"].replace("/", "_")
-    return Path("result") / "ETHICS" / model_slug
+    return Path("result/benchmarks/ethics/runs") / model_slug
 
 
 def load_persona_files() -> dict[str, str]:

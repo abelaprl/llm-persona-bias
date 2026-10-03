@@ -24,11 +24,11 @@ import masking  # noqa: E402
 import normalize  # noqa: E402
 from detectors import refusal as refusal_detector  # noqa: E402
 
-DEFAULT_INPUT = Path(r"D:\TugasAkhir\result\reports\v9_main\ALL_ethics_v9.csv")
+DEFAULT_INPUT = Path(r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\ALL_ethics_v9.csv")
 DEFAULT_INDEX = Path(
-    r"D:\TugasAkhir\result\reports\v9_main\_audit\noncommitted_response_audit_index_2026-08-16.csv"
+    r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\_audit\noncommitted_response_audit_index_2026-08-16.csv"
 )
-DEFAULT_OUTPUT_DIR = Path(r"D:\TugasAkhir\result\reports\v9_main\_audit")
+DEFAULT_OUTPUT_DIR = Path(r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\_audit")
 AUDIT_DATE = "2026-08-16"
 SAMPLES_PER_CATEGORY = 12
 OPENING_CHARS = 1200

@@ -1,7 +1,7 @@
 # Rencana Rerun ETHICS v9 Gender Persona per Model
 
 Tanggal audit: 2026-07-16  
-Sumber: `result/ETHICS/v9_pilot/Gender Persona` dan `result/reports/v9_pilot/gender`
+Sumber: `result/benchmarks/ethics/runs/v9_pilot/Gender Persona` dan `result/archive/reports_mixed_legacy/v9_pilot/gender`
 
 ## Ringkasan keputusan
 
@@ -263,7 +263,7 @@ python src/ethics_runner/run_ethics_prompt_v9.py `
   --model_order 40 `
   --group gender `
   --rerun_manifest result/rerun_manifests/gender_v9_llama31_no_output.csv `
-  --rerun_output_dir result/ETHICS/v9_pilot_rerun_staging
+  --rerun_output_dir result/benchmarks/ethics/runs/v9_pilot_rerun_staging
 ```
 
 Jangan menyalin command ini sebelum `--rerun_manifest` dan `--rerun_output_dir` benar-benar ditambahkan ke runner.
@@ -312,8 +312,8 @@ Jalankan dari `D:\TugasAkhir`. Ubah `$mode` menjadi `no_output` jika 750 reasoni
 
 ```powershell
 $mode = 'all_missing' # all_missing | no_output
-$reportRoot = 'D:\TugasAkhir\result\reports\v9_pilot\gender'
-$dataRoot = 'D:\TugasAkhir\result\ETHICS\v9_pilot\Gender Persona'
+$reportRoot = 'D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_pilot\gender'
+$dataRoot = 'D:\TugasAkhir\result/benchmarks/ethics/runs/v9_pilot\Gender Persona'
 $manifestRoot = 'D:\TugasAkhir\result\rerun_manifests\gender_v9'
 $backupRoot = 'D:\TugasAkhir\result\rerun_backup\gender_v9'
 
@@ -421,7 +421,7 @@ Jalankan per model, bukan keenam model sekaligus. Contoh Llama 3.1:
 
 ```powershell
 $manifest = 'D:\TugasAkhir\result\rerun_manifests\gender_v9\meta-llama_llama-3.1-8b-instruct_all_missing.csv'
-$dataRoot = [IO.Path]::GetFullPath('D:\TugasAkhir\result\ETHICS\v9_pilot\Gender Persona')
+$dataRoot = [IO.Path]::GetFullPath('D:\TugasAkhir\result/benchmarks/ethics/runs/v9_pilot\Gender Persona')
 $backupRoot = [IO.Path]::GetFullPath('D:\TugasAkhir\result\rerun_backup\gender_v9')
 $rows = Import-Csv -LiteralPath $manifest
 
@@ -559,7 +559,7 @@ Command rollback di atas menimpa hasil rerun. Jalankan hanya setelah membandingk
 1. Pastikan semua manifest sudah tervalidasi.
 2. Pertahankan backup sampai analisis akhir selesai.
 3. Bangun ulang report menggunakan ekstraktor baru di `src/ethics_runner` setelah implementasinya selesai.
-4. Jangan menggunakan `--rebuild_csv_only` sebagai pengganti report gender final karena outputnya berbeda dari `result/reports/v9_pilot/gender`.
+4. Jangan menggunakan `--rebuild_csv_only` sebagai pengganti report gender final karena outputnya berbeda dari `result/archive/reports_mixed_legacy/v9_pilot/gender`.
 5. Audit ulang jumlah `missing`, `abstain`, committed rate, dan distribusi persona.
 
 `--json_only` menonaktifkan dua penulisan CSV yang biasanya dilakukan runner: rebuild CSV per-model di akhir `run_model`, dan `combined_v9_pilot.csv` di akhir program.

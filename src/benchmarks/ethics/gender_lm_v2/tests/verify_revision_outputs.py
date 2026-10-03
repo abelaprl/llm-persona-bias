@@ -258,8 +258,8 @@ def validate_statistics(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stage", choices=["revision", "statistics"])
-    parser.add_argument("--parent", type=Path, default=Path("result/ETHICS/reports/gender_lm_v2_candidate_20260915_r2"))
-    parser.add_argument("--output", type=Path, default=Path("result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"))
+    parser.add_argument("--parent", type=Path, default=Path("result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260915_r2"))
+    parser.add_argument("--output", type=Path, default=Path("result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"))
     args = parser.parse_args()
     if args.stage == "revision":
         validate_revision(args.parent, args.output)

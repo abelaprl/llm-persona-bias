@@ -83,7 +83,7 @@ CONFIGS = {
         slug="religion",
         display_name="Religion",
         source_response_table=Path(
-            "result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv"
+            "result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv"
         ),
         accuracy_table=Path(
             "notebooks/religion/ethics accuracy analysis/tables/"
@@ -101,7 +101,7 @@ CONFIGS = {
         slug="regional",
         display_name="Regional Cultural",
         source_response_table=Path(
-            "result/ETHICS/reports/Regional_Cultural_Persona/_combined/"
+            "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/"
             "all_models_results_full.csv"
         ),
         accuracy_table=Path(

@@ -10,7 +10,7 @@ def main():
     if args.report_dir:
         report_dir = args.report_dir
     else:
-        report_dir = os.path.join(os.path.dirname(__file__), '../result/reports/allenai_olmo-3-32b-think')
+        report_dir = os.path.join(os.path.dirname(__file__), '../result/archive/reports_mixed_legacy/allenai_olmo-3-32b-think')
     results_path = os.path.join(report_dir, 'results.csv')
     persona_stats = {}
     total = 0

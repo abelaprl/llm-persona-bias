@@ -32,7 +32,7 @@ import nbformat
 import numpy as np
 import pandas as pd
 
-REPORTS = ROOT / "result/ETHICS/reports"
+REPORTS = ROOT / "result/benchmarks/ethics/reports"
 GENDER_POOL = REPORTS / "Gender_Persona/linguistic_markers/analysis/gender_ethics_lm_gabungan_20260909_r4"
 GENDER_MARKERS = REPORTS / "Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/response_level_markers.csv.gz"
 CONDITIONS = ["explicit", "implicit_1", "implicit_2", "implicit_3"]

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-BUNDLE = ROOT / "result/ETHICS/reports/overall_presentation_20260913_r2/gender"
+BUNDLE = ROOT / "result/benchmarks/ethics/reports/overall_presentation_20260913_r2/gender"
 
 
 def digest(path):

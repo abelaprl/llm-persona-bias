@@ -12,7 +12,7 @@ from src.benchmarks.ethics.religion_lm_v3_io import sha256, write_json
 
 
 def main():
-    base = ROOT / 'result/ETHICS/reports'
+    base = ROOT / 'result/benchmarks/ethics/reports'
     report = base / 'religion_lm_v3_candidate_20260916_r4_overall'
     summary = base / 'religion_lm_v3_summary_20260916_r4'
     verification = base / 'religion_lm_v3_verification_20260916_r5/verification.json'

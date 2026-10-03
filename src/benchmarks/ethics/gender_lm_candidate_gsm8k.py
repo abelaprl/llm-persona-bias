@@ -15,8 +15,8 @@ import pandas as pd
 from .gender_lm_reference_data import COLORS, MODELS, MODEL_LABELS, PERSONAS, ROOT, scenario
 
 
-BUNDLE = ROOT / "result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
-SOURCE = ROOT / "result/linguistic_markers/gender_gsm8k_full_source_aligned_v1_2_1_20260817"
+BUNDLE = ROOT / "result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
+SOURCE = ROOT / "result/analyses/linguistic_markers/runs/gender_gsm8k_full_source_aligned_v1_2_1_20260817"
 WIDTH = 16 / 2.54
 STATUS = "candidate_pending_manual_precision_recall_audit"
 SCENARIOS = ["E", "I1", "I2", "I3"]

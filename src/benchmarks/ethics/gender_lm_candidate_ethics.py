@@ -18,7 +18,7 @@ from .gender_lm_presentation_v2_data import (
 )
 from .gender_lm_presentation_v2_plots import plot_coverage, plot_view
 
-PACKAGE = ROOT / 'result/ETHICS/reports/gender_lm_presentation_v2_bundle_20260920_r2'
+PACKAGE = ROOT / 'result/benchmarks/ethics/reports/gender_lm_presentation_v2_bundle_20260920_r2'
 OVERVIEW_DENSITY = [
     'organization_explicit_step', 'stance_hedge', 'connective_causal',
     'self_reference_first_person', 'framing_deontological',

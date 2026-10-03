@@ -3,7 +3,7 @@
 Runs the ETHICS evaluation across two prompt variants and five persona
 categories, saving results under:
 
-  result/ETHICS/<model_slug>/<prompt_variant>/<category>/<sub_folder>/<sample_id>.json
+  result/benchmarks/ethics/runs/<model_slug>/<prompt_variant>/<category>/<sub_folder>/<sample_id>.json
 
 Supported prompt variants : prompt_v1, prompt_v2
 Supported categories       : neutral, gender_explicit, gender_implicit_1,
@@ -514,7 +514,7 @@ def save_json(path: Path, payload: dict) -> None:
 
 def output_base_folder(model_cfg: dict) -> Path:
     model_slug = model_cfg["model_id"].replace("/", "_")
-    return Path("result") / "ETHICS" / model_slug
+    return Path("result/benchmarks/ethics/runs") / model_slug
 
 
 def persona_out_dir(base: Path, prompt_variant: str, category: str, sub_folder: str) -> Path:

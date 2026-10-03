@@ -22,10 +22,10 @@ from src.benchmarks.ethics import gender_lm_model_persona as plots
 from src.benchmarks.ethics.gender_lm_compact_plots import overview_figure
 from src.benchmarks.ethics.gender_lm_diagnostic_data import PERSONAS
 
-SOURCE = ROOT / 'result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3'
 TARGET = ROOT / 'notebooks/gender/linguistic marker/ETHICS'
 NOTEBOOK = 'ETHICS_Gender_Linguistic_Markers_Analysis_v1_5_candidate.ipynb'
-REFERENCE = ROOT / 'result/ETHICS/reports/gender_lm_diagnostics_20260919_r1/diagnostic_tables/diagnostic_gender_reference_context.csv'
+REFERENCE = ROOT / 'result/benchmarks/ethics/reports/gender_lm_diagnostics_20260919_r1/diagnostic_tables/diagnostic_gender_reference_context.csv'
 
 
 def digest(path):

@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path('src').resolve()))
 from generate_analysis_csv import extract_answer_from_response
 
 # Config
-reports_csv = Path('result/reports/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/results.csv')
+reports_csv = Path('result/archive/reports_mixed_legacy/qwen_qwen3-next-80b-a3b-thinking/man_explicit_1/results.csv')
 results_root = Path('results [january]/qwen_qwen3-next-80b-a3b-thinking')
 output_count = 100
 

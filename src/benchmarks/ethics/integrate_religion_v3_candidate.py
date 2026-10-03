@@ -41,11 +41,11 @@ def integrate(parts,output):
         (output/sub).mkdir()
     for relative in ('source_manifest.json','registry/markers.json','statistics/design_manifest.json'):
         shutil.copyfile(parts[0]/relative,output/relative)
-    shutil.copyfile(ROOT/'result/ETHICS/reports/religion_lm_v3_preservation_20260916_r1/manifest.json',output/'preservation_manifest.json')
-    baseline_check=ROOT/'result/ETHICS/reports/religion_lm_v3_baseline_identity_20260916_r1'
+    shutil.copyfile(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_preservation_20260916_r1/manifest.json',output/'preservation_manifest.json')
+    baseline_check=ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_baseline_identity_20260916_r1'
     shutil.copyfile(baseline_check/'manifest.json',output/'comparison_with_baseline/published_baseline_identity.json')
     shutil.copyfile(baseline_check/'column_comparison.csv',output/'comparison_with_baseline/published_baseline_columns.csv')
-    effective_audit = ROOT/'result/ETHICS/reports/religion_lm_v3_human_audit_20260916_r2'
+    effective_audit = ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_human_audit_20260916_r2'
     audit_design = json.loads((effective_audit/'manifest.json').read_text(encoding='utf-8'))
     write_json(output/'audit/design_manifest.json',dict(effective_package=str(effective_audit),
         design=audit_design,package_manifest_sha256=sha256(effective_audit/'manifest.json'),
@@ -71,7 +71,7 @@ def integrate(parts,output):
     summary.to_csv(output/'audit/rule_quotas.csv',index=False)
     write_json(output/'audit/precision_sampling_manifest.json',dict(design='one global occurrence stream; per-rule reservoir of 100 or all if fewer',
         seed=18222008,supersedes_shard_samples=True,selection_independent_of_human_labels=True,sampled_occurrences=len(selected)))
-    selected,evidence = precision_evidence(ROOT/'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv',selected)
+    selected,evidence = precision_evidence(ROOT/'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv',selected)
     selected.to_csv(output/'audit/precision_sample.csv',index=False)
     write_json(output/'audit/precision_full_responses.json',evidence)
     write_precision_templates(output,selected,evidence)
@@ -138,7 +138,7 @@ def integrate(parts,output):
         publication_panel_count=publication['count'],publication_pdf=publication['pdf'],
         default_notebook=default_notebook,notebook_path=notebook_path,
         equal_subset_insufficient_rows=int(incomplete.sum()),
-        development_review=str(ROOT/'result/ETHICS/reports/religion_lm_v3_development_review_20260915_r1'),
+        development_review=str(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_development_review_20260915_r1'),
         limitations=['upstream parsing remains candidate','independent human precision/recall pending','discovery saturation not reached','some function and referent attributes unresolved']))
     import platform
     from importlib.metadata import version

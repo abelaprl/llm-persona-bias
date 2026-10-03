@@ -7,11 +7,11 @@ from collections import defaultdict
 parser = argparse.ArgumentParser()
 parser.add_argument(
     '--csv_path',
-    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\arcee-ai_trinity-large-thinking_llama\results.csv'
+    default=r'e:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\arcee-ai_trinity-large-thinking_llama\results.csv'
 )
 parser.add_argument(
     '--out_dir',
-    default=r'e:\Tugas Akhir\TugasAkhir\result\reports\arcee-ai_trinity-large-thinking_llama'
+    default=r'e:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\arcee-ai_trinity-large-thinking_llama'
 )
 parser.add_argument(
     '--max_rows',

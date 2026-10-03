@@ -17,7 +17,7 @@ from src.benchmarks.ethics.religion_lm_v3_io import KEYS,create_run_directory,wr
 
 
 def main():
-    base=ROOT/'result/ETHICS/reports'
+    base=ROOT/'result/benchmarks/ethics/reports'
     shard=base/'religion_lm_v3_candidate_20260915_r2_shard_b'
     out=create_run_directory(base/'religion_lm_v3_thread_check_20260916_r1')
     markers=[m.marker_id for m in get_registry()]

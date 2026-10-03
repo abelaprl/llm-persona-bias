@@ -10,7 +10,7 @@ from src.benchmarks.ethics.religion_lm_v3_io import create_run_directory,write_j
 from src.benchmarks.ethics.religion_lm_v3_registry import registry_rows,FAMILIES
 
 def main():
-    base = ROOT/'result/ETHICS/reports'
+    base = ROOT/'result/benchmarks/ethics/reports'
     effective = base/'religion_lm_v3_partition_revision_20260915_r1'
     out = create_run_directory(base/'religion_lm_v3_human_audit_20260915_r1')
     rows = pd.read_csv(effective/'human_recall_key.csv')
@@ -30,7 +30,7 @@ def main():
         'Density = 100 × jumlah occurrence / token Unicode mengandung huruf. Label-only tidak mempunyai density penjelasan. Presence output-level dan text-conditional adalah estimand berbeda.\n',
         'Tema moral adalah lexical mention, termasuk negasi, hipotesis dan kutipan; tidak membuktikan adopsi agama, stance positif atau kebenaran doktrin. Aturan konteks terbatas; unresolved dipertahankan.\n',
         'Atribusi pustaka pada 50 marker dasar diwariskan dari registry lokal, belum menjadi verifikasi bibliografi baru. Seluruh ekstensi v3 dan tema baru ditandai custom corpus-derived. Lihat src/core/linguistic_markers/ethics_religion_registry.py dan registry.py untuk asal aturan dasar.\n',
-        'Pembacaan pengembangan: 301 respons unik, indeks/hash di result/ETHICS/reports/religion_lm_v3_development_review_20260915_r1/. Ini bukan precision/recall gold.\n']
+        'Pembacaan pengembangan: 301 respons unik, indeks/hash di result/benchmarks/ethics/reports/religion_lm_v3_development_review_20260915_r1/. Ini bukan precision/recall gold.\n']
     for family,title in FAMILIES.items():
         intro += ['\n## '+title+'\n']
         for m in markers:

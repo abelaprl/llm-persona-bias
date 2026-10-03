@@ -7,9 +7,9 @@ from collections import defaultdict
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT   = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/v9_pilot")
-CSV_IN = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/result_ethics_v9_pilot_deepseek_deepseek-r1-distill-qwen-32b.csv")
-OUT_DIR = Path("result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b")
+ROOT   = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/v9_pilot")
+CSV_IN = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/result_ethics_v9_pilot_deepseek_deepseek-r1-distill-qwen-32b.csv")
+OUT_DIR = Path("result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b")
 
 df_csv = pd.read_csv(CSV_IN)
 

@@ -16,7 +16,7 @@ from src.benchmarks.ethics.religion_lm_v3_registry import get_registry,BASE_PATT
 def summarize(report,output):
     output=create_run_directory(output)
     markers=[m.marker_id for m in get_registry()]
-    base=ROOT/'result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
+    base=ROOT/'result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
     old=pd.read_csv(base,usecols=lambda c:c in KEYS+['text_available','word_count'] or c.endswith('__count')).set_index(KEYS)
     totals=Counter(); replay=[]
     for chunk in pd.read_csv(report/'comparison_with_baseline/factorial_ablation.csv.gz',chunksize=5000):
@@ -50,7 +50,7 @@ def summarize(report,output):
             if ':candidate:' in r.rule_id:new_hits[(r.model_id,r.rule_id)]+=1
     pd.DataFrame([dict(marker_id=m,observed_form=f,occurrences=n) for (m,f),n in forms.items()]).to_csv(output/'observed_forms.csv.gz',index=False)
     pd.DataFrame([dict(model_id=m,speaker_role=s,discourse_scope=d,occurrences=n) for (m,s,d),n in scope.items()]).to_csv(output/'scope_counts.csv',index=False)
-    readback=pd.read_csv(ROOT/'result/ETHICS/reports/religion_lm_v3_development_review_20260915_r1/readback_by_model_rule.csv').set_index(['model_id','rule_id'])
+    readback=pd.read_csv(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_development_review_20260915_r1/readback_by_model_rule.csv').set_index(['model_id','rule_id'])
     support=[]
     for (model,rule),keys in sorted(rule_responses.items()):
         read=int(readback.loc[(model,rule),'ai_full_responses_read']) if (model,rule) in readback.index else 0
@@ -59,7 +59,7 @@ def summarize(report,output):
             origin='candidate' if ':candidate:' in rule else 'legacy',human_reviewed=0,false_positives=None,
             status='candidate_not_human_validated'))
     support=pd.DataFrame(support);support.to_csv(output/'rule_readback_support.csv',index=False)
-    matrix=pd.read_csv(ROOT/'result/ETHICS/reports/religion_lm_v3_development_review_20260915_r1/completeness_matrix.csv')
+    matrix=pd.read_csv(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_development_review_20260915_r1/completeness_matrix.csv')
     count=Counter(m for m,f in forms)
     matrix['form_count_observed']=matrix.marker_id.map(count).fillna(0).astype(int)
     matrix['form_count_definition']='distinct whitespace-normalized casefolded accepted matched spans; not synonym or semantic coverage'

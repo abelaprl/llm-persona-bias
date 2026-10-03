@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(r"D:\TugasAkhir")
 AUDIT_DIR = (
     ROOT
-    / "result/ETHICS/reports/_audit/regional_neutral_full_20260821"
+    / "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821"
     / "parser_refinement_scan"
 )
 SAMPLE = AUDIT_DIR / "aita_verdict_label_audit_sample.csv"

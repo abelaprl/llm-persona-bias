@@ -16,7 +16,7 @@ import nbformat
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 TARGET = ROOT / "notebooks/gender/linguistic marker/ETHICS/ETHICS_Gender_Linguistic_Markers_Analysis_v1_5_candidate.ipynb"
-BUNDLE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
+BUNDLE = ROOT / "result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"
 
 
 def figure_bundle():
@@ -25,7 +25,7 @@ def figure_bundle():
     if not config.exists():
         return BUNDLE
     selected = (ROOT / json.loads(config.read_text(encoding="utf-8"))["figure_bundle"]).resolve()
-    if not selected.is_relative_to((ROOT / "result/ETHICS/reports").resolve()):
+    if not selected.is_relative_to((ROOT / "result/benchmarks/ethics/reports").resolve()):
         raise ValueError("Figure bundle must remain within ETHICS reports")
     return selected
 
@@ -163,7 +163,7 @@ from IPython.display import HTML, Image, Markdown, display
 ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents]
             if (p / "src/benchmarks/ethics").is_dir())
 NOTEBOOK_DIR = ROOT / "notebooks/gender/linguistic marker/ETHICS"
-BUNDLE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
+BUNDLE = ROOT / "result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"
 PRESENTATION_CONFIG = NOTEBOOK_DIR / "presentation_source.json"
 FIGURE_BUNDLE = (ROOT / json.loads(PRESENTATION_CONFIG.read_text(encoding="utf-8"))["figure_bundle"]
                  if PRESENTATION_CONFIG.exists() else BUNDLE)
@@ -424,7 +424,7 @@ print("Audit manusia:", audit_manifest["human_annotations_completed"], "; klaim 
 
 def main():
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    output = ROOT / "result/ETHICS/reports" / ("gender_lm_v2_notebook_integration_" + stamp)
+    output = ROOT / "result/benchmarks/ethics/reports" / ("gender_lm_v2_notebook_integration_" + stamp)
     output.mkdir(exist_ok=False)
     original = TARGET.read_bytes()
     (output / "notebook_before.ipynb").write_bytes(original)

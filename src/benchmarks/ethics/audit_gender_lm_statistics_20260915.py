@@ -17,8 +17,8 @@ parser.add_argument("--output-dir", type=Path, required=True, help="A new direct
 args = parser.parse_args()
 OUT = args.output_dir.resolve()
 OUT.mkdir(parents=True, exist_ok=False)
-SOURCE = ROOT / "result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/response_level_markers.csv.gz"
-BUNDLE = ROOT / "result/ETHICS/reports/Gender_Persona/linguistic_markers/analysis/gender_ethics_lm_gabungan_20260909_r4"
+SOURCE = ROOT / "result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/response_level_markers.csv.gz"
+BUNDLE = ROOT / "result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers/analysis/gender_ethics_lm_gabungan_20260909_r4"
 
 
 def holm(values):

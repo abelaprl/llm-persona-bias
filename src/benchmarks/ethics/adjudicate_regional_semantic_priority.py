@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(r"D:\TugasAkhir")
-AUDIT_DIR = ROOT / "result/ETHICS/reports/_audit/regional_neutral_full_20260821/semantic_commits"
+AUDIT_DIR = ROOT / "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821/semantic_commits"
 SOURCE = AUDIT_DIR / "regional_semantic_priority_review.csv"
 OUTPUT = AUDIT_DIR / "regional_semantic_priority_adjudicated.csv"
 SUMMARY = AUDIT_DIR / "regional_semantic_priority_adjudication_summary.json"

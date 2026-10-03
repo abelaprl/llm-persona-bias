@@ -22,7 +22,7 @@ PROBES={
 
 
 def enrich_gap_provenance(output):
-    base=ROOT/'result/ETHICS/reports'
+    base=ROOT/'result/benchmarks/ethics/reports'
     gaps=pd.read_csv(base/'religion_lm_v3_development_review_20260915_r1/discovery_gaps.csv',keep_default_na=False)
     readback=pd.read_csv(base/'religion_lm_v3_development_review_20260915_r1/readback_index.csv')
     gap_keys=set(gaps.response_key)

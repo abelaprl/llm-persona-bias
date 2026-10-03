@@ -25,7 +25,7 @@ import unittest
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[3]
-REPORTS = ROOT / 'result/ETHICS/reports'
+REPORTS = ROOT / 'result/benchmarks/ethics/reports'
 SOURCE = REPORTS / 'Regional_Cultural_Persona/_combined/all_models_results_full.csv'
 FROZEN = REPORTS / 'Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16'
 RECON = REPORTS / 'regional_lm_plan_recon_20260916_r1/full_response_readback.json'

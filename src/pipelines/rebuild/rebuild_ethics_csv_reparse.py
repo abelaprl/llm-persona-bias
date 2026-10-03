@@ -36,7 +36,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-RESULT_ROOT = Path("result/ETHICS")
+RESULT_ROOT = Path("result/benchmarks/ethics/runs")
 DEFAULT_SLUG = "deepseek_deepseek-r1-distill-qwen-32b"
 VARIANTS = ["prompt_v7", "v8_pilot", "v9_pilot"]
 

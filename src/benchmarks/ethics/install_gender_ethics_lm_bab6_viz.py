@@ -17,8 +17,8 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
 ACTIVE = ROOT / "notebooks/gender/linguistic marker/ETHICS"
-MAIN = ROOT / "result/ETHICS/reports/gender_lm_bab6_viz_20261002_r3"
-SUPPORT = ROOT / "result/ETHICS/reports/gender_lm_reference_presentation_20260920_r3"
+MAIN = ROOT / "result/benchmarks/ethics/reports/gender_lm_bab6_viz_20261002_r3"
+SUPPORT = ROOT / "result/benchmarks/ethics/reports/gender_lm_reference_presentation_20260920_r3"
 NOTEBOOK = "ETHICS_Gender_Linguistic_Markers_Analysis_v1_5_candidate.ipynb"
 
 
@@ -92,7 +92,7 @@ Warna pekat menunjukkan p Holm < 0,05; pudar bukan berarti efek nol. Holm mengik
 Menjalankan notebook memuat hasil dan memeriksa hash sumber, tanpa API maupun scoring ulang. Untuk membuat kembali lima visual utama, pilih direktori output yang belum ada:
 
 ```powershell
-.\\.venv\\Scripts\\python.exe -X utf8 src/benchmarks/ethics/build_gender_ethics_lm_bab6_viz.py --output result/ETHICS/reports/gender_lm_bab6_viz_reproduction_01
+.\\.venv\\Scripts\\python.exe -X utf8 src/benchmarks/ethics/build_gender_ethics_lm_bab6_viz.py --output result/benchmarks/ethics/reports/gender_lm_bab6_viz_reproduction_01
 ```
 
 Grafik pendukung dan tabel keragaman tetap berasal dari `gender_lm_reference_presentation_20260920_r3`. Gambar lama disimpan untuk penelusuran, tetapi tidak ditampilkan sebagai hasil utama."""

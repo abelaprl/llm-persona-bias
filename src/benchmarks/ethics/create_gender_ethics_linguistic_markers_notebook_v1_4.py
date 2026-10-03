@@ -67,7 +67,7 @@ def locate_repo_root() -> Path:
 REPO_ROOT = locate_repo_root()
 BUNDLE_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/Gender_Persona/linguistic_markers/analysis"
+    / "result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers/analysis"
     / "gender_ethics_linguistic_markers_v1_4_candidate_r4_20260826"
 )
 FIG_DIR = BUNDLE_DIR / "images"

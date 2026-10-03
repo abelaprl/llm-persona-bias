@@ -16,8 +16,8 @@ from pathlib import Path
 
 
 ROOT = Path(r"D:\TugasAkhir")
-AUDIT_DIR = ROOT / "result/ETHICS/reports/_audit/gender_neutral_full_20260820"
-INPUT = ROOT / "result/ETHICS/reports/all_models_results_full.csv"
+AUDIT_DIR = ROOT / "result/benchmarks/ethics/reports/_audit/gender_neutral_full_20260820"
+INPUT = ROOT / "result/benchmarks/ethics/reports/all_models_results_full.csv"
 INDEX_INPUT = AUDIT_DIR / "noncommitted_response_audit_index_2026-08-16.csv"
 STRICT_REVIEW_INPUT = AUDIT_DIR / "gender_strict_44_codex_adjudicated.csv"
 DETAIL_OUT = AUDIT_DIR / "gender_abstain_deep_triage.csv"

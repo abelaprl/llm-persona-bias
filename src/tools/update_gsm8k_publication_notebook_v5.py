@@ -361,7 +361,7 @@ print(f"Output baru         : {OUTPUT_ROOT}")
 CELL_2 = r'''
 ## 1. Loader sumber tingkat pertanyaan
 
-`Gender` dibaca dari report per-persona di `result/reports/<model>/`. Untuk GPT-OSS 20B,
+`Gender` dibaca dari report per-persona di `result/archive/reports_mixed_legacy/<model>/`. Untuk GPT-OSS 20B,
 baris `Neutral` dibaca dari combined report karena file `results_neutral.csv` tidak tersedia.
 `question_id` dinormalisasi dari nama file `gsm8k_XXXXX.json` sehingga perbedaan skema
 0-based, 1-based, atau kolom kosong pada report lama tidak mengubah pairing.

@@ -40,7 +40,7 @@ def main():
     parser.add_argument('--run-id',required=True)
     args = parser.parse_args()
     if not args.run_id.replace('_','').replace('-','').isalnum(): parser.error('Invalid run ID')
-    base = ROOT/'result/ETHICS/reports'
+    base = ROOT/'result/benchmarks/ethics/reports'
     planned=[base/f'religion_lm_v3_candidate_{args.run_id}_shard_{index}' for index in range(len(GROUPS))]
     planned.append(base/f'religion_lm_v3_candidate_{args.run_id}_overall')
     planned.extend([base/f'religion_lm_v3_verification_{args.run_id}',base/f'religion_lm_v3_summary_{args.run_id}'])

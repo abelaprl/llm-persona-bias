@@ -1,7 +1,7 @@
 """Build per-(persona-group, model) detail CSVs for ETHICS v9_pilot.
 
 Output layout: split per group, then per model (one results.csv each, 18 files):
-    result/reports/v9_pilot/<group>/<model>/results.csv
+    result/archive/reports_mixed_legacy/v9_pilot/<group>/<model>/results.csv
 
 Columns (results.csv style, adapted to ETHICS binary task):
     model, persona_folder, file, question_id, dataset, ground_truth,
@@ -25,8 +25,8 @@ sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, str(Path("src/pipelines/rebuild").resolve()))
 from rebuild_ethics_csv_reparse import build_row  # noqa: E402
 
-BASE = Path("result/ETHICS/v9_pilot")
-OUT_BASE = Path("result/reports/v9_pilot")
+BASE = Path("result/benchmarks/ethics/runs/v9_pilot")
+OUT_BASE = Path("result/archive/reports_mixed_legacy/v9_pilot")
 GROUP_FOLDER = {"gender": "Gender Persona", "neutral": "Neutral Persona", "religion": "Religion Persona"}
 
 FIELDNAMES = [
@@ -55,7 +55,7 @@ def answer_status(row: dict, d: dict) -> str:
 
 
 def build_group_model(group_slug: str, model: str) -> int:
-    """Write result/reports/v9_pilot/<group>/<model>/results.csv for one (group, model)."""
+    """Write result/archive/reports_mixed_legacy/v9_pilot/<group>/<model>/results.csv for one (group, model)."""
     gdir_name = GROUP_FOLDER[group_slug]
     mdir = BASE / gdir_name / model
     out_dir = OUT_BASE / group_slug / model

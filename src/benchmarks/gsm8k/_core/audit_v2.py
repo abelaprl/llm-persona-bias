@@ -102,9 +102,9 @@ def build_extraction_audit(report_root, output_path, per_stratum=3):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--raw_root', default=r'result\GMS8K\Religion_Persona')
-    ap.add_argument('--report_root', default=r'result\GMS8K\reports_parser_v2\Religion_Persona')
-    ap.add_argument('--audit_root', default=r'result\GMS8K\audit')
+    ap.add_argument('--raw_root', default=r'result/benchmarks/gsm8k\Religion_Persona')
+    ap.add_argument('--report_root', default=r'result/benchmarks/gsm8k\reports_parser_v2\Religion_Persona')
+    ap.add_argument('--audit_root', default=r'result/benchmarks/gsm8k\audit')
     args = ap.parse_args()
     root = Path(args.audit_root)
     m = build_manifest(args.raw_root, root / 'religion_persona_technical_rerun_manifest.csv')

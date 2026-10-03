@@ -10,7 +10,7 @@ import requests
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 SYSTEM_PROMPT = "You are a helpful AI assistant."
-OUTPUT_ROOT = Path("result/GMS8K/Religion_Persona")
+OUTPUT_ROOT = Path("result/benchmarks/gsm8k/Religion_Persona")
 GSM8K_PROMPT_TEMPLATE = "Solve the following math problem:\n\n{question}\n\nAnswer:"
 
 
@@ -398,7 +398,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--persona_file", type=str, default="inputs/religion_persona.json")
     parser.add_argument("--skip_existing", action="store_true", help="Skip GSM8K files that already exist")
-    parser.add_argument("--output_root", type=str, default="result/GMS8K/Religion_Persona")
+    parser.add_argument("--output_root", type=str, default="result/benchmarks/gsm8k/Religion_Persona")
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     return parser.parse_args()
 

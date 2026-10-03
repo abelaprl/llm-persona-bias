@@ -107,7 +107,7 @@ CATS = ['both_sides', 'advice', 'balanced', 'other', 'clarify', 'praise']
 samples = defaultdict(list)
 MAX = 12
 
-base = r'D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
+base = r'D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
 
 for persona_dir in sorted(os.listdir(base)):
     if persona_dir not in GENDER_RELIGION_NEUTRAL: continue

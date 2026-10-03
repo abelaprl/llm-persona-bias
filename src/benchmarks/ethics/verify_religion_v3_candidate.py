@@ -152,7 +152,7 @@ def verify(report,output):
     split = pd.read_csv(package/'question_split.csv')
     assert len(audit_key)==1020 and audit_key.question_id.nunique()>10 and audit_key.subset.nunique()==4
     assert audit_key.merge(split,on=['subset','question_id'],suffixes=('','_effective')).partition_effective.eq('held_out').all()
-    readback = pd.read_csv(ROOT/'result/ETHICS/reports/religion_lm_v3_development_review_20260915_r1/readback_index.csv')
+    readback = pd.read_csv(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_development_review_20260915_r1/readback_index.csv')
     assert readback.merge(split,on=['subset','question_id']).partition.eq('development').all()
     rules = pd.read_csv(report/'audit/rule_quotas.csv')
     assert rules.human_reviewed.eq(0).all() and rules.false_positives.isna().all()

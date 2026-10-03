@@ -12,7 +12,7 @@ from src.benchmarks.ethics.religion_lm_v3_surface import prepare_final_surface
 from src.benchmarks.ethics.religion_lm_v3_registry import registry_rows
 
 def main():
-    base = ROOT/'result/ETHICS/reports'
+    base = ROOT/'result/benchmarks/ethics/reports'
     partition = base/'religion_lm_v3_partition_revision_20260915_r1'
     previous = base/'religion_lm_v3_human_audit_20260915_r1'
     output = create_run_directory(base/'religion_lm_v3_human_audit_20260916_r2')

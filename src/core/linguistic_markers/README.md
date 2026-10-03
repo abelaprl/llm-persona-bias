@@ -19,8 +19,8 @@ analisis.
 
 Input utama sekarang adalah CSV hasil parsing:
 
-- `result/GMS8K/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv` untuk GSM8K; serta
-- `result/reports/v9_main/{gender,neutral}/<model>/*.csv` untuk ETHICS.
+- `result/benchmarks/gsm8k/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv` untuk GSM8K; serta
+- `result/archive/reports_mixed_legacy/v9_main/{gender,neutral}/<model>/*.csv` untuk ETHICS.
 
 Kolom `question_id` pada CSV GSM8K gabungan tidak dipakai karena sebagian file
 berisi nilai konstan. ID pasangan diturunkan dari kolom `file`, misalnya
@@ -78,7 +78,7 @@ Contoh smoke run GSM8K tanpa statistik penuh:
   --models meta-llama_llama-3.1-8b-instruct `
   --max-records-per-persona 20 `
   --extract-only `
-  --output-dir result/linguistic_markers/smoke_gender_lm_v1
+  --output-dir result/analyses/linguistic_markers/runs/smoke_gender_lm_v1
 ```
 
 Program menolak output directory yang sudah ada agar hasil lama tidak tertimpa.
@@ -94,9 +94,9 @@ Full extraction khusus ETHICS Gender Persona dijalankan dengan:
 ```
 
 Input default-nya adalah
-`result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`
+`result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`
 dan output default ditulis ke folder versi baru
-`result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/`.
+`result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0/`.
 Program menolak folder output yang sudah berisi file. Registry gabungan ETHICS
 memuat keluarga marker umum, wacana moral, dan gender sebagai outcome terpisah;
 tidak ada satu skor gabungan lintas keluarga.
@@ -147,11 +147,11 @@ Full extraction regional-cultural dijalankan dari file gabungan kanonik terbaru:
 
 ```powershell
 python -m src.core.linguistic_markers.regional_cultural_dataset_audit `
-  --output-dir result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16 `
+  --output-dir result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16 `
   --extraction-workers 1
 ```
 
-Input `result/ETHICS/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv`
+Input `result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv`
 memiliki SHA-256
 `09f96bec32feafe3426c39526c1d9a80453d09ede2edb06a25e90fbddacc89a5`.
 Run memproses 154.428 respons unik dari 6 model, 17 kondisi, dan 1.514
@@ -163,8 +163,8 @@ Audit AI first-pass beserta seluruh aggregated anchor form dibuat dengan:
 
 ```powershell
 python -m src.core.linguistic_markers.regional_cultural_codex_adjudication `
-  --base-output result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16 `
-  --output-dir result/ETHICS/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_codex_audit_r1
+  --base-output result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16 `
+  --output-dir result/benchmarks/ethics/reports/Regional_Cultural_Persona/linguistic_markers_regional_cultural_candidate_20260822_v1_0_16_codex_audit_r1
 ```
 
 Registry v1.0.16 merupakan hasil pembacaan manual AI atas seluruh 2.017
@@ -182,7 +182,7 @@ Codex tidak mengisi kolom reviewer manusia.
 
 Full extraction kandidat final saat ini memakai sumber kanonik:
 
-`result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv`
+`result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv`
 
 SHA-256 sumber adalah
 `c10a998ce65073e4adbd4a77e69cc1105540d0d600ceff9e8062d375c299533a`,
@@ -199,17 +199,17 @@ bundle dasar. Inferensi tetap mati.
 
 Bundle kandidat final ditulis ke:
 
-`result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/`
+`result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/`
 
 Adjudikasi AI first-pass dijalankan secara write-once ke:
 
-`result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10_codex_audit_r1/`
+`result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10_codex_audit_r1/`
 
 Audit exhaustif R2 dan adjudikasi finalnya berada di:
 
-`result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10_codex_audit_r2_exhaustive/`
+`result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10_codex_audit_r2_exhaustive/`
 
-`result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10_codex_audit_r2_adjudicated_v3/`
+`result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10_codex_audit_r2_adjudicated_v3/`
 
 Audit berulang memperbaiki recall bentuk Quranic/Qur'anic, halakhah, kavod
 habrit, mitzvah/mitzvaso, commandment/verse berjangkar agama, fasting sebagai
@@ -257,9 +257,9 @@ Rincian provenance, angka marker, audit delta, dan batas interpretasi ada di
 
 ## HASIL SAMPEL YANG TERSEDIA
 
-- `result/linguistic_markers/gender_gsm8k_source_aligned_pilot_v1_2_1_20260817/`
+- `result/analyses/linguistic_markers/runs/gender_gsm8k_source_aligned_pilot_v1_2_1_20260817/`
   berisi pilot audit 2.700 respons (50 per model-persona).
-- `result/linguistic_markers/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
+- `result/analyses/linguistic_markers/runs/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
   berisi full run GSM8K 71.215 respons dan 10.000 bootstrap resample.
 
 Pilot adalah diagnostic subset. Full run tetap berstatus kandidat sampai audit
@@ -310,7 +310,7 @@ serta positive/negative context marker gender.
 
 ## INTEGRATION
 
-Output baru ditulis ke `result/linguistic_markers/<versi>/`:
+Output baru ditulis ke `result/analyses/linguistic_markers/runs/<versi>/`:
 
 | File | Isi |
 |---|---|

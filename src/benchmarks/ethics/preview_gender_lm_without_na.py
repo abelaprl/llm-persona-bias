@@ -11,7 +11,7 @@ from src.benchmarks.ethics import build_gender_ethics_lm_print as plots
 
 
 def main():
-    output = ROOT / "result/ETHICS/reports/gender_lm_preview_without_na_20261002_r2"
+    output = ROOT / "result/benchmarks/ethics/reports/gender_lm_preview_without_na_20261002_r2"
     if output.exists():
         raise FileExistsError(output)
     fid = "02_bahasa_etika_man_minus_woman"

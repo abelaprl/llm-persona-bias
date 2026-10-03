@@ -1,6 +1,6 @@
 import csv
 
-CSV_PATH = r'result/reports/openai_gpt-oss-20b/results.csv'
+CSV_PATH = r'result/archive/reports_mixed_legacy/openai_gpt-oss-20b/results.csv'
 
 # Print a few examples where extraction failed (is_correct == False), show full answer and analysis
 

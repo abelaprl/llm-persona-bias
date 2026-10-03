@@ -34,7 +34,7 @@ from IPython.display import Image, Markdown, HTML, display
 
 ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents]
             if (p / 'src/benchmarks/ethics').is_dir() and (p / 'result').is_dir())
-BUNDLE = ROOT / 'result/ETHICS/reports/religion_ethics_gsm8k_style_{run_id}'
+BUNDLE = ROOT / 'result/benchmarks/ethics/reports/religion_ethics_gsm8k_style_{run_id}'
 ACTIVE_DIR = ROOT / 'notebooks/religion/linguistic marker/ETHICS'
 DOCUMENT_DIR = ROOT / 'notebooks/religion/linguistic marker/ETHICS'
 LOCAL_FIGURES = ACTIVE_DIR / 'figures/gsm8k_style_{run_id}'

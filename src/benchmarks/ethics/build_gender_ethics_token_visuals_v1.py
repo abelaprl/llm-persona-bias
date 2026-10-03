@@ -38,7 +38,7 @@ import seaborn as sns
 
 ANALYSIS_VERSION = "ethics-gender-token-visuals-v1-20260929"
 SOURCE_RESPONSE_TABLE = Path(
-    "result/ETHICS/reports/Gender_Persona/_combined/"
+    "result/benchmarks/ethics/reports/Gender_Persona/_combined/"
     "parser_refinement_20260820/all_models_results_full.csv"
 )
 ACCURACY_TABLE = Path(

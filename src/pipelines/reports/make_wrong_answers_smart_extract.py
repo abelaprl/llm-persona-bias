@@ -1,8 +1,8 @@
 import csv
 import re
 
-IN_CSV = r'result/reports/openai_gpt-oss-20b/results.csv'
-OUT_CSV = r'result/reports/openai_gpt-oss-20b/wrong_answers_smart_extract.csv'
+IN_CSV = r'result/archive/reports_mixed_legacy/openai_gpt-oss-20b/results.csv'
+OUT_CSV = r'result/archive/reports_mixed_legacy/openai_gpt-oss-20b/wrong_answers_smart_extract.csv'
 
 # Helper to extract the best candidate number based on user heuristics
 # - Prefer number after last '='

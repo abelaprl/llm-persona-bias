@@ -10,7 +10,7 @@ Run from the repository root::
     python src/benchmarks/ethics/build_persona_combined_full.py --group religion --execute
     python src/benchmarks/ethics/build_persona_combined_full.py --group regional --execute
 
-Outputs are written below ``result/ETHICS/reports``.  Each combined folder
+Outputs are written below ``result/benchmarks/ethics/reports``.  Each combined folder
 contains the full CSV, a source-file manifest, and an audit manifest.
 """
 from __future__ import annotations

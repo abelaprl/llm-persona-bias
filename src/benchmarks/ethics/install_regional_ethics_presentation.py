@@ -52,7 +52,7 @@ def publish_files(source, active, archive, previous, names, fail_after=None):
 
 def install_verified(bundle, active_dir=ACTIVE):
     bundle, active = Path(bundle).resolve(), Path(active_dir).resolve()
-    if active != ACTIVE.resolve() or bundle.parent != (ROOT / 'result/ETHICS/reports').resolve():
+    if active != ACTIVE.resolve() or bundle.parent != (ROOT / 'result/benchmarks/ethics/reports').resolve():
         raise ValueError('Installer target outside approved Regional scope')
     verification = verify_bundle(bundle)
     previous = {}

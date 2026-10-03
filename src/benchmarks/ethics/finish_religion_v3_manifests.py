@@ -15,7 +15,7 @@ def finish(output):
     targets=['manifest.json','environment_manifest.json','integration_sources.json','completion_recovery.json']
     for name in targets:
         if (output/name).exists():raise FileExistsError(output/name)
-    base=ROOT/'result/ETHICS/reports'
+    base=ROOT/'result/benchmarks/ethics/reports'
     parts=[base/f'religion_lm_v3_candidate_20260915_r2_shard_{s}' for s in 'abc']
     manifests=[json.loads((p/'manifest.json').read_text(encoding='utf-8')) for p in parts]
     figures=json.loads((output/'figure_manifest.json').read_text(encoding='utf-8'))
@@ -67,6 +67,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--report',required=True,type=Path);args=parser.parse_args();finish(args.report)
     from src.benchmarks.ethics.verify_religion_v3_candidate import verify
     from src.benchmarks.ethics.summarize_religion_v3_candidate import summarize
-    base=ROOT/'result/ETHICS/reports'
+    base=ROOT/'result/benchmarks/ethics/reports'
     verify(args.report,base/'religion_lm_v3_verification_20260916_r4')
     summarize(args.report,base/'religion_lm_v3_summary_20260916_r4')

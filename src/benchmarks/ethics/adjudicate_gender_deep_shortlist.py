@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(r"D:\TugasAkhir")
-AUDIT_DIR = ROOT / "result/ETHICS/reports/_audit/gender_neutral_full_20260820"
+AUDIT_DIR = ROOT / "result/benchmarks/ethics/reports/_audit/gender_neutral_full_20260820"
 SOURCE = AUDIT_DIR / "gender_abstain_deep_shortlist_57.csv"
 OUTPUT = AUDIT_DIR / "gender_abstain_deep_shortlist_57_codex_adjudicated.csv"
 

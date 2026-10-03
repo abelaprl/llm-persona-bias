@@ -20,7 +20,7 @@ THEMES = {
 }
 
 def main():
-    base = ROOT/'result/ETHICS/reports'
+    base = ROOT/'result/benchmarks/ethics/reports'
     prep = base/'religion_lm_v3_preparation_20260915_r1'
     out = create_run_directory(base/'religion_lm_v3_theme_discovery_20260915_r1')
     rows = load_final_rows(base/'Religion_Persona/_combined/all_models_results_full.csv')

@@ -3,7 +3,7 @@
 ## Ruang lingkup
 
 Input canonical adalah 81.756 respons Gender Persona + Neutral pada
-`result/ETHICS/reports/Gender_Persona/_combined/all_models_results_full.csv`
+`result/benchmarks/ethics/reports/Gender_Persona/_combined/all_models_results_full.csv`
 dengan SHA-256
 `93301f45395ae532193b76a166b88ef23c8e2d3dc206935ca5f5220a55b2d56e`.
 Tidak ada API call, perubahan response text, atau penggunaan ground truth pada
@@ -39,7 +39,7 @@ unresolved.
   Neutral tidak berubah.
 
 Audit terisi dan riwayat aturan gagal tersedia di
-`result/ETHICS/reports/_audit/gender_parser_refinement_20260820/`.
+`result/benchmarks/ethics/reports/_audit/gender_parser_refinement_20260820/`.
 
 ## Kandidat semantik setelah boilerplate
 
@@ -71,7 +71,7 @@ tidak boleh ditambahkan ke coverage.
 
 Output baru:
 
-`result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`
+`result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`
 
 SHA-256 output:
 `9a442ffeda5b3308b21fd9c398ab2633e3ad835d41346f5fc1d4ed302b5ee5a4`.

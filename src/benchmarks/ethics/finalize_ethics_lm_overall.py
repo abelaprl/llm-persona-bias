@@ -111,7 +111,7 @@ def make_notebook(bundle, group, review_note):
     verbosity = pd.read_csv(output / "figure_tables/verbosity.csv")
     short = verbosity.loc[verbosity.model_id.eq("openai_gpt-oss-20b")]
     one_word = int(short['median'].eq(1).sum())
-    example_source = ROOT / "result/ETHICS/reports/presentation_completion_20260913_r5" / group / "paired_examples.json"
+    example_source = ROOT / "result/benchmarks/ethics/reports/presentation_completion_20260913_r5" / group / "paired_examples.json"
     assert not (output / "paired_examples.json").exists()
     (output / "paired_examples.json").write_bytes(example_source.read_bytes())
     total, available = int(coverage.total.sum()), int(coverage.available.sum())
@@ -254,7 +254,7 @@ def main():
     parser.add_argument("--review-note")
     args = parser.parse_args()
     bundle = args.bundle.resolve()
-    assert bundle.is_relative_to(ROOT / "result/ETHICS/reports")
+    assert bundle.is_relative_to(ROOT / "result/benchmarks/ethics/reports")
     if args.action == "install":
         prior.install_prepared(bundle)
     elif args.action == "audit":

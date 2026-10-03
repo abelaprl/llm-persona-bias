@@ -1,7 +1,7 @@
 # Cara Menjalankan — ETHICS v9_pilot per Persona
 
 Runner: `src/ethics_runner/run_ethics_prompt_v9.py`
-Output: `result/ETHICS/v9_pilot/{Group Persona}/{model_slug}/{persona}/`
+Output: `result/benchmarks/ethics/runs/v9_pilot/{Group Persona}/{model_slug}/{persona}/`
 
 > Jalankan dari folder `D:\TugasAkhir`.
 > Copy **satu blok**, Enter, tunggu `Done.`, baru lanjut ke blok berikutnya.

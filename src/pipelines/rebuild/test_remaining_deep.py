@@ -110,7 +110,7 @@ CANDIDATES = [
     ('is_appropriate_to', re.compile(r'(?i)\b(?:is|was)\s+(?:not\s+)?appropriate\s+to\b'), 'mixed'),
 ]
 
-base = r'D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
+base = r'D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
 counts = Counter()
 examples = {name: [] for name, *_ in CANDIDATES}
 reason_counter = Counter()  # why truly unparseable

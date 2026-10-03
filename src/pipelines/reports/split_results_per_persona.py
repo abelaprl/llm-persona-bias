@@ -2,8 +2,8 @@ import csv
 import os
 
 # Path to the main results.csv
-MAIN_CSV = r"e:\Tugas Akhir\TugasAkhir\result\reports\deepseek_deepseek-v3.2\results.csv"
-REPORTS_DIR = r"e:\Tugas Akhir\TugasAkhir\result\reports\deepseek_deepseek-v3.2"
+MAIN_CSV = r"e:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\deepseek_deepseek-v3.2\results.csv"
+REPORTS_DIR = r"e:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\deepseek_deepseek-v3.2"
 
 # Read all rows from the main CSV
 with open(MAIN_CSV, encoding="utf-8") as f:

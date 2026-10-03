@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--raw-group",
         default=None,
-        help="Raw directory below result/GMS8K; default equals --group.",
+        help="Raw directory below result/benchmarks/gsm8k; default equals --group.",
     )
     parser.add_argument("--results", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)

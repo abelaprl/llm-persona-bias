@@ -9,7 +9,7 @@ from src.benchmarks.ethics.religion_lm_v3_io import write_json,sha256
 
 
 def record():
-    report=ROOT/'result/ETHICS/reports/religion_lm_v3_candidate_20260916_r4_overall'
+    report=ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_candidate_20260916_r4_overall'
     figures=json.loads((report/'figure_manifest.json').read_text(encoding='utf-8'))
     figures+=json.loads((report/'figure_manifest_additional.json').read_text(encoding='utf-8'))
     panels=json.loads((report/'publication_panel_manifest.json').read_text(encoding='utf-8'))
@@ -28,7 +28,7 @@ def record():
     write_json(report/'visual_review.json',dict(status='AI_visual_and_automated_layout_review_complete_not_human_gold',
         reviewed_images=records,image_count=37,pdf_pages=pages,pdf_a4_media_boxes_checked=len(boxes),pdf_sha256=sha256(pdf),
         native_publication_geometry_checks='24 panels assert text bounds and non-overlapping footer blocks during rendering',
-        numerical_verification=str(ROOT/'result/ETHICS/reports/religion_lm_v3_verification_20260916_r5/verification.json'),
+        numerical_verification=str(ROOT/'result/benchmarks/ethics/reports/religion_lm_v3_verification_20260916_r5/verification.json'),
         guidance=['Use A4 PDF or individual publication panels for thesis export; six-model forests are overview figures.',
             'Overview implicit forest requires its caption: I1 minus explicit. A4 titles and row labels state conditions explicitly.',
             'A dot without visible interval is not evidence of certainty; CI support and p-Holm are in the accompanying tables.'],

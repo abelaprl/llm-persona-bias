@@ -988,7 +988,7 @@ abstain.
 
 ## Provenance
 
-Sumber statistik: bundle v3 tervalidasi pada `result/ETHICS/reports/{SOURCE_GROUP_PATH}/_combined`.
+Sumber statistik: bundle v3 tervalidasi pada `result/benchmarks/ethics/reports/{SOURCE_GROUP_PATH}/_combined`.
 CSV respons sumber hanya dibaca untuk membentuk tabel status dan alasan abstain;
 tidak ada parsing ulang, rescoring, API call, atau perubahan pada `result/`.
 

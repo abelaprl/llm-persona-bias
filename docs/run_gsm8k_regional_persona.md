@@ -2,7 +2,7 @@
 
 Runner: `src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py`
 Persona file: `inputs/regional_cultural_persona.json`
-Output: `result/GMS8K/regional_cultural_persona/{model_slug}/{persona}/gsm8k_NNNNN.json`
+Output: `result/benchmarks/gsm8k/regional_cultural_persona/{model_slug}/{persona}/gsm8k_NNNNN.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
 
@@ -168,7 +168,7 @@ python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31
 | `--persona_file` | `inputs/regional_cultural_persona.json` | Path ke file persona |
 | `--skip_existing` | `False` | Lewati soal yang file JSON-nya sudah ada |
 | `--force_warmup` | `False` | Paksa regenerasi warmup meski sudah ada |
-| `--output_root` | `result/GMS8K/regional_cultural_persona` | Folder output |
+| `--output_root` | `result/benchmarks/gsm8k/regional_cultural_persona` | Folder output |
 | `--sleep_sec` | `1.0` | Jeda antar request API (detik) |
 
 ---
@@ -176,7 +176,7 @@ python src/gsm8k_runner/run_gsm8k_regional_cultural_personas.py --model_order 31
 ## Struktur Output
 
 ```
-result/GMS8K/regional_cultural_persona/
+result/benchmarks/gsm8k/regional_cultural_persona/
 └── {model_slug}/                       # e.g. deepseek_deepseek-r1-distill-qwen-32b
     ├── north_american_explicit/
     │   ├── gsm8k_00001.json

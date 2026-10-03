@@ -21,8 +21,8 @@ from .references import annotate_references
 from .sources import KEYS, load_source, reserve_output, sha256
 from .surfaces import build_surfaces
 
-DEFAULT_SOURCE = Path("result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv")
-BASELINE = Path("result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0")
+DEFAULT_SOURCE = Path("result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv")
+BASELINE = Path("result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_6_0")
 SURFACE_COLUMNS = ["raw_text", "visible_text", "explanation_text", "structure_text", "layout_fidelity", "offset_map", "surface_flags"]
 SPAN_COLUMNS = ["response_id", *KEYS, "marker_id", "rule_id", "start", "end", "text", "surface_name", "flags", "evidence_strength", "rule_status", "reference_type"]
 
@@ -269,8 +269,8 @@ def analyze(output: Path, resamples: int, permutations: int, workers: int = 4) -
     print("Preparing full-response audit packets", flush=True)
     source_config = json.loads(Path(__file__).with_name("source_config.json").read_text(encoding="utf-8"))
     previously_read = {tuple(pair) for pair in source_config.get("previously_read_clusters", [])}
-    prior_samples = [Path("result/ETHICS/reports/gender_lm_plan_recon_20260915/ethics_response_reading/full_responses.json"),
-                     Path("result/ETHICS/reports/gender_lm_99_readiness_20260915_r1/full_response_discovery_samples.json")]
+    prior_samples = [Path("result/benchmarks/ethics/reports/gender_lm_plan_recon_20260915/ethics_response_reading/full_responses.json"),
+                     Path("result/benchmarks/ethics/reports/gender_lm_99_readiness_20260915_r1/full_response_discovery_samples.json")]
     for path in prior_samples:
         for row in json.loads(path.read_text(encoding="utf-8")):
             previously_read.add((row["subset"], row["question_id"]))

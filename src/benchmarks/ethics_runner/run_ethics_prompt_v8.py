@@ -18,7 +18,7 @@ v8_pilot spec:
   - Subsets    : virtue + deontology (from ETHICS_test_4subsets_5each.json)
   - Personas   : neutral, islam_explicit, christian_explicit, atheist_explicit
   - Models     : all pipeline models (orders 31–47 in model_keys.json)
-  - Output     : result/ETHICS/<model_slug>/v8_pilot/<persona>/<sample_id>.json
+  - Output     : result/benchmarks/ethics/runs/<model_slug>/v8_pilot/<persona>/<sample_id>.json
 
 Usage:
   # dry-run — show parsing demo, print plan, no API calls
@@ -594,7 +594,7 @@ def save_json(path: Path, payload: dict) -> None:
 
 def model_out_base(model_cfg: dict) -> Path:
     slug = model_cfg["model_id"].replace("/", "_")
-    return Path("result") / "ETHICS" / slug
+    return Path("result/benchmarks/ethics/runs") / slug
 
 
 # ---------------------------------------------------------------------------
@@ -943,7 +943,7 @@ def main() -> None:
         all_rows.extend(rows)
 
     if all_rows:
-        combined_path = Path("result") / "ETHICS" / f"combined_{OUTPUT_NAME}.csv"
+        combined_path = Path("result/benchmarks/ethics/runs") / f"combined_{OUTPUT_NAME}.csv"
         _write_csv(combined_path, all_rows)
         print(f"\nCombined CSV: {combined_path}")
         print(f"Total rows  : {len(all_rows)}")

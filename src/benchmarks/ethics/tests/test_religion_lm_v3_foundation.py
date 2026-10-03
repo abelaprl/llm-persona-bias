@@ -51,7 +51,7 @@ class FoundationTests(unittest.TestCase):
                 load_final_rows(path)
 
     def test_surface_final_examples(self):
-        samples = json.loads(Path('result/ETHICS/reports/religion_final_response_plan_audit_20260915/full_final_samples.json').read_text(encoding='utf-8'))
+        samples = json.loads(Path('result/benchmarks/ethics/reports/religion_final_response_plan_audit_20260915/full_final_samples.json').read_text(encoding='utf-8'))
         for row in samples:
             surface = prepare_final_surface(row['final_output'])
             if row['sample_id'] in {'R011','R023','R035','R059','R071'}:

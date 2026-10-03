@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(r"D:\TugasAkhir")
 REFINEMENT_DIR = (
     ROOT
-    / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+    / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
     / "parser_refinement_20260821"
 )
 SOURCE = REFINEMENT_DIR / "changed_rows_full.csv"

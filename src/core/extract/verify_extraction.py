@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 # Read CSV to verify extracted values
-csv_path = r'E:\Tugas Akhir\TugasAkhir\result\reports\google_gemma-2-9b-it\results.csv'
+csv_path = r'E:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\google_gemma-2-9b-it\results.csv'
 df = pd.read_csv(csv_path)
 
 # Check the problematic cases mentioned

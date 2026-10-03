@@ -30,8 +30,8 @@ import masking  # noqa: E402
 import normalize  # noqa: E402
 from detectors import semantic  # noqa: E402
 
-DEFAULT_INPUT = Path(r"D:\TugasAkhir\result\reports\v9_main\ALL_ethics_v9.csv")
-DEFAULT_OUTPUT_DIR = Path(r"D:\TugasAkhir\result\reports\v9_main\_audit")
+DEFAULT_INPUT = Path(r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\ALL_ethics_v9.csv")
+DEFAULT_OUTPUT_DIR = Path(r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\_audit")
 PAIR_SEP = "\x1f"
 SAMPLE_KINDS = ("blocked", "midtext", "disagreement", "analysis_none")
 SAMPLES_PER_BATCH = 2

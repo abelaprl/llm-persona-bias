@@ -25,7 +25,7 @@ RESULT_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
 PARSE_CACHE_ROOT = REPO_ROOT / "result" / "parsing" / "v9_main"
 
 #: Final CSV reports. Deliberately a NEW path: the old reports under
-#: result/reports/v9_pilot/ must stay intact for comparison (AGENT.md 2.7).
+#: result/archive/reports_mixed_legacy/v9_pilot/ must stay intact for comparison (AGENT.md 2.7).
 REPORT_ROOT = REPO_ROOT / "result" / "reports" / "v9_main"
 
 #: Benchmark items with their reference labels.
@@ -121,7 +121,7 @@ DEFAULT_CONVENTION = CONVENTION_STANDARD
 # Output schema
 # --------------------------------------------------------------------------
 
-#: Columns carried over from result/reports/v9_pilot/ so existing notebooks
+#: Columns carried over from result/archive/reports_mixed_legacy/v9_pilot/ so existing notebooks
 #: keep working. Order matters - keep it stable.
 LEGACY_COLUMNS: tuple[str, ...] = (
     "model",

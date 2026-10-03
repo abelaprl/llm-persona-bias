@@ -18,7 +18,7 @@
     hide it (AGENT.md 2.3).
 
 --regression
-    Compare against result/reports/v9_pilot/. Every row that moved from
+    Compare against result/archive/reports_mixed_legacy/v9_pilot/. Every row that moved from
     committed to abstain has to be explainable; the old engine harvested digits
     out of the phrase "a 0 or 1", so most of them should be false positives
     that this pipeline correctly drops.

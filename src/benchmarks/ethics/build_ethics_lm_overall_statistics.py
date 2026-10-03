@@ -16,7 +16,7 @@ enable_marker_imports()
 import numpy as np
 import pandas as pd
 
-REPORTS = ROOT / "result/ETHICS/reports"
+REPORTS = ROOT / "result/benchmarks/ethics/reports"
 SOURCES = {
     "religion": REPORTS / "Religion_Persona/linguistic_markers/analysis/religion_ethics_linguistic_markers_v2_0_2_candidate_20260827",
     "regional": REPORTS / "Regional_Cultural_Persona/linguistic_markers/analysis/regional_lm_v2_0_1_complete_20260828",

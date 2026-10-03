@@ -16,9 +16,9 @@ from .gender_lm_reference_data import MODELS, ROOT
 
 
 TABLES = ROOT / "notebooks/gender/linguistic marker/candidate/tables"
-ETHICS_SOURCE = ROOT / "result/ETHICS/reports/gender_lm_v2_candidate_20260916_r3"
-GSM_SOURCE = ROOT / "result/linguistic_markers/gender_gsm8k_full_source_aligned_v1_2_1_20260817"
-GSM_BUNDLE = ROOT / "result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
+ETHICS_SOURCE = ROOT / "result/benchmarks/ethics/reports/gender_lm_v2_candidate_20260916_r3"
+GSM_SOURCE = ROOT / "result/analyses/linguistic_markers/runs/gender_gsm8k_full_source_aligned_v1_2_1_20260817"
+GSM_BUNDLE = ROOT / "result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
 PANELS = {"man_explicit_1": "Man E", "woman_explicit_1": "Woman E"}
 EXAMPLE_PERSONAS = ["neutral", *PANELS]
 EXAMPLE_MODEL = "deepseek_deepseek-r1-distill-qwen-32b"

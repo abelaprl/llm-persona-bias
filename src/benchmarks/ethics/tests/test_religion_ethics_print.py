@@ -190,7 +190,7 @@ class PrintTests(unittest.TestCase):
     def test_real_card_excerpts_fit_without_shortening_or_font_shrink(self):
         mod = self.module()
         root = Path(__file__).resolve().parents[4]
-        source = root / 'result/ETHICS/reports/religion_ethics_expression_20260919_r1/response_cards.json'
+        source = root / 'result/benchmarks/ethics/reports/religion_ethics_expression_20260919_r1/response_cards.json'
         if not source.exists():
             self.skipTest('Frozen research fixtures are not installed')
         cards = json.loads(source.read_text(encoding='utf-8'))

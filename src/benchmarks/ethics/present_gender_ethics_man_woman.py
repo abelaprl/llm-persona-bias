@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
-REPORTS = ROOT / "result/ETHICS/reports/Gender_Persona/linguistic_markers/analysis"
+REPORTS = ROOT / "result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers/analysis"
 BASE = REPORTS / "gender_ethics_lm_workspace_v1_5_20260909_r2"
 POOL = REPORTS / "gender_ethics_lm_gabungan_20260909_r4"
 NOTEBOOK = ROOT / "notebooks/gender/linguistic marker/ETHICS_Gender_Linguistic_Markers_Analysis_v1_5_candidate.ipynb"

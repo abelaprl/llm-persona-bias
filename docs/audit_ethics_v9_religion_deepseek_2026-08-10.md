@@ -8,7 +8,7 @@ Status: audit read-only atas seluruh JSON yang tersimpan
 Folder yang diperiksa:
 
 ```text
-result/ETHICS/v9 [THIS IS THE MAIN]/Religion Persona/
+result/benchmarks/ethics/runs/v9_main/Religion Persona/
   deepseek_deepseek-r1-distill-qwen-32b/
 ```
 

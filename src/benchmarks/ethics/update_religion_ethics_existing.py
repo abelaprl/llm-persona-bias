@@ -313,11 +313,11 @@ import pandas as pd
 from IPython.display import Image, Markdown, display
 
 ROOT = Path.cwd()
-while not (ROOT / 'result/ETHICS').is_dir(): ROOT = ROOT.parent
+while not (ROOT / 'result/benchmarks/ethics/runs').is_dir(): ROOT = ROOT.parent
 NOTEBOOK_DIR = ROOT / 'notebooks/religion/ethics accuracy analysis'
 TABLE_DIR = NOTEBOOK_DIR / 'tables'
 FIGURE_DIR = NOTEBOOK_DIR / 'figures'
-SOURCE = ROOT / 'result/ETHICS/reports/Religion_Persona/_combined/persona_publication_analysis_v3_accuracy_paired_holm_six_models'
+SOURCE = ROOT / 'result/benchmarks/ethics/reports/Religion_Persona/_combined/persona_publication_analysis_v3_accuracy_paired_holm_six_models'
 manifest = json.loads((NOTEBOOK_DIR / 'bundle_manifest.json').read_text(encoding='utf-8'))
 summary = pd.read_csv(TABLE_DIR / 'ethics_condition_summary_source_derived.csv')
 status = pd.read_csv(TABLE_DIR / 'ethics_status_by_model_persona_category.csv')

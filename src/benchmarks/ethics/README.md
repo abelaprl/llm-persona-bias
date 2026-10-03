@@ -95,28 +95,28 @@ Kelompok yang tersedia: `gender`, `religion`, `regional`, `neutral`.
 ## Keluaran
 
 ```
-result/parsing/v9_main/<Group Persona>/<model>/<persona>.jsonl   cache antara
-result/reports/v9_main/<slug>/<model>/results_<slug>_<model>.csv CSV utama
-result/reports/v9_main/<slug>/<model>/summary_<slug>_<model>.csv ringkasan
-result/reports/v9_main/summary_all_models.csv                    gabungan
-result/reports/v9_main/<slug>/_audit/audit_<slug>_<rule>.csv     sampel audit
-result/ETHICS/reports/Gender_Persona/_combined/all_models_results_full.csv
+result/benchmarks/ethics/parsed/legacy_parsing/v9_main/<Group Persona>/<model>/<persona>.jsonl   cache antara
+result/archive/reports_mixed_legacy/v9_main/<slug>/<model>/results_<slug>_<model>.csv CSV utama
+result/archive/reports_mixed_legacy/v9_main/<slug>/<model>/summary_<slug>_<model>.csv ringkasan
+result/archive/reports_mixed_legacy/v9_main/summary_all_models.csv                    gabungan
+result/archive/reports_mixed_legacy/v9_main/<slug>/_audit/audit_<slug>_<rule>.csv     sampel audit
+result/benchmarks/ethics/reports/Gender_Persona/_combined/all_models_results_full.csv
                                                     Gender + Neutral, full text
-result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/
+result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/
                                                     refinement terverifikasi
-result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv
+result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv
                                                     Religion + Neutral, full text
-result/ETHICS/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv
+result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv
                                                     Regional + Neutral, full text
-result/ETHICS/reports/Regional_Cultural_Persona/_combined/parser_refinement_20260821/
+result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/parser_refinement_20260821/
                                                     refinement konservatif + audit
-result/ETHICS/reports/Regional_Cultural_Persona/_combined/parser_refinement_audited_aita_20260821/
+result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined/parser_refinement_audited_aita_20260821/
                                                     +37 verdict AITA audit-pinned
 ```
 
 CSV utama berisi **satu file per model** dengan seluruh persona disatukan —
 Gender Persona = 8 × 1.514 = 12.112 baris. Kolom lama dari
-`result/reports/v9_pilot/` dipertahankan supaya notebook lama tetap jalan,
+`result/archive/reports_mixed_legacy/v9_pilot/` dipertahankan supaya notebook lama tetap jalan,
 ditambah 13 kolom provenance.
 
 Report lama tidak pernah ditimpa. Path keluaran sengaja berbeda.

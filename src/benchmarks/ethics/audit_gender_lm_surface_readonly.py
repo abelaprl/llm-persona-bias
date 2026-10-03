@@ -24,7 +24,7 @@ def main() -> None:
     output = args.output_dir.resolve()
     output.relative_to(root / "result")
     output.mkdir(parents=True, exist_ok=False)
-    base = root / "result/ETHICS/reports/Gender_Persona"
+    base = root / "result/benchmarks/ethics/reports/Gender_Persona"
     marker_dir = base / "linguistic_markers_gender_candidate_20260821_v1_6_0"
     print("[1/4] Reading frozen marker table", flush=True)
     markers = pd.read_csv(marker_dir / "response_level_markers.csv.gz")

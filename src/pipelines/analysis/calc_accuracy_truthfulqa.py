@@ -262,7 +262,7 @@ def main():
         "--model_dir",
         type=str,
         default=default_model_dir(),
-        help="TRUTHFULQA model result folder, e.g. result/TRUTHFULQA/allenai_olmo-3.1-32b-instruct",
+        help="TRUTHFULQA model result folder, e.g. result/benchmarks/truthfulqa/allenai_olmo-3.1-32b-instruct",
     )
     parser.add_argument(
         "--save_csv",

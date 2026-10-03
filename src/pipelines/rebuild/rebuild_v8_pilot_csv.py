@@ -1,6 +1,6 @@
 """Rebuild V7-compatible CSV from existing v8_pilot JSON files.
 
-Reads all per-question JSON files from result/ETHICS/<model_slug>/v8_pilot/
+Reads all per-question JSON files from result/benchmarks/ethics/runs/<model_slug>/v8_pilot/
 and writes a CSV with the V7 schema:
   prompt_variant, category, persona, sub_folder, id, subset,
   ground_truth_label, prediction_label, is_correct,
@@ -17,7 +17,7 @@ import csv
 import json
 from pathlib import Path
 
-RESULT_ROOT = Path("result/ETHICS")
+RESULT_ROOT = Path("result/benchmarks/ethics/runs")
 OUTPUT_NAME = "v8_pilot"
 
 PERSONA_CATEGORY: dict[str, tuple[str, str]] = {

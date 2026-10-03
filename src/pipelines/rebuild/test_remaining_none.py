@@ -90,7 +90,7 @@ def reparse(raw):
     return _pv(t)
 
 # Scan remaining no_pattern cases and show 30 samples with tail
-base = r'D:\TugasAkhir\result\ETHICS\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
+base = r'D:\TugasAkhir\result/benchmarks/ethics/runs\deepseek_deepseek-r1-distill-qwen-32b\v9_pilot'
 samples = []
 counts = Counter()
 

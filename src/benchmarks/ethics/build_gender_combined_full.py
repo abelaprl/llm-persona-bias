@@ -11,9 +11,9 @@ Run from the repository root::
 
 Outputs::
 
-    result/ETHICS/reports/all_models_results_full.csv
-    result/ETHICS/reports/all_models_results_full_source_manifest.csv
-    result/ETHICS/reports/all_models_results_full_manifest.json
+    result/benchmarks/ethics/reports/all_models_results_full.csv
+    result/benchmarks/ethics/reports/all_models_results_full_source_manifest.csv
+    result/benchmarks/ethics/reports/all_models_results_full_manifest.json
 """
 from __future__ import annotations
 

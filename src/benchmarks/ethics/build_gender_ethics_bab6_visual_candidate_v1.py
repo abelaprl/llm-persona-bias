@@ -22,17 +22,17 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_ANALYSIS_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/Gender_Persona/linguistic_markers/analysis"
+    / "result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers/analysis"
     / "gender_ethics_linguistic_markers_overall_candidate_r2_20260905"
 )
 DEFAULT_REGISTRY = (
     REPO_ROOT
-    / "result/ETHICS/reports/Gender_Persona"
+    / "result/benchmarks/ethics/reports/Gender_Persona"
     / "linguistic_markers_gender_candidate_20260821_v1_6_0/marker_registry.csv"
 )
 DEFAULT_OUTPUT_DIR = (
     REPO_ROOT
-    / "result/ETHICS/reports/Gender_Persona/linguistic_markers/visual"
+    / "result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers/visual"
     / "gender_ethics_bab6_overall_candidate_v1_1_20260906"
 )
 

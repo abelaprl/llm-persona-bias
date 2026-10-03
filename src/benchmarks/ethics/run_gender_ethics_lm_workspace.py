@@ -15,7 +15,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
 WORKSPACE = ROOT / "notebooks/gender/linguistic marker"
-REPORTS = ROOT / "result/ETHICS/reports/Gender_Persona"
+REPORTS = ROOT / "result/benchmarks/ethics/reports/Gender_Persona"
 
 
 def enable_marker_imports() -> Path:

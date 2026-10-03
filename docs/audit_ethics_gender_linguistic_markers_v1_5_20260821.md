@@ -9,9 +9,9 @@ hasil final inferensial sebelum precision/recall dinilai manusia.
 Audit menggunakan tiga sumber:
 
 - CSV canonical gabungan
-  `result/ETHICS/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`;
+  `result/benchmarks/ethics/reports/Gender_Persona/_combined/parser_refinement_20260820/all_models_results_full.csv`;
 - bundle kandidat awal
-  `result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821/`;
+  `result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821/`;
 - referensi eksperimen lama
   `docs/ref/linguistic marker yang udah aku coba.zip`.
 
@@ -121,7 +121,7 @@ coverage turun secara benar dari 55,63% pada v1.4 menjadi 53,62% pada v1.5.
 
 Bundle yang direkomendasikan:
 
-`result/ETHICS/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_5_0/`
+`result/benchmarks/ethics/reports/Gender_Persona/linguistic_markers_gender_candidate_20260821_v1_5_0/`
 
 Angka utama bundle:
 

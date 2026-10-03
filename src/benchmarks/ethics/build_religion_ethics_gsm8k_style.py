@@ -44,8 +44,8 @@ def source_files():
     files = [SOURCE / name for name in relative]
     files += sorted((SOURCE / 'figures').rglob('*.png')) + sorted((SOURCE / 'figures').rglob('*.svg'))
     files += [ROOT / 'notebooks/religion/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb',
-              ROOT / 'result/ETHICS/reports/religion_lm_v3_preparation_20260915_r1/targeted_full_responses.json',
-              ROOT / 'result/ETHICS/reports/religion_lm_v3_preparation_20260915_r1/open_discovery_round_1.json']
+              ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1/targeted_full_responses.json',
+              ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1/open_discovery_round_1.json']
     return files
 
 
@@ -94,7 +94,7 @@ def build(run_id, output):
     registry[['marker_id', 'label', 'family_id', 'operational_definition', 'theoretical_source',
               'exclusion_rule', 'validation_status', 'registry_version']].to_csv(tables / 'registry.csv', index=False)
     shutil.copy2(SOURCE / 'statistics/paired_contrasts.csv.gz', tables / 'paired_contrasts.csv.gz')
-    example_directory = ROOT / 'result/ETHICS/reports/religion_lm_v3_preparation_20260915_r1'
+    example_directory = ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1'
     examples = select_examples({str((example_directory / name).relative_to(ROOT)).replace('\\', '/'):
                                 json.loads((example_directory / name).read_text(encoding='utf-8'))
                                 for name in ['targeted_full_responses.json', 'open_discovery_round_1.json']})
@@ -193,7 +193,7 @@ def main():
     args = parser.parse_args()
     if not re.fullmatch(r'[A-Za-z0-9_-]+', args.run_id):
         parser.error('run-id may contain only letters, digits, underscores and hyphens')
-    output = ROOT / 'result/ETHICS/reports' / f'religion_ethics_gsm8k_style_{args.run_id}'
+    output = ROOT / 'result/benchmarks/ethics/reports' / f'religion_ethics_gsm8k_style_{args.run_id}'
     if args.install:
         install(args.run_id, output)
     else:

@@ -25,8 +25,8 @@ import normalize  # noqa: E402
 from detectors import semantic  # noqa: E402
 from detectors import refusal as refusal_detector  # noqa: E402
 
-DEFAULT_INPUT = Path(r"D:\TugasAkhir\result\reports\v9_main\ALL_ethics_v9.csv")
-DEFAULT_OUTPUT_DIR = Path(r"D:\TugasAkhir\result\reports\v9_main\_audit")
+DEFAULT_INPUT = Path(r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\ALL_ethics_v9.csv")
+DEFAULT_OUTPUT_DIR = Path(r"D:\TugasAkhir\result/archive/reports_mixed_legacy\v9_main\_audit")
 AUDIT_DATE = "2026-08-16"
 SAMPLES_PER_BUCKET = 12
 

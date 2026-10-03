@@ -1,6 +1,6 @@
 """
 Generate summary CSV for models that have completed all 8 personas
-Output: result/reports/summary_{model_name}.csv
+Output: result/archive/reports_mixed_legacy/summary_{model_name}.csv
 """
 import csv
 from pathlib import Path
@@ -105,7 +105,7 @@ def generate_model_summary(model_dir, output_path):
 
 
 def main():
-    reports_dir = Path("result/reports")
+    reports_dir = Path("result/archive/reports_mixed_legacy")
     
     print("="*80, flush=True)
     print("GENERATING MODEL SUMMARIES", flush=True)

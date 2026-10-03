@@ -10,7 +10,7 @@ from src.benchmarks.ethics.religion_lm_v3_io import KEYS,create_run_directory,wr
 
 
 def main():
-    base=ROOT/'result/ETHICS/reports'
+    base=ROOT/'result/benchmarks/ethics/reports'
     source=base/'Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
     current=base/'Religion_Persona/linguistic_markers/analysis/religion_ethics_linguistic_markers_v2_0_2_candidate_20260827/dataset/ethics_religion_marker_analysis_response_level.csv.gz'
     out=create_run_directory(base/'religion_lm_v3_baseline_identity_20260916_r1')

@@ -52,8 +52,8 @@ def locate_repo_root() -> Path:
 
 
 REPO_ROOT = locate_repo_root()
-RUN_DIR = REPO_ROOT / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818"
-BUNDLE_DIR = REPO_ROOT / "result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/visual/regional_gsm8k_bab4_visual_v1_1_0_20260818"
+RUN_DIR = REPO_ROOT / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818"
+BUNDLE_DIR = REPO_ROOT / "result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/visual/regional_gsm8k_bab4_visual_v1_1_0_20260818"
 FIG_DIR = BUNDLE_DIR / "images"
 AUDIT_DIR = RUN_DIR / "audit_codex_contextual_review_20260818"
 

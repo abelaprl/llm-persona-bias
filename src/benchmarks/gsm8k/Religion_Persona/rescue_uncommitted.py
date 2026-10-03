@@ -19,9 +19,9 @@ from .personas import MODELS
 from .run import load_rules
 
 
-DEFAULT_SOURCE_ROOT = Path(r'result\GMS8K\reports\Religion_Persona')
+DEFAULT_SOURCE_ROOT = Path(r'result/benchmarks/gsm8k\reports\Religion_Persona')
 DEFAULT_OUT_ROOT = Path(
-    r'result\GMS8K\reports_rescue\20260816_religion_candidate_rescue_v1'
+    r'result/benchmarks/gsm8k\reports_rescue\20260816_religion_candidate_rescue_v1'
 )
 DEFAULT_MODELS = tuple(model for model in MODELS if not model.startswith('deepseek_'))
 ELIGIBLE_REASONS = frozenset({'truncated', 'candidate_only', 'no_final_answer'})

@@ -12,7 +12,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
 ACTIVE = ROOT / "notebooks/gender/linguistic marker/ETHICS"
-BUNDLE = ROOT / "result/ETHICS/reports/gender_lm_bab6_viz_20261002_r5"
+BUNDLE = ROOT / "result/benchmarks/ethics/reports/gender_lm_bab6_viz_20261002_r5"
 NOTEBOOK = "ETHICS_Gender_Linguistic_Markers_Analysis_v1_5_candidate.ipynb"
 
 

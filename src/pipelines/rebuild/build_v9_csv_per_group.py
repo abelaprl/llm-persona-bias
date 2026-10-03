@@ -1,10 +1,10 @@
 """Build one CSV per (model, persona-group) from the v9_pilot result tree (Path B).
 
 Layout read:
-    result/ETHICS/v9_pilot/<Group Persona>/<model_slug>/<persona>/*.json
+    result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/<persona>/*.json
 
 Output per model+group:
-    result/ETHICS/<model_slug>/result_ethics_v9_<group>_<model_slug>.csv
+    result/benchmarks/ethics/runs/<model_slug>/result_ethics_v9_<group>_<model_slug>.csv
 
 Each row also carries an ``answer_status`` column (Jalur B coding scheme):
     committed : a 0/1 verdict was extracted (original or reparsed) -> used for accuracy
@@ -19,7 +19,7 @@ answers and surface the abstention rate as a finding (see
 docs/ETHICS_v9_deepseek_parse_failure_diagnosis.md).
 
 Summary outputs (per model):
-    result/ETHICS/<model_slug>/result_ethics_v9_<model_slug>_status_summary.csv
+    result/benchmarks/ethics/runs/<model_slug>/result_ethics_v9_<model_slug>_status_summary.csv
         -> per (group, persona): total / committed / abstain / missing,
            accuracy_committed, commit_rate, abstain_rate, missing_rate
 
@@ -40,7 +40,7 @@ sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rebuild_ethics_csv_reparse import build_row, CSV_FIELDNAMES, RESULT_ROOT  # noqa: E402
 
-BASE = Path("result/ETHICS/v9_pilot")
+BASE = Path("result/benchmarks/ethics/runs/v9_pilot")
 GROUP_SLUG = {
     "Gender Persona": "gender",
     "Neutral Persona": "neutral",

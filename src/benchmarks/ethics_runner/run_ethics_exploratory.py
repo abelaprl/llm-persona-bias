@@ -7,7 +7,7 @@ menggunakan framing yang lebih terbuka:
            including if it feels complicated or unclear>
 
 Output disimpan di:
-  result/ETHICS/<model_slug>/prompt_v7_exploratory/<category>/<sub_folder>/<sample_id>.json
+  result/benchmarks/ethics/runs/<model_slug>/prompt_v7_exploratory/<category>/<sub_folder>/<sample_id>.json
 
 Usage:
   python src/benchmarks/ethics_runner/run_ethics_exploratory.py
@@ -299,7 +299,7 @@ def save_json(path: Path, payload: dict) -> None:
 
 def output_base_folder(model_cfg: dict) -> Path:
     model_slug = model_cfg["model_id"].replace("/", "_")
-    return Path("result") / "ETHICS" / model_slug
+    return Path("result/benchmarks/ethics/runs") / model_slug
 
 
 def persona_out_dir(base: Path, category: str, sub_folder: str) -> Path:

@@ -2,7 +2,7 @@
 
 Runner: `src/gsm8k_runner/run_gsm8k_religion_personas.py`
 Temperature: **0.0**, max_tokens **4096**.
-Output: `result/GMS8K/Religion_Persona/{model_slug}/{persona}/gsm8k_NNNNN.json`
+Output: `result/benchmarks/gsm8k/Religion_Persona/{model_slug}/{persona}/gsm8k_NNNNN.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
 
@@ -80,7 +80,7 @@ Ganti angka `--model_order` di perintah di bawah untuk memilih model yang diingi
 
 ## Rerun yang kurang dari 1318
 
-Hasil cek `result/GMS8K/Religion_Persona` menemukan 2 folder persona yang belum lengkap.
+Hasil cek `result/benchmarks/gsm8k/Religion_Persona` menemukan 2 folder persona yang belum lengkap.
 Jalankan command berikut dari `D:\TugasAkhir`. Flag `--skip_existing` akan melewati file yang sudah ada dan hanya mengisi `gsm8k_*.json` yang missing sampai `--limit_samples 1319`.
 
 ```powershell
@@ -192,7 +192,7 @@ python src/gsm8k_runner/run_gsm8k_religion_personas.py --model_order 43 --limit_
 | `--persona_file` | `inputs/religion_persona.json` | Path ke file persona |
 | `--skip_existing` | `False` | Lewati soal yang file JSON-nya sudah ada |
 | `--force_warmup` | `False` | Paksa regenerasi warmup meski sudah ada |
-| `--output_root` | `result/GMS8K/Religion_Persona` | Folder output |
+| `--output_root` | `result/benchmarks/gsm8k/Religion_Persona` | Folder output |
 | `--sleep_sec` | `1.0` | Jeda antar request API (detik) |
 
 ---
@@ -200,7 +200,7 @@ python src/gsm8k_runner/run_gsm8k_religion_personas.py --model_order 43 --limit_
 ## Struktur Output
 
 ```
-result/GMS8K/Religion_Persona/
+result/benchmarks/gsm8k/Religion_Persona/
 └── {model_slug}/              # e.g. deepseek_deepseek-r1-distill-qwen-32b
     ├── islam_explicit/
     │   ├── gsm8k_00001.json

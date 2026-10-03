@@ -17,8 +17,8 @@ import pandas as pd
 
 def prepare(source, output, seed=18222008):
     output = create_run_directory(output)
-    samples_path = ROOT/'result/ETHICS/reports/religion_final_response_plan_audit_20260915/full_final_samples.json'
-    baseline = ROOT/'result/ETHICS/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
+    samples_path = ROOT/'result/benchmarks/ethics/reports/religion_final_response_plan_audit_20260915/full_final_samples.json'
+    baseline = ROOT/'result/benchmarks/ethics/reports/Religion_Persona/linguistic_markers_religion_candidate_20260824_v1_1_10/response_level_markers.csv.gz'
     sources = [source,samples_path,baseline]
     sources += sorted((ROOT/'src/core/linguistic_markers').glob('*.py'))
     write_json(output/'source_manifest.json',build_source_manifest(sources))
@@ -72,7 +72,7 @@ def prepare(source, output, seed=18222008):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--source',type=Path,default=ROOT/'result/ETHICS/reports/Religion_Persona/_combined/all_models_results_full.csv')
+    parser.add_argument('--source',type=Path,default=ROOT/'result/benchmarks/ethics/reports/Religion_Persona/_combined/all_models_results_full.csv')
     parser.add_argument('--output',type=Path,required=True)
     args = parser.parse_args()
     prepare(args.source,args.output)

@@ -7,7 +7,7 @@ sys.path.insert(0,str(ROOT))
 
 
 def main():
-    base=ROOT/'result/ETHICS/reports'
+    base=ROOT/'result/benchmarks/ethics/reports'
     parts=[base/f'religion_lm_v3_candidate_20260915_r2_shard_{s}' for s in ('a','b','c')]
     while not all((p/'manifest.json').is_file() for p in parts):
         ready=[p.name for p in parts if (p/'manifest.json').is_file()]

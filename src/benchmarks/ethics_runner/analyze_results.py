@@ -15,7 +15,7 @@ def load_model_names():
         return {}
 
 def analyze_results():
-    result_root = Path("result/ETHICS/Age_Group_Persona")
+    result_root = Path("result/benchmarks/ethics/runs/Age_Group_Persona")
     model_names = load_model_names()
 
     if not result_root.exists():

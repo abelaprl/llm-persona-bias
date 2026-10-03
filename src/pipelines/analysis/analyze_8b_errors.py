@@ -4,9 +4,9 @@ import re
 import json
 from collections import defaultdict
 
-CSV_PATH = r'result\reports\meta-llama_llama-3.1-8b-instruct\results.csv'
-OUT_WRONG = r'result\reports\meta-llama_llama-3.1-8b-instruct\wrong_answers_only_8b.csv'
-OUT_POSSIBLE = r'result\reports\meta-llama_llama-3.1-8b-instruct\possible_extraction_errors_8b.csv'
+CSV_PATH = r'result/archive/reports_mixed_legacy\meta-llama_llama-3.1-8b-instruct\results.csv'
+OUT_WRONG = r'result/archive/reports_mixed_legacy\meta-llama_llama-3.1-8b-instruct\wrong_answers_only_8b.csv'
+OUT_POSSIBLE = r'result/archive/reports_mixed_legacy\meta-llama_llama-3.1-8b-instruct\possible_extraction_errors_8b.csv'
 
 df = pd.read_csv(CSV_PATH)
 wrong = df[df['is_correct'] == False].copy()

@@ -56,15 +56,15 @@ Tidak ditemukan HTTP 404 atau 5xx pada set Regional Cultural Qwen ini.
 
 ## Contoh isi error tersimpan
 
-- HTTP 403 key-limit: [`ethics_deontology_0102.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Regional%20Cultural%20Persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_explicit/ethics_deontology_0102.json)<br>
+- HTTP 403 key-limit: [`ethics_deontology_0102.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Regional%20Cultural%20Persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_explicit/ethics_deontology_0102.json)<br>
   `HTTP 403 ... Key limit exceeded (total limit)`
-- TLS: [`ethics_justice_0132.json`](../result/ETHICS/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Regional%20Cultural%20Persona/qwen_qwen3-next-80b-a3b-thinking/north_american_explicit/ethics_justice_0132.json)<br>
+- TLS: [`ethics_justice_0132.json`](../result/benchmarks/ethics/runs/v9%20%5BTHIS%20IS%20THE%20MAIN%5D/Regional%20Cultural%20Persona/qwen_qwen3-next-80b-a3b-thinking/north_american_explicit/ethics_justice_0132.json)<br>
   `SSLError ... UNEXPECTED_EOF_WHILE_READING`
-- DNS: [`gsm8k_00604.json`](../result/GMS8K/regional_cultural_persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_explicit/gsm8k_00604.json)<br>
+- DNS: [`gsm8k_00604.json`](../result/benchmarks/gsm8k/regional_cultural_persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_explicit/gsm8k_00604.json)<br>
   `NameResolutionError ... Failed to resolve openrouter.ai`
-- Host-aborted: [`gsm8k_00268.json`](../result/GMS8K/regional_cultural_persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_implicit_2/gsm8k_00268.json)<br>
+- Host-aborted: [`gsm8k_00268.json`](../result/benchmarks/gsm8k/regional_cultural_persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_implicit_2/gsm8k_00268.json)<br>
   `ConnectionAbortedError 10053`
-- Remote reset: [`gsm8k_00274.json`](../result/GMS8K/regional_cultural_persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_implicit_2/gsm8k_00274.json)<br>
+- Remote reset: [`gsm8k_00274.json`](../result/benchmarks/gsm8k/regional_cultural_persona/qwen_qwen3-next-80b-a3b-thinking/east_asian_implicit_2/gsm8k_00274.json)<br>
   `RemoteDisconnected: Remote end closed connection without response`
 
 ## Warmup

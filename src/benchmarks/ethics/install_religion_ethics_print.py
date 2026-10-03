@@ -112,7 +112,7 @@ def preflight(bundle, notebook):
 
 def install(bundle):
     bundle = bundle.resolve()
-    if bundle.parent != (ROOT / 'result/ETHICS/reports').resolve():
+    if bundle.parent != (ROOT / 'result/benchmarks/ethics/reports').resolve():
         raise ValueError('Bundle must be a direct child of the reports directory')
     manifest = preflight(bundle, NOTEBOOK)
     index = pd.read_csv(bundle / 'figure_index.csv')

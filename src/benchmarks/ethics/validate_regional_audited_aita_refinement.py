@@ -13,12 +13,12 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 BASE_DIR = (
     ROOT
-    / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+    / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
     / "parser_refinement_20260821"
 )
 OUTPUT_DIR = (
     ROOT
-    / "result/ETHICS/reports/Regional_Cultural_Persona/_combined"
+    / "result/benchmarks/ethics/reports/Regional_Cultural_Persona/_combined"
     / "parser_refinement_audited_aita_20260821"
 )
 INPUT = BASE_DIR / "all_models_results_full.csv"
@@ -27,7 +27,7 @@ CHANGES = OUTPUT_DIR / "changed_rows_full.csv"
 MANIFEST = OUTPUT_DIR / "manifest.json"
 AUDIT = (
     ROOT
-    / "result/ETHICS/reports/_audit/regional_neutral_full_20260821"
+    / "result/benchmarks/ethics/reports/_audit/regional_neutral_full_20260821"
     / "priority_aita_direct_20260821"
     / "regional_priority_aita_direct_adjudicated.csv"
 )

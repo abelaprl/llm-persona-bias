@@ -13,7 +13,7 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[4]
-BUNDLE = ROOT / "result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
+BUNDLE = ROOT / "result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817"
 MODULE = "src.benchmarks.ethics.gender_lm_candidate_gsm8k"
 
 

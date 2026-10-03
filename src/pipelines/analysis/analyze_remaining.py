@@ -5,7 +5,7 @@ Show full response tail for each case.
 import csv, re
 from collections import Counter
 
-csv_path = r'e:\Tugas Akhir\TugasAkhir\result\reports\openai_gpt-oss-20b\results.csv'
+csv_path = r'e:\Tugas Akhir\TugasAkhir\result/archive/reports_mixed_legacy\openai_gpt-oss-20b\results.csv'
 
 no_extract = []
 truncated  = []
