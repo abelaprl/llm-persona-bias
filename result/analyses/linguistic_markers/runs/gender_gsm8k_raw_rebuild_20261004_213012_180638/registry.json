@@ -1,0 +1,463 @@
+[
+  {
+    "marker_id": "organization_explicit_step",
+    "family": "reasoning_organization",
+    "operational_definition": "Line-initial numbered or explicitly labelled reasoning step.",
+    "patterns": [
+      {
+        "pattern": "^\\s*(?:#{1,4}\\s*)?(?:\\*{0,2}step\\s*\\d{1,2}\\*{0,2}|\\d{1,2}[.)])\\s*[:.\\-]?\\s+(?=[A-Za-z])",
+        "note": "Restricted to line starts so arithmetic numbers are not list items.",
+        "flags": 10
+      }
+    ],
+    "measurement": "density",
+    "surface": "structure",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Wei et al. (2022), operationalized for model responses",
+    "exclusion_rule": "Does not match equation-internal numbers or answer-only lines.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "organization_bullet",
+    "family": "reasoning_organization",
+    "operational_definition": "Line-initial bullet used to organize an explanation.",
+    "patterns": [
+      {
+        "pattern": "^\\s*[-*\\u2022]\\s+(?=[A-Za-z])",
+        "note": "Markdown or Unicode bullets followed by lexical content.",
+        "flags": 10
+      }
+    ],
+    "measurement": "density",
+    "surface": "structure",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Biber (1988), custom response-format operationalization",
+    "exclusion_rule": "Multiplication symbols and bullets without following words are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "organization_section_header",
+    "family": "reasoning_organization",
+    "operational_definition": "Markdown heading or short bold line that labels a reasoning section.",
+    "patterns": [
+      {
+        "pattern": "^\\s*#{1,4}\\s+[A-Za-z][^\\n]{1,60}$",
+        "note": "Markdown heading.",
+        "flags": 10
+      },
+      {
+        "pattern": "^\\s*\\*\\*(?:[A-Za-z][^*.!?\\n]{0,48}:|(?:solution|given|steps?|steps?\\s+to\\s+solve|step[- ]by[- ]step\\s+explanation|analysis|approach|method|calculations?|explanation|answer|final\\s+answer|result|conclusion))\\*\\*\\s*$",
+        "note": "Bold label ending in a colon, or a restricted conventional section label.",
+        "flags": 10
+      }
+    ],
+    "measurement": "density",
+    "surface": "structure",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Biber (1988), custom response-format operationalization",
+    "exclusion_rule": "Technical answer lines are removed before this rule is applied.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "stance_hedge",
+    "family": "epistemic_stance",
+    "operational_definition": "Explicit uncertainty or tentativeness about a proposition.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:perhaps|maybe|possibly|probably|likely|arguably|apparently|seemingly)\\b",
+        "note": "Lexical hedges with comparatively narrow epistemic use.",
+        "flags": 2
+      },
+      {
+        "pattern": "\\b(?:it\\s+(?:seems?|appears?)\\s+(?:that|to)|(?:may|might|could)\\s+be\\b|(?:is|are)\\s+likely\\s+to\\b)\\b",
+        "note": "Context-bounded modal and evidential phrases.",
+        "flags": 2
+      },
+      {
+        "pattern": "\\b(?:i\\s+(?:think|believe|suspect)|(?:it|this|that)\\s+(?:seems?|appears?))\\b",
+        "note": "First-person stance and subject-bounded evidential frames.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Hyland (2005); Biber and Finegan (1989), adapted list",
+    "exclusion_rule": "Bare about/around, bare could/may/might, and ability expressions such as 'could calculate' are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "stance_booster",
+    "family": "epistemic_stance",
+    "operational_definition": "Explicit emphasis on certainty or obviousness.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:clearly|obviously|definitely|certainly|undoubtedly|unquestionably|surely|indeed|in\\s+fact)\\b",
+        "note": "Single-word certainty boosters.",
+        "flags": 2
+      },
+      {
+        "pattern": "\\b(?:without\\s+(?:a\\s+)?doubt|of\\s+course|it\\s+is\\s+clear\\s+that)\\b",
+        "note": "Multi-word certainty boosters.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Hyland (2005); Biber and Finegan (1989), adapted list",
+    "exclusion_rule": "Generic always, unmodified right/wrong, and must be are excluded; must be was predominantly deontic or constraint-like in the corpus audit.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "stance_assumption",
+    "family": "epistemic_stance",
+    "operational_definition": "An assumption is made explicit before a calculation or judgment.",
+    "patterns": [
+      {
+        "pattern": "(?:^|(?<=[.!?;:])\\s+)(?:assuming\\s+(?:that|the|this)|presuming\\s+that)\\b",
+        "note": "Clause-initial participial assumption frame.",
+        "flags": 10
+      },
+      {
+        "pattern": "\\b(?:(?:i(?:'ll|\\s+will)|we|let(?:'s|\\s+us))\\s+assume|under\\s+the\\s+assumption\\s+that)\\b",
+        "note": "Explicit finite or prepositional assumption frame.",
+        "flags": 2
+      },
+      {
+        "pattern": "(?:^|(?<=[.!?;:])\\s+)assume\\s+(?:that|the|a|an|this)\\b",
+        "note": "Clause-initial imperative assumption frame.",
+        "flags": 10
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Hyland (2005), custom task-specific operationalization",
+    "exclusion_rule": "Given that and note that are not automatically treated as assumptions.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "stance_self_correction",
+    "family": "epistemic_stance",
+    "operational_definition": "Overt revision of the model's own preceding reasoning.",
+    "patterns": [
+      {
+        "pattern": "(?<=[.!?])\\s+(?:wait[,!:]|actually[,!:]?)\\s+(?=[A-Za-z])",
+        "note": "Post-sentence correction cue; Wait requires correction punctuation.",
+        "flags": 2
+      },
+      {
+        "pattern": "\\b(?:let\\s+me\\s+(?:re-?check|recalculate|correct\\s+that|restart|revise\\s+that)|i\\s+need\\s+to\\s+correct\\s+(?:myself|that)|on\\s+second\\s+thought|scratch\\s+that|correction\\s*:|recalculating)\\b",
+        "note": "Explicit model-oriented self-repair phrase.",
+        "flags": 2
+      },
+      {
+        "pattern": "\\blet(?:'s|\\s+us)\\s+(?:re-?check|re-?evaluate|recalculate|reconsider|correct\\s+that)\\b",
+        "note": "Inclusive explicit re-check or revision phrase; generic advice scripts excluded.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "custom, motivated by reasoning-monitorability literature",
+    "exclusion_rule": "Actually within an unpunctuated clause, Wait without correction punctuation, generic advice scripts, and quoted I-was-wrong apologies are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "connective_causal",
+    "family": "logical_connective",
+    "operational_definition": "Explicit causal or inferential relation between propositions.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:therefore|thus|hence|consequently|accordingly|because|as\\s+a\\s+result|for\\s+(?:this|that)\\s+reason|thereby|it\\s+follows\\s+that|which\\s+means|this\\s+means)\\b",
+        "note": "Causal and result connectives.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Halliday and Hasan (1976); Hyland (2005)",
+    "exclusion_rule": "Bare so is excluded because its discourse function is highly ambiguous.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "connective_contrastive",
+    "family": "logical_connective",
+    "operational_definition": "Explicit contrast or concession between propositions.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:however|nevertheless|nonetheless|on\\s+the\\s+other\\s+hand|although|even\\s+though|despite\\s+(?:this|that|the)|in\\s+contrast)\\b",
+        "note": "Contrastive and concessive connectives.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Halliday and Hasan (1976); Hyland (2005)",
+    "exclusion_rule": "Bare but/while/yet are excluded because they are strongly polyfunctional.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "connective_conditional",
+    "family": "logical_connective",
+    "operational_definition": "Explicit conditional frame.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:if|unless|provided\\s+that|in\\s+the\\s+event\\s+that|on\\s+condition\\s+that)\\b",
+        "note": "Conditional connectives.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Halliday and Hasan (1976)",
+    "exclusion_rule": "Only whole lexical items or phrases are counted.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "self_reference_first_person",
+    "family": "self_reference",
+    "operational_definition": "First-person singular reference tied to reasoning or stance.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:i\\s+(?:think|believe|assume|need|will|would|find|calculate|get|conclude|interpret|understand)|let\\s+me\\s+(?:think|check|re-?check|calculate|recalculate|explain|clarify|break|work|walk|analy[sz]e|reason|solve|determine|find|consider|evaluate|summarize))\\b",
+        "note": "Restricted first-person reasoning frames.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Hyland (2005), adapted self-mention operationalization",
+    "exclusion_rule": "Bare I/me/my and AI-identity statements are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "self_reference_inclusive_we",
+    "family": "self_reference",
+    "operational_definition": "Inclusive first-person plural used to guide joint reasoning.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:we\\s+(?:need|can|have|get|find|calculate|determine|see|know|conclude|will|should|want)|let(?:'s|\\s+us))\\b",
+        "note": "Reasoning-functional inclusive we.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Hyland (2005), adapted self-mention/engagement operationalization",
+    "exclusion_rule": "Bare we/our/us are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "engagement_reader_directive",
+    "family": "engagement",
+    "operational_definition": "A narrow directive that explicitly guides the reader's attention.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:note\\s+that|notice\\s+that|recall\\s+that|keep\\s+in\\s+mind|you\\s+can\\s+see\\s+that|you\\s+should\\s+consider\\s+(?:that|the|this))\\b",
+        "note": "Reader-directing phrase.",
+        "flags": 2
+      },
+      {
+        "pattern": "(?:^|(?<=[.!?;:])\\s+)consider\\s+(?:that|the|this)\\b",
+        "note": "Clause-initial imperative consider.",
+        "flags": 10
+      },
+      {
+        "pattern": "(?:^|(?<=[.!?;:])\\s+)(?:please\\s+)?remember\\s+that\\b|\\b(?:but|and)\\s+remember\\s+that\\b",
+        "note": "Reader-directed imperative remember; first-person memory reports are excluded.",
+        "flags": 10
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "primary",
+    "theoretical_source": "Hyland (2005), adapted engagement-marker list",
+    "exclusion_rule": "Bare you/your and generic imperatives are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "elaboration_code_gloss",
+    "family": "textual_elaboration",
+    "operational_definition": "Reformulation or example that elaborates a preceding proposition.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:in\\s+other\\s+words|that\\s+is\\s+to\\s+say|namely|for\\s+example|such\\s+as)\\b|\\bthat\\s+is(?=\\s*[,;:])|(?<!\\w)(?:e\\.g\\.|i\\.e\\.)(?!\\w)",
+        "note": "Code glosses and exemplifiers.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "supplementary",
+    "theoretical_source": "Hyland (2005), adapted code-gloss list",
+    "exclusion_rule": "Phrase-level matching; punctuation variants are allowed.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "math_latex_display",
+    "family": "mathematical_presentation",
+    "operational_definition": "Displayed LaTeX mathematics block.",
+    "patterns": [
+      {
+        "pattern": "\\\\\\[[\\s\\S]{1,1000}?\\\\\\]|\\$\\$[\\s\\S]{1,1000}?\\$\\$",
+        "note": "Paired display delimiters.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "structure",
+    "benchmarks": [
+      "gsm8k"
+    ],
+    "analysis_role": "format",
+    "theoretical_source": "custom GSM8K presentation feature",
+    "exclusion_rule": "Unpaired delimiters and inline LaTeX are excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "math_inline_arithmetic",
+    "family": "mathematical_presentation",
+    "operational_definition": "Plain inline arithmetic equality.",
+    "patterns": [
+      {
+        "pattern": "(?<![\\w.])[-+]?(?:[$\\u20ac\\u00a3][ \\t]*)?(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?%?(?:[ \\t]*[+\\-\\u00d7x*\\u00f7/][ \\t]*[-+]?(?:[$\\u20ac\\u00a3][ \\t]*)?(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?%?)+[ \\t]*=[ \\t]*[-+]?(?:[$\\u20ac\\u00a3][ \\t]*)?(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?(?:[ \\t]*/[ \\t]*(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?)?",
+        "note": "Complete plain arithmetic expression followed by an equality.",
+        "flags": 2
+      }
+    ],
+    "measurement": "density",
+    "surface": "structure",
+    "benchmarks": [
+      "gsm8k"
+    ],
+    "analysis_role": "format",
+    "theoretical_source": "custom GSM8K presentation feature",
+    "exclusion_rule": "Operations without an equals-result structure are excluded; a multi-operand expression is counted once rather than from its final two operands.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "math_boxed_answer",
+    "family": "answer_format",
+    "operational_definition": "A boxed final mathematical answer.",
+    "patterns": [
+      {
+        "pattern": "\\\\(?:boxed|bbox)\\{(?:[^{}\\n]|\\{[^{}\\n]{0,40}\\}){1,120}\\}",
+        "note": "Boxed LaTeX answer, allowing one level of nested braces.",
+        "flags": 2
+      }
+    ],
+    "measurement": "binary",
+    "surface": "visible",
+    "benchmarks": [
+      "gsm8k"
+    ],
+    "analysis_role": "quality_control",
+    "theoretical_source": "custom GSM8K answer-format feature",
+    "exclusion_rule": "Recorded as quality control, not mathematical formality.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  },
+  {
+    "marker_id": "ai_identity_statement",
+    "family": "model_identity",
+    "operational_definition": "Direct statement that the speaker is an AI/system without human experience.",
+    "patterns": [
+      {
+        "pattern": "\\b(?:as\\s+an\\s+(?:ai|artificial\\s+intelligence|language\\s+model)|i\\s+am\\s+an?\\s+(?:ai|artificial\\s+intelligence|language\\s+model)|i(?:'m|\\s+am)\\s+not\\s+a\\s+human)\\b",
+        "note": "Direct AI identity statement.",
+        "flags": 2
+      }
+    ],
+    "measurement": "binary",
+    "surface": "lexical",
+    "benchmarks": [
+      "gsm8k",
+      "ethics"
+    ],
+    "analysis_role": "supplementary",
+    "theoretical_source": "Diep et al. (2025), custom phrase operationalization",
+    "exclusion_rule": "Generic refusal without an AI identity statement is excluded.",
+    "version": "1.2.1-candidate",
+    "validation_status": "candidate_pending_manual_audit"
+  }
+]
