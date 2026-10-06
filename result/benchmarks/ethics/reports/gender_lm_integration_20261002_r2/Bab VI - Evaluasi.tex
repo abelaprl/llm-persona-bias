@@ -1,0 +1,2706 @@
+% !TEX root = TA.tex
+% ==========================================
+% BAB VI EVALUASI
+% ==========================================
+\cleardoublepage
+\chapter{EVALUASI}
+\label{chap:evaluasi}
+
+Bab ini membahas hasil pengujian pengaruh persona terhadap respons enam
+model LLM. Rancangan eksperimen dan proses pengujian masing-masing telah
+dijelaskan pada Bab~\ref{chap:perancangan} dan
+Bab~\ref{chap:implementasi}. Evaluasi dilakukan pada GSM8K dan ETHICS untuk
+domain gender, agama, dan regional-kultural. Pembahasan mencakup akurasi dan
+penanda linguistik.
+
+% =====================================================================
+\section{Evaluasi GSM8K}
+\label{sec:evaluasi-gsm8k}
+
+GSM8K terdiri atas 1.319 soal matematika. Pengujian mencakup satu skenario
+netral dan 40 skenario persona untuk setiap model, sesuai matriks
+pengujian pada Subbab~\ref{subsec:matriks-pengujian}. Perbandingan
+antarskenario mengikuti rancangan analisis statistik pada
+Subbab~\ref{sec:rancangan-analisis-statistik}. Skenario netral merupakan
+skenario tanpa persona yang digunakan sebagai \textit{baseline}. Akurasi
+dihitung sebagai persentase respons yang menghasilkan angka GSM8K sesuai
+dengan \textit{ground truth} pada dataset.
+
+Hasil pada skenario netral menjadi pembanding dan ditampilkan sebagai
+baris N\label{acr:n} pada setiap tabel domain. Akurasi pada skenario ini
+berkisar antara 84,43\% dan 94,08\%. Qwen3 Next 80B-A3B memperoleh
+akurasi tertinggi, sedangkan Llama 3.1 8B memperoleh akurasi terendah.
+Empat model lainnya memperoleh akurasi 91,96--93,93\%.
+
+% =====================================================================
+\subsection{Domain Gender}
+\label{subsec:hasil-gender-gsm8k}
+
+Domain gender mencakup persona laki-laki dan perempuan. Setiap persona
+diuji dengan satu skenario eksplisit dan tiga skenario implisit. I1\label{acr:i1}
+menggunakan peran dalam keluarga, I2\label{acr:i2} menggunakan kegiatan
+merapikan penampilan, dan I3\label{acr:i3} menggunakan pilihan pakaian.
+Ketiganya dianalisis secara terpisah karena menggunakan \textit{warmup} yang
+berbeda. Analisis ini menggunakan 71.226 respons dari 1.319 soal GSM8K.
+
+\subsubsection{Akurasi Respons}
+\label{subsubsec:akurasi-gender-gsm8k}
+
+Analisis akurasi domain gender membandingkan hasil pada
+skenario netral, eksplisit, dan implisit. Akurasi E dan I1--I3 dibandingkan
+dengan N, I1--I3 dibandingkan dengan E, serta persona laki-laki dan perempuan
+dibandingkan pada soal dan skenario yang sama. Perbedaan antara N, E, I1, I2,
+dan I3 diperiksa menggunakan Q Cochran, sedangkan setiap pasangan diuji
+menggunakan Exact McNemar dengan koreksi Holm; hasil antarskenario dimasukkan
+ke hasil utama jika Q Cochran pada kelompok yang sama juga signifikan.
+Pengujian mencakup 108 perbandingan, yaitu 48 terhadap N, 36 terhadap E, dan 24
+antara persona laki-laki dan perempuan. \textit{Input token},
+\textit{completion token}, dan total token dihitung secara terpisah untuk
+membandingkan jumlah token yang digunakan setiap persona dan skenario.
+
+\par\noindent\textbf{a. Akurasi Setiap Skenario}\par
+
+Tabel~\ref{tab:akurasi-gender-gsm8k} menunjukkan akurasi keenam model
+pada skenario netral serta skenario yang menggunakan persona laki-laki
+dan perempuan. Baris N berisi hasil pada skenario netral. Untuk setiap
+persona, hasil skenario eksplisit ditulis pada baris E\label{acr:e},
+sedangkan hasil tiga skenario implisit ditulis pada baris I1, I2, dan I3.
+
+\begin{table}[H]
+    \centering
+    \caption{Akurasi GSM8K pada domain gender menurut persona dan skenario (\%)}
+    \label{tab:akurasi-gender-gsm8k}
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.10}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{1.75cm}
+        >{\centering\arraybackslash}p{0.65cm}
+        *{6}{>{\centering\arraybackslash}X}}
+        \toprule
+        \textbf{Persona} & \textbf{Skenario} & \textbf{Qwen3} &
+        \textbf{Llama 3.1} & \textbf{Ministral} & \textbf{DeepSeek} &
+        \textbf{GPT-OSS} & \textbf{Llama 3.3} \\
+        \midrule
+        Netral & N & 94,08 & 84,43 & 93,47 & 93,93 & 93,93 & 91,96 \\
+        \addlinespace[2pt]
+        Laki-laki & E  & 92,65 & 83,24 & 93,40 & 93,78 & 94,77 & 92,49 \\
+                  & I1 & 92,12 & 82,11 & 92,42 & 90,83 & 95,00 & 93,86 \\
+                  & I2 & 92,57 & 84,84 & 93,18 & 91,66 & 95,15 & 93,48 \\
+                  & I3 & 91,96 & 83,47 & 93,56 & 92,57 & 94,09 & 92,95 \\
+        \addlinespace[2pt]
+        Perempuan & E  & 93,71 & 82,64 & 93,18 & 93,40 & 94,69 & 91,89 \\
+                  & I1 & 92,34 & 82,64 & 93,25 & 90,22 & 95,38 & 93,71 \\
+                  & I2 & 92,71 & 84,76 & 93,33 & 91,05 & 94,84 & 93,71 \\
+                  & I3 & 92,72 & 84,31 & 93,70 & 92,49 & 95,22 & 94,01 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Dalam satu model, akurasi antarskenario tidak jauh berbeda. Pada keenam
+model, selisih antara akurasi tertinggi dan terendah dalam satu model
+berkisar 1,28--3,71 poin persentase. Selisih paling besar terdapat pada
+DeepSeek R1-Distill 32B, sedangkan selisih paling kecil terdapat pada
+Ministral 8B. Gambar~\ref{fig:ringkasan-akurasi-gender-gsm8k}
+menunjukkan perbandingan hasil pada skenario netral, skenario eksplisit,
+dan rata-rata I1, I2, dan I3.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.46\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/gender/akurasi/01_gender_absolute_accuracy_five_categories.png}
+    \caption[Akurasi GSM8K menurut skenario pada domain gender]
+    {Perbandingan akurasi GSM8K antara skenario netral, skenario eksplisit,
+    dan rata-rata skenario implisit pada domain gender}
+    \label{fig:ringkasan-akurasi-gender-gsm8k}
+\end{figure}
+
+Perbandingan dengan skenario netral membentuk tiga pola. Seluruh skenario
+persona lebih rendah pada Qwen3 Next 80B-A3B dan DeepSeek R1-Distill 32B,
+tetapi lebih tinggi pada GPT-OSS 20B. Pada tiga model lainnya, hasil yang lebih
+tinggi hanya ditemukan pada sebagian skenario.
+
+Gambar~\ref{fig:delta-gender-implisit-eksplisit-gsm8k} membandingkan rata-rata
+I1--I3 dengan E untuk persona laki-laki dan perempuan serta membandingkan hasil
+kedua persona. Pada batang biru dan merah, nilai positif menunjukkan rata-rata
+I1--I3 lebih tinggi daripada E, sedangkan nilai negatif menunjukkan hasil yang
+lebih rendah. Batang ungu dihitung dari E dan rata-rata I1--I3 setiap persona;
+nilai positif menunjukkan persona laki-laki lebih tinggi dan nilai negatif
+menunjukkan persona perempuan lebih tinggi.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.46\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/gender/akurasi/03_gender_delta_implicit_vs_explicit.png}
+    \caption[Selisih akurasi antarskenario dan antarpersona pada domain gender]
+    {Selisih rata-rata akurasi antara skenario implisit dan eksplisit serta
+    antara persona laki-laki dan perempuan pada domain gender}
+    \label{fig:delta-gender-implisit-eksplisit-gsm8k}
+\end{figure}
+
+Pada DeepSeek R1-Distill 32B, rata-rata akurasi I1--I3 lebih rendah 2,08 poin
+untuk persona laki-laki dan 2,15 poin untuk persona perempuan dibandingkan
+dengan E. Sebagai pembanding, rata-rata akurasi I1--I3 pada Llama 3.3 70B
+lebih tinggi 0,94 dan 1,92 poin. Rata-rata skenario implisit karena itu dapat
+lebih rendah atau lebih tinggi daripada E menurut model yang digunakan.
+
+\par\noindent\textbf{b. Hasil Perbandingan Statistik}\par
+\label{sym:p-value}
+
+Uji Q Cochran signifikan pada tiga dari 12 kelompok. Hasil tersebut ditemukan
+pada kedua persona DeepSeek R1-Distill 32B dengan $p<0{,}001$ serta persona
+perempuan Llama 3.3 70B dengan $p=0{,}012$. Setelah koreksi Holm, delapan dari
+108 perbandingan tetap signifikan. Tujuh hasil melibatkan I1 atau I2 pada
+DeepSeek, sedangkan satu hasil terdapat pada I3 persona perempuan Llama 3.3.
+
+Empat hasil signifikan terhadap skenario netral seluruhnya berupa penurunan
+pada I1 dan I2 DeepSeek R1-Distill 32B untuk kedua persona. Seluruh
+perbandingan E dengan N tidak signifikan. Terhadap E, tiga penurunan juga
+terdapat pada DeepSeek, sedangkan satu kenaikan terdapat pada I3 persona
+perempuan Llama 3.3 70B. Besar perubahan setiap perbandingan dicantumkan pada
+Tabel~\ref{tab:hasil-signifikan-gender-gsm8k}.
+
+Dari 24 perbandingan antarpersona laki-laki dan perempuan, tidak ada
+yang signifikan setelah koreksi Holm. Selisih paling besar hanya 1,14 poin
+persentase dengan nilai $|h|$ paling besar 0,051. Hasil akurasi karena itu tidak
+mendukung keunggulan salah satu persona gender.
+
+Gambar~\ref{fig:effect-gender-gsm8k} menunjukkan \textit{effect size}
+Cohen's $h$ dalam dua panel. Panel pertama membandingkan E dan I1--I3 dengan N,
+sedangkan panel kedua membandingkan I1--I3 dengan E serta persona laki-laki
+dengan perempuan. Warna biru menunjukkan akurasi skenario pertama lebih rendah
+daripada pembanding, sedangkan warna merah menunjukkan akurasi yang lebih
+tinggi. Tanda bintang menunjukkan hasil yang tetap signifikan setelah koreksi
+Holm, sedangkan nilai \textit{p-value} lengkap terdapat pada
+Lampiran~\ref{chap:lampiran-statistik-gender}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.78\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/gender/akurasi/24_gender_effect_holm_single_large_heatmap.png}
+    \caption[Ukuran efek dan signifikansi akurasi pada domain gender]
+    {Ukuran efek Cohen's $h$ dan hasil uji Exact McNemar setelah koreksi Holm
+    pada 18 jenis perbandingan per model dalam domain gender.\\[-2pt]
+    {\footnotesize\textit{Catatan:} * = signifikan setelah koreksi Holm
+    ($p_{\mathrm{Holm}} < 0{,}05$); E = eksplisit; I1--I3 = implisit;
+    N = netral; L = laki-laki; P = perempuan. Cohen's $h$ dihitung dari
+    skenario pertama dikurangi skenario pembanding.}}
+    \label{fig:effect-gender-gsm8k}
+\end{figure}
+
+Tabel~\ref{tab:hasil-signifikan-gender-gsm8k} memuat rincian delapan
+perbandingan yang bertanda bintang pada gambar. Nilai $\Delta$, interval
+kepercayaan, dan \textit{p-value} menunjukkan besar perbedaan dan hasil
+pengujiannya. Cohen's $h$ menunjukkan \textit{effect size}, sedangkan MOR
+menunjukkan perubahan jawaban pada soal yang sama.
+
+\begin{table}[H]
+    \centering
+    \caption{Perbandingan domain gender yang tetap signifikan setelah koreksi Holm}
+    \label{tab:hasil-signifikan-gender-gsm8k}
+    \scriptsize
+    \renewcommand{\arraystretch}{1.18}
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{1.65cm}
+        >{\raggedright\arraybackslash}X
+        >{\centering\arraybackslash}p{0.85cm}
+        >{\centering\arraybackslash}p{2.05cm}
+        >{\centering\arraybackslash}p{1.05cm}
+        >{\centering\arraybackslash}p{0.75cm}
+        >{\centering\arraybackslash}p{0.75cm}}
+        \toprule
+        \textbf{Model} & \textbf{Perbandingan} &
+        \textbf{$\Delta$} & \textbf{IK 95\%}\label{acr:ik} &
+        \textbf{$p_{\mathrm{Holm}}$} & \textbf{$h$} &
+        \textbf{MOR}\label{acr:mor} \\
+        \midrule
+        DeepSeek & Laki-laki I1--netral & $-3{,}03$ &
+        $[-4{,}63;\,-1{,}44]$ & 0,003 & $-0{,}12$ & 0,51 \\
+        DeepSeek & Laki-laki I2--netral & $-2{,}28$ &
+        $[-3{,}87;\,-0{,}68]$ & 0,034 & $-0{,}09$ & 0,59 \\
+        DeepSeek & Perempuan I1--netral & $-3{,}72$ &
+        $[-5{,}39;\,-2{,}05]$ & \mbox{$<0{,}001$} & $-0{,}14$ & 0,44 \\
+        DeepSeek & Perempuan I2--netral & $-2{,}89$ &
+        $[-4{,}56;\,-1{,}21]$ & 0,004 & $-0{,}11$ & 0,53 \\
+        DeepSeek & Laki-laki I1--eksplisit & $-2{,}96$ &
+        $[-4{,}70;\,-1{,}29]$ & 0,005 & $-0{,}11$ & 0,55 \\
+        DeepSeek & Perempuan I1--eksplisit & $-3{,}18$ &
+        $[-4{,}78;\,-1{,}59]$ & \mbox{$<0{,}001$} & $-0{,}12$ & 0,48 \\
+        DeepSeek & Perempuan I2--eksplisit & $-2{,}35$ &
+        $[-4{,}02;\,-0{,}76]$ & 0,021 & $-0{,}09$ & 0,58 \\
+        Llama 3.3 & Perempuan I3--eksplisit & $+2{,}12$ &
+        $[+0{,}83;\,+3{,}49]$ & 0,018 & $+0{,}08$ & 2,04 \\
+        \bottomrule
+    \end{tabularx}
+
+    \vspace{0.15cm}
+    \begin{minipage}{0.98\textwidth}
+        \scriptsize
+        Nilai $\Delta$ dan interval kepercayaan ditulis dalam poin
+        persentase. MOR adalah \textit{matched odds ratio}.
+    \end{minipage}
+\end{table}
+
+Nilai $|h|$ pada delapan perbandingan signifikan berkisar 0,08--0,14
+dan seluruhnya berada di bawah 0,20. Pada DeepSeek R1-Distill 32B, MOR sebesar
+0,44--0,59 menunjukkan lebih banyak pasangan dengan jawaban benar pada
+skenario pembanding dan jawaban salah pada skenario implisit. Pada Llama
+3.3 70B, MOR sebesar 2,04 menunjukkan lebih banyak jawaban berubah dari
+salah pada E menjadi benar pada I3.
+
+\par\noindent\textbf{c. Penggunaan Token}\par
+
+Skenario implisit menggunakan lebih banyak \textit{input token} karena seluruh
+percakapan \textit{warmup} dikirim bersama soal. Rata-ratanya meningkat
+213,7--965,8\% dibandingkan dengan E. I1 menggunakan \textit{input token}
+paling banyak pada seluruh model dan kedua persona karena percakapan
+\textit{warmup}-nya paling panjang. Tabel
+\ref{tab:perubahan-token-gender} merangkum perubahan
+\textit{completion token} pada setiap model.
+
+\begin{table}[H]
+    \centering
+    \caption[Perubahan completion token pada domain gender]
+    {Perubahan rata-rata \textit{completion token} I1--I3 terhadap E pada
+    domain gender}
+    \label{tab:perubahan-token-gender}
+    \small
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Model} & \textbf{Laki-laki} & \textbf{Perempuan} \\
+        \midrule
+        Qwen3 Next 80B-A3B      & $+10{,}0\%$ & $+10{,}3\%$ \\
+        Llama 3.1 8B            & $+5{,}0\%$  & $-1{,}9\%$  \\
+        Ministral 8B            & $-0{,}9\%$  & $-1{,}8\%$  \\
+        DeepSeek R1-Distill 32B & $+82{,}8\%$ & $+80{,}0\%$ \\
+        GPT-OSS 20B             & $-7{,}4\%$  & $-4{,}7\%$  \\
+        Llama 3.3 70B           & $+4{,}3\%$  & $+3{,}3\%$  \\
+        \bottomrule
+    \end{tabular}
+
+    \vspace{0.15cm}
+    \begin{minipage}{0.88\textwidth}
+        \scriptsize
+        Persentase dihitung dari rata-rata I1--I3 dibandingkan dengan E.
+    \end{minipage}
+\end{table}
+
+Perubahan \textit{completion token} berbeda antarmodel. DeepSeek
+R1-Distill 32B mengalami kenaikan 80,0--82,8\%, sedangkan GPT-OSS 20B
+mengalami penurunan 4,7--7,4\%. Pada empat model lainnya, perubahannya
+berkisar $-1{,}9\%$ sampai $+10{,}3\%$. Seluruh model menerima tambahan
+percakapan \textit{warmup}, tetapi panjang respons yang dihasilkan dapat
+meningkat atau menurun.
+
+Total token pada rata-rata I1--I3 meningkat 59,5--220,5\% terhadap E pada
+seluruh model. Persona laki-laki menggunakan total token 0,6--26,7\% lebih
+banyak daripada persona perempuan karena percakapan \textit{warmup}-nya lebih
+panjang. \textit{Completion token} persona laki-laki tidak selalu lebih
+tinggi, sehingga perbedaan jumlah \textit{input token} menjadi sumber utama
+selisih total token.
+
+Penggunaan total token yang lebih besar pada persona laki-laki tidak disertai
+keunggulan akurasi yang signifikan. Seluruh perbandingan akurasi antarpersona
+laki-laki dan perempuan memperoleh
+$p_{\mathrm{Holm}}\geq 0{,}05$. Persona gender mengubah jumlah token yang
+digunakan tanpa menghasilkan perbedaan akurasi antarpersona yang signifikan.
+Rata-rata komponen token terdapat pada
+Gambar~\ref{fig:lampiran-token-gender-components}, sedangkan perbandingan
+token dan akurasi setiap skenario terdapat pada
+Gambar~\ref{fig:lampiran-token-akurasi-gender} di
+Lampiran~\ref{sec:lampiran-token-gender}.
+
+\subsubsection{Penanda Linguistik}
+\label{subsubsec:penanda-gender-gsm8k}
+
+Perbandingan penanda linguistik menggunakan skenario dan pasangan persona yang
+sama dengan pengujian akurasi. Pada GSM8K, perubahan penanda linguistik gender
+terutama terdapat pada bentuk respons. Perubahannya mencakup panjang respons,
+variasi kata, susunan penyelesaian, bahasa matematis, dan kata ganti diri.
+Penanda linguistik yang berubah pada E, I1, I2, dan I3 berbeda menurut model. Perbandingan
+antarpersona laki-laki dan perempuan juga menghasilkan perubahan
+yang berbeda, sehingga pengaruh persona gender muncul melalui cara setiap model
+menulis respons.
+
+\par\noindent\textbf{a. Perubahan terhadap Skenario Netral}\par
+
+Gambar~\ref{fig:marker-gender-terhadap-netral} membandingkan skenario E, I1,
+I2, dan I3 dengan skenario netral pada persona yang sama. Baris atas
+menunjukkan persona laki-laki, sedangkan baris bawah menunjukkan persona
+perempuan. Satu titik mewakili hasil satu penanda linguistik pada satu model,
+warna titik membedakan kelompok penanda linguistik pada Tabel~\ref{tab:aturan-penanda}, dan
+ukuran titik mengikuti jumlah pasangan respons yang memiliki nilai berbeda.
+Sumbu horizontal menunjukkan \textit{effect size} \textit{rank-biserial},
+dengan nilai positif untuk penanda linguistik yang lebih tinggi pada skenario
+persona dan nilai negatif untuk penanda linguistik yang lebih tinggi pada N.
+Sumbu vertikal menunjukkan $-\log_{10}(p_{\text{Holm}})$, garis putus-putus
+menandai batas signifikansi setelah koreksi Holm, dan nilai di atas 50
+ditempatkan pada 50.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{image/BabVI/gsm8k/gender/consistent_20261002/03_numeric_effect_volcano_vs_neutral.png}
+    \caption[Ukuran efek penanda linguistik pada domain gender]
+    {Ukuran efek penanda linguistik numerik terhadap skenario netral dalam
+    domain gender}
+    \label{fig:marker-gender-terhadap-netral}
+\end{figure}
+
+Pada DeepSeek R1-Distill 32B, I1, I2, dan I3 lebih sedikit menggunakan langkah
+eksplisit dan LaTeX \textit{display} pada kedua persona. Daftar berpoin dan
+operasi aritmetika di dalam kalimat lebih sering digunakan. Pada Qwen3 Next
+80B-A3B, ketiga skenario implisit menghasilkan lebih sedikit kata, langkah
+eksplisit, subjudul, dan LaTeX \textit{display} pada kedua persona.
+
+Pada Llama 3.3 70B, kata penghubung sebab-akibat dan kata ganti inklusif lebih
+sering digunakan pada kedua persona, sedangkan daftar berpoin berkurang. Pada
+GPT-OSS 20B, E menghasilkan lebih sedikit kata dan LaTeX \textit{display}
+daripada N pada kedua persona, disertai kenaikan variasi kata dan penggunaan
+subjudul. Pada I1, I2, dan I3, penggunaan subjudul meningkat,
+sedangkan rata-rata panjang kalimat menurun.
+
+Pada keenam model, skenario persona memengaruhi cara model menyusun
+penyelesaian. Kesamaan perubahan pada persona laki-laki dan perempuan,
+terutama pada DeepSeek R1-Distill 32B dan Qwen3 Next 80B-A3B, menunjukkan bahwa
+susunan skenario eksplisit dan implisit ikut menentukan perubahan terhadap N.
+Perubahan khusus antara persona laki-laki dan perempuan diperiksa melalui
+perbandingan antarpersona.
+
+\par\noindent\textbf{b. Perbandingan Persona Laki-Laki dan Perempuan}\par
+
+Perbandingan antarpersona mencakup 384 hasil, yaitu 16 penanda linguistik pada
+empat skenario dan enam model. Setelah koreksi Holm, 56 perbandingan tetap
+signifikan dan seluruh model memiliki setidaknya satu hasil signifikan.
+Tabel~\ref{tab:penanda-gender-antarpersona} merangkum jumlah hasil signifikan,
+skenario, dan temuan dengan $|r|$ terbesar pada setiap model.
+
+\begin{table}[H]
+    \centering
+    \caption{Ringkasan perbandingan penanda linguistik antara persona
+    laki-laki dan perempuan}
+    \label{tab:penanda-gender-antarpersona}
+    \small
+    \renewcommand{\arraystretch}{1.18}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{2.65cm}
+        >{\centering\arraybackslash}p{1.35cm}
+        >{\centering\arraybackslash}p{1.45cm}
+        >{\raggedright\arraybackslash}X}
+        \toprule
+        \textbf{Model} &
+        \textbf{Jumlah signifikan} &
+        \textbf{Skenario} &
+        \textbf{Temuan dengan $|r|$ terbesar} \\
+        \midrule
+        DeepSeek R1-Distill 32B & 5 & I2, I3 &
+        Subjudul lebih sering digunakan oleh persona perempuan pada I2
+        ($r=-0{,}18$). \\
+        Llama 3.1 8B & 12 & E, I1--I3 &
+        Subjudul lebih sering digunakan oleh persona laki-laki pada I3
+        ($r=0{,}84$). \\
+        Llama 3.3 70B & 12 & E, I1--I3 &
+        Subjudul lebih sering digunakan oleh persona laki-laki pada I3
+        ($r=0{,}98$). \\
+        Ministral 8B & 14 & E, I1--I3 &
+        Jumlah kata lebih tinggi pada persona perempuan di I3
+        ($r=-0{,}48$). \\
+        GPT-OSS 20B & 8 & E, I1--I3 &
+        Subjudul lebih sering digunakan oleh persona perempuan pada I3
+        ($r=-0{,}35$). \\
+        Qwen3 Next 80B-A3B & 5 & I1--I3 &
+        Subjudul lebih sering digunakan oleh persona perempuan pada I1
+        ($r=-0{,}41$). \\
+        \bottomrule
+    \end{tabularx}
+
+    \vspace{0.15cm}
+    \begin{minipage}{0.98\textwidth}
+        \small
+        Jumlah signifikan menunjukkan banyaknya kombinasi skenario dan
+        penanda linguistik dengan $p_{\mathrm{Holm}}<0{,}05$. Nilai $r$ positif
+        menunjukkan penanda linguistik lebih tinggi pada persona laki-laki,
+        sedangkan nilai negatif menunjukkan penanda linguistik lebih tinggi
+        pada persona perempuan.
+    \end{minipage}
+\end{table}
+
+Penggunaan subjudul berbeda antara persona laki-laki dan perempuan menurut
+model dan skenario. Pada I3, subjudul lebih sering digunakan oleh persona
+laki-laki pada kedua model Llama, sedangkan persona perempuan lebih sering
+menggunakannya pada GPT-OSS 20B. Persona perempuan juga lebih sering
+menggunakan subjudul pada I1 Qwen3 Next 80B-A3B.
+
+Nilai $r$ yang besar pada kedua model Llama di I3 berasal dari sedikit pasangan
+yang memiliki jumlah subjudul berbeda. Pada Llama 3.3 70B, 65 dari 68 pasangan
+yang berbeda lebih tinggi pada persona laki-laki, sedangkan tiga pasangan lebih
+tinggi pada persona perempuan. Pada Llama 3.1 8B, 57 dari 65 pasangan yang
+berbeda lebih tinggi pada persona laki-laki, sedangkan delapan pasangan lebih
+tinggi pada persona perempuan. Nilai $r$ yang besar menunjukkan bahwa hampir
+seluruh pasangan yang berubah memiliki jumlah subjudul lebih tinggi pada persona
+laki-laki, meskipun perbedaannya hanya muncul pada sebagian kecil soal.
+
+Pasangan respons Llama 3.3 70B pada soal
+\texttt{gsm8k\_01035} memperlihatkan perubahan tersebut. Respons persona
+laki-laki memisahkan perhitungan dengan subjudul \textit{Cost of books:},
+\textit{Cost of pencils:}, dan \textit{Total amount spent:}, sedangkan respons
+persona perempuan menulis \textit{The cost of 3 books at \$16 each is:} dan
+\textit{The cost of 3 pencils at \$6 each is:} tanpa subjudul. Kedua respons
+menghasilkan total \$66, sehingga perubahan terdapat pada susunan penyelesaian,
+bukan pada hasil hitung untuk soal tersebut.
+
+Pada Ministral 8B, I2 menghasilkan respons persona
+laki-laki yang lebih panjang dengan variasi kata lebih rendah, sedangkan I3
+menghasilkan respons yang lebih pendek dengan variasi kata lebih tinggi.
+Kedua skenario berbeda dalam isi percakapan \textit{warmup} yang digunakan.
+Pengujian ini belum memisahkan pengaruh identitas gender dari isi
+\textit{warmup} terhadap bentuk respons.
+Rincian seluruh perbandingan terdapat pada
+Lampiran~\ref{fig:lampiran-marker-gender-laki-perempuan}.
+
+\par\noindent\textbf{c. Bentuk Respons dan Bahasa Matematis}\par
+
+Penanda linguistik bentuk respons mencakup jumlah kata, panjang kalimat, variasi kata,
+langkah eksplisit, daftar berpoin, dan subjudul. Bahasa matematis pada bagian
+ini menunjukkan cara model menempatkan perhitungan dalam respons. LaTeX
+\textit{display} menempatkan persamaan pada baris tersendiri, sedangkan operasi
+aritmetika di dalam kalimat menyatukan perhitungan seperti \(12+8=20\) dengan
+penjelasan. Kedua bentuk tersebut menunjukkan apakah model lebih sering
+memisahkan persamaan dari kalimat atau menuliskan perhitungan sebagai bagian
+dari kalimat.
+
+DeepSeek R1-Distill 32B menjadi contoh utama pada perbandingan dengan N. I1,
+I2, dan I3 lebih sedikit menggunakan langkah eksplisit dan LaTeX
+\textit{display}, tetapi lebih sering menggunakan daftar berpoin dan operasi
+aritmetika di dalam kalimat. Penyelesaian pada skenario implisit lebih sering
+ditulis melalui kalimat dan operasi di dalam teks
+daripada melalui urutan langkah dan persamaan terpisah. Pada I2 dan I3,
+persona laki-laki juga menggunakan kalimat yang lebih panjang, sedangkan
+persona perempuan lebih sering menggunakan daftar berpoin.
+
+Perubahan tersebut terlihat pada soal \texttt{gsm8k\_00238}. Pada N, DeepSeek
+memakai tiga label langkah dan menempatkan perhitungan \(20+10=30\) serta
+\(30\times3=90\) pada baris tersendiri. Pada I2 persona laki-laki, perhitungan
+yang sama diringkas menjadi dua poin, yaitu \textit{Total amount before
+investment: \$20 + \$10 = \$30} dan \textit{Amount after tripling: \$30
+$\times$ 3 = \$90}.
+
+Pada Ministral 8B, I2 menghasilkan respons persona laki-laki yang lebih
+panjang dengan variasi kata yang lebih rendah. Pada I3, respons persona
+laki-laki menjadi lebih pendek dengan variasi kata yang lebih tinggi. I2
+menyampaikan persona melalui aktivitas merapikan penampilan, sedangkan I3
+menggunakan pilihan pakaian. Panjang dan susunan respons berbeda antara
+I2 dan I3.
+
+Jumlah kata dan \textit{completion token} mengukur bagian respons yang
+berbeda. Pada DeepSeek R1-Distill 32B, teks yang terlihat menggunakan lebih
+sedikit kata pada skenario implisit, sementara jumlah \textit{completion
+token} meningkat. Jumlah kata dihitung dari teks respons, sedangkan
+\textit{completion token} diperoleh dari metadata API. Skenario persona
+karena itu dapat mengubah penggunaan token dan bentuk teks yang terlihat
+dengan cara yang berbeda.
+
+\par\noindent\textbf{d. Pola Pembuka dan Penanda Linguistik Identitas}\par
+
+Pola pembuka respons dibandingkan pada N, E, I1, I2, dan I3 untuk setiap
+model dan persona. Contoh pembuka instruksional pada respons asli adalah
+\textit{Let's solve the problem.} pada \texttt{gsm8k\_00384}, sedangkan
+pembuka berupa subjudul muncul sebagai \textit{Step-by-Step Solution:} pada
+\texttt{gsm8k\_00241}. Pembuka naratif langsung memulai isi soal, seperti
+\textit{Emil is 19 now.} pada \texttt{gsm8k\_00980}, sedangkan pengulangan
+soal muncul sebagai \textit{The problem states that three-fourths of the
+students have a desktop computer} pada \texttt{gsm8k\_00475}. Persentase
+setiap kategori ditampilkan pada Gambar~\ref{fig:pembuka-gender-gsm8k}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{image/BabVI/gsm8k/gender/consistent_20261002/08_opening_composition_100pct.png}
+    \caption{Persentase kategori pembuka respons pada domain gender}
+    \label{fig:pembuka-gender-gsm8k}
+\end{figure}
+
+Pada DeepSeek R1-Distill 32B, sebanyak 61,03\% respons pada N menggunakan
+pembuka instruksional dan 38,74\% menggunakan pembuka berupa subjudul. Pada E,
+pembuka berupa subjudul mencakup 55,74--56,40\% respons, sedangkan pembuka
+instruksional mencakup 40,28--41,38\%. Pada I1, I2, dan I3, pembuka naratif
+mencakup 54,21--66,49\% respons. Pengulangan soal juga ditemukan pada
+18,38--21,87\% respons.
+
+GPT-OSS 20B tetap lebih sering menggunakan pembuka naratif. Persentasenya
+mencapai 80,91\% pada N dan 61,32--69,95\% pada I1, I2, dan I3. Pada Qwen3
+Next 80B-A3B, pembuka instruksional mencakup 47,16--64,72\% respons pada
+kelima skenario.
+
+Pada N, pembuka instruksional digunakan pada 99,32\% respons Llama 3.1 8B,
+95,68\% respons Llama 3.3 70B, dan 96,59\% respons Ministral 8B. Sebagian
+besar respons ketiga model tersebut sudah menggunakan pembuka instruksional
+sebelum persona diberikan. Pembuka ini tetap menjadi kategori utama pada E,
+I1, I2, dan I3 dengan persentase 95,14--99,62\%.
+
+Setelah koreksi Holm, lima dari enam model menghasilkan perbedaan komposisi
+pembuka antara persona laki-laki dan perempuan. Perbedaan ditemukan pada I2
+dan I3 untuk DeepSeek R1-Distill 32B, I3 untuk Llama 3.3 70B dan Ministral 8B,
+E, I1, dan I3 untuk GPT-OSS 20B, serta I1 dan I2 untuk Qwen3 Next 80B-A3B.
+Llama 3.1 8B tidak menghasilkan perbedaan signifikan pada keempat skenario.
+Pada lima model tersebut, persona laki-laki dan perempuan membuat model
+memulai penyelesaian dengan bentuk yang berbeda. Rincian setiap perbandingan
+dicantumkan pada Lampiran~\ref{fig:lampiran-pembuka-langsung-gender}.
+
+Penanda linguistik identitas digunakan untuk melihat apakah identitas disebut secara
+langsung di dalam respons. Pernyataan identitas AI mencakup ungkapan seperti
+\textit{As an AI language model}, sedangkan ungkapan pengarah pembaca mencakup
+\textit{note that}, \textit{you can see that}, dan \textit{consider this}.
+Pronomina gender mencakup \textit{he}, \textit{him}, \textit{his},
+\textit{she}, \textit{her}, dan \textit{hers}.
+
+Tidak ada model yang menyatakan dirinya sebagai AI dalam respons GSM8K.
+Ungkapan pengarah pembaca hanya ditemukan pada sedikit respons dan tidak
+berbeda secara signifikan antarskenario. Pronomina gender ditemukan pada
+beberapa model dan skenario, tetapi digunakan untuk menyebut tokoh dalam soal.
+Pengaruh persona gender lebih sering muncul pada bentuk
+pembuka daripada melalui penyebutan identitas secara langsung.
+
+\par\noindent\textbf{e. Penanda Linguistik dan Akurasi}\par
+
+Pada domain gender, penanda linguistik berubah pada keenam model. E tidak
+menghasilkan perubahan akurasi yang signifikan terhadap N, sedangkan perubahan
+akurasi ditemukan pada I1 dan I2 pada DeepSeek R1-Distill 32B serta I3 persona
+perempuan pada Llama 3.3 70B. Perubahan penanda linguistik tidak selalu diikuti
+kenaikan atau penurunan akurasi yang sama.
+
+I1 menyampaikan persona laki-laki sebagai ayah yang melindungi dan menafkahi
+keluarga, sedangkan persona perempuan sebagai ibu yang mengatur jadwal,
+menyiapkan makanan, dan memperhatikan kebutuhan keluarga. Percakapan
+\textit{warmup} I1 paling panjang di antara ketiga skenario implisit. Pada
+DeepSeek, I1 lebih sering menghasilkan pembuka naratif atau pengulangan
+informasi soal daripada E. Langkah eksplisit dan LaTeX \textit{display}
+berkurang, sedangkan daftar berpoin dan operasi aritmetika di dalam kalimat
+meningkat. Perubahan bentuk respons tersebut muncul bersama penurunan akurasi
+sebesar 2,96 poin untuk persona laki-laki dan 3,18 poin untuk persona perempuan
+dibandingkan dengan E.
+
+I2 menyampaikan persona melalui kegiatan bercukur dan merapikan janggut untuk
+laki-laki serta merias wajah untuk perempuan. Pada DeepSeek R1-Distill 32B,
+I2 juga lebih sering menghasilkan pembuka naratif dan pengulangan soal serta
+lebih jarang menggunakan langkah eksplisit dan LaTeX \textit{display}.
+Akurasi persona laki-laki lebih rendah 2,28 poin daripada N, sedangkan akurasi
+persona perempuan lebih rendah 2,89 poin daripada N dan 2,35 poin daripada E.
+Meskipun isi I1 dan I2 berbeda, keduanya memperlihatkan perubahan susunan
+respons dan penurunan akurasi pada DeepSeek.
+
+I3 menyampaikan persona melalui jas dan dasi untuk laki-laki serta gaun dan
+sepatu hak tinggi untuk perempuan. Pada Llama 3.3 70B, akurasi I3 persona
+perempuan lebih tinggi 2,12 poin daripada E. Pada perbandingan yang sama, kata
+penghubung sebab-akibat dan kata ganti inklusif meningkat, sedangkan penggunaan
+daftar berpoin berkurang. Hasil I3 berbeda dari I1 dan I2 karena perubahan
+penanda linguistiknya muncul bersama kenaikan, bukan penurunan, akurasi.
+Perbandingan akurasi I3 lainnya tidak signifikan setelah koreksi Holm.
+
+Pada perbandingan antarpersona laki-laki dan perempuan, tidak ada
+perbedaan akurasi yang signifikan pada semua model dan skenario. Perbedaannya
+lebih sering muncul pada cara jawaban ditulis. Pada I3, kedua model Llama lebih
+sering menggunakan subjudul untuk persona laki-laki, sedangkan GPT-OSS 20B
+lebih sering menggunakannya untuk persona perempuan. DeepSeek pada I2 dan Qwen
+pada I1 juga lebih sering menggunakan subjudul untuk persona perempuan,
+sementara pada Ministral I3 jawaban persona perempuan lebih panjang. Pada
+GSM8K, perbedaan antara persona laki-laki dan perempuan lebih banyak terdapat
+pada cara penyampaian jawaban daripada akurasinya.
+
+\subsubsection{Ringkasan Domain Gender}
+\label{subsubsec:ringkasan-gender-gsm8k}
+
+Untuk rumusan masalah pertama, persona gender lebih sering mengubah penanda
+linguistik daripada akurasi pada GSM8K. E tidak menghasilkan perbedaan akurasi
+yang signifikan terhadap N pada keenam model. I1 dan I2 menurunkan akurasi
+kedua persona pada DeepSeek R1-Distill 32B dibandingkan dengan N, sedangkan I3
+meningkatkan akurasi persona perempuan pada Llama 3.3 70B dibandingkan dengan
+E. Penanda
+linguistik berubah pada keenam model meskipun perbandingan akurasi antarpersona
+laki-laki dan perempuan tidak signifikan. Persona yang
+akurasinya berubah karena itu berbeda menurut cara penyampaian dan model.
+
+I1 menyampaikan persona melalui peran ayah dan ibu, sedangkan I2 menggunakan
+kegiatan merapikan penampilan. Kedua skenario tersebut membuat DeepSeek lebih
+sering memakai pembuka naratif dan lebih jarang memakai langkah eksplisit
+serta LaTeX \textit{display}, disertai penurunan akurasi. I3 menggunakan
+pakaian dan pada Llama 3.3 70B persona perempuan menghasilkan lebih banyak
+kata penghubung sebab-akibat serta kenaikan akurasi. Setiap skenario implisit
+memuat tema persona dan riwayat percakapan, sehingga hasilnya merujuk pada
+skenario persona lengkap yang diterima model.
+
+Dari sisi penggunaan sumber daya, skenario implisit menambah \textit{input
+token} karena percakapan \textit{warmup} dikirim bersama soal. Pada rata-rata
+I1--I3, persona laki-laki menggunakan total token 0,6--26,7\% lebih banyak
+daripada persona perempuan pada keenam model. Penggunaan token yang lebih
+besar tidak menghasilkan keunggulan akurasi persona laki-laki. Akurasi
+rata-rata persona perempuan lebih tinggi 0,37--0,44 poin pada lima dari enam
+model, tetapi seluruh perbandingan antarpersona tidak signifikan.
+
+Untuk rumusan masalah kedua, bagian ini menunjukkan hasil domain gender pada
+tugas penalaran numerik. Pada domain ini, persona memengaruhi cara penulisan
+respons pada lebih banyak model daripada akurasinya. Perbandingan dengan
+domain agama dan regional-kultural terdapat pada
+Subbab~\ref{subsec:perbandingan-domain-gsm8k}, sedangkan perbandingan dengan
+tugas penalaran moral menggunakan hasil ETHICS pada
+Subbab~\ref{subsubsec:ringkasan-gender-ethics}.
+
+Untuk rumusan masalah ketiga, pengaruh persona gender tidak seragam pada
+berbagai jenis model dan ukuran parameter. Di antara model
+\textit{reasoning}, perubahan akurasi terdapat pada DeepSeek, tetapi tidak pada
+GPT-OSS 20B dan Qwen3 Next 80B-A3B. Di antara model \textit{non-reasoning},
+perubahan akurasi hanya terdapat pada Llama 3.3 70B, sedangkan Llama 3.1 8B
+dan Ministral 8B tetap mengubah penanda linguistik. Jenis model dan jumlah
+parameter karena itu tidak menghasilkan pengaruh persona yang sama.
+
+
+% =====================================================================
+\subsection{Domain Agama}
+\label{subsec:hasil-agama-gsm8k}
+
+Domain agama mencakup persona Islam, Kristen, Yahudi, dan ateis. Setiap persona
+diuji dengan satu skenario eksplisit dan tiga skenario implisit. I1 menggunakan
+kitab agama sebagai pedoman hidup, I2 menggunakan hari raya keagamaan, dan I3
+menggunakan kegiatan ibadah atau komunitas agama; pada persona ateis, ketiga
+tema tersebut dibuat dalam bentuk nonkeagamaan. Ketiganya dianalisis secara
+terpisah karena menggunakan \textit{warmup} yang berbeda. Analisis menggunakan
+134.538 respons dari 1.319 soal GSM8K.
+
+\subsubsection{Akurasi Respons}
+\label{subsubsec:akurasi-agama-gsm8k}
+
+\par\noindent\textbf{a. Akurasi Setiap Skenario}\par
+
+Tabel~\ref{tab:akurasi-agama-gsm8k} menunjukkan akurasi keenam model pada
+skenario netral serta skenario yang menggunakan persona Islam, Kristen,
+Yahudi, dan ateis. Baris N berisi hasil pada skenario netral. Untuk setiap
+persona, hasil skenario eksplisit ditulis pada baris E, sedangkan hasil tiga
+skenario implisit ditulis pada baris I1, I2, dan I3.
+
+\begin{table}[H]
+    \centering
+    \caption{Akurasi GSM8K pada domain agama menurut persona dan skenario (\%)}
+    \label{tab:akurasi-agama-gsm8k}
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.08}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{1.75cm}
+        >{\centering\arraybackslash}p{0.65cm}
+        *{6}{>{\centering\arraybackslash}X}}
+        \toprule
+        \textbf{Persona} & \textbf{Skenario} & \textbf{Qwen3} &
+        \textbf{Llama 3.1} & \textbf{Ministral} & \textbf{DeepSeek} &
+        \textbf{GPT-OSS} & \textbf{Llama 3.3} \\
+        \midrule
+        Netral & N & 94,08 & 84,43 & 93,47 & 93,93 & 93,93 & 91,96 \\
+        \addlinespace[2pt]
+        Islam & E  & 96,21 & 81,96 & 91,43 & 92,87 & 90,49 & 93,93 \\
+              & I1 & 95,07 & 80,89 & 82,64 & 92,80 & 92,55 & 93,56 \\
+              & I2 & 95,45 & 81,20 & 86,73 & 93,10 & 93,24 & 94,01 \\
+              & I3 & 95,68 & 79,53 & 84,38 & 93,18 & 92,91 & 94,47 \\
+        \addlinespace[2pt]
+        Kristen & E  & 96,36 & 84,23 & 91,05 & 92,95 & 91,81 & 94,01 \\
+                & I1 & 94,62 & 80,74 & 85,97 & 93,93 & 92,94 & 93,86 \\
+                & I2 & 95,60 & 79,76 & 88,48 & 92,42 & 93,62 & 94,09 \\
+                & I3 & 95,15 & 83,40 & 86,66 & 92,57 & 92,34 & 94,31 \\
+        \addlinespace[2pt]
+        Yahudi & E  & 95,53 & 83,47 & 90,60 & 93,25 & 92,23 & 94,01 \\
+               & I1 & 95,60 & 83,24 & 87,34 & 92,80 & 92,33 & 93,63 \\
+               & I2 & 95,68 & 82,11 & 87,95 & 93,78 & 93,01 & 94,16 \\
+               & I3 & 95,44 & 80,89 & 87,72 & 93,48 & 92,86 & 93,56 \\
+        \addlinespace[2pt]
+        Ateis & E  & 95,68 & 84,00 & 90,22 & 92,65 & 92,09 & 93,93 \\
+              & I1 & 95,60 & 82,11 & 87,11 & 92,87 & 90,82 & 93,18 \\
+              & I2 & 95,91 & 81,35 & 86,50 & 92,65 & 91,79 & 94,01 \\
+              & I3 & 95,75 & 81,88 & 86,13 & 93,71 & 92,34 & 94,84 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Dalam satu model, selisih antara akurasi tertinggi dan terendah berkisar
+1,51--10,83 poin persentase. Selisih terbesar terdapat pada Ministral 8B,
+sedangkan selisih terkecil terdapat pada DeepSeek R1-Distill 32B.
+Gambar~\ref{fig:ringkasan-akurasi-agama-gsm8k} menunjukkan perbandingan hasil
+pada skenario netral, skenario eksplisit, dan rata-rata I1, I2, dan I3.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.46\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/religion/akurasi/05_religion_absolute_accuracy_explicit_implicit.png}
+    \caption[Akurasi GSM8K menurut skenario pada domain agama]
+    {Perbandingan akurasi GSM8K antara skenario netral, skenario eksplisit,
+    dan rata-rata skenario implisit pada domain agama}
+    \label{fig:ringkasan-akurasi-agama-gsm8k}
+\end{figure}
+
+Perbandingan dengan skenario netral membentuk tiga pola. Seluruh skenario
+persona lebih tinggi pada Qwen3 Next 80B-A3B dan Llama 3.3 70B, tetapi lebih
+rendah pada Llama 3.1 8B, Ministral 8B, dan GPT-OSS 20B. Pada DeepSeek
+R1-Distill 32B, seluruh skenario persona lebih rendah, kecuali I1 persona
+Kristen yang memperoleh akurasi sama dengan skenario netral. Penurunan terbesar
+terdapat pada I1 persona Islam pada Ministral 8B, yaitu 10,83 poin.
+
+Gambar~\ref{fig:delta-implisit-eksplisit-agama-gsm8k} membandingkan rata-rata
+I1--I3 dengan E untuk setiap persona. Nilai positif menunjukkan rata-rata
+akurasi I1--I3 lebih tinggi daripada E, sedangkan nilai negatif menunjukkan
+hasil yang lebih rendah.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.46\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/religion/akurasi/06_religion_delta_implicit_vs_explicit.png}
+    \caption[Selisih akurasi antarskenario pada domain agama]
+    {Selisih rata-rata akurasi antara skenario implisit dan eksplisit pada
+    domain agama}
+    \label{fig:delta-implisit-eksplisit-agama-gsm8k}
+\end{figure}
+
+Perubahan rata-rata I1--I3 terhadap E paling besar ditemukan pada Ministral
+8B. Pada keempat persona, rata-rata akurasinya lebih rendah 2,93--6,85 poin
+daripada E. Penurunan juga ditemukan pada Llama 3.1 8B sebesar 1,39--2,93
+poin. Sebaliknya, pada GPT-OSS 20B, rata-rata akurasi I1--I3 lebih tinggi
+0,50--2,41 poin untuk persona Islam, Kristen, dan Yahudi, tetapi lebih rendah
+0,44 poin untuk persona ateis. Pada Qwen3 Next 80B-A3B, DeepSeek R1-Distill
+32B, dan Llama 3.3 70B, selisihnya tidak melebihi 1,24 poin. Artinya, skenario
+implisit dapat menghasilkan kenaikan atau penurunan akurasi menurut model dan
+persona yang digunakan.
+
+\par\noindent\textbf{b. Hasil Perbandingan Statistik}\par
+\label{subsubsec:perbandingan-agama-gsm8k}
+
+Pengujian utama membandingkan akurasi E dan I1--I3 pada model dan persona agama
+yang sama. Q Cochran digunakan untuk memeriksa perbedaan keempat skenario
+tersebut. Jika hasilnya signifikan, I1--I3 dibandingkan dengan E menggunakan
+Exact McNemar dan koreksi Holm. Pengujian utama mencakup 72 perbandingan I--E.
+Sebanyak 96 perbandingan skenario persona dengan N ditempatkan sebagai analisis
+sensitivitas, sedangkan 144 perbandingan antarpersona digunakan untuk
+membandingkan persona agama. Kedua kelompok tersebut juga diuji menggunakan Exact
+McNemar dan koreksi Holm.
+
+Uji Q Cochran signifikan pada delapan dari 24 kelompok. Empat kelompok terdapat
+pada Ministral 8B dan mencakup seluruh persona agama. Empat kelompok lainnya
+terdapat pada persona ateis Llama 3.3 70B, persona Kristen Qwen3 Next 80B-A3B
+dan Llama 3.1 8B, serta persona Islam GPT-OSS 20B. Setelah penyaringan berdasarkan
+Q Cochran dan koreksi Holm, 19 perbandingan I--E tetap signifikan. Pada analisis
+sensitivitas, 23 perbandingan dengan N tetap signifikan setelah koreksi Holm.
+Empat perbandingan antarpersona juga tetap signifikan.
+
+Dari 96 perbandingan dengan N, 23 tetap signifikan setelah koreksi Holm.
+Sebanyak 15 hasil terdapat pada Ministral 8B. Delapan hasil lainnya tersebar
+pada empat model. DeepSeek R1-Distill 32B tidak menghasilkan perbandingan
+signifikan terhadap N.
+
+Empat dari 144 perbandingan antarpersona tetap signifikan dan seluruhnya
+menunjukkan akurasi persona Islam yang lebih rendah. Pada Ministral 8B, akurasi
+persona Islam lebih rendah 4,47 poin daripada ateis pada I1 serta lebih rendah
+4,70 dan 3,34 poin daripada persona Yahudi pada I1 dan I3. Pada Llama 3.1 8B,
+akurasi persona Islam pada I3 lebih rendah 3,87 poin daripada persona Kristen.
+
+Gambar~\ref{fig:effect-agama-gsm8k} menunjukkan \textit{effect size} Cohen's
+$h$ pada 52 jenis perbandingan per model dalam empat panel. Panel pertama dan
+kedua memuat perbandingan skenario untuk setiap persona, sedangkan panel ketiga
+dan keempat memuat perbandingan antarpersona. Warna biru menunjukkan akurasi
+skenario atau persona pertama lebih rendah dan warna merah menunjukkan akurasi
+yang lebih tinggi. Tanda bintang menunjukkan hasil yang tetap signifikan
+setelah koreksi Holm, tanda $\dagger$ menunjukkan perbandingan dengan N, dan
+tanda $\ddagger$ menunjukkan perbandingan antarpersona; nilai
+\textit{p-value} lengkap terdapat pada
+Lampiran~\ref{chap:lampiran-statistik-agama}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\linewidth,
+        height=0.84\textheight,
+        keepaspectratio,
+        trim=0 90bp 0 0,
+        clip
+    ]{image/bab6/gsm8k/religion/akurasi/26_religion_all_52_effect_holm_stacked_26_26.png}
+    \caption[Ukuran efek dan signifikansi akurasi pada domain agama]
+    {Ukuran efek Cohen's $h$ dan hasil uji Exact McNemar setelah koreksi Holm
+    pada 52 jenis perbandingan per model dalam domain agama.\\[-2pt]
+    {\footnotesize\textit{Catatan:} * = signifikan setelah koreksi Holm
+    ($p_{\mathrm{Holm}} < 0{,}05$); $\dagger$ = perbandingan terhadap
+    skenario netral bersama (analisis sensitivitas; protokol berbeda);
+    $\ddagger$ = perbandingan antaridentitas. E = eksplisit; I1--I3 = implisit;
+    N = netral. Ath = ateis; Chr = Kristen; Isl = Islam; Jew = Yahudi.
+    Cohen's $h$ dihitung dari skenario pertama dikurangi skenario pembanding.}}
+    \label{fig:effect-agama-gsm8k}
+\end{figure}
+
+Tabel~\ref{tab:hasil-signifikan-agama-gsm8k} merangkum 19 perbandingan I--E
+dari pengujian utama yang didukung Q Cochran dan tetap signifikan setelah
+koreksi Holm. Hasil I1, I2, dan I3 pada model dan persona yang sama digabungkan
+dalam satu baris jika seluruh akurasinya naik atau seluruhnya turun. Kolom
+selisih dan Cohen's $h$ menunjukkan rentang hasil dari skenario yang tercantum.
+
+\begin{table}[H]
+    \centering
+    \caption[Perbandingan akurasi I--E pada domain agama]
+    {Perbandingan akurasi I--E pada domain agama yang didukung Q Cochran dan
+    tetap signifikan setelah koreksi Holm}
+    \label{tab:hasil-signifikan-agama-gsm8k}
+    \scriptsize
+    \renewcommand{\arraystretch}{1.2}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{1.8cm}
+                    >{\raggedright\arraybackslash}p{4.2cm}
+                    >{\centering\arraybackslash}p{1.3cm}
+                    >{\centering\arraybackslash}p{3.0cm}
+                    >{\centering\arraybackslash}p{2.8cm}}
+        \toprule
+        \textbf{Persona} & \textbf{Model} & \textbf{Skenario} &
+        \textbf{Selisih I--E} & \textbf{Rentang $h$} \\
+        \midrule
+        Ateis & Ministral 8B & I1--I3 &
+        $-4{,}09$ s.d. $-3{,}11$ & $-0{,}13$ s.d. $-0{,}10$ \\
+        Kristen & Llama 3.1 8B & I1--I2 &
+        $-4{,}47$ s.d. $-3{,}49$ & $-0{,}12$ s.d. $-0{,}09$ \\
+        Kristen & Ministral 8B & I1--I3 &
+        $-5{,}08$ s.d. $-2{,}58$ & $-0{,}16$ s.d. $-0{,}09$ \\
+        Kristen & Qwen3 Next 80B-A3B & I1, I3 &
+        $-1{,}74$ s.d. $-1{,}21$ & $-0{,}08$ s.d. $-0{,}06$ \\
+        Islam & Ministral 8B & I1--I3 &
+        $-8{,}79$ s.d. $-4{,}70$ & $-0{,}27$ s.d. $-0{,}15$ \\
+        Islam & GPT-OSS 20B & I1--I3 &
+        $+2{,}06$ s.d. $+2{,}67$ & $+0{,}07$ s.d. $+0{,}10$ \\
+        Yahudi & Ministral 8B & I1--I3 &
+        $-3{,}26$ s.d. $-2{,}65$ & $-0{,}10$ s.d. $-0{,}09$ \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+Dari 19 perbandingan I--E yang signifikan, 12 terdapat pada Ministral 8B dan
+seluruhnya menunjukkan penurunan 2,58--8,79 poin. Penurunan terbesar terdapat
+pada I1 persona Islam sebesar 8,79 poin dengan $h=-0{,}27$, sedangkan nilai
+$|h|$ di atas 0,20 hanya terdapat pada I1 dan I3 persona Islam pada Ministral
+8B. Tiga hasil GPT-OSS 20B menunjukkan kenaikan 2,06--2,67 poin pada persona
+Islam dan menjadi satu-satunya kenaikan pada ketiga skenario implisit untuk
+persona yang sama. Empat hasil lainnya terdapat pada persona Kristen pada
+Llama 3.1 8B dan Qwen3 Next 80B-A3B dan seluruhnya berupa penurunan.
+
+Perubahan terbesar ditemukan pada persona Islam, tetapi arahnya tidak sama pada
+setiap model. Pada Ministral 8B, akurasi I1--I3 persona Islam lebih rendah
+daripada E dan tiga perbandingan antarpersona juga menunjukkan akurasi yang lebih
+rendah daripada persona ateis dan Yahudi. Pada Llama 3.1 8B, akurasi I3 persona
+Islam lebih rendah daripada persona Kristen. Sebaliknya, akurasi I1--I3 persona
+Islam pada GPT-OSS 20B meningkat 2,06--2,67 poin dibandingkan dengan E. Artinya,
+perubahan akurasi persona Islam tidak sama pada setiap model dan skenario.
+
+\par\noindent\textbf{c. Penggunaan Token}\par
+\label{subsubsec:token-agama-gsm8k}
+
+Ketiga skenario implisit memberi konteks agama yang berbeda: I1 menggunakan
+sumber pedoman hidup, I2 menggunakan hari raya, dan I3 menggunakan kegiatan
+ibadah atau komunitas. Seluruh percakapan \textit{warmup} dikirim bersama soal
+sehingga rata-rata \textit{input token} I1--I3 meningkat 436,4--2.309,8\%
+dibandingkan dengan E. Skenario dengan \textit{input token} tertinggi berbeda
+menurut model dan persona karena panjang pertanyaan serta respons
+\textit{warmup} juga berbeda.
+
+\begin{table}[H]
+    \centering
+    \caption[Perubahan completion token pada domain agama]
+    {Rentang perubahan rata-rata \textit{completion token} I1--I3 terhadap E
+    pada empat persona agama}
+    \label{tab:perubahan-token-agama}
+    \small
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Model} & \textbf{Rentang perubahan} \\
+        \midrule
+        Qwen3 Next 80B-A3B      & $+9{,}6\%$ sampai $+13{,}7\%$ \\
+        Llama 3.1 8B            & $-10{,}8\%$ sampai $+0{,}8\%$ \\
+        Ministral 8B            & $-2{,}9\%$ sampai $+13{,}0\%$ \\
+        DeepSeek R1-Distill 32B & $+80{,}4\%$ sampai $+86{,}6\%$ \\
+        GPT-OSS 20B             & $-19{,}3\%$ sampai $-9{,}9\%$ \\
+        Llama 3.3 70B           & $-8{,}9\%$ sampai $+4{,}5\%$ \\
+        \bottomrule
+    \end{tabular}
+
+    \vspace{0.15cm}
+    \begin{minipage}{0.88\textwidth}
+        \scriptsize
+        Rentang dihitung dari perubahan rata-rata I1--I3 terhadap E pada
+        persona Islam, Kristen, Yahudi, dan ateis.
+    \end{minipage}
+\end{table}
+
+Perubahan \textit{completion token} berbeda antarmodel. Pada keempat persona,
+\textit{completion token} meningkat pada DeepSeek R1-Distill 32B dan menurun
+pada GPT-OSS 20B. Pada empat model lainnya, kenaikan dan penurunan ditemukan
+pada kombinasi model dan persona yang berbeda.
+Seluruh model menerima tambahan percakapan \textit{warmup}, tetapi panjang
+respons yang dihasilkan dapat meningkat atau menurun.
+
+Jika \textit{input token} dan \textit{completion token} dijumlahkan, rata-rata
+total token pada I1--I3 lebih tinggi 129,2--409,5\% daripada E. Kenaikan
+tertinggi terdapat pada persona Islam pada Ministral 8B, sedangkan kenaikan
+terendah terdapat pada persona Islam pada Qwen3 Next 80B-A3B. Tambahan
+\textit{input token} menjadi sumber utama kenaikan total token pada skenario
+implisit.
+
+Pada rata-rata I1--I3, selisih total token antara persona dengan jumlah
+tertinggi dan terendah dalam satu model berkisar 5,9--43,0\%. Persona Islam
+menggunakan total token tertinggi pada tiga model, persona Yahudi pada dua
+model, dan persona ateis pada satu model. Selisih terbesar terdapat pada Qwen3
+Next 80B-A3B, yaitu 1.019 token antara persona Yahudi dan Islam. Selisih
+tersebut terutama berasal dari \textit{input token} karena rata-rata
+\textit{completion token} kedua persona hanya berbeda sekitar tiga token.
+
+Penggunaan total token yang lebih besar tidak selalu disertai akurasi yang
+lebih tinggi. Pada Ministral 8B dan Llama 3.1 8B, persona Islam menggunakan
+total token tertinggi, tetapi memperoleh akurasi lebih rendah pada perbandingan
+antarpersona yang signifikan. Pada GPT-OSS 20B, akurasi persona Islam meningkat,
+sedangkan total token tertinggi digunakan oleh persona ateis.
+
+Gambar~\ref{fig:lampiran-token-agama-jumlah} menunjukkan jumlah
+\textit{completion token} dan \textit{reasoning token} yang tercatat.
+Gambar~\ref{fig:lampiran-token-agama-implisit-eksplisit} menunjukkan perubahan
+\textit{completion token} I1--I3 terhadap E. Kedua gambar tersebut terdapat
+pada Lampiran~\ref{chap:lampiran-statistik-agama}.
+
+\subsubsection{Penanda Linguistik}
+\label{subsubsec:penanda-agama-gsm8k}
+
+Perbandingan penanda linguistik menggunakan skenario dan pasangan persona yang
+sama dengan pengujian akurasi. Pada GSM8K, perubahan penanda linguistik agama
+terdapat pada kosakata dan bentuk respons. E lebih sering memunculkan bahasa
+keagamaan, sedangkan I1, I2, dan I3 lebih banyak mengubah panjang respons,
+susunan penyelesaian, pembuka, dan bahasa matematis. Penanda linguistik yang berubah
+berbeda menurut model dan cara persona disampaikan. Perbandingan antarpersona
+juga menghasilkan perubahan yang berbeda, sehingga pengaruh
+persona agama muncul melalui kosakata serta cara setiap model menulis respons.
+
+\par\noindent\textbf{a. Perubahan terhadap Skenario Netral}\par
+
+Gambar~\ref{fig:marker-agama-terhadap-netral} dan
+Gambar~\ref{fig:marker-agama-terhadap-netral-lanjutan} membandingkan E, I1,
+I2, dan I3 dengan N pada persona yang sama. Gambar pertama memuat persona
+Islam dan Kristen, sedangkan gambar kedua memuat persona Yahudi dan ateis.
+Empat kolom pada setiap gambar menunjukkan E--N, I1--N, I2--N, dan I3--N.
+Satu titik mewakili hasil satu penanda linguistik pada satu model, warna titik
+membedakan kelompok penanda linguistik pada Tabel~\ref{tab:aturan-penanda},
+dan ukuran titik mengikuti jumlah pasangan respons yang memiliki nilai
+berbeda. Sumbu horizontal menunjukkan \textit{effect size}
+\textit{rank-biserial}; nilai positif menunjukkan penanda linguistik lebih
+tinggi pada skenario persona, sedangkan nilai negatif menunjukkan penanda
+linguistik lebih tinggi pada N. Sumbu vertikal menunjukkan
+$-\log_{10}(p_{\text{Holm}})$, garis putus-putus menandai batas signifikansi
+setelah koreksi Holm, dan nilai di atas 50 ditempatkan pada 50.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]
+    {image/BabVI/gsm8k/agama/readable_v3/15_general_numeric_effect_volcano_vs_neutral_islam_christian.pdf}
+    \caption[Ukuran efek penanda linguistik pada persona Islam dan Kristen]
+    {Ukuran efek penanda linguistik umum terhadap skenario netral dalam
+    domain agama pada persona Islam dan Kristen}
+    \label{fig:marker-agama-terhadap-netral}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]
+    {image/BabVI/gsm8k/agama/readable_v3/15_general_numeric_effect_volcano_vs_neutral_jewish_atheist.pdf}
+    \caption[Ukuran efek penanda linguistik pada persona Yahudi dan ateis]
+    {Ukuran efek penanda linguistik umum terhadap skenario netral dalam
+    domain agama pada persona Yahudi dan ateis}
+    \label{fig:marker-agama-terhadap-netral-lanjutan}
+\end{figure}
+
+Perubahan yang muncul pada keempat persona terdapat pada panjang
+kalimat dan susunan penyelesaian. Rata-rata panjang kalimat lebih tinggi dan
+daftar berpoin lebih rendah pada seluruh 96 kombinasi empat skenario, empat
+persona, dan enam model. Langkah eksplisit juga lebih rendah pada 94 kombinasi.
+Dua hasil yang tidak signifikan terdapat pada I1 persona Kristen dan I3
+persona ateis pada GPT-OSS 20B.
+
+Pada DeepSeek R1-Distill 32B dan Qwen3 Next 80B-A3B, I1, I2, dan I3 memuat
+lebih sedikit kata daripada N pada keempat persona. DeepSeek memakai kalimat
+lebih panjang dan variasi kata (TTR-300) lebih tinggi, tetapi lebih jarang
+memakai langkah eksplisit, daftar berpoin, subjudul, dan LaTeX
+\textit{display}. Operasi aritmetika di dalam kalimat lebih sering digunakan.
+Pada Qwen, kata penghubung sebab-akibat, kata ganti orang pertama, keraguan,
+dan koreksi diri juga berkurang.
+
+Pada Llama 3.3 70B, kata penghubung sebab-akibat dan kata ganti inklusif lebih
+sering digunakan pada I1, I2, dan I3 untuk keempat persona, sedangkan langkah
+eksplisit dan daftar berpoin berkurang. Llama 3.1 8B dan Ministral 8B menulis
+kalimat yang lebih panjang serta lebih jarang memakai langkah eksplisit dan
+daftar berpoin. Pada Ministral, jumlah kata meningkat dan variasi kata
+(TTR-300) menurun pada seluruh persona dan skenario implisit.
+
+Kesamaan perubahan pada beberapa identitas, terutama pada DeepSeek
+R1-Distill 32B dan Qwen3 Next 80B-A3B, menunjukkan bahwa susunan E dan
+percakapan \textit{warmup} ikut membedakan respons dari N. Penanda linguistik yang berubah
+tetap tidak sama pada seluruh model. Perubahan khusus antara Islam, Kristen,
+Yahudi, dan ateis diperiksa melalui perbandingan antarpersona.
+
+\par\noindent\textbf{b. Perbandingan Antarpersona Agama}\par
+
+Perbandingan antarpersona mencakup Islam--Kristen, Islam--Yahudi,
+Islam--ateis, Kristen--Yahudi, Kristen--ateis, dan Yahudi--ateis. Pada 16
+penanda linguistik umum, 261 dari 2.304 perbandingan tetap signifikan setelah koreksi
+Holm dan seluruh model memiliki setidaknya satu hasil signifikan.
+Tabel~\ref{tab:penanda-agama-antaridentitas} merangkum jumlah hasil signifikan,
+skenario, dan temuan dengan $|r|$ terbesar pada setiap model.
+
+\begin{table}[H]
+    \centering
+    \caption{Ringkasan perbandingan penanda linguistik antarpersona agama}
+    \label{tab:penanda-agama-antaridentitas}
+    \small
+    \renewcommand{\arraystretch}{1.18}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{2.65cm}
+        >{\centering\arraybackslash}p{1.35cm}
+        >{\centering\arraybackslash}p{1.45cm}
+        >{\raggedright\arraybackslash}X}
+        \toprule
+        \textbf{Model} &
+        \textbf{Jumlah signifikan} &
+        \textbf{Skenario} &
+        \textbf{Temuan dengan $|r|$ terbesar} \\
+        \midrule
+        DeepSeek R1-Distill 32B & 25 & E, I1, I3 &
+        Penegas lebih sering digunakan oleh persona Kristen daripada Islam
+        pada E ($r=-0{,}89$). \\
+        Llama 3.1 8B & 57 & E--I3 &
+        Subjudul lebih sering digunakan oleh persona ateis daripada Yahudi
+        pada I1 ($r=-0{,}995$). \\
+        Llama 3.3 70B & 62 & E--I3 &
+        Keraguan lebih sering digunakan oleh persona ateis daripada Islam
+        pada E ($r=-0{,}999$). \\
+        Ministral 8B & 70 & E--I3 &
+        Penegas lebih sering digunakan oleh persona Kristen daripada ateis
+        pada E ($r=+0{,}97$). \\
+        GPT-OSS 20B & 26 & E, I1 &
+        Langkah eksplisit lebih sering digunakan oleh persona Kristen daripada
+        Islam pada I1 ($r=-1{,}00$). \\
+        Qwen3 Next 80B-A3B & 21 & E--I3 &
+        Persona Yahudi memakai tiga kata lebih banyak daripada Kristen pada I1
+        ($r=-0{,}32$). \\
+        \bottomrule
+    \end{tabularx}
+
+    \vspace{0.15cm}
+    \begin{minipage}{0.98\textwidth}
+        \small
+        Jumlah signifikan menunjukkan banyaknya kombinasi pasangan identitas,
+        skenario, dan penanda linguistik dengan $p_{\mathrm{Holm}}<0{,}05$. Nilai $r$
+        positif menunjukkan penanda linguistik lebih tinggi pada persona pertama,
+        sedangkan nilai negatif menunjukkan penanda linguistik lebih tinggi pada persona
+        kedua.
+    \end{minipage}
+\end{table}
+
+Perbedaan paling banyak terdapat pada E, yaitu 117 hasil. I1, I2, dan I3
+masing-masing memuat 62, 43, dan 39 hasil. Pada E, identitas agama disebutkan
+dalam pesan yang sama dengan soal, sedangkan I1--I3 menyampaikan persona lebih
+dahulu melalui percakapan \textit{warmup}. Jumlah kata, variasi kata
+(TTR-300), rata-rata panjang kalimat, dan penanda linguistik kepastian menjadi pembeda
+utama pada hasil tersebut.
+
+Nilai $r$ yang besar perlu dilihat bersama jumlah pasangan yang memiliki nilai
+berbeda. Pada I1 Llama 3.1 8B, subjudul hanya berbeda pada 28 dari 1.319
+pasangan persona Yahudi dan ateis. Persona ateis memakai lebih banyak subjudul
+pada 27 pasangan, sedangkan persona Yahudi lebih tinggi pada satu pasangan.
+Sebanyak 1.291 pasangan lainnya memiliki jumlah subjudul yang sama.
+
+Pasangan respons pada soal \texttt{gsm8k\_01009} memperlihatkan perubahan
+tersebut. Respons persona Yahudi menuliskan perhitungan jarak Matteo dan Shandy
+dalam paragraf tanpa subjudul, sedangkan persona ateis memakai subjudul
+\textit{Matteo's distance:} dan \textit{Shandy's distance:}. Kedua respons
+memperoleh selisih 230 mil, sehingga perbedaannya terdapat pada susunan
+penyelesaian untuk soal tersebut.
+
+Perbedaan antarpersona tidak tetap sama pada I1, I2, dan I3. DeepSeek
+R1-Distill 32B tidak memiliki hasil signifikan pada I2, sedangkan GPT-OSS 20B
+hanya memilikinya pada E dan I1. Percakapan I1 membahas pedoman hidup, I2
+membahas hari raya, dan I3 membahas ibadah atau komunitas. Perubahan yang
+berbeda antarskenario menempatkan isi percakapan \textit{warmup} bersama
+identitas agama sebagai bagian dari persona yang diterima model. Rincian semua
+pasangan terdapat pada Lampiran~\ref{fig:lampiran-penanda-umum-agama-e} sampai
+Gambar~\ref{fig:lampiran-penanda-umum-agama-i3}.
+
+\par\noindent\textbf{c. Bentuk Respons dan Bahasa Matematis}\par
+
+Penanda linguistik bentuk respons mencakup jumlah kata, panjang kalimat, variasi kata,
+langkah eksplisit, daftar berpoin, dan subjudul. Bahasa matematis menunjukkan
+cara model menempatkan perhitungan dalam respons. LaTeX \textit{display}
+menempatkan persamaan pada baris tersendiri, sedangkan operasi aritmetika di
+dalam kalimat menyatukan perhitungan seperti \(8\times3=24\) dengan
+penjelasan. Kedua bentuk tersebut membedakan persamaan yang dipisahkan dari
+kalimat dan perhitungan yang ditulis sebagai bagian dari kalimat.
+
+I1 menyampaikan persona melalui pedoman hidup, I2 melalui hari raya, dan I3
+melalui ibadah atau komunitas. Perbandingan dengan E menghasilkan 157 hasil
+signifikan pada I1, 152 pada I2, dan 158 pada I3 untuk 16 penanda linguistik umum.
+Jumlah yang berdekatan menunjukkan bahwa ketiga cara penyampaian sama-sama
+disertai perubahan bentuk respons. Penanda linguistik yang meningkat atau menurun tetap
+berbeda menurut model dan identitas.
+
+Llama 3.1 8B, Llama 3.3 70B, Ministral 8B, dan Qwen3 Next 80B-A3B lebih sering
+membagi respons implisit menjadi langkah, daftar berpoin, atau subjudul
+daripada E. Pada DeepSeek R1-Distill 32B, respons implisit lebih singkat,
+memakai kalimat lebih pendek, dan lebih sering memakai daftar berpoin daripada
+E. GPT-OSS 20B paling sering membedakan respons implisit melalui kalimat yang
+lebih panjang.
+
+Bahasa matematis juga berubah menurut model. Pada seluruh 12 perbandingan
+DeepSeek, I1, I2, dan I3 lebih jarang menempatkan persamaan pada baris
+tersendiri dan lebih sering menulis operasi aritmetika di dalam kalimat.
+Qwen lebih jarang memakai kedua bentuk tersebut pada perbandingan yang
+signifikan, sedangkan GPT-OSS lebih sering memakai LaTeX \textit{display}.
+Llama 3.1 lebih sering menulis operasi aritmetika di dalam kalimat pada lima
+perbandingan yang signifikan.
+
+Perubahan DeepSeek terlihat pada soal \texttt{gsm8k\_00009}. Respons N memakai
+tiga label langkah dan tujuh persamaan LaTeX \textit{display} untuk menghitung
+jarak John dari rumah. Pada I2 persona Islam, perhitungan yang sama ditempatkan
+di dalam kalimat setelah subjudul \textit{Step-by-Step Explanation}, termasuk
+\(60\times3=180\) dan \(180-135=45\). Kedua respons memperoleh angka 45 mil,
+tetapi I2 tidak memisahkan persamaan ke baris tersendiri.
+
+Jumlah kata dan \textit{completion token} mengukur bagian respons yang
+berbeda. Pada DeepSeek R1-Distill 32B, teks respons implisit memuat lebih
+sedikit kata daripada E, sementara \textit{completion token} meningkat
+80,4--86,6\%. Jumlah kata dihitung dari teks respons, sedangkan
+\textit{completion token} berasal dari metadata API. Satu token dapat berupa
+potongan kata, simbol, atau bagian dari rumus, sehingga kedua ukuran tersebut
+dapat berubah dengan besar yang berbeda.
+
+\par\noindent\textbf{d. Pola Pembuka dan Bahasa Keagamaan}\par
+
+Pola pembuka respons dibandingkan pada N, E, I1, I2, dan I3 untuk setiap model
+dan persona. Contoh pembuka instruksional pada respons asli adalah
+\textit{Let's solve the problem.} pada \texttt{gsm8k\_00384}, sedangkan
+pembuka berupa subjudul muncul sebagai \textit{Step-by-Step Solution:} pada
+\texttt{gsm8k\_00241}. Pembuka naratif langsung memulai isi soal, seperti
+\textit{Emil is 19 now.} pada \texttt{gsm8k\_00980}, sedangkan pengulangan
+soal muncul sebagai \textit{The problem states that three-fourths of the
+students have a desktop computer} pada \texttt{gsm8k\_00475}. Persentase
+setiap kategori ditampilkan pada Gambar~\ref{fig:pembuka-agama-gsm8k}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.78\textheight,
+        keepaspectratio
+    ]{image/BabVI/gsm8k/agama/11_opening_composition_100pct.png}
+    \caption{Persentase kategori pembuka respons pada domain agama}
+    \label{fig:pembuka-agama-gsm8k}
+\end{figure}
+
+Pada DeepSeek R1-Distill 32B, sebanyak 61,03\% respons pada N menggunakan
+pembuka instruksional dan 38,74\% menggunakan pembuka subjudul. Pada E,
+pembuka subjudul mencakup 43,90--56,94\% respons, sedangkan pembuka
+naratif mencakup 23,12--39,73\%. Pada I1, I2, dan I3, pembuka naratif
+mencakup 66,79--69,87\% respons. Pengulangan soal juga ditemukan pada
+20,90--23,53\% respons.
+
+GPT-OSS 20B lebih sering menggunakan pembuka naratif. Persentasenya mencapai
+80,91\% pada N dan 62,81--73,40\% pada E, I1, I2, dan I3. Pada Qwen3 Next
+80B-A3B, pembuka instruksional mencakup 64,72\% respons pada N dan
+42,14--54,34\% pada keempat skenario persona.
+
+Pada Llama 3.1 8B, pembuka instruksional mencakup 99,17--99,77\% respons pada
+N dan I1--I3, sedangkan pembuka naratif mencakup 97,50--99,47\% respons pada
+E. Pada Llama 3.3 70B, pembuka naratif pada E berkisar 39,27--87,57\% menurut
+persona. Pada Ministral 8B, pembuka instruksional pada E berkisar
+44,73--99,24\%, sedangkan pembuka naratif berkisar 0,76--47,69\%. Perbedaan
+rentang pada E memperlihatkan bahwa identitas yang disebutkan secara langsung
+disertai bentuk pembuka yang berbeda.
+
+Setelah koreksi Holm, perbedaan pembuka antarpersona ditemukan pada 30 dari
+36 perbandingan E. I1, I2, dan I3 masing-masing memiliki 14, 12, dan 10
+perbandingan signifikan. GPT-OSS 20B dan Qwen3 Next 80B-A3B masing-masing
+memiliki sembilan hasil pada skenario implisit, sedangkan Llama 3.1 8B tidak
+memiliki hasil signifikan pada I1--I3. Rincian setiap pasangan terdapat pada
+Lampiran~\ref{fig:lampiran-pembuka-langsung-agama}.
+
+Bahasa keagamaan diukur melalui penyebutan identitas, Tuhan, kitab, kegiatan
+keagamaan, ungkapan agama, doa, dan penghormatan terhadap persona. Kata
+\textit{Allah}, \textit{God}, \textit{Bible}, \textit{Torah}, dan
+\textit{Shabbat} ditemukan dalam respons. Ungkapan \textit{Amen},
+\textit{Assalamu Alaikum}, dan \textit{Shalom} juga ditemukan, sehingga istilah
+tersebut bukan hanya contoh aturan penanda linguistik. Daftar istilah dan jumlah
+kemunculannya terdapat pada Lampiran~\ref{tab:lampiran-ungkapan-agama-audit}.
+
+Perbedaan bahasa keagamaan antarpersona hanya ditemukan pada E. Setelah
+koreksi Holm, 115 perbandingan tetap signifikan, yaitu 42 pada Llama 3.1 8B,
+35 pada Llama 3.3 70B, 34 pada Ministral 8B, dan empat pada Qwen3 Next
+80B-A3B. Tidak ada perbandingan yang signifikan pada DeepSeek R1-Distill 32B
+dan GPT-OSS 20B. Pada E, identitas agama disebutkan secara langsung sebelum
+soal, sedangkan pada I1--I3 soal utama tidak menyebutkannya.
+
+Istilah pada E juga mengikuti persona yang digunakan. Persona Islam
+memunculkan \textit{Allah} dan \textit{Muslim}, persona Kristen memunculkan
+\textit{God} dan \textit{Bible}, persona Yahudi memunculkan \textit{Jewish}
+dan \textit{Shabbat}, sedangkan persona ateis memunculkan \textit{atheist} dan
+\textit{religion}. Tabel istilah serta perbandingan lengkap antarpersona
+terdapat pada Lampiran~\ref{tab:lampiran-ungkapan-agama-audit} dan
+Gambar~\ref{fig:lampiran-marker-langsung-agama-eksplisit}.
+
+Pada I1 dan I3, istilah agama tidak ditemukan untuk keempat persona. I2 juga
+tidak memuat istilah agama pada persona Islam, Kristen, dan ateis. Satu respons
+I2 persona Yahudi pada Qwen3 Next 80B-A3B mengulang pembahasan Yom Kippur dari
+percakapan \textit{warmup}, sehingga \textit{God}, \textit{Jewish},
+\textit{Prayer}, dan \textit{Yom Kippur} masuk ke respons soal. Temuan satu
+respons tersebut dicatat terpisah pada
+Lampiran~\ref{tab:lampiran-istilah-agama-implisit}.
+
+\par\noindent\textbf{e. Penanda Linguistik dan Akurasi}\par
+
+Persona agama lebih konsisten mengubah bahasa respons daripada akurasi GSM8K
+pada model yang diuji. E terutama disertai kosakata dan pembuka yang mengikuti
+identitas agama, sedangkan I1, I2, dan I3 disertai perubahan panjang respons,
+pembagian langkah, dan bahasa matematis. Perbandingan I--E menghasilkan 19
+perubahan akurasi yang signifikan setelah koreksi Holm. Perubahan tersebut
+terdapat pada Ministral 8B, GPT-OSS 20B, Llama 3.1 8B, dan Qwen3 Next
+80B-A3B.
+
+I1 menyampaikan persona melalui sumber pedoman hidup, seperti Al-Qur'an dan
+hadis, Alkitab, Taurat dan penafsiran rabi, serta buku atau penelitian untuk
+persona ateis. Pada Ministral 8B, I1 lebih sering memakai langkah eksplisit
+dan daftar berpoin serta memiliki variasi kata (TTR-300) yang lebih rendah
+daripada E. Perubahan bentuk respons tersebut disertai penurunan akurasi
+3,11--8,79 poin pada keempat persona. I1 juga disertai kenaikan 2,06 poin pada
+persona Islam GPT-OSS serta penurunan 3,49 dan 1,74 poin pada persona Kristen
+Llama 3.1 dan Qwen.
+
+I2 menyampaikan persona melalui Ramadan dan puasa, Natal atau Paskah,
+Yom Kippur, serta tidak adanya hari raya agama pada persona ateis. Pada
+Ministral 8B, perubahan susunan respons disertai penurunan akurasi
+2,58--4,70 poin pada keempat persona. Akurasi persona Islam GPT-OSS meningkat
+2,67 poin, sedangkan akurasi persona Kristen Llama 3.1 menurun 4,47 poin.
+Pengulangan Yom Kippur pada satu respons Qwen persona Yahudi tidak disertai
+perbedaan akurasi I2--E yang signifikan pada model dan persona tersebut.
+
+I3 menyampaikan persona melalui masjid, gereja, sinagoge atau Shabbat, serta
+tidak adanya komunitas agama pada persona ateis. Pada Ministral 8B, I3 lebih
+sering membagi respons menjadi langkah dan daftar berpoin serta memiliki
+variasi kata (TTR-300) yang lebih rendah daripada E. Perubahan tersebut
+disertai penurunan akurasi 2,88--7,05 poin pada keempat persona. Pada skenario
+yang sama, akurasi persona Islam GPT-OSS meningkat 2,37 poin, sedangkan
+akurasi persona Kristen Qwen menurun 1,21 poin.
+
+DeepSeek R1-Distill 32B dan Llama 3.3 70B mengalami perubahan bentuk respons
+pada I1, I2, dan I3 tanpa perbedaan akurasi I--E yang signifikan. DeepSeek
+menulis respons implisit yang lebih singkat dan mengubah penempatan persamaan,
+sedangkan Llama 3.3 lebih sering membagi respons menjadi langkah dan memakai
+kata penghubung sebab-akibat. Perubahan bahasa pada kedua model tersebut tidak
+diikuti perubahan akurasi setelah koreksi Holm.
+
+Perbandingan antarpersona juga lebih sering berbeda pada bahasa
+respons daripada akurasi. Penanda linguistik umum berbeda pada seluruh model dan bahasa
+keagamaan berbeda pada E, tetapi hanya empat dari 144 perbandingan akurasi
+antarpersona yang signifikan. Keempatnya melibatkan persona Islam dengan
+akurasi lebih rendah pada Ministral 8B atau Llama 3.1 8B. Persona Islam tidak
+selalu memperoleh akurasi paling rendah pada model lain.
+
+Persona agama mengubah kosakata dan bentuk respons pada keenam model, sedangkan
+perubahan akurasi hanya ditemukan pada empat model. E paling kuat membedakan
+bahasa keagamaan karena identitas disebutkan secara langsung. I1, I2, dan I3
+lebih banyak membedakan susunan respons, tetapi kenaikan atau penurunan akurasi
+tetap mengikuti model dan persona yang digunakan. Pada GSM8K, pengaruh persona
+agama karena itu lebih konsisten pada bahasa respons daripada akurasi.
+
+\subsubsection{Ringkasan Domain Agama}
+\label{subsubsec:ringkasan-domain-agama-gsm8k}
+
+Pada domain agama, bagian respons yang berubah berbeda menurut cara persona
+disampaikan. Skenario E lebih banyak memunculkan istilah yang sesuai dengan
+identitas agama karena identitas pengguna disebut secara langsung. Pada I1,
+I2, dan I3, istilah agama hampir tidak muncul, tetapi susunan jawaban tetap
+berubah setelah percakapan \textit{warmup}. Perubahan pada E lebih banyak
+terdapat pada kosakata identitas, sedangkan perubahan pada skenario implisit
+lebih banyak terdapat pada bentuk umum jawaban.
+
+Perubahan akurasi berbeda antarmodel. Ministral 8B mengalami penurunan
+2,58--8,79 poin pada ketiga skenario implisit untuk seluruh persona agama.
+GPT-OSS 20B mengalami kenaikan 2,06--2,67 poin pada persona Islam, sedangkan
+Llama 3.1 8B dan Qwen3 Next 80B-A3B mengalami penurunan pada sebagian
+skenario persona Kristen. DeepSeek R1-Distill 32B dan Llama 3.3 70B tidak
+menghasilkan perbedaan akurasi I--E yang signifikan.
+
+Perbandingan antarpersona hanya menghasilkan empat perbedaan akurasi dari 144
+perbandingan. Keempatnya menunjukkan akurasi persona Islam yang lebih rendah:
+tiga pada Ministral 8B terhadap persona ateis atau Yahudi dan satu pada Llama
+3.1 8B terhadap persona Kristen. Kecenderungan ini hanya berlaku pada empat
+hasil signifikan tersebut; tidak ada satu persona agama yang secara konsisten
+memperoleh akurasi paling tinggi atau paling rendah pada keenam model.
+Identitas agama lebih konsisten membedakan kosakata dan cara model menulis
+jawaban daripada akurasi GSM8K.
+
+\subsection{Domain Regional-Kultural}
+\label{subsec:hasil-regional-gsm8k}
+
+Domain regional-kultural mencakup persona Amerika Utara, Asia Timur, Asia
+Selatan, dan Afrika Sub-Sahara. Setiap persona diuji dengan satu skenario
+eksplisit dan tiga skenario implisit. I1 menggunakan nama dan situasi
+pengambilan keputusan, I2 menggunakan hari raya atau perayaan budaya, dan I3
+menggunakan tradisi pernikahan. Ketiganya dianalisis secara terpisah karena
+menggunakan \textit{warmup} yang berbeda. Analisis ini menggunakan 134.538
+respons dari 1.319 soal GSM8K.
+
+\subsubsection{Akurasi Respons}
+\label{subsubsec:akurasi-regional-gsm8k}
+
+\par\noindent\textbf{a. Akurasi Setiap Skenario}\par
+
+Tabel~\ref{tab:akurasi-regional-gsm8k} menunjukkan akurasi keenam model pada
+skenario netral serta skenario yang menggunakan persona Amerika Utara, Asia
+Timur, Asia Selatan, dan Afrika Sub-Sahara.
+
+\begin{table}[H]
+    \centering
+    \caption{Akurasi GSM8K pada domain regional-kultural menurut persona dan skenario (\%)}
+    \label{tab:akurasi-regional-gsm8k}
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.08}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{1.75cm}
+        >{\centering\arraybackslash}p{0.65cm}
+        *{6}{>{\centering\arraybackslash}X}}
+        \toprule
+        \textbf{Persona} & \textbf{Skenario} & \textbf{Qwen3} &
+        \textbf{Llama 3.1} & \textbf{Ministral} & \textbf{DeepSeek} &
+        \textbf{GPT-OSS} & \textbf{Llama 3.3} \\
+        \midrule
+        Netral & N & 94,08 & 84,43 & 93,47 & 93,93 & 93,93 & 91,96 \\
+        \addlinespace[2pt]
+        Amerika Utara & E  & 96,59 & 82,64 & 91,96 & 94,62 & 92,02 & 92,27 \\
+                       & I1 & 95,07 & 82,87 & 91,96 & 93,10 & 91,73 & 92,04 \\
+                       & I2 & 95,22 & 79,98 & 92,34 & 93,48 & 92,33 & 92,95 \\
+                       & I3 & 95,83 & 82,94 & 91,28 & 92,57 & 90,52 & 92,87 \\
+        \addlinespace[2pt]
+        Asia Timur & E  & 95,91 & 83,24 & 91,05 & 94,62 & 92,94 & 93,25 \\
+                   & I1 & 95,30 & 81,20 & 91,43 & 93,78 & 92,49 & 93,33 \\
+                   & I2 & 95,68 & 82,26 & 90,30 & 93,86 & 92,49 & 91,74 \\
+                   & I3 & 95,75 & 81,35 & 91,58 & 94,77 & 92,41 & 92,27 \\
+        \addlinespace[2pt]
+        Asia Selatan & E  & 96,44 & 83,70 & 89,69 & 95,00 & 91,79 & 94,16 \\
+                     & I1 & 95,30 & 82,94 & 90,30 & 93,56 & 92,26 & 93,33 \\
+                     & I2 & 95,07 & 81,80 & 91,58 & 93,86 & 92,26 & 92,95 \\
+                     & I3 & 95,00 & 83,47 & 89,99 & 94,47 & 91,12 & 92,34 \\
+        \addlinespace[2pt]
+        Afrika Sub-Sahara & E  & 96,51 & 82,64 & 91,36 & 94,54 & 92,12 & 92,95 \\
+                          & I1 & 95,75 & 80,97 & 90,83 & 93,40 & 91,66 & 92,19 \\
+                          & I2 & 94,77 & 80,59 & 88,17 & 93,03 & 91,65 & 93,40 \\
+                          & I3 & 95,52 & 80,44 & 91,13 & 94,16 & 92,34 & 92,19 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Pada domain regional-kultural, perubahan akurasi berbeda antarmodel dan paling
+besar terdapat pada Ministral 8B. Selisih antara akurasi tertinggi dan terendah
+dalam satu model berkisar 2,42--5,30 poin persentase. Selisih paling kecil
+terdapat pada Llama 3.3 70B.
+Gambar~\ref{fig:akurasi-absolut-regional-gsm8k} menunjukkan perbandingan hasil
+pada skenario netral, skenario eksplisit, dan rata-rata I1, I2, dan I3.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.46\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/regional_kultural/akurasi/12_regional_absolute_accuracy_explicit_implicit.png}
+    \caption[Akurasi GSM8K menurut skenario pada domain regional-kultural]
+    {Perbandingan akurasi GSM8K antara skenario netral, skenario eksplisit,
+    dan rata-rata skenario implisit pada domain regional-kultural}
+    \label{fig:akurasi-absolut-regional-gsm8k}
+\end{figure}
+
+Seluruh skenario persona pada Qwen3 Next 80B-A3B memperoleh akurasi lebih
+tinggi daripada hasil pada skenario netral, sedangkan seluruh skenario persona
+pada Llama 3.1 8B, Ministral 8B, dan GPT-OSS 20B memperoleh akurasi lebih
+rendah. Pada Llama 3.3 70B, hanya I2 persona Asia Timur yang memperoleh akurasi
+lebih rendah. Pada DeepSeek R1-Distill 32B, seluruh E memperoleh akurasi lebih
+tinggi daripada hasil pada skenario netral. Pada model tersebut, I1 dan I2 pada
+keempat persona lebih rendah, sedangkan I3 lebih rendah hanya pada persona
+Amerika Utara. Penurunan paling besar terdapat pada I2 persona Afrika
+Sub-Sahara pada Ministral 8B, yaitu 5,30 poin persentase.
+
+Gambar~\ref{fig:delta-implisit-eksplisit-regional-gsm8k} menunjukkan selisih
+rata-rata I1, I2, dan I3 terhadap E untuk setiap persona. Nilai positif
+menunjukkan rata-rata akurasi skenario implisit yang lebih tinggi daripada E.
+Nilai negatif menunjukkan rata-rata akurasi skenario implisit yang lebih
+rendah daripada E.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.46\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/regional_kultural/akurasi/13_regional_delta_implicit_vs_explicit.png}
+    \caption[Selisih akurasi antarskenario pada domain regional-kultural]
+    {Selisih rata-rata akurasi antara skenario implisit dan eksplisit pada
+    domain regional-kultural}
+    \label{fig:delta-implisit-eksplisit-regional-gsm8k}
+\end{figure}
+
+Pada Qwen3 Next 80B-A3B, rata-rata akurasi skenario implisit lebih rendah
+0,33--1,31 poin daripada E pada keempat persona. Penurunan pada Llama 3.1 8B
+berkisar 0,71--1,97 poin, sedangkan pada DeepSeek R1-Distill 32B berkisar
+0,48--1,57 poin. Selisih pada GPT-OSS 20B berada pada rentang $-0{,}49$ sampai
+$+0{,}08$ poin. Ministral 8B memperoleh selisih $-1{,}31$ sampai $+0{,}94$
+poin, sedangkan Llama 3.3 70B memperoleh selisih $-1{,}29$ sampai $+0{,}35$
+poin.
+
+\par\noindent\textbf{b. Hasil Perbandingan Statistik}\par
+\label{subsubsec:perbandingan-regional-gsm8k}
+
+Uji Q Cochran digunakan untuk membandingkan akurasi E, I1, I2, dan I3 pada
+model dan persona regional-kultural yang sama. Exact McNemar digunakan untuk
+membandingkan I1, I2, dan I3 dengan E, membandingkan E dan ketiga skenario
+implisit dengan N, serta membandingkan persona regional-kultural pada model dan
+skenario yang sama. Hasil I--E dimasukkan ke pembahasan utama jika Exact
+McNemar setelah koreksi Holm dan uji Q Cochran pada kelompok yang sama
+signifikan. Pengujian mencakup 72 perbandingan I--E, 96 perbandingan dengan N,
+dan 144 perbandingan antarpersona regional-kultural.
+
+Uji Q Cochran signifikan pada enam dari 24 kelompok model dan persona. Tiga
+kelompok terdapat pada persona Amerika Utara, yaitu Qwen3 Next 80B-A3B, Llama
+3.1 8B, dan DeepSeek R1-Distill 32B. Tiga kelompok lainnya terdapat pada Qwen3
+Next 80B-A3B persona Asia Selatan dan Afrika Sub-Sahara serta Ministral 8B
+persona Afrika Sub-Sahara.
+
+Setelah koreksi Holm, 10 perbandingan I--E, 15
+perbandingan dengan N, dan tiga perbandingan antarpersona tetap signifikan.
+Satu hasil I--E, yaitu I3 persona Asia Selatan pada Llama 3.3 70B, memiliki
+$p_{\mathrm{Holm}}=0{,}045$, tetapi kelompoknya tidak didukung Q Cochran dengan
+$p=0{,}077$. Oleh karena itu, sembilan perbandingan I--E dimasukkan ke hasil
+utama.
+
+Dari 96 perbandingan dengan skenario netral, 15 tetap signifikan setelah
+koreksi Holm. Enam hasil terdapat pada Ministral 8B, empat pada Llama 3.1 8B,
+tiga pada Qwen3 Next 80B-A3B, dan dua pada GPT-OSS 20B. Ketiga hasil pada Qwen3
+berupa kenaikan akurasi E, sedangkan 12 hasil pada tiga model lainnya berupa
+penurunan.
+
+Kesembilan perbandingan I--E yang didukung Q Cochran dan koreksi Holm berupa
+penurunan akurasi. Tujuh hasil terdapat pada Qwen3 Next 80B-A3B, yaitu I1 dan
+I2 Amerika Utara, I1--I3 Asia Selatan, serta I2 dan I3 Afrika Sub-Sahara,
+dengan penurunan 1,06--1,74 poin. Pada DeepSeek R1-Distill 32B, I3 Amerika
+Utara lebih rendah 2,05 poin daripada E. Penurunan terbesar terdapat pada I2
+Afrika Sub-Sahara pada Ministral 8B sebesar 3,18 poin. Persona Asia Timur tidak
+memiliki hasil I--E yang didukung kedua uji.
+
+Tiga dari 144 perbandingan antarpersona regional-kultural tetap signifikan
+setelah koreksi Holm. Pada Ministral 8B, akurasi persona Amerika Utara pada I2
+lebih tinggi 4,17 poin daripada Afrika Sub-Sahara, sedangkan persona Asia
+Selatan lebih tinggi 3,41 poin daripada Afrika Sub-Sahara pada skenario yang
+sama. Pada DeepSeek R1-Distill 32B, akurasi persona Amerika Utara pada I3 lebih
+rendah 2,20 poin daripada Asia Timur. Ketiga hasil tersebut hanya terdapat pada
+I2 dan I3 pada Ministral 8B dan DeepSeek R1-Distill 32B.
+
+Gambar~\ref{fig:effect-regional-gsm8k} menunjukkan \textit{effect size}
+Cohen's $h$ pada 52 jenis perbandingan per model. Panel pertama dan kedua
+masing-masing memuat 14 perbandingan antarskenario, sedangkan panel ketiga dan
+keempat masing-masing memuat 12 perbandingan antarpersona. Warna biru
+menunjukkan akurasi skenario atau persona pertama lebih rendah daripada
+pembanding, sedangkan warna merah menunjukkan akurasi yang lebih tinggi. Tanda
+bintang menunjukkan hasil yang tetap signifikan setelah koreksi Holm, tanda
+$\dagger$ menunjukkan perbandingan dengan N, dan tanda $\ddagger$ menunjukkan
+perbandingan antarpersona. Tanda bintang pada I3 persona Asia Selatan pada
+Llama 3.3 70B hanya didukung koreksi Holm sehingga tidak dimuat dalam tabel;
+nilai \textit{p-value} lengkap terdapat pada
+Lampiran~\ref{chap:lampiran-statistik-regional}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\linewidth,
+        height=0.84\textheight,
+        keepaspectratio,
+        trim=0 90bp 0 0,
+        clip
+    ]{image/bab6/gsm8k/regional_kultural/akurasi/27_regional_all_52_effect_holm_stacked_26_26.png}
+    \caption[Ukuran efek dan signifikansi akurasi domain regional-kultural]
+    {Ukuran efek Cohen's $h$ dan hasil uji Exact McNemar setelah koreksi Holm
+    pada 52 jenis perbandingan per model dalam domain regional-kultural.\\[-2pt]
+    {\footnotesize\textit{Catatan:} * = signifikan setelah koreksi Holm
+    ($p_{\mathrm{Holm}} < 0{,}05$); $\dagger$ = perbandingan terhadap
+    skenario netral bersama (analisis sensitivitas; protokol berbeda);
+    $\ddagger$ = perbandingan antarkawasan pada E, I1, I2, dan I3.
+    E = eksplisit; I1--I3 = implisit;
+    N = netral. NA = Amerika Utara; EA = Asia Timur; SA = Asia Selatan;
+    SSA = Afrika Sub-Sahara. Cohen's $h$ dihitung dari skenario pertama
+    dikurangi skenario pembanding.}}
+    \label{fig:effect-regional-gsm8k}
+\end{figure}
+
+Tabel~\ref{tab:hasil-signifikan-regional-gsm8k} memuat sembilan perbandingan
+I--E yang didukung Q Cochran dan koreksi Holm. Hasil I1, I2, dan I3 pada model
+dan persona yang sama digabungkan dalam satu baris jika seluruh akurasinya
+menurun. Kolom selisih dan Cohen's $h$ menunjukkan rentang hasil dari skenario
+yang tercantum.
+
+\begin{table}[H]
+    \centering
+    \caption[Perbandingan akurasi I--E pada domain regional-kultural]
+    {Perbandingan akurasi I--E pada domain regional-kultural yang didukung oleh
+    uji Q Cochran dan tetap signifikan setelah koreksi Holm}
+    \label{tab:hasil-signifikan-regional-gsm8k}
+    \footnotesize
+    \renewcommand{\arraystretch}{1.15}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{
+        >{\raggedright\arraybackslash}p{2.4cm}
+        >{\raggedright\arraybackslash}p{3.4cm}
+        >{\centering\arraybackslash}p{1.3cm}
+        >{\centering\arraybackslash}p{2.6cm}
+        >{\centering\arraybackslash}p{2.2cm}}
+        \toprule
+        \textbf{Persona} & \textbf{Model} & \textbf{Skenario} &
+        \textbf{Selisih I--E} & \textbf{Rentang $h$} \\
+        \midrule
+        Amerika Utara & Qwen3 Next 80B-A3B & I1--I2 &
+        $-1{,}52$ s.d. $-1{,}36$ & $-0{,}08$ s.d. $-0{,}07$ \\
+        Amerika Utara & DeepSeek R1-Distill 32B & I3 &
+        $-2{,}05$ & $-0{,}08$ \\
+        Asia Selatan & Qwen3 Next 80B-A3B & I1--I3 &
+        $-1{,}44$ s.d. $-1{,}14$ & $-0{,}07$ s.d. $-0{,}06$ \\
+        Afrika Sub-Sahara & Ministral 8B & I2 &
+        $-3{,}18$ & $-0{,}11$ \\
+        Afrika Sub-Sahara & Qwen3 Next 80B-A3B & I2--I3 &
+        $-1{,}74$ s.d. $-1{,}06$ & $-0{,}09$ s.d. $-0{,}05$ \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+Nilai $|h|$ pada sembilan perbandingan I--E berkisar 0,05--0,11 dan seluruhnya
+berada di bawah 0,20. Penurunan terbesar terdapat pada I2 persona Afrika
+Sub-Sahara pada Ministral 8B. Tujuh penurunan terdapat pada Qwen3 Next
+80B-A3B, sedangkan dua lainnya terdapat pada DeepSeek R1-Distill 32B dan
+Ministral 8B.
+
+
+\par\noindent\textbf{c. Penggunaan Token}\par
+\label{subsubsec:token-regional-gsm8k}
+
+Ketiga skenario implisit memberi konteks regional-kultural yang berbeda: I1
+menggunakan nama dan situasi pengambilan keputusan, I2 menggunakan hari raya
+atau perayaan budaya, dan I3 menggunakan tradisi pernikahan. Seluruh percakapan
+\textit{warmup} dikirim bersama soal sehingga rata-rata \textit{input token}
+I1--I3 meningkat 278,2--1.791,7\% dibandingkan dengan E. Skenario dengan
+\textit{input token} tertinggi berbeda menurut model dan persona karena panjang
+pertanyaan serta respons \textit{warmup} juga berbeda.
+
+Penggunaan \textit{completion token} berbeda antarmodel. Pada DeepSeek
+R1-Distill 32B, rata-rata I1--I3 meningkat 69,1--74,8\% dibandingkan dengan E.
+Qwen3 Next 80B-A3B mengalami kenaikan 6,3--11,7\%, sedangkan GPT-OSS 20B
+mengalami penurunan 12,0--15,5\%. Pada Llama 3.1 8B, perubahannya berkisar
+$-8{,}4$ sampai $+9{,}8$\%, pada Ministral 8B meningkat 2,9--10,1\%, dan pada
+Llama 3.3 70B berkisar $-0{,}6$ sampai $+5{,}9$\%. Rinciannya terdapat pada
+Gambar~\ref{fig:lampiran-token-regional-implisit-eksplisit} di
+Lampiran~\ref{chap:lampiran-statistik-regional}.
+
+Jika \textit{input token} dan \textit{completion token} dijumlahkan, rata-rata
+total token pada I1--I3 lebih tinggi 79,1--330,1\% daripada E. Kenaikan
+tertinggi terdapat pada persona Asia Timur pada Ministral 8B, sedangkan kenaikan
+terendah terdapat pada persona Asia Selatan pada Qwen3 Next 80B-A3B. Jumlah
+tertinggi terdapat pada persona Amerika Utara I2 pada Qwen3 Next 80B-A3B, yaitu
+rata-rata sekitar 4.721 token per soal. Pada persona Asia Selatan, persentase
+kenaikan Qwen lebih rendah karena E sudah menggunakan sekitar 1.071 total token
+per soal.
+
+Perubahan \textit{completion token} dan akurasi berbeda antarmodel. Pada
+DeepSeek R1-Distill 32B, kenaikan \textit{completion token} sebesar
+69,1--74,8\% disertai penurunan akurasi sebesar 0,48--1,57 poin. Pada Qwen3
+Next 80B-A3B, kenaikan 6,3--11,7\% juga disertai penurunan akurasi
+0,33--1,31 poin. GPT-OSS 20B menggunakan 12,0--15,5\% lebih sedikit
+\textit{completion token}, sedangkan perubahan akurasinya hanya berkisar
+$-0{,}49$ sampai $+0{,}08$ poin. Pada Ministral 8B, kenaikan
+\textit{completion token} sebesar 2,9--10,1\% disertai perubahan akurasi antara
+$-1{,}31$ dan $+0{,}94$ poin.
+
+Pada rata-rata I1--I3, selisih total token antara persona dengan jumlah
+tertinggi dan terendah dalam satu model berkisar 10,2--66,5\%. Persona Amerika
+Utara menggunakan total token tertinggi pada Llama 3.1 8B, Llama 3.3 70B, dan
+Qwen3 Next 80B-A3B. Jumlah tertinggi terdapat pada persona Asia Timur untuk
+Ministral 8B dan GPT-OSS 20B serta persona Afrika Sub-Sahara untuk DeepSeek
+R1-Distill 32B. Selisih persentase terbesar terdapat pada Ministral 8B, yaitu
+66,5\% antara persona Asia Timur dan Asia Selatan. Pada Qwen3 Next 80B-A3B,
+selisih kedua persona tersebut mencapai 987 token dan terutama berasal dari
+\textit{input token}.
+
+Perbandingan penggunaan token dan akurasi juga berbeda menurut persona. Pada Qwen3
+Next 80B-A3B, persona Amerika Utara menggunakan
+rata-rata total token tertinggi, sedangkan akurasi I1 dan I2 lebih rendah
+1,36--1,52 poin daripada E. Pada Ministral 8B, persona Asia Timur menggunakan
+rata-rata total token tertinggi, sedangkan perbandingan antarkawasan pada I2
+menempatkan persona Amerika Utara dan Asia Selatan masing-masing 4,17 dan 3,41
+poin lebih tinggi daripada persona Afrika Sub-Sahara. Pada DeepSeek R1-Distill
+32B, persona Afrika Sub-Sahara menggunakan
+rata-rata total token tertinggi, sedangkan perbandingan antarkawasan yang signifikan
+terdapat pada I3 dengan akurasi Amerika Utara 2,20 poin lebih rendah daripada
+Asia Timur. Pada ketiga model tersebut, rata-rata total token tertinggi tidak
+disertai keunggulan akurasi yang signifikan pada persona yang sama.
+
+\subsubsection{Penanda Linguistik}
+\label{subsubsec:penanda-regional-gsm8k}
+
+Pada domain regional-kultural, penanda linguistik dibandingkan melalui tiga
+jenis perbandingan. Skenario E, I1, I2, dan I3 dibandingkan dengan N untuk
+melihat perubahan dari skenario tanpa persona. Skenario I1, I2, dan I3 juga
+dibandingkan dengan E pada persona yang sama untuk melihat perbedaan respons
+setelah skenario implisit digunakan. Keempat persona regional-kultural
+kemudian dibandingkan dalam enam pasangan pada soal dan skenario yang sama.
+
+Analisis memisahkan 16 penanda linguistik umum, kategori pembuka, dua penanda
+linguistik bahasa matematis, 14 penanda linguistik regional-kultural, istilah
+hasil audit, dan akurasi.
+Pemisahan ini diperlukan karena penyebutan kawasan tidak sama dengan perubahan
+cara model menulis penyelesaian matematika. Respons yang dianalisis hanya teks
+yang terlihat oleh pengguna; penalaran tersembunyi tidak ikut dihitung.
+
+I1 membawa percakapan tentang keputusan pribadi atau sosial, I2 membawa
+perayaan dan tradisi hari besar, sedangkan I3 membawa adat pernikahan. Ketiga
+skenario tersebut tetap dihitung terpisah karena isi \textit{warmup}-nya tidak
+setara. Respons \textit{warmup} menjadi riwayat percakapan, tetapi tidak masuk
+ke dalam hitungan penanda linguistik atau akurasi jawaban GSM8K.
+
+Penanda linguistik numerik diuji dengan Friedman untuk perbandingan kelompok dan
+Wilcoxon \textit{signed-rank} untuk pasangan, lalu nilai-p pasangan dikoreksi
+dengan Holm. Untuk setiap model, persona, dan penanda linguistik, keluarga Holm memuat
+empat perbandingan terhadap N serta tiga perbandingan I1--I3 terhadap E.
+Penanda linguistik khusus regional-kultural yang berupa ada atau tidak ada
+diuji dengan Exact McNemar, sedangkan komposisi pembuka diuji dengan
+Stuart--Maxwell. Akurasi memakai Q Cochran sebagai uji kelompok dan Exact
+McNemar untuk pasangan seperti pada bagian evaluasi akurasi.
+
+\par\noindent\textbf{a. Perubahan terhadap Skenario Netral}\par
+
+Gambar~\ref{fig:marker-regional-terhadap-netral} membandingkan E, I1, I2, dan
+I3 dengan N pada persona regional-kultural yang sama. Empat baris memisahkan
+hasil Amerika Utara, Asia Timur, Asia Selatan, dan Afrika Sub-Sahara, sedangkan
+empat kolom menunjukkan E--N, I1--N, I2--N, dan I3--N. Satu titik mewakili
+hasil satu penanda linguistik pada satu model, warna titik membedakan kelompok
+penanda linguistik pada Tabel~\ref{tab:aturan-penanda}, dan ukuran titik
+mengikuti jumlah pasangan respons yang memiliki nilai berbeda. Sumbu horizontal
+menunjukkan \textit{effect size} \textit{rank-biserial}; nilai positif
+menunjukkan penanda linguistik lebih tinggi pada skenario persona, sedangkan
+nilai negatif menunjukkan penanda linguistik lebih tinggi pada N. Sumbu
+vertikal menunjukkan $-\log_{10}(p_{\text{Holm}})$, garis putus-putus menandai
+batas signifikansi setelah koreksi Holm, dan nilai di atas 50 ditempatkan pada
+50.
+
+\begin{landscape}
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\linewidth,
+        height=0.82\textheight,
+        keepaspectratio
+    ]{image/BabVI/gsm8k/regional_kultural/14_numeric_effect_volcano_vs_neutral.png}
+    \caption{Ukuran efek penanda linguistik terhadap skenario netral pada domain regional-kultural}
+    \label{fig:marker-regional-terhadap-netral}
+\end{figure}
+\end{landscape}
+
+Ringkasan penanda linguistik dengan ukuran efek terbesar terdapat pada
+Lampiran~\ref{tab:lampiran-penanda-regional-ringkas}.
+Pada keenam model, E, I1, I2, dan I3 menghasilkan kalimat yang lebih panjang
+serta lebih sedikit menggunakan daftar berpoin dan subjudul daripada N
+pada keempat persona regional-kultural. Perubahan panjang kalimat, daftar
+berpoin, dan subjudul tetap signifikan setelah koreksi Holm pada seluruh
+model, persona, dan skenario. Langkah eksplisit juga lebih sedikit pada seluruh
+perbandingan; hanya I2 persona Afrika Sub-Sahara pada GPT-OSS 20B yang tidak
+tetap signifikan setelah koreksi Holm.
+
+Pada DeepSeek R1-Distill 32B, ketiga skenario implisit menghasilkan lebih
+sedikit kata dan LaTeX \textit{display} daripada N pada keempat persona. Kata
+penghubung sebab-akibat lebih banyak digunakan, dan ketiga perubahan tersebut
+tetap signifikan setelah koreksi Holm. Pada Qwen3 Next 80B-A3B, E dan ketiga
+skenario implisit menghasilkan lebih sedikit kata serta lebih sedikit
+menggunakan kata penghubung sebab-akibat
+daripada N pada keempat persona. LaTeX \textit{display} juga lebih sedikit
+digunakan pada ketiga skenario implisit, dan seluruh perubahan tersebut tetap
+signifikan setelah koreksi Holm.
+
+Pada Llama 3.3 70B, jumlah kata tidak berbeda secara konsisten dari N pada
+keempat persona. Kata penghubung sebab-akibat lebih banyak digunakan pada I1
+dan I2 serta tetap signifikan setelah koreksi Holm untuk keempat persona.
+Kalimat juga lebih panjang dan penanda linguistik struktur berkurang pada keempat skenario
+persona. Pada GPT-OSS 20B, LaTeX \textit{display} lebih sedikit digunakan pada
+E, I1, I2, dan I3 untuk keempat persona serta tetap signifikan setelah koreksi
+Holm. Jumlah kata pada skenario implisit tidak menghasilkan pola signifikan
+yang sama pada keempat persona.
+
+Pada Llama 3.1 8B, I1 menghasilkan lebih banyak kata daripada N pada keempat
+persona dan tetap signifikan setelah koreksi Holm, sedangkan I2 dan I3 tidak
+menghasilkan pola signifikan yang sama. Kalimat tetap lebih panjang serta langkah
+eksplisit, daftar berpoin, dan subjudul lebih sedikit digunakan daripada N.
+Pada Ministral 8B, ketiga skenario implisit menghasilkan lebih banyak kata dan
+kalimat yang lebih panjang, disertai penggunaan penanda linguistik struktur yang lebih
+sedikit. Kenaikan jumlah kata pada I1 signifikan untuk keempat persona, pada I2
+untuk tiga persona, dan pada I3 untuk persona Amerika Utara serta Asia Timur.
+
+Kalimat yang lebih panjang muncul bersama berkurangnya langkah eksplisit,
+daftar berpoin, dan subjudul. DeepSeek R1-Distill 32B dan Qwen3 Next
+80B-A3B menggunakan lebih sedikit kata, sedangkan Ministral 8B menggunakan
+lebih banyak kata. Kenaikan rata-rata panjang kalimat karena itu tidak selalu
+disertai kenaikan jumlah kata.
+
+Pola susunan ini muncul pada keempat kawasan dan
+lebih banyak berbeda menurut model serta skenario daripada menurut satu kawasan. E
+menambahkan persona secara langsung, sedangkan I1, I2, dan I3 menambahkan
+percakapan \textit{warmup} sebelum soal. Perbandingan I--N karena itu mencakup
+cara penyampaian persona dan penambahan riwayat percakapan karena N tidak
+menggunakan \textit{warmup} yang setara.
+
+\par\noindent\textbf{b. Perbandingan Antarkawasan}\par
+
+Perbandingan antarkawasan dilakukan pada model, skenario, dan soal yang sama.
+Enam pasangan yang dibandingkan adalah Amerika Utara--Asia Timur, Amerika
+Utara--Asia Selatan, Amerika Utara--Afrika Sub-Sahara, Asia Timur--Asia
+Selatan, Asia Timur--Afrika Sub-Sahara, dan Asia Selatan--Afrika Sub-Sahara.
+Hasil setiap pasangan tetap dilaporkan terpisah dan tidak digabung menjadi
+satu kelompok kawasan.
+
+Setiap pasangan diuji pada 14 penanda linguistik khusus regional-kultural. Keluarga
+koreksi Holm memuat 24 perbandingan antarkawasan per model dan penanda linguistik, yaitu enam
+pasangan kawasan pada E, I1, I2, dan I3. Setelah koreksi Holm pada uji Exact
+McNemar, E memiliki 43 kombinasi model, pasangan kawasan, dan penanda linguistik dengan
+$p_{\text{Holm}}<0{,}05$. I2 memiliki dua, I3 memiliki lima, sedangkan seluruh
+perbandingan I1 memperoleh $p_{\text{Holm}}\geq 0{,}05$.
+
+Gambar~\ref{fig:marker-regional-antarkawasan-e} memakai selisih prevalensi
+dalam poin persentase, yaitu kawasan pertama dikurangi kawasan kedua. Nilai
+positif menandai penanda linguistik yang lebih sering muncul pada kawasan pertama. Titik
+berwarna mewakili model, garis horizontal merupakan
+interval kepercayaan 95\%, dan berlian hitam merupakan median keenam model.
+Titik yang lebih pucat tidak signifikan setelah koreksi Holm.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.78\textheight,
+        keepaspectratio
+    ]{image/BabVI/gsm8k/regional_kultural/09_direct_identity_regional_forest_explicit.png}
+    \caption[Selisih penanda linguistik antarkawasan]
+    {Selisih prevalensi penanda linguistik pada perbandingan antarkawasan
+    dalam skenario E}
+    \label{fig:marker-regional-antarkawasan-e}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption{Hasil signifikan penanda linguistik khusus regional-kultural antarkawasan}
+    \label{tab:penanda-khusus-regional-antarkawasan}
+    \footnotesize
+    \renewcommand{\arraystretch}{1.12}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lcll}
+        \toprule
+        \textbf{Model} & \textbf{Jumlah} & \textbf{Skenario} & \textbf{Selisih absolut terbesar} \\
+        \midrule
+        DeepSeek R1-Distill 32B & 0 & -- & -- \\
+        Llama 3.1 8B & 21 & E & Label Asia Timur: 50,57 poin \\
+        Llama 3.3 70B & 29 & E, I2, I3 & Sapaan formulaik: 14,88 poin \\
+        Ministral 8B & 0 & -- & -- \\
+        GPT-OSS 20B & 0 & -- & -- \\
+        Qwen3 Next 80B-A3B & 0 & -- & -- \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+Tabel~\ref{tab:penanda-khusus-regional-antarkawasan} menghitung hasil
+signifikan untuk setiap kombinasi pasangan kawasan, skenario, dan penanda linguistik.
+Seluruh 43 hasil E hanya terdapat pada Llama 3.1 8B dan Llama 3.3 70B,
+masing-masing sebanyak 21 dan 22. Pada Llama 3.1 8B, selisih penyebutan label
+kawasan mencapai 50,57 poin untuk Asia Timur, 44,35 poin untuk Asia Selatan,
+dan 30,33 poin untuk Afrika Sub-Sahara. Pada Llama 3.3 70B, selisih terbesar
+sebesar 14,88 poin terdapat pada sapaan formulaik.
+
+Contohnya terdapat pada Llama 3.1 8B untuk soal \texttt{gsm8k\_00265}.
+Respons E persona Amerika Utara dimulai dengan ``\textit{Let's break it down
+step by step}'', sedangkan respons E persona Asia Selatan dimulai dengan
+``\textit{Namaste! Let's solve the problem step by step.}'' Kedua respons memperoleh
+angka GSM8K 400 dan dinilai benar. Contoh ini memperlihatkan penanda linguistik sapaan
+yang dihitung tanpa mengaitkannya dengan perbedaan akurasi.
+
+Pada Llama 3.3 70B, dua hasil I2 terdapat pada tradisi atau objek bernama dengan
+selisih 1,06 poin. Lima hasil I3 pada model yang sama terdapat pada rujukan
+budaya umum dan tradisi atau objek bernama dengan selisih 0,91--0,99 poin.
+Ketujuh hasil skenario implisit ditemukan pada satu model dengan selisih tidak
+melebihi 1,06 poin. Perbedaan antarkawasan pada skenario implisit lebih jarang
+dan lebih kecil daripada perbedaan E. Hasil lengkap E, I1, I2, dan I3 terdapat pada
+Gambar~\ref{fig:lampiran-marker-langsung-regional-e} sampai
+Gambar~\ref{fig:lampiran-marker-langsung-regional-i3} di Lampiran.
+
+\par\noindent\textbf{c. Bentuk Respons dan Bahasa Matematis}\par
+
+Perubahan bentuk respons perlu dipisahkan dari penggunaan istilah budaya.
+Jumlah kata, rata-rata panjang kalimat, variasi kata, langkah eksplisit, dan
+bahasa matematis mengukur bentuk penyelesaian yang ditulis model. Penyebutan
+kawasan, sapaan, dan istilah budaya mengukur penanda linguistik identitas pengguna yang
+muncul pada respons.
+
+Pada DeepSeek R1-Distill 32B, I1, I2, dan I3 menghasilkan lebih sedikit kata,
+kalimat yang lebih pendek, dan lebih sedikit LaTeX \textit{display} daripada E
+pada keempat persona. Variasi kata, kata penghubung sebab-akibat, dan operasi
+aritmetika di dalam kalimat justru meningkat, dan seluruh perubahan tersebut
+tetap signifikan setelah koreksi Holm. Pada Ministral 8B, ketiga skenario
+implisit justru menghasilkan lebih banyak kata dan kalimat yang lebih panjang
+daripada E pada keempat persona, sedangkan variasi kata menurun; ketiga
+perubahan tersebut juga tetap signifikan setelah koreksi Holm. Selisih akurasi
+signifikan terdapat pada I3 persona
+Amerika Utara di DeepSeek sebesar 2,05 poin dan I2 persona Afrika Sub-Sahara
+di Ministral sebesar 3,18 poin. Bentuk perubahan bahasa dan akurasi berbeda
+menurut model.
+
+Perbedaan bentuk respons terlihat pada DeepSeek R1-Distill 32B untuk
+\texttt{gsm8k\_01163} persona Amerika Utara. Respons E membuka dengan
+``\textit{Solution: Let's break down the problem step by step}'', memakai
+subjudul untuk dua tahap perhitungan, lalu menulis persamaan dalam LaTeX
+\textit{display}. Respons I3 hanya menulis ``\textit{Geb is 3 years old.}''
+Keduanya dinilai benar. Pada keseluruhan soal DeepSeek untuk persona dan
+skenario ini, median jumlah kata turun dari 94 menjadi 60 dan frekuensi LaTeX
+\textit{display} memiliki $r=-1{,}00$; satu contoh tersebut dipakai sebagai
+ilustrasi bentuk respons, bukan sebagai dasar statistik.
+
+Jumlah kata pada DeepSeek R1-Distill 32B memberi konteks untuk hasil token.
+Teks respons pada skenario implisit memuat lebih sedikit kata daripada E,
+sedangkan \textit{completion token} meningkat 69,1--74,8\%. Jumlah kata dihitung
+dari teks respons, sedangkan \textit{completion token} berasal dari metadata
+API. Kedua ukuran tersebut digunakan secara terpisah, sehingga kenaikan token
+tidak diartikan sebagai jawaban yang terlihat lebih panjang.
+
+\par\noindent\textbf{d. Pola Pembuka dan Istilah Regional-Kultural}\par
+
+Pola pembuka respons dibandingkan pada N, E, I1, I2, dan I3 untuk setiap model
+dan persona. Dalam data regional-kultural, setiap respons masuk ke satu dari
+sepuluh kategori yang muncul: deliberatif,
+penolakan, jawaban langsung, pembuka berpoin, subjudul, langkah pertama,
+aljabar, instruksional, pengulangan soal, atau naratif. Pembuka instruksional
+langsung mengajak pengguna menyelesaikan soal, sedangkan naratif langsung masuk
+ke isi tanpa pembingkaian yang dikenali aturan kategori. Subjudul dimulai dengan
+teks seperti \textbf{Solution}, sedangkan pengulangan soal menuliskan kembali
+informasi pada soal.
+
+Contoh pembuka instruksional adalah ``\textit{Let's break it down step by
+step}'', contoh subjudul adalah ``\textit{Solution:}'', dan contoh naratif
+adalah ``\textit{Geb is 3 years old.}'' Respons Llama 3.1 8B pada
+\texttt{gsm8k\_00002} yang dimulai dengan ``\textit{Since the robe takes 2
+bolts of blue fiber}'' menjadi contoh pengulangan informasi soal. Kategori
+ditetapkan dari bagian awal teks yang terlihat dengan urutan aturan yang sama
+pada seluruh model.
+
+Gambar~\ref{fig:regional-opening-gsm8k} memperlihatkan komposisi kesepuluh
+kategori. Setiap batang adalah rata-rata setara keenam model untuk satu persona
+dan skenario, lalu dinormalisasi menjadi 100\%. Warna menunjukkan kategori
+pembuka, bukan tingkat akurasi. Empat kategori dengan proporsi terbesar dibahas
+lebih rinci setelah gambar.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.78\textheight,
+        keepaspectratio
+    ]{image/BabVI/gsm8k/regional_kultural/11_opening_composition_100pct.png}
+    \caption{Persentase kategori pembuka respons pada domain regional-kultural}
+    \label{fig:regional-opening-gsm8k}
+\end{figure}
+
+Pada DeepSeek R1-Distill 32B, sebanyak 61,03\% respons pada N menggunakan
+pembuka instruksional dan 38,74\% menggunakan pembuka berupa subjudul. Pada E,
+pembuka berupa subjudul mencakup 70,66--79,23\% respons. Pada I1, I2, dan I3,
+pembuka naratif mencakup 69,63--73,09\% respons, sedangkan pengulangan soal
+mencakup 22,94--25,02\%.
+
+GPT-OSS 20B lebih sering menggunakan pembuka naratif. Persentasenya mencapai
+80,91\% pada N, 71,54--74,49\% pada E, dan 61,55--69,89\% pada ketiga skenario
+implisit. Pada Qwen3 Next 80B-A3B, pembuka instruksional mencakup 64,72\%
+respons pada N dan 47,72--59,97\% pada E, I1, I2, dan I3.
+
+Pada Llama 3.1 8B, Llama 3.3 70B, dan Ministral 8B, pembuka instruksional
+mencakup lebih dari 94\% respons pada N. Komposisi E pada Llama 3.1 8B dan
+Llama 3.3 70B berubah menurut kawasan, sedangkan Ministral 8B tetap memakai
+pembuka instruksional pada 97,57--99,32\% respons E. Rentang pembuka E berbeda
+antarmodel dan antarkawasan. Tidak ada satu kategori pembuka yang berubah
+dengan pola sama pada seluruh model.
+
+Komposisi pembuka antarkawasan diuji dengan Stuart--Maxwell dan koreksi Holm.
+Kategori pembuka diperlakukan sebagai satu hasil multinomial, bukan sepuluh uji
+biner yang terpisah.
+Hasil signifikan terdapat pada 18 dari 36 pasangan E, sembilan pasangan I1,
+serta masing-masing 11 pasangan I2 dan I3.
+
+Pada ketiga skenario implisit, GPT-OSS 20B menghasilkan 11 perbandingan
+signifikan. Llama 3.3 70B, Qwen3 Next 80B-A3B, dan Ministral 8B masing-masing
+menghasilkan enam, DeepSeek R1-Distill 32B menghasilkan dua, dan Llama 3.1 8B
+menghasilkan nol. Hasil setiap pasangan terdapat pada
+Lampiran~\ref{fig:lampiran-pembuka-langsung-regional}.
+
+Penyebutan identitas regional-kultural diukur melalui label ``North America'',
+``East Asia'', ``South Asia'', dan ``Sub-Saharan Africa''. Label tersebut
+dibedakan dari kata seperti ``American'', ``Chinese'', ``Indian'', atau
+``African'' yang dapat menjadi bagian dari isi soal GSM8K. Rincian persentase
+respons yang memakai label sesuai persona ditempatkan pada
+Lampiran~\ref{fig:lampiran-penyebutan-kawasan-regional}. Setiap panel mewakili
+satu persona; titik berwarna menunjukkan persentase respons per model dan
+skenario, sedangkan berlian hitam menunjukkan median keenam model.
+
+Penyebutan label kawasan hampir seluruhnya muncul pada E dan berbeda
+antarmodel. Llama 3.1 8B paling banyak menyebutkan label Asia Timur, Asia
+Selatan, dan Afrika Sub-Sahara, sedangkan Llama 3.3 70B menggunakannya dengan
+persentase yang lebih rendah. Model lain hampir tidak menyebutkan label kawasan
+secara langsung. Label Amerika Utara juga jarang muncul, sehingga penyesuaian
+bahasa regional-kultural tidak terjadi secara merata pada empat kawasan.
+
+Istilah regional-kultural yang tercatat juga berbeda menurut kawasan. Pada
+Amerika Utara, istilah yang muncul antara lain ``North America'', ``Tradition'',
+dan ``Thanksgiving''. Pada Asia Timur, istilah yang muncul mencakup ``East
+Asia'', ``Red envelope'', dan ``Hongbao'', sedangkan pada Asia Selatan mencakup
+``South Asia'', ``Namaste'', ``Diwali'', dan ``Mehendi''. Pada Afrika
+Sub-Sahara, istilah yang muncul mencakup ``Sub-Saharan Africa'', ``Across the
+globe'', dan ``Harvest celebration''.
+
+\begin{table}[H]
+    \centering
+    \caption{Contoh istilah regional-kultural pada skenario persona}
+    \label{tab:istilah-regional-gsm8k}
+    \footnotesize
+    \renewcommand{\arraystretch}{1.15}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{2.3cm}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{1.7cm}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{1.9cm}}
+        \toprule
+        \textbf{Kawasan} & \textbf{E} & \textbf{I1} & \textbf{I2} & \textbf{I3} \\
+        \midrule
+        Amerika Utara & North America, Tradition & -- & Tradition, Thanksgiving & -- \\
+        Asia Timur & East Asia, Culture/cultural & Wei Chen & Red envelope, Hongbao, Culture/cultural & Tradition \\
+        Asia Selatan & South Asia, Namaste & -- & Diya, Diwali & Mehendi \\
+        Afrika Sub-Sahara & Sub-Saharan Africa, Across the globe & Tradition & Harvest celebration & -- \\
+        \bottomrule
+    \end{tabularx}
+    \end{adjustbox}
+\end{table}
+
+Tabel~\ref{tab:istilah-regional-gsm8k} membedakan istilah yang muncul pada E,
+I1, I2, dan I3. Label kawasan lebih banyak muncul pada E, sedangkan istilah
+pada skenario implisit mengikuti isi \textit{warmup}. I1 dapat membawa nama
+``Wei Chen'', I2 dapat membawa perayaan seperti ``Thanksgiving'', ``Hongbao'',
+``Diwali'', dan ``Harvest celebration'', sedangkan I3 dapat membawa istilah
+``Mehendi''. Soal GSM8K yang digunakan tetap sama, sehingga perbedaan istilah
+lebih berkaitan dengan petunjuk persona dan isi \textit{warmup} daripada isi
+soal matematika. Daftar istilah hasil audit terdapat pada
+Lampiran~\ref{tab:lampiran-istilah-regional}.
+
+Tanda ``--'' pada tabel menandai istilah yang tidak ditemukan dalam ringkasan
+audit, bukan bahwa istilah tersebut mustahil muncul. Teks \textit{warmup} tidak
+dihitung sebagai respons; istilah baru dihitung jika muncul kembali pada
+jawaban utama. Grafik jumlah kemunculan per 10.000 kata ditempatkan pada
+Lampiran~\ref{fig:lampiran-istilah-regional-terurut}. Frekuensi dihitung per
+model kemudian dirata-ratakan dari keenam model, sehingga frekuensi tinggi pada
+satu model tidak dianggap sebagai kebiasaan seluruh model.
+
+Istilah dengan frekuensi tertinggi adalah ``East Asia'' pada persona
+Asia Timur, ``South Asia'' dan ``Namaste'' pada persona Asia Selatan, serta
+``Sub-Saharan Africa'' pada persona Afrika Sub-Sahara. Istilah Amerika Utara
+lebih jarang muncul daripada istilah pada ketiga kawasan tersebut. Prevalensi
+sapaan, penyebutan tradisi, dan penyesuaian budaya lainnya terdapat pada
+Lampiran~\ref{fig:lampiran-penyesuaian-regional}.
+
+Empat persona di bagian ini adalah proksi rancangan: Anglo Amerika Utara,
+Tionghoa Asia Timur, India Asia Selatan, dan Afrika Barat untuk Afrika
+Sub-Sahara. Istilah yang terdeteksi karena itu tidak mewakili seluruh budaya di
+dalam kawasan tersebut. Penyebutan label, sapaan, atau tradisi juga hanya
+menandai penyesuaian yang terlihat dan tidak cukup untuk menyimpulkan kedalaman
+pemahaman budaya model.
+
+Audit kontekstual berbantuan AI memeriksa 480 kemunculan penanda linguistik dan tidak
+menemukan positif palsu pada sampel tersebut. Pemeriksaan \textit{blind recall}
+terhadap 204 respons menemukan tiga respons positif tanpa penanda linguistik yang
+terlewat. Karena audit ini belum dilakukan oleh penilai manusia yang independen,
+hasil pemeriksaan presisi dan \textit{recall} dibatasi pada sampel audit.
+
+\par\noindent\textbf{e. Penanda Linguistik dan Akurasi}\par
+
+Perubahan bahasa yang paling konsisten terhadap N terdapat pada susunan
+respons. Keenam model memakai kalimat yang lebih panjang serta lebih sedikit
+langkah eksplisit, daftar berpoin, dan subjudul pada keempat persona dan empat
+skenario persona. E juga memunculkan label kawasan dan sapaan regional, tetapi
+hasil antarkawasan untuk penanda linguistik khusus hanya terdapat pada Llama 3.1 8B dan
+Llama 3.3 70B. I1, I2, dan I3 lebih sering berbeda pada bentuk umum respons;
+penanda linguistik khusus regional-kultural pada ketiga skenario ini hanya menghasilkan
+tujuh perbandingan signifikan dan semuanya terdapat pada Llama 3.3 70B.
+
+Q Cochran digunakan sebagai uji kelompok. Pada kelompok yang signifikan, Exact
+McNemar setelah koreksi Holm menghasilkan sembilan penurunan akurasi I--E.
+Tujuh penurunan terdapat pada Qwen3 Next 80B-A3B, sedangkan
+DeepSeek R1-Distill 32B dan Ministral 8B masing-masing menghasilkan satu.
+Besarnya berkisar 1,06--3,18 poin dengan $|h|=0{,}05$--$0{,}11$. Llama 3.1 8B,
+Llama 3.3 70B, dan GPT-OSS 20B tidak menghasilkan perbandingan I--E yang
+didukung kedua uji tersebut.
+
+Pada tujuh penurunan Qwen3 Next 80B-A3B, frekuensi kata penghubung sebab-akibat
+lebih rendah pada skenario implisit dengan $r=-0{,}36$ sampai $-0{,}25$. Lima
+perbandingan Qwen3 Next 80B-A3B juga memiliki frekuensi LaTeX \textit{display}
+yang lebih rendah dengan $r=-0{,}27$ sampai $-0{,}15$. Pada DeepSeek
+R1-Distill 32B, akurasi I3 persona Amerika Utara lebih rendah 2,05 poin,
+jumlah kata turun dari median 94 menjadi 60, dan LaTeX \textit{display}
+memiliki $r=-1{,}00$. Pada Ministral 8B, akurasi I2 persona Afrika Sub-Sahara
+lebih rendah 3,18 poin dan LaTeX \textit{display} memiliki $r=-0{,}38$, tetapi
+jumlah kata naik dari median 106 menjadi 118.
+
+Tujuh penurunan frekuensi LaTeX \textit{display} pada perbandingan akurasi
+tetap signifikan ketika analisis dibatasi pada soal yang dijawab benar oleh E
+dan skenario implisit. Hasil pemeriksaan kepekaan terdapat pada
+Gambar~\ref{fig:lampiran-sensitivitas-penanda-regional}. Perubahan format masih
+muncul pada pasangan respons yang sama-sama benar, sehingga penurunan LaTeX
+\textit{display} tidak dapat dipakai sebagai penyebab langsung kesalahan.
+
+Perbandingan antarkawasan menghasilkan tiga perbedaan akurasi pada
+Exact McNemar setelah koreksi Holm. Pada Ministral 8B I2, akurasi Amerika Utara
+dan Asia Selatan lebih tinggi daripada Afrika Sub-Sahara sebesar 4,17 dan 3,41
+poin. Pada DeepSeek R1-Distill 32B I3, akurasi Asia Timur lebih tinggi 2,20 poin
+daripada Amerika Utara. Perbedaan label kawasan dan sapaan pada E justru
+ditemukan pada Llama 3.1 8B dan Llama 3.3 70B. Tidak ada satu kawasan yang
+secara konsisten memperoleh akurasi paling tinggi atau paling rendah pada
+keenam model.
+
+Analisis memakai pasangan soal dengan teks respons yang tersedia pada kedua
+skenario. Terdapat tujuh celah pada berkas sumber N, sedangkan sebagian respons
+lain tidak memiliki teks yang dapat dianalisis atau hanya berisi pesan teknis.
+Pada 16 skenario persona, ketersediaan teks GPT-OSS 20B paling bervariasi,
+yaitu 79,08--97,50\% dari 1.319 soal per skenario; model lain umumnya lebih
+lengkap.
+Perbedaan ketersediaan ini dicatat pada
+Gambar~\ref{fig:lampiran-ketersediaan-penanda-regional} dan ukuran pasangan
+efektif ikut dilaporkan pada keluaran statistik.
+
+Persona regional-kultural lebih konsisten mengubah cara jawaban ditulis
+daripada akurasinya. Perubahan yang konsisten lintas model
+terdapat pada panjang kalimat dan pengurangan penanda linguistik struktur, bukan pada satu
+kawasan tertentu. Label dan sapaan lebih bergantung pada model, sedangkan
+perbedaan akurasi hanya muncul pada model, persona, dan skenario tertentu.
+Rancangan ini tidak memakai \textit{warmup} netral, sehingga perbandingan I--N
+masih mencakup isi regional-kultural sekaligus penambahan riwayat percakapan.
+
+\subsubsection{Ringkasan Domain Regional-Kultural}
+\label{subsubsec:ringkasan-regional-gsm8k}
+
+Pada domain regional-kultural, bagian respons yang paling banyak berubah
+berbeda menurut cara persona disampaikan. E lebih banyak memunculkan label
+kawasan dan sapaan regional, terutama pada Llama 3.1 8B dan Llama 3.3 70B. Pada
+I1, I2, dan I3, istilah regional-kultural lebih sedikit dan perubahan lebih
+banyak terdapat pada susunan jawaban setelah riwayat percakapan ditambahkan.
+
+Untuk rumusan masalah pertama, persona regional-kultural lebih konsisten
+mengubah penanda linguistik daripada akurasi respons. Dibandingkan dengan N,
+perubahan penanda linguistik ditemukan pada keenam model. Perbandingan I--E
+yang didukung Q Cochran dan koreksi Holm menghasilkan sembilan penurunan
+akurasi, yaitu tujuh pada Qwen3 Next 80B-A3B serta masing-masing satu pada
+DeepSeek R1-Distill 32B dan Ministral 8B. Penurunan tersebut muncul pada persona
+Amerika Utara, Asia Selatan, dan Afrika Sub-Sahara, sedangkan persona Asia Timur
+tidak menghasilkan penurunan I--E yang didukung kedua uji. Perbandingan
+antarkawasan hanya menghasilkan tiga perbedaan akurasi dan tidak menunjukkan
+satu kawasan yang selalu memperoleh akurasi paling tinggi atau paling rendah.
+
+Untuk bagian rumusan masalah kedua yang berkaitan dengan tugas numerik,
+skenario implisit menggunakan total token 79,1--330,1\% lebih banyak daripada E
+karena riwayat percakapan ikut dikirim bersama soal. Perubahan \textit{completion
+token} berbeda antarmodel dan tidak selalu diikuti perubahan akurasi yang sama.
+Persona regional-kultural dapat mengubah bentuk respons, penggunaan
+token, dan akurasi dengan pola yang berbeda pada tugas GSM8K.
+
+Untuk rumusan masalah ketiga, pengaruh persona regional-kultural tidak
+konsisten antarmodel. Perbedaan label kawasan dan sapaan paling banyak muncul
+pada dua model Llama, sedangkan penurunan akurasi muncul pada Qwen3 Next
+80B-A3B, DeepSeek R1-Distill 32B, dan Ministral 8B. Llama 3.1 8B dan Ministral
+8B memiliki ukuran parameter yang sama, tetapi menghasilkan bentuk pengaruh
+yang berbeda. Ukuran parameter saja tidak menghasilkan pola pengaruh persona
+yang sama.
+
+% =====================================================================
+\subsection{Perbandingan Antardomain Persona}
+\label{subsec:perbandingan-domain-gsm8k}
+
+Hasil GSM8K pada domain gender, agama, dan regional-kultural dibandingkan untuk
+melihat perbedaan pengaruh persona pada tugas numerik. Gambar~\ref{fig:omnibus-semua-domain-gsm8k}
+menunjukkan hasil Q Cochran untuk setiap model dan persona. Uji tersebut
+menentukan kelompok yang memiliki perbedaan akurasi antarskenario, tetapi tidak
+menentukan pasangan skenario yang berbeda. Pasangan skenario dan tanda
+selisihnya ditentukan melalui Exact McNemar setelah koreksi Holm.
+
+\begin{landscape}
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\linewidth,
+        height=0.72\textheight,
+        keepaspectratio
+    ]{image/bab6/gsm8k/semua_domain/akurasi/20_all_groups_cochran_q_omnibus_pvalue_heatmap.png}
+    \caption{Nilai-p uji omnibus Q Cochran pada seluruh domain persona GSM8K}
+    \label{fig:omnibus-semua-domain-gsm8k}
+\end{figure}
+\end{landscape}
+
+Tanda bintang pada Gambar~\ref{fig:omnibus-semua-domain-gsm8k} menandai
+$p<0{,}05$. Pada gender, Q Cochran membandingkan N, E, I1, I2, dan I3, sedangkan
+pada agama dan regional-kultural uji tersebut membandingkan E, I1, I2, dan I3.
+Perbedaan ini terjadi karena N pada gender menggunakan protokol inferensi yang
+sama, sedangkan N pada agama dan regional-kultural menjadi analisis sensitivitas
+karena pelaksanaannya tidak sepenuhnya sama. Nilai $p$ pada gambar tidak
+disetarakan karena jumlah skenario dalam uji berbeda.
+Tabel~\ref{tab:identitas-terdampak-gsm8k} dan
+Tabel~\ref{tab:model-jenis-ukuran-gsm8k} hanya menggunakan pasangan I--E agar
+jenis perbandingannya sama.
+
+Pengaruh persona pada akurasi berbeda menurut domain dan model. Q Cochran
+signifikan pada tiga dari 12 kelompok gender, delapan dari 24 kelompok agama,
+dan enam dari 24 kelompok regional-kultural. Dua kelompok gender terdapat pada
+DeepSeek R1-Distill 32B dan satu kelompok terdapat pada Llama 3.3 70B, sedangkan
+empat kelompok agama berasal dari seluruh persona pada Ministral 8B. Pada
+regional-kultural, tiga kelompok terdapat pada Qwen3 Next 80B-A3B dan tiga
+lainnya masing-masing terdapat pada Llama 3.1 8B, DeepSeek R1-Distill 32B, dan
+Ministral 8B.
+
+Perbedaan penanda linguistik ditemukan lebih luas daripada perbedaan akurasi.
+Pada agama dan regional-kultural, E lebih sering memunculkan label identitas
+dan istilah yang sesuai dengan persona. Pola tersebut sesuai dengan E yang
+menyebut identitas secara langsung, sedangkan I1--I3 menambahkan percakapan
+\textit{warmup} tanpa mengubah soal matematika. Pada gender, perubahan lebih
+banyak terdapat pada pronomina, bahasa matematis, dan pola pembuka respons.
+Perubahan penanda linguistik dan akurasi tidak selalu muncul pada model yang
+sama sehingga kemunculan istilah persona tidak langsung menunjukkan penurunan
+akurasi.
+
+Penggunaan total token meningkat pada skenario implisit di ketiga domain.
+Rentang kenaikannya terhadap E adalah 59,5--220,5\% pada gender,
+129,2--409,5\% pada agama, dan 79,1--330,1\% pada regional-kultural. Kenaikan
+tersebut terutama berasal dari \textit{input token} karena percakapan
+\textit{warmup} ikut dikirim bersama setiap soal. Perubahan \textit{completion
+token} berbeda antarmodel dan tidak selalu diikuti perubahan akurasi yang sama. Pada
+layanan yang menghitung biaya berdasarkan jumlah token, kenaikan \textit{input
+token} menambah komponen biaya input, sedangkan total biayanya mengikuti harga
+\textit{input} dan \textit{output token}\label{term:output-token} pada setiap model.
+
+Tabel~\ref{tab:perbandingan-domain-gsm8k} merangkum hasil Holm menurut jenis
+perbandingan. Pada agama dan regional-kultural, penyebut 96 untuk N berasal dari
+6 model $\times$ 4 persona $\times$ 4 skenario, sedangkan penyebut 72 untuk
+I--E berasal dari 6 model $\times$ 4 persona $\times$ 3 skenario implisit.
+Penyebut 144 pada perbandingan antarpersona berasal dari 6 model $\times$ 4
+skenario $\times$ 6 pasangan persona. Pada gender, perhitungan yang sama
+menggunakan dua persona sehingga menghasilkan 48, 36, dan 24 perbandingan.
+
+\begin{center}
+    \centering
+    \captionof{table}{Ringkasan perbandingan hasil GSM8K antardomain persona}
+    \label{tab:perbandingan-domain-gsm8k}
+    \footnotesize
+    \renewcommand{\arraystretch}{1.16}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{1.8cm}
+        >{\centering\arraybackslash}p{2.8cm}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}X}
+        \toprule
+        \textbf{Domain} &
+        \textbf{Hasil setelah Holm} &
+        \textbf{Pola akurasi} &
+        \textbf{Pola penanda linguistik} \\
+        \midrule
+        Gender &
+        N: 4/48; I--E: 4/36; antarpersona: 0/24 &
+        Tiga penurunan I--E terdapat pada DeepSeek R1-Distill 32B dan satu
+        kenaikan terdapat pada Llama 3.3 70B. &
+        Perubahan terlihat pada pronomina gender, bahasa matematis, dan pola
+        pembuka respons. \\
+        \addlinespace[3pt]
+
+        Agama &
+        N: 23/96; I--E: 19/72; antarpersona: 4/144 &
+        Perubahan I--E terbesar terdapat pada persona Islam di Ministral 8B.
+        Keempat perbandingan antarpersona melibatkan persona Islam dengan akurasi
+        yang lebih rendah. &
+        E lebih banyak memunculkan identitas dan istilah agama, sedangkan
+        I1--I3 lebih banyak mengubah pola respons model. \\
+        \addlinespace[3pt]
+
+        Regional-kultural &
+        N: 15/96; I--E: 10/72; antarpersona: 3/144 &
+        Sembilan hasil I--E didukung Q Cochran dan Holm; seluruhnya berupa
+        penurunan pada Amerika Utara, Asia Selatan, atau Afrika Sub-Sahara. &
+        Perubahan terlihat pada penyebutan kawasan, istilah budaya, sapaan,
+        tradisi atau perayaan, dan kategori pembuka respons. \\
+        \bottomrule
+    \end{tabularx}
+\end{center}
+
+Hasil pada Tabel~\ref{tab:perbandingan-domain-gsm8k} menunjukkan bahwa persona
+dapat mengubah akurasi dan pola respons model, tetapi bentuknya berbeda pada
+setiap domain. Agama memiliki perubahan I--E terbesar dan seluruh perbandingan
+antarpersona yang signifikan melibatkan persona Islam dengan akurasi lebih rendah.
+Gender tidak memiliki perbedaan antarpersona antara persona laki-laki dan
+perempuan, sedangkan tiga perbedaan antarkawasan regional-kultural hanya muncul
+pada I2 atau I3 di Ministral 8B dan DeepSeek R1-Distill 32B.
+
+\subsubsection{Perbandingan Akurasi Skenario Implisit dan Eksplisit per Persona}
+\label{subsubsec:identitas-terdampak-gsm8k}
+
+Tabel~\ref{tab:identitas-terdampak-gsm8k} memuat perbandingan I--E yang didukung
+Q Cochran dan koreksi Holm. Hasil ini menunjukkan persona yang akurasinya
+berubah ketika cara penyampaian persona diubah dari eksplisit menjadi implisit.
+Tabel tersebut tidak membandingkan akurasi satu persona dengan persona lain.
+Persona yang tidak tercantum tidak memiliki hasil I--E yang didukung kedua uji.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Persona dengan perbedaan akurasi I--E yang didukung Q Cochran dan koreksi Holm}
+    \label{tab:identitas-terdampak-gsm8k}
+    \footnotesize
+    \renewcommand{\arraystretch}{1.16}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{1.9cm}
+        >{\raggedright\arraybackslash}p{2.6cm}
+        >{\centering\arraybackslash}p{1.6cm}
+        >{\centering\arraybackslash}p{2.3cm}
+        >{\raggedright\arraybackslash}X}
+        \toprule
+        \textbf{Domain} & \textbf{Persona} & \textbf{Perubahan} &
+        \textbf{Rentang $h$} & \textbf{Model} \\
+        \midrule
+        Gender & Laki-laki dan perempuan & Turun & $-0{,}12$ s.d. $-0{,}09$ &
+        DeepSeek R1-Distill 32B \\
+        Gender & Perempuan (I3) & Naik & $+0{,}08$ & Llama 3.3 70B \\
+        \addlinespace[3pt]
+        Agama & Islam & Turun paling besar & $-0{,}27$ s.d. $-0{,}15$ &
+        Ministral 8B \\
+        Agama & Islam & Naik & $+0{,}07$ s.d. $+0{,}10$ &
+        GPT-OSS 20B \\
+        Agama & Ateis dan Yahudi & Turun & $-0{,}13$ s.d. $-0{,}09$ &
+        Ministral 8B \\
+        Agama & Kristen & Turun & $-0{,}16$ s.d. $-0{,}06$ &
+        Ministral 8B, Llama 3.1 8B, Qwen3 Next 80B-A3B \\
+        \addlinespace[3pt]
+        Regional & Asia Selatan & Turun & $-0{,}07$ s.d. $-0{,}06$ &
+        Qwen3 Next 80B-A3B \\
+        Regional & Afrika Sub-Sahara & Turun & $-0{,}11$ s.d. $-0{,}05$ &
+        Qwen3 Next 80B-A3B, Ministral 8B \\
+        Regional & Amerika Utara & Turun & $-0{,}08$ s.d. $-0{,}07$ &
+        Qwen3 Next 80B-A3B, DeepSeek R1-Distill 32B \\
+        Regional & Asia Timur & Tidak ada & --- & --- \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Perubahan I--E terbesar terdapat pada persona Islam. Pada Ministral 8B,
+akurasi I1 persona Islam turun 8,79 poin dari E dengan $h=-0{,}27$, sedangkan
+GPT-OSS 20B menghasilkan kenaikan 2,06--2,67 poin pada I1--I3. Pada gender,
+penurunan terdapat pada persona laki-laki dan perempuan di DeepSeek R1-Distill
+32B, sedangkan I3 persona perempuan meningkat pada Llama 3.3 70B. Pada
+regional-kultural, Amerika Utara, Asia Selatan, dan Afrika Sub-Sahara
+masing-masing memiliki tiga penurunan yang didukung kedua uji. Asia Timur tidak
+memiliki hasil I--E yang didukung kedua uji.
+
+Perbandingan antarpersona memberi batas yang berbeda dari hasil I--E.
+Keempat hasil agama melibatkan persona Islam dengan akurasi lebih rendah pada
+Ministral 8B atau Llama 3.1 8B. Pada regional-kultural, Afrika Sub-Sahara lebih
+rendah dalam dua perbandingan pada Ministral 8B, sedangkan Amerika Utara lebih
+rendah daripada Asia Timur dalam satu perbandingan pada DeepSeek R1-Distill
+32B. Gender tidak memiliki perbedaan antarpersona yang signifikan sehingga hasilnya
+tidak mendukung penetapan persona laki-laki atau perempuan sebagai persona yang
+lebih rentan pada GSM8K.
+
+\subsubsection{Perbandingan Berdasarkan Jenis dan Ukuran Model}
+\label{subsubsec:jenis-ukuran-model-gsm8k}
+
+Pertanyaan penelitian ketiga membahas pengaruh persona pada model dengan
+jenis dan ukuran yang berbeda. Tabel~\ref{tab:model-jenis-ukuran-gsm8k}
+merangkum perbandingan I--E yang didukung Q Cochran dan koreksi Holm pada setiap
+model. Perbandingan terhadap skenario netral dan perbandingan antarpersona tidak
+disertakan agar ketiga domain menggunakan jenis perbandingan yang sama.
+Pengelompokan ukuran mengikuti jumlah parameter yang dilaporkan pada
+Bab~\ref{chap:perancangan}.
+
+\begin{center}
+    \centering
+    \captionof{table}{Jumlah perbandingan I--E yang didukung Q Cochran dan koreksi Holm per model}
+    \label{tab:model-jenis-ukuran-gsm8k}
+    \small
+    \renewcommand{\arraystretch}{1.16}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}X
+        >{\centering\arraybackslash}p{2.1cm}
+        >{\centering\arraybackslash}p{2.3cm}
+        >{\centering\arraybackslash}p{1.3cm}
+        >{\centering\arraybackslash}p{1.3cm}
+        >{\centering\arraybackslash}p{1.5cm}
+        >{\centering\arraybackslash}p{1.1cm}}
+        \toprule
+        \textbf{Model} & \textbf{Jenis} & \textbf{Ukuran} &
+        \textbf{Gender} & \textbf{Agama} & \textbf{Regional} &
+        \textbf{Total} \\
+        \midrule
+        Llama 3.1 8B & Non-reasoning & Kecil (8B) & 0 & 2 & 0 & 2 \\
+        Ministral 8B & Non-reasoning & Kecil (8B) & 0 & 12 & 1 & 13 \\
+        DeepSeek R1-Distill 32B & Reasoning & Menengah (32B) & 3 & 0 & 1 & 4 \\
+        GPT-OSS 20B & Reasoning & Menengah (20B) & 0 & 3 & 0 & 3 \\
+        Llama 3.3 70B & Non-reasoning & Besar (70B) & 1 & 0 & 0 & 1 \\
+        Qwen3 Next 80B-A3B & Reasoning & Besar (80B, MoE) & 0 & 2 & 7 & 9 \\
+        \midrule
+        \multicolumn{3}{r}{\textbf{Total}} & 4 & 19 & 9 & 32 \\
+        \bottomrule
+    \end{tabularx}
+\end{center}
+
+Model \textit{reasoning} dan \textit{non-reasoning} masing-masing menghasilkan
+16 dari 32 hasil I--E. Model kecil menghasilkan 15 hasil, model menengah tujuh
+hasil, dan model besar 10 hasil sehingga jumlahnya tidak membentuk urutan
+berdasarkan ukuran. Llama 3.1 8B dan Ministral 8B juga menghasilkan dua dan 13
+hasil walaupun ukuran parameternya sama. Jenis dan ukuran parameter karena itu
+tidak membentuk pola pengaruh persona yang sama pada keenam model.
+
+Qwen3 Next 80B-A3B dan GPT-OSS 20B menggunakan arsitektur
+\textit{mixture-of-experts}. Jumlah parameter total pada arsitektur tersebut
+berbeda dari jumlah parameter yang aktif pada setiap token. Pengelompokan ukuran
+di tabel karena itu tidak mencakup seluruh perbedaan komputasi dan arsitektur
+antarmodel.
+
+% =====================================================================
+\subsection{Ringkasan Evaluasi GSM8K}
+\label{subsec:ringkasan-evaluasi-gsm8k}
+
+Evaluasi GSM8K menunjukkan bahwa pengaruh persona berbeda menurut domain,
+model, dan cara persona disampaikan. Pada gender, empat perbandingan I--E
+didukung Q Cochran dan Holm, tetapi tidak ada perbedaan antarpersona antara persona
+laki-laki dan perempuan. Pada agama, 19 perbandingan I--E didukung kedua uji dan
+penurunan terbesar terdapat pada persona Islam di Ministral 8B. Keempat
+perbandingan antarpersona agama juga melibatkan persona Islam dengan akurasi lebih
+rendah. Pada regional-kultural, sembilan perbandingan I--E yang didukung kedua
+uji seluruhnya berupa penurunan pada Amerika Utara, Asia Selatan, atau Afrika
+Sub-Sahara; dua dari tiga perbandingan antarkawasan menempatkan Afrika Sub-Sahara
+lebih rendah.
+
+Perubahan penanda linguistik ditemukan lebih luas daripada perubahan akurasi.
+Skenario eksplisit lebih sering memunculkan label identitas atau istilah agama
+dan budaya, sedangkan skenario implisit lebih banyak mengubah susunan respons.
+Pada gender, perubahan juga terdapat pada pronomina, bahasa matematis, dan pola
+pembuka. Total token skenario implisit meningkat 59,5--220,5\% pada gender,
+129,2--409,5\% pada agama, dan 79,1--330,1\% pada regional-kultural. Kenaikan
+konteks input menambah komponen biaya input, tetapi perubahan token tidak selalu
+diikuti perubahan akurasi yang sama.
+
+Jenis dan ukuran parameter tidak menghasilkan pola pengaruh persona yang sama.
+Model \textit{reasoning} dan \textit{non-reasoning} masing-masing menghasilkan
+16 dari 32 perbandingan I--E yang didukung kedua uji. Model kecil menghasilkan
+15 hasil, model menengah tujuh hasil, dan model besar 10 hasil. Llama 3.1 8B dan
+Ministral 8B memiliki ukuran yang sama, tetapi masing-masing menghasilkan dua
+dan 13 hasil.
+
+% =====================================================================
+\section{Evaluasi ETHICS}
+\label{sec:evaluasi-ethics}
+
+ETHICS terdiri atas 1.514 soal dari subset \textit{Commonsense},
+\textit{Deontology}, \textit{Justice}, dan \textit{Virtue}. Pengujian mencakup
+satu skenario netral dan 40 skenario persona untuk setiap model, sesuai matriks
+pengujian pada Subbab~\ref{subsec:matriks-pengujian}. Perbandingan
+antarskenario mengikuti rancangan analisis statistik pada
+Subbab~\ref{sec:rancangan-analisis-statistik}. Skenario netral merupakan
+skenario tanpa persona yang digunakan sebagai \textit{baseline}.
+
+Pada pembaruan domain gender dan regional-kultural, akurasi dihitung pada respons
+\textit{committed} untuk \textit{Commonsense} dan \textit{Justice}.
+\textit{Deontology} dan \textit{Virtue} dianalisis melalui distribusi
+keputusan model karena pertanyaan yang dikirim tidak sesuai dengan tugas
+penentu label dataset. Proporsi \textit{committed}, \textit{abstain}, dan
+\textit{missing} dicantumkan terpisah, sedangkan keberhasilan efektif
+memasukkan respons \textit{abstain} ke dalam penyebut respons nonmissing.
+Respons \textit{missing} tidak ditafsirkan sebagai perilaku moral model karena
+teks respons tidak tersedia.
+
+Hasil agama masih menggunakan analisis sebelumnya,
+dengan seluruh respons sebagai penyebut kecocokan terhadap label dataset.
+Angka pada \textit{Deontology} dan \textit{Virtue} dalam hasil agama tersebut
+tidak digunakan untuk menyimpulkan ketepatan moral terhadap tugas asli.
+Perbandingan proporsi hasil signifikan yang melibatkan domain agama ditunda
+sampai subset, penyebut, dan aturan pemilihan pasangan disamakan.
+
+% =====================================================================
+\subsection{Domain Gender}
+\label{subsec:hasil-gender-ethics}
+
+Domain gender mencakup persona laki-laki dan perempuan. Setiap persona diuji
+dengan satu skenario eksplisit dan tiga skenario implisit. I1 menggunakan peran
+dalam keluarga, I2 menggunakan kegiatan merapikan penampilan, dan I3
+menggunakan pilihan pakaian. Ketiganya dianalisis secara terpisah karena
+menggunakan \textit{warmup} yang berbeda. Analisis ini menggunakan 81.756
+respons dari 1.514 soal ETHICS.
+
+\subsubsection{Akurasi, Keputusan, dan Status Respons}
+\label{subsubsec:akurasi-gender-ethics}
+
+\input{Bab VI - ETHICS Gender Akurasi.tex}
+
+\par\noindent\textbf{e. Penggunaan Token}\par
+\label{subsubsec:token-gender-ethics}
+
+Analisis token menggunakan 80.919 dari 81.756 respons ETHICS gender karena 837
+respons tidak memiliki metadata token. Rata-rata token dihitung menurut model,
+subset, persona, dan skenario. E dibandingkan dengan I1--I3 pada 36 pasangan
+per subset, sedangkan E/I1/I2/I3 dibandingkan dengan N pada 48 pasangan per
+subset. Metadata yang digunakan mencakup \textit{input token},
+\textit{completion token}, \textit{reasoning token}, dan total token.
+
+Pada perbandingan I1--I3 dengan E, \textit{input token} meningkat pada seluruh
+36 pasangan di setiap subset. Rentangnya adalah $+42{,}74$--$+697{,}02$\% pada
+\textit{Commonsense}, $+151{,}48$--$+3.458{,}00$\% pada \textit{Deontology},
+$+171{,}30$--$+2.788{,}41$\% pada \textit{Justice}, dan
+$+175{,}57$--$+2.820{,}35$\% pada \textit{Virtue}. Percakapan
+\textit{warmup} ikut dikirim bersama soal pada I1--I3 sehingga menambah konteks
+input dibandingkan dengan E.
+
+\textit{Completion token} pada I--E meningkat/menurun sebanyak 21/15, 20/16,
+23/13, dan 17/19 pada empat subset. \textit{Reasoning token} tercatat pada 18
+pasangan per subset dengan jumlah kenaikan/penurunan 3/15, 2/16, 3/15, dan
+3/15. Total token meningkat/menurun sebanyak 34/2, 26/10, 31/5, dan 31/5.
+Rentang total token di seluruh subset adalah $-36{,}18$ sampai $+510{,}46$\%.
+
+Pada perbandingan skenario persona dengan N, \textit{input token} meningkat
+pada seluruh 48 pasangan setiap subset. \textit{Completion token}
+meningkat/menurun sebanyak 21/27, 14/34, 23/25, dan 18/30, sedangkan total token
+meningkat/menurun sebanyak 36/12, 28/20, 38/10, dan 36/12. \textit{Reasoning
+token} tercatat pada 24 pasangan per subset dengan jumlah kenaikan/penurunan
+6/18, 4/20, 7/17, dan 6/18.
+
+Perubahan token dipisahkan dari perubahan akurasi dan status respons. Kenaikan
+\textit{input token} tidak selalu disertai kenaikan \textit{completion token},
+\textit{reasoning token}, total token, atau akurasi. Biaya nominal juga tidak
+dihitung karena harga token input dan output berbeda menurut model dan
+penyedia. Ringkasan per subset terdapat pada
+Lampiran~\ref{tab:token-gender-ethics-ringkas}.
+
+Visualisasi rinci rata-rata, perubahan terhadap netral, dan hubungan
+token--akurasi ditempatkan sebagai materi pendukung agar bagian utama tetap
+berfokus pada keluaran ETHICS.
+
+\subsubsection{Ringkasan Akurasi dan Keputusan Domain Gender}
+\label{subsubsec:ringkasan-akurasi-gender-ethics}
+
+Empat dari 48 perbandingan akurasi antara persona laki-laki dan perempuan
+signifikan setelah koreksi Holm. Seluruhnya terdapat pada \textit{Justice},
+dengan tiga hasil lebih tinggi pada persona laki-laki dan satu pada persona
+perempuan. Perbandingan ini hanya menggunakan pasangan soal yang menghasilkan
+keputusan pada kedua skenario. \textit{Commonsense} tidak menghasilkan
+perbandingan akurasi yang signifikan pada ketiga keluarga pengujian.
+
+Pada perbandingan antarskenario, enam dari 72 hasil I--E dan dua dari 96
+hasil persona--N didukung Q Cochran serta koreksi Holm.
+Seluruhnya berupa penurunan akurasi \textit{Justice}, dengan enam hasil pada
+Qwen3 Next 80B-A3B dan dua pada Ministral 8B.
+Jumlah pasangan yang masuk ke setiap uji berbeda karena tidak semua skenario
+menghasilkan keputusan pada soal yang sama. Hasil tersebut tidak
+digeneralisasi ke respons yang berstatus \textit{abstain} atau
+\textit{missing}.
+
+Gabungan empat subset menunjukkan perubahan distribusi keputusan, bukan
+akurasi moral gabungan. Proporsi \textit{wrong} pada gabungan skenario
+implisit lebih tinggi daripada E pada Llama 3.1 8B, tetapi lebih rendah pada
+DeepSeek R1-Distill 32B untuk kedua persona. Sebanyak 76,68\% respons
+berstatus \textit{committed}, 22,65\% \textit{abstain}, dan 0,67\%
+\textit{missing}. Distribusi keputusan dan frekuensi model menghasilkan
+keputusan karena itu dipisahkan dari ketepatan terhadap label dataset.
+
+\subsubsection{Penanda Linguistik}
+\label{subsubsec:penanda-gender-ethics}
+
+Penanda linguistik ETHICS domain gender dihitung melalui notebook v1.5
+\textit{candidate} yang terpisah dari analisis akurasi. Bagian akurasi tidak
+menggunakan hasil notebook tersebut untuk menentukan benar--salah, status
+respons, atau signifikansi perbandingan akurasi. Hasil penanda linguistik tetap
+perlu dilaporkan dengan status \textit{candidate} sampai validasi manusia
+independen selesai.
+
+\input{Bab VI - ETHICS Gender Penanda Linguistik.tex}
+
+\subsubsection{Ringkasan Domain Gender}
+\label{subsubsec:ringkasan-gender-ethics}
+
+Pada GSM8K, tidak ada satu pun dari 24 perbandingan akurasi antarpersona
+laki-laki--perempuan yang signifikan setelah koreksi Holm. Pada
+\textit{Commonsense} dan \textit{Justice} ETHICS, empat dari 48 perbandingan
+akurasi pada pasangan \textit{committed} signifikan.
+Jumlah hasil signifikan tidak digunakan untuk menyimpulkan bahwa pengaruh
+persona lebih besar pada salah satu tugas karena ukuran, jumlah soal, dan
+pasangan yang dianalisis berbeda.
+
+Pengaruh persona berbeda antarmodel. Qwen3 Next 80B-A3B menghasilkan enam
+perbedaan akurasi antarskenario pada \textit{Justice}, tetapi tidak memiliki
+perbedaan akurasi laki-laki--perempuan yang signifikan.
+GPT-OSS 20B justru memiliki dua perbedaan laki-laki--perempuan.
+Jenis maupun ukuran model tidak digunakan sebagai penyebab tunggal
+perbedaan respons tersebut.
+
+% =====================================================================
+\subsection{Domain Agama}
+\label{subsec:hasil-agama-ethics}
+
+Domain agama mencakup persona Islam, Kristen, Yahudi, dan ateis. Setiap persona
+diuji dengan skenario E, I1, I2, dan I3, sedangkan N digunakan sebagai
+pembanding tanpa persona. Keempat subset memiliki jumlah soal berbeda dan
+karena itu tetap dipisahkan pada seluruh pengujian. Analisis akurasi memakai
+154.428 respons.
+
+\subsubsection{Akurasi Respons}
+\label{subsubsec:akurasi-agama-ethics}
+
+\input{Bab VI - ETHICS Religion Akurasi.tex}
+
+\subsubsection{Ringkasan Akurasi Domain Agama}
+\label{subsubsec:ringkasan-akurasi-agama-ethics}
+
+\textit{Virtue} paling sering menghasilkan perbedaan akurasi, dengan 103
+hasil antarskenario utama dan 41 hasil antarpersona agama. \textit{Justice}
+menghasilkan 93 hasil antarskenario dan 30 hasil antarpersona, sedangkan
+\textit{Commonsense} dan \textit{Deontology} masing-masing menghasilkan 83
+dan 86 hasil antarskenario. Qwen3 Next 80B-A3B paling sering berubah pada
+perbandingan antarskenario, yaitu 95 hasil. DeepSeek R1-Distill 32B paling
+banyak menghasilkan perbedaan antarpersona agama, yaitu 24 hasil.
+
+Perubahan I--E terdiri atas 88 kenaikan dan 98 penurunan, sedangkan
+perbandingan persona dengan N terdiri atas 40 kenaikan dan 139 penurunan.
+Persona Islam paling sering berada pada sisi dengan akurasi lebih tinggi dalam
+hasil antarpersona agama, yaitu 35 hasil, dan berada pada sisi lebih rendah
+pada 14 hasil. Kecenderungan ini tidak konsisten pada seluruh model, subset,
+dan skenario. Hasil tersebut juga tidak menunjukkan kemampuan moral suatu
+kelompok agama.
+
+Perubahan status respons menyertai sebagian besar hasil akurasi. Pada 359 dari
+365 hasil antarskenario utama, sisi dengan akurasi penuh lebih tinggi memiliki
+\textit{abstain} lebih rendah; 261 hasil juga memiliki akurasi
+\textit{committed} lebih tinggi. E berbeda dari I1--I3 pada 186 dari 288
+perbandingan, dengan 88 kenaikan dan 98 penurunan, sedangkan perbandingan dengan
+N lebih sering menurun. Angka analisis sebelumnya ini tidak dibandingkan
+dengan hasil gender yang sudah menggunakan akurasi pada pasangan
+\textit{committed} untuk dua subset.
+
+Pada GSM8K domain agama, empat dari 144 perbandingan antarpersona agama
+signifikan. Seluruhnya melibatkan persona Islam pada Ministral 8B atau
+Llama 3.1 8B. Perbedaan jumlah hasil signifikan antartugas tidak digunakan
+sebagai ukuran besar pengaruh persona.
+
+% =====================================================================
+\subsection{Domain Regional-Kultural}
+\label{subsec:hasil-regional-ethics}
+
+Domain regional-kultural mencakup persona Amerika Utara, Asia Timur, Asia
+Selatan, dan Afrika Sub-Sahara. Skenario E, I1, I2, dan I3 diperiksa terhadap
+N dan dibandingkan pada persona kawasan yang sama. Perbandingan antarkawasan
+menggunakan soal, model, subset, dan skenario yang berpasangan. Analisis
+akurasi memakai 154.428 respons.
+
+\subsubsection{Akurasi Respons}
+\label{subsubsec:akurasi-regional-ethics}
+
+\input{Bab VI - ETHICS Regional Akurasi.tex}
+
+\subsubsection{Ringkasan Akurasi Domain Regional-Kultural}
+\label{subsubsec:ringkasan-akurasi-regional-ethics}
+
+Pada perbandingan setiap persona dengan N, perubahan \textit{coverage}
+lebih sering muncul daripada perubahan akurasi respons yang sudah
+\textit{committed}: 178 dari 384 perbandingan \textit{coverage} signifikan
+setelah Holm, sedangkan akurasi \textit{committed} hanya sembilan dari 192
+perbandingan pada \textit{Commonsense} dan \textit{Justice}. Keberhasilan
+efektif, yang memeriksa ketepatan sekaligus ketersediaan putusan, signifikan
+pada 68 dari 192 perbandingan. Pada \textit{Deontology} dan \textit{Virtue},
+42 dari 192 perbandingan distribusi keputusan signifikan setelah Holm.
+
+Hasil tersebut berubah menurut model, persona, subset, dan skenario sehingga
+tidak membentuk urutan kawasan yang umum. Interpretasi tetap dilakukan per
+subset dan keluaran; angka tersebut tidak digunakan untuk menyatakan bahwa
+satu kawasan lebih akurat atau lebih bermoral. Rincian kombinasi model,
+persona, skenario, dan subset ditampilkan pada lampiran tanpa membentuk satu
+angka ``akurasi ETHICS gabungan''.
+
+Pada GSM8K regional-kultural, sembilan dari 72 hasil I--E didukung Q Cochran
+dan Holm serta tiga dari 144 perbandingan antarkawasan tetap signifikan.
+Perbedaan jumlah hasil signifikan antara GSM8K dan ETHICS tidak digunakan
+sebagai ukuran besar pengaruh persona karena tugas, jumlah soal, keluaran yang
+dinilai, dan keluarga perbandingannya berbeda.
+
+% =====================================================================
+\subsection{Ringkasan Status Respons dan Batas Perbandingan ETHICS Antardomain}
+\label{subsec:ringkasan-akurasi-antardomain-ethics}
+\label{acr:rq}
+
+Perbandingan proporsi hasil akurasi yang signifikan dengan domain agama belum
+dilakukan karena ukuran agama masih memakai seluruh respons pada empat subset.
+Gender dan regional-kultural sama-sama menggunakan akurasi pasangan
+\textit{committed} pada \textit{Commonsense} dan \textit{Justice}, serta
+memisahkan \textit{coverage} dan distribusi keputusan pada dua subset lain.
+Jumlah hasil signifikan keduanya tetap tidak dipakai sebagai ukuran besar
+pengaruh persona karena jumlah persona dan keluarga perbandingannya berbeda.
+Angka kecocokan label pada \textit{Deontology} dan \textit{Virtue} tidak
+digunakan untuk menyimpulkan akurasi moral terhadap tugas aslinya.
+
+Tabel~\ref{tab:ringkasan-akurasi-antardomain-ethics} membandingkan status
+respons, yang pada ketiga domain menggunakan seluruh respons sebagai
+penyebut. \textit{Committed} menunjukkan keputusan yang diperoleh aturan
+ekstraksi, sedangkan \textit{abstain} menunjukkan teks tanpa keputusan yang
+dapat digunakan. \textit{Missing} dicantumkan terpisah karena menunjukkan
+respons yang tidak tersedia, bukan keputusan moral model.
+
+\begin{table}[H]
+    \centering
+    \caption{Status respons ETHICS menurut domain (\%)}
+    \label{tab:ringkasan-akurasi-antardomain-ethics}
+    \small
+    \renewcommand{\arraystretch}{1.16}
+    \begin{tabularx}{\textwidth}{Xccc}
+        \toprule
+        \textbf{Domain} & \textbf{\textit{Committed}} &
+        \textbf{\textit{Abstain}} & \textbf{\textit{Missing}} \\
+        \midrule
+        Gender & 76,68 & 22,65 & 0,67 \\
+        Agama & 68,63 & 29,83 & 1,54 \\
+        Regional-kultural & 72,55 & 26,27 & 1,18 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Gender memiliki proporsi \textit{committed} tertinggi, yaitu 76,68\%,
+dibandingkan 72,55\% pada regional-kultural dan 68,63\% pada agama.
+Agama memiliki proporsi \textit{abstain} dan \textit{missing} tertinggi,
+masing-masing 29,83\% dan 1,54\%.
+Perbedaan tersebut menunjukkan frekuensi model menghasilkan keputusan dan
+ketersediaan respons, bukan keunggulan akurasi moral suatu domain.

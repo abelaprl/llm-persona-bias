@@ -1,0 +1,3 @@
+# ETHICS terhadap skenario netral
+
+Tiga grafik memakai susunan GSM8K Bab VI: Man/Woman × E/I1/I2/I3. Seluruh 30 marker density × 6 model × 8 persona = 1.440 baris sumber dipertahankan, tanpa sampling maupun uji baru. Tidak ada pembalikan tanda: perbandingan adalah persona − netral. Warna menunjukkan kelompok marker, bukan model. Biner tidak dicampur dengan density; profil biner tetap tersedia di notebook. Holm mengikuti keluarga sumber. Nilai NA tidak diplot, tetapi tetap ada di CSV. Batas sumbu vertikal 50 tidak mengubah p-value pada CSV. Titik dengan −log10(p Holm) di atas 50 ditempatkan pada batas atas. Status tetap candidate; bukan validasi kamus atau hasil audit manusia.
