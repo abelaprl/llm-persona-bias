@@ -1,4 +1,4 @@
-"""Quick script to generate and save 20-sample JSON file"""
+"""Generate 20 balanced SQuAD samples"""
 import json
 import random
 from collections import defaultdict
@@ -18,12 +18,9 @@ def is_list_type(answer):
 
 def get_question_type(question):
     q_lower = question.lower().split()[0].rstrip('?')
-    if q_lower in ['what', 'who', 'when', 'where', 'why', 'how']:
-        return q_lower
-    return 'other'
+    return q_lower if q_lower in ['what', 'who', 'when', 'where', 'why', 'how'] else 'other'
 
-# Load data
-with open('data/SQuAD_validation.json', 'r', encoding='utf-8') as f:
+with open('data/squad/SQuAD_validation.json', 'r', encoding='utf-8') as f:
     dataset = json.load(f)
 
 data = []
@@ -35,54 +32,41 @@ for item in dataset:
         'answer': item['answers']['text'][0] if item.get('answers', {}).get('text') else ''
     })
 
-# Pre-filter
-filtered = []
-for item in data:
-    if not item['answer'].strip():
-        continue
-    if count_words(item['answer']) < 1:
-        continue
-    if is_yes_no_question(item['question']):
-        continue
-    if count_words(item['context']) > 400:
-        continue
-    filtered.append(item)
+filtered = [item for item in data if item['answer'].strip() and count_words(item['answer']) >= 1 
+            and not is_yes_no_question(item['question']) and count_words(item['context']) <= 400]
 
-# Compute features
 for item in filtered:
     item['answer_length'] = count_words(item['answer'])
     item['is_list_type'] = is_list_type(item['answer'])
     item['question_type'] = get_question_type(item['question'])
 
-# Categorize
 pools = defaultdict(list)
 for item in filtered:
     if item['is_list_type']:
-        category = 'list'
+        cat = 'list'
     elif 1 <= item['answer_length'] <= 3:
-        category = 'short'
+        cat = 'short'
     elif 4 <= item['answer_length'] <= 10:
-        category = 'medium'
+        cat = 'medium'
     elif item['answer_length'] > 10:
-        category = 'long'
+        cat = 'long'
     else:
         continue
-    
-    item['category'] = category
-    pools[category].append(item)
+    item['category'] = cat
+    pools[cat].append(item)
 
-# Sample
 samples = []
-for category in ['short', 'medium', 'long', 'list']:
-    pool = pools[category]
+for cat in ['short', 'medium', 'long', 'list']:
+    pool = pools[cat]
     random.shuffle(pool)
     samples.extend(pool[:5])
 
 random.shuffle(samples)
 samples = samples[:20]
 
-# Save
-with open('data/SQuAD_20_samples.json', 'w', encoding='utf-8') as f:
+with open('data/squad/SQuAD_20_samples.json', 'w', encoding='utf-8') as f:
     json.dump(samples, f, indent=2, ensure_ascii=False)
 
-print(f"✓ Saved 20 samples to data/SQuAD_20_samples.json")
+cat_counts = {cat: sum(1 for s in samples if s['category'] == cat) for cat in ['short', 'medium', 'long', 'list']}
+print(f'✓ Saved 20 samples to data/squad/SQuAD_20_samples.json')
+print(f'Categories: {cat_counts}')

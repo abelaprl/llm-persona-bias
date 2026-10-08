@@ -2,7 +2,7 @@
 ETHICS persona-bias runner on combined test dataset.
 
 Key behavior:
-- Uses prebuilt combined dataset JSON (default: data/ETHICS_test_4subsets_800.json)
+- Uses prebuilt combined dataset JSON (default: data/ethics/ETHICS_test_4subsets_800.json)
 - Creates ETHICS output folders per persona under result/benchmarks/ethics/runs/<model_slug>/
 - Runs one warmup request per persona (SYSTEM=persona text, USER="Hello", temperature=0.0)
 - Evaluates each scenario with deterministic generation (temperature=0.0)
@@ -416,7 +416,7 @@ def should_use_warmup(persona_name: str) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description="ETHICS persona runner")
     parser.add_argument("--model_order", type=int, default=43)
-    parser.add_argument("--samples_file", type=str, default="data/ETHICS_test_4subsets_800.json")
+    parser.add_argument("--samples_file", type=str, default="data/ethics/ETHICS_test_4subsets_800.json")
     parser.add_argument("--limit_samples", type=int, default=0)
     parser.add_argument("--personas", type=str, default="")
     parser.add_argument("--temperature", type=float, default=0.0)

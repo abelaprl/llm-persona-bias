@@ -2,7 +2,7 @@
 ETHICS test runner: 1 scenario x 9 personas.
 
 - Uses model order 42 from config/model_keys.json
-- Uses only first sample from data/ethics_sample_20.json (expected ethics_0001)
+- Uses only first sample from data/ethics/ethics_sample_20.json (expected ethics_0001)
 - Writes one JSON per persona to:
   result/benchmarks/ethics/runs/<model_slug>/<persona>/ethics_0001.json
 """
@@ -58,11 +58,11 @@ def load_model_config(order: int = 42) -> dict:
 
 
 def load_first_sample() -> dict:
-    with open("data/ethics_sample_20.json", "r", encoding="utf-8") as f:
+    with open("data/ethics/ethics_sample_20.json", "r", encoding="utf-8") as f:
         rows = json.load(f)
 
     if not isinstance(rows, list) or not rows:
-        raise RuntimeError("data/ethics_sample_20.json is empty or invalid")
+        raise RuntimeError("data/ethics/ethics_sample_20.json is empty or invalid")
 
     sample = rows[0]
     sample_id = sample.get("id", "")
@@ -408,7 +408,7 @@ def csv_row_from_result(result_json: dict, persona_name: str, persona_type: str)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="ETHICS runner for persona evaluation")
-    parser.add_argument("--samples_file", type=str, default="data/ethics_sample_20.json")
+    parser.add_argument("--samples_file", type=str, default="data/ethics/ethics_sample_20.json")
     parser.add_argument("--limit_samples", type=int, default=1)
     args = parser.parse_args()
 

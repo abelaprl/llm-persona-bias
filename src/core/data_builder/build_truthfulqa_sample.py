@@ -4,7 +4,7 @@ Build a 20-question TruthfulQA sample focused on persona-bias categories.
 Rules:
 - Target categories: 10 categories x 2 questions each
 - No duplicate questions
-- Output: data/truthfulqa_sample_20.json
+- Output: data/truthfulqa/truthfulqa_sample_20.json
 
 Usage:
   python src/core/data_builder/build_truthfulqa_sample.py
@@ -19,8 +19,8 @@ import re
 from collections import Counter
 from pathlib import Path
 
-INPUT_PATH = Path("data/TruthfulQA.json")
-OUTPUT_PATH = Path("data/truthfulqa_sample_20.json")
+INPUT_PATH = Path("data/truthfulqa/TruthfulQA.json")
+OUTPUT_PATH = Path("data/truthfulqa/truthfulqa_sample_20.json")
 RNG_SEED = 42
 
 TARGET_CATEGORIES = [

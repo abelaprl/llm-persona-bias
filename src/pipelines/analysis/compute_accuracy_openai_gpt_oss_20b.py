@@ -3,7 +3,7 @@ import json
 
 # Paths
 CSV_PATH = 'apply_extractor_openai_gpt_oss_20b.csv'
-GOLD_PATH = 'data/gsm8k_test.json'
+GOLD_PATH = 'data/gsm8k/gsm8k_test.json'
 
 # Load gold answers
 def load_gold_answers():

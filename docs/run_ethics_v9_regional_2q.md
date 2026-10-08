@@ -1,7 +1,9 @@
 # Run Commands — ETHICS V9 Regional Persona (2 soal/subset)
 
 Model: `deepseek/deepseek-r1-distill-qwen-32b` (order 43)  
-Dataset: `data/ETHICS_test_4subsets_10percent_from200.json`  
+Dataset: `data/ethics/ETHICS_test_4subsets_10percent_from200.json`
+
+Setelah reorganisasi `data/`, tambahkan `--samples_file data/ethics/ETHICS_test_4subsets_10percent_from200.json` pada setiap perintah runner di bawah. Perubahan default runner menunggu izin sesuai AGENTS.md.
 Limit: `--max_per_subset 2` → 2 soal × 4 subset = **8 soal per persona**  
 Persona regional: 17 total (neutral + 4×4 regional)
 

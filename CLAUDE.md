@@ -16,13 +16,12 @@ D:\TugasAkhir\
 │   └── model_keys.json         # OpenRouter/OpenAI/Anthropic keys + model order
 │
 ├── data/                       # Raw benchmark datasets (77.8 MB)
-│   ├── gsm8k_test.json         # GSM8K full test split (8,819 questions)
-│   ├── gsm8k_train.json        # GSM8K training split
-│   ├── mmlu_redux.json         # MMLU Redux (1,540 questions)
-│   ├── ELI5_pair_train_5k.json # ELI5 dataset
-│   ├── ETHICS_*.json           # ETHICS benchmark (commonsense/deontology/justice/virtue/utilitarianism)
-│   ├── squad_20_*.json         # SQuAD samples
-│   └── gen_samples.py          # Script to generate dataset subsets
+│   ├── eli5/                  # Dataset dan sampel ELI5
+│   ├── ethics/                # Seluruh subset dan gabungan ETHICS
+│   ├── gsm8k/                 # GSM8K train dan test
+│   ├── mmlu_redux/            # MMLU Redux
+│   ├── squad/                 # SQuAD v1/v2, sampel, dan skrip sampling
+│   └── truthfulqa/            # TruthfulQA dan sampelnya
 │
 ├── inputs/                     # Persona definitions (JSON)
 │   ├── religion_persona.json       # Islam/Christian/Atheist/Jewish × explicit + 3 implicit variants

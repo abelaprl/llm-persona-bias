@@ -18,7 +18,7 @@ MODEL_ID = "llama-3.1-8b-instant"
 
 # Paths
 INPUT_PROMPTS_PATH = "inputs/explicits_woman_promts.json"
-GSM8K_DATA_PATH = "data/gsm8k_test.json"
+GSM8K_DATA_PATH = "data/gsm8k/gsm8k_test.json"
 # Default to the _v2 folder for improved structure
 OUTPUT_DIR = "results/groq-llama-3.1-8b-instant/woman_explicits"
 

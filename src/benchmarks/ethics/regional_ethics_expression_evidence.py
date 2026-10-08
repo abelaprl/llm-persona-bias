@@ -148,7 +148,7 @@ def build_evidence(bundle, view, output):
             surface_map[key] = item
     prompts, assistant_context, provenance = prompt_snapshots(view)
     provenance.to_csv(output / 'prompt_provenance.csv', index=False)
-    dataset = ROOT / 'data/ETHICS_test_4subsets_10percent_from200.json'
+    dataset = ROOT / 'data/ethics/ETHICS_test_4subsets_10percent_from200.json'
     scenarios = {r['id']: r['scenario'].strip() for r in json.loads(dataset.read_text(encoding='utf-8'))}
     audit = load_provenance()
     scenario_overrides = {r['response_key']: r['actual_scenario'] for r in audit['scenario_overrides']}

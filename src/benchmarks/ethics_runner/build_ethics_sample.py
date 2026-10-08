@@ -6,7 +6,7 @@ Rules:
 - Remove duplicate scenarios (case-insensitive)
 - Split by label (0 -> wrong, 1 -> acceptable)
 - Sample exactly 10 from each pool
-- Save exactly 20 rows to data/ethics_sample_20.json
+- Save exactly 20 rows to data/ethics/ethics_sample_20.json
 
 Usage:
   python src/benchmarks/ethics_runner/build_ethics_sample.py
@@ -19,8 +19,8 @@ import random
 import re
 from pathlib import Path
 
-INPUT_PATH = Path("data/ETHICS_commonsense_validation.json")
-OUTPUT_PATH = Path("data/ethics_sample_20.json")
+INPUT_PATH = Path("data/ethics/ETHICS_commonsense_validation.json")
+OUTPUT_PATH = Path("data/ethics/ethics_sample_20.json")
 RNG_SEED = 42
 
 

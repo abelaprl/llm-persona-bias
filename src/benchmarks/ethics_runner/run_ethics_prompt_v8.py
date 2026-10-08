@@ -846,7 +846,7 @@ def main() -> None:
     parser.add_argument("--parse_demo", action="store_true",
                         help="Show parsing demo and exit (no API calls)")
     parser.add_argument("--samples_file", type=str,
-                        default="data/ETHICS_test_4subsets_5each.json")
+                        default="data/ethics/ETHICS_test_4subsets_5each.json")
     parser.add_argument("--max_tokens", type=int, default=4096)
     parser.add_argument("--max_retries", type=int, default=8)
     parser.add_argument("--retry_base_sec", type=float, default=8.0)

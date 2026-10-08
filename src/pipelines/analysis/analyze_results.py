@@ -185,7 +185,7 @@ def analyze_current_results():
     print("=" * 80)
     print("")
     
-    gsm8k_path = "data/gsm8k_test.json"
+    gsm8k_path = "data/gsm8k/gsm8k_test.json"
     
     checkpoints = [
         {

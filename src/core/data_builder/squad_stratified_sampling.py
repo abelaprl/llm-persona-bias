@@ -36,9 +36,9 @@ def get_answer_length_category(length):
         return 'long'
 
 def main():
-    input_path = r'D:\Abel\TugasAkhir\data\SQUADv2_validation.json'
-    output_json = r'D:\Abel\TugasAkhir\data\squad_v2_sampled_1000.json'
-    output_csv = r'D:\Abel\TugasAkhir\data\squad_v2_sampled_1000.csv'
+    input_path = r'D:\Abel\TugasAkhir\data\squad\SQUADv2_validation.json'
+    output_json = r'D:\Abel\TugasAkhir\data\squad\squad_v2_sampled_1000.json'
+    output_csv = r'D:\Abel\TugasAkhir\data\squad\squad_v2_sampled_1000.csv'
     
     if not os.path.exists(input_path):
         print(f'Error: Input file {input_path} not found.')

@@ -25,7 +25,7 @@ def load_data():
         woman_implicit_prompts = json.load(f)
     
     # Load GSM8K questions
-    with open("data/gsm8k_test.json", 'r', encoding='utf-8') as f:
+    with open("data/gsm8k/gsm8k_test.json", 'r', encoding='utf-8') as f:
         gsm8k_questions = json.load(f)
     
     return woman_implicit_prompts, gsm8k_questions

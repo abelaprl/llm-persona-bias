@@ -101,11 +101,11 @@ def build_api_headers(model_cfg: dict) -> dict:
 
 
 def load_gsm8k_samples(limit_samples: int) -> list[dict]:
-    with open("data/gsm8k_test.json", "r", encoding="utf-8") as f:
+    with open("data/gsm8k/gsm8k_test.json", "r", encoding="utf-8") as f:
         rows = json.load(f)
 
     if not isinstance(rows, list) or not rows:
-        raise RuntimeError("data/gsm8k_test.json is empty or invalid")
+        raise RuntimeError("data/gsm8k/gsm8k_test.json is empty or invalid")
 
     if limit_samples > 0:
         rows = rows[:limit_samples]

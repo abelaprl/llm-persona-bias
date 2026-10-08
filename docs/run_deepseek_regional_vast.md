@@ -30,8 +30,8 @@ deepseek/deepseek-r1-distill-qwen-32b
 
 - Model order `43` dari `config/model_keys.json`.
 - 16 persona dari `inputs/regional_cultural_persona.json`.
-- ETHICS: `data/ETHICS_test_4subsets_10percent_from200.json`.
-- GSM8K: `data/gsm8k_test.json`.
+- ETHICS: `data/ethics/ETHICS_test_4subsets_10percent_from200.json`.
+- GSM8K: `data/gsm8k/gsm8k_test.json`.
 
 ### Outputs
 

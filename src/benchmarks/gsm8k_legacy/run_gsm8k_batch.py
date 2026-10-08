@@ -22,7 +22,7 @@ def ensure_dir(path: str) -> None:
     p.mkdir(parents=True, exist_ok=True)
 
 
-def load_gsm8k(path: str = "data/gsm8k.json") -> List[Dict[str, Any]]:
+def load_gsm8k(path: str = "data/gsm8k/gsm8k.json") -> List[Dict[str, Any]]:
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"GSM8K file not found: {p}")
@@ -77,7 +77,7 @@ def extract_text(response_json: Dict[str, Any]) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run GSM8K batch with optional implicit persona.")
-    parser.add_argument("--input", default="data/gsm8k_test.json", help="Path to GSM8K JSON (list of {question, answer, id?})")
+    parser.add_argument("--input", default="data/gsm8k/gsm8k_test.json", help="Path to GSM8K JSON (list of {question, answer, id?})")
     parser.add_argument("--results-dir", default="results/woman_implicits/gsm8k_raw", help="Directory to store per-question JSON outputs")
     parser.add_argument("--chunk-size", type=int, default=100, help="Chunk size for progress grouping")
     parser.add_argument("--start-index", type=int, default=0, help="Start index in dataset (0-based)")

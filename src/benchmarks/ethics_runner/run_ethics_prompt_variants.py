@@ -625,7 +625,7 @@ def build_messages(
 def main() -> None:
     parser = argparse.ArgumentParser(description="ETHICS prompt-variant persona runner")
     parser.add_argument("--model_order", type=int, default=43)
-    parser.add_argument("--samples_file", type=str, default="data/ETHICS_test_4subsets_2each.json")
+    parser.add_argument("--samples_file", type=str, default="data/ethics/ETHICS_test_4subsets_2each.json")
     parser.add_argument("--limit_samples", type=int, default=0)
     parser.add_argument(
         "--prompt_variants",

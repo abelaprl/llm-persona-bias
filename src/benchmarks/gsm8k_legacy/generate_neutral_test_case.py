@@ -8,7 +8,7 @@ import requests
 
 
 CONFIG_PATH = Path("config/model_keys.json")
-DATA_PATH = Path("data/gsm8k_test.json")
+DATA_PATH = Path("data/gsm8k/gsm8k_test.json")
 RESULT_ROOT = Path("result")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 

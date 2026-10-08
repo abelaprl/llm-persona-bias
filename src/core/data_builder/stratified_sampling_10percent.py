@@ -201,8 +201,8 @@ def main():
     """Main execution function."""
     
     # Define paths
-    input_path = r'D:\Abel\TugasAkhir\data\squad_v2_validation.csv'
-    output_path = r'D:\Abel\TugasAkhir\data\squad_v2_sampled_10percent.csv'
+    input_path = r'D:\Abel\TugasAkhir\data\squad\squad_v2_validation.csv'
+    output_path = r'D:\Abel\TugasAkhir\data\squad\squad_v2_sampled_10percent.csv'
     
     # Validate input file exists
     if not os.path.exists(input_path):

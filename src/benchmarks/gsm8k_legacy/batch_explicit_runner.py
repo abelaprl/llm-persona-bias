@@ -30,7 +30,7 @@ def load_model_config(order):
 
 def load_gsm8k_question(question_id):
     """Load specific GSM8K question"""
-    with open('data/gsm8k_test.json', 'r', encoding='utf-8') as f:
+    with open('data/gsm8k/gsm8k_test.json', 'r', encoding='utf-8') as f:
         dataset = json.load(f)
     
     for item in dataset:

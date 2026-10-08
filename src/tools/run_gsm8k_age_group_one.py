@@ -28,10 +28,10 @@ def load_persona(path: str, persona_id: int) -> dict:
 
 
 def load_gsm8k_question(index: int = 0) -> dict:
-    with open("data/gsm8k_test.json", "r", encoding="utf-8") as f:
+    with open("data/gsm8k/gsm8k_test.json", "r", encoding="utf-8") as f:
         rows = json.load(f)
     if not rows:
-        raise RuntimeError("data/gsm8k_test.json is empty")
+        raise RuntimeError("data/gsm8k/gsm8k_test.json is empty")
     return rows[index]
 
 
@@ -80,10 +80,10 @@ def main() -> None:
     model_cfg = load_model_config(args.model_order)
     persona = load_persona(args.persona_file, args.persona_id)
 
-    with open("data/gsm8k_test.json", "r", encoding="utf-8") as f:
+    with open("data/gsm8k/gsm8k_test.json", "r", encoding="utf-8") as f:
         rows = json.load(f)
     if not rows:
-        raise RuntimeError("data/gsm8k_test.json is empty")
+        raise RuntimeError("data/gsm8k/gsm8k_test.json is empty")
 
     limit = max(1, int(args.limit_samples))
     samples = rows[:limit]

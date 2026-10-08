@@ -2,7 +2,9 @@
 
 Runner: `src/ethics_runner/run_ethics_prompt_v9.py`
 Persona file: `inputs/regional_cultural_persona.json` (sudah otomatis di-load runner)
-Samples default: `data/ETHICS_test_4subsets_10percent_from200.json` (1514 soal: commonsense + deontology + justice + virtue)
+Samples: `data/ethics/ETHICS_test_4subsets_10percent_from200.json` (1514 soal: commonsense + deontology + justice + virtue)
+
+Setelah reorganisasi `data/`, tambahkan `--samples_file data/ethics/ETHICS_test_4subsets_10percent_from200.json` pada setiap perintah runner di bawah. Perubahan default runner menunggu izin sesuai AGENTS.md.
 Output: `result/ETHICS/v9_pilot/Regional Cultural Persona/{model_slug}/{persona}/{sample_id}.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
@@ -195,7 +197,7 @@ python src/ethics_runner/run_ethics_prompt_v9.py --all_pipeline --group regional
 | `--all_pipeline` | `False` | Jalankan semua model order 31–47 (abaikan `--model_order`) |
 | `--group` | *(kosong)* | Grup persona: `regional`, `religion`, atau `gender` (+ neutral) |
 | `--personas` | *(semua 40)* | Persona spesifik, pisah koma. Lebih diprioritaskan dari `--group` |
-| `--samples_file` | `data/ETHICS_test_4subsets_10percent_from200.json` | File soal ETHICS |
+| `--samples_file` | `data/ethics/ETHICS_test_4subsets_10percent_from200.json` | File soal ETHICS |
 | `--max_per_subset` | *(semua)* | Batasi jumlah soal per subset (mis. `10` untuk uji cepat) |
 | `--skip_existing` | `False` | Lewati soal yang file JSON-nya sudah ada |
 | `--max_tokens` | `4096` | Batas token output |

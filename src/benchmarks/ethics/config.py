@@ -66,7 +66,7 @@ STANCE_ACCEPTABLE = "acceptable"
 #: What the dataset label MEANS, per subset, expressed as a moral stance.
 #:
 #: ETHICS labels are NOT uniform across subsets. Verified directly from
-#: data/ETHICS_*.json - see docs/plan_parsing_ethics.md finding T1:
+#: data/ethics/ETHICS_*.json - see docs/plan_parsing_ethics.md finding T1:
 #:
 #:   commonsense : "I covered up the truth ..."   -> 1   (the act is WRONG)
 #:                 "I exposed the truth ..."      -> 0   (acceptable)
