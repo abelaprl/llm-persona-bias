@@ -14,8 +14,8 @@ from pathlib import Path, PurePosixPath
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT = REPO_ROOT / "dist" / "deepseek_nonregional_vast_rerun.zip"
 
-ETHICS_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
-GSM8K_ROOT = REPO_ROOT / "result" / "GMS8K"
+ETHICS_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
+GSM8K_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main"
 ETHICS_MANIFESTS = (
     (
         REPO_ROOT
@@ -144,17 +144,17 @@ def collect_files() -> tuple[dict[str, Path], dict[str, object]]:
     for relative in ethics_paths:
         include(
             ETHICS_ROOT.joinpath(*relative.parts),
-            (PurePosixPath("result/benchmarks/ethics/runs/v9_main") / relative).as_posix(),
+            (PurePosixPath("result/benchmarks/ethics/runs/main/v9") / relative).as_posix(),
         )
     for relative in WARMUP_RELATIVE_PATHS:
         include(
             ETHICS_ROOT.joinpath(*relative.parts),
-            (PurePosixPath("result/benchmarks/ethics/runs/v9_main") / relative).as_posix(),
+            (PurePosixPath("result/benchmarks/ethics/runs/main/v9") / relative).as_posix(),
         )
     for relative in gsm8k_paths:
         include(
             GSM8K_ROOT.joinpath(*relative.parts),
-            (PurePosixPath("result/benchmarks/gsm8k") / relative).as_posix(),
+            (PurePosixPath("result/benchmarks/gsm8k/runs/main") / relative).as_posix(),
         )
 
     inventory: dict[str, object] = {

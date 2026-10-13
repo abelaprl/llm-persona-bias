@@ -90,9 +90,9 @@ ETH_FILES = {
     "diversity": ETH_PRINT / "tables/diversity_summary.csv",
 }
 GSM_EXAMPLE_RAW = {
-    "N": ROOT / "result/benchmarks/gsm8k/Gender_Persona/deepseek_deepseek-r1-distill-qwen-32b/neutral/gsm8k_00001.json",
-    "E": ROOT / "result/benchmarks/gsm8k/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_explicit/gsm8k_00001.json",
-    "I1": ROOT / "result/benchmarks/gsm8k/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_implicit_1/gsm8k_00001.json",
+    "N": ROOT / "result/benchmarks/gsm8k/runs/main/Gender_Persona/deepseek_deepseek-r1-distill-qwen-32b/neutral/gsm8k_00001.json",
+    "E": ROOT / "result/benchmarks/gsm8k/runs/main/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_explicit/gsm8k_00001.json",
+    "I1": ROOT / "result/benchmarks/gsm8k/runs/main/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/islam_implicit_1/gsm8k_00001.json",
 }
 
 

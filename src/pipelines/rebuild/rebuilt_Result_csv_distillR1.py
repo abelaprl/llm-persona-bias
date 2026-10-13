@@ -217,8 +217,8 @@ NUMBER_RE = r'(?:[-\u2212\u2013]\s*)?(?:\$)?(?:\d{1,3}(?:(?:,\\!|,|\{,\}|\s)\d{3
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_root', default=r'D:\TugasAkhir\result/benchmarks/gsm8k\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b')
-    parser.add_argument('--report_dir', default=r'D:\TugasAkhir\result/benchmarks/gsm8k\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b')
+    parser.add_argument('--input_root', default=r'D:\TugasAkhir\result/benchmarks/gsm8k\runs\main\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b')
+    parser.add_argument('--report_dir', default=r'D:\TugasAkhir\result/benchmarks/gsm8k\runs\main\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b')
     parser.add_argument('--include_personas', default=None)
     parser.add_argument('--exclude_dirs', default='warmup')
     parser.add_argument('--test', action='store_true', help='Run unit tests and exit')

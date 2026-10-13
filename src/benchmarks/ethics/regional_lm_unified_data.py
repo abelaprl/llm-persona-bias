@@ -430,10 +430,10 @@ def _ethics_example_rows() -> pd.DataFrame:
     paths = []
     for row in rows.itertuples(index=False):
         if row.persona == "neutral":
-            path = (ROOT / "result/benchmarks/ethics/runs/v9_main/Neutral Persona"
+            path = (ROOT / "result/benchmarks/ethics/runs/main/v9/Neutral Persona"
                     / row.model_id / row.file)
         else:
-            path = (ROOT / "result/benchmarks/ethics/runs/v9_main/Regional Cultural Persona"
+            path = (ROOT / "result/benchmarks/ethics/runs/main/v9/Regional Cultural Persona"
                     / row.model_id / row.persona / row.file)
         paths.append(str(path))
     rows["source_path"] = paths

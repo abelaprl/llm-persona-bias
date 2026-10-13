@@ -16,8 +16,8 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODEL_ID = "qwen/qwen3-next-80b-a3b-thinking"
 MODEL_SLUG = "qwen_qwen3-next-80b-a3b-thinking"
-ETHICS_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
-GSM8K_ROOT = REPO_ROOT / "result" / "GMS8K"
+ETHICS_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
+GSM8K_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main"
 OUTPUT_DIR = (
     REPO_ROOT / "result" / "rerun_manifests" / "qwen3_next_80b_nonregional"
 )

@@ -25,7 +25,7 @@ sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, str(Path("src/pipelines/rebuild").resolve()))
 from rebuild_ethics_csv_reparse import build_row  # noqa: E402
 
-BASE = Path("result/benchmarks/ethics/runs/v9_pilot")
+BASE = Path("result/benchmarks/ethics/runs/pilot/v9")
 OUT_BASE = Path("result/archive/reports_mixed_legacy/v9_pilot")
 GROUP_FOLDER = {"gender": "Gender Persona", "neutral": "Neutral Persona", "religion": "Religion Persona"}
 

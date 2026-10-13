@@ -71,7 +71,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--persona_file", type=str, default="inputs/age_group_persona.json")
     parser.add_argument("--persona_id", type=int, default=1)
     parser.add_argument("--limit_samples", type=int, default=1)
-    parser.add_argument("--output_root", type=str, default="result/benchmarks/gsm8k/Age_Group_Persona")
+    parser.add_argument(
+        "--output_root",
+        type=str,
+        default="result/benchmarks/gsm8k/runs/main/Age_Group_Persona",
+    )
     return parser.parse_args()
 
 

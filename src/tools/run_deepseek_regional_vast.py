@@ -2,8 +2,8 @@
 
 The output locations are intentionally fixed to the project's canonical trees:
 
-* result/benchmarks/ethics/runs/v9_main/Regional Cultural Persona/...
-* result/benchmarks/gsm8k/regional_cultural_persona/...
+* result/benchmarks/ethics/runs/main/v9/Regional Cultural Persona/...
+* result/benchmarks/gsm8k/runs/main/regional_cultural_persona/...
 
 Use ``--mode plan`` before renting, then progress through ``preflight``,
 ``smoke``, and ``pilot`` before starting a confirmed ``full`` run.
@@ -28,9 +28,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 MODEL_ID = "deepseek/deepseek-r1-distill-qwen-32b"
 MODEL_SLUG = MODEL_ID.replace("/", "_")
 
-ETHICS_OUTPUT_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
+ETHICS_OUTPUT_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
 ETHICS_MODEL_ROOT = ETHICS_OUTPUT_ROOT / "Regional Cultural Persona" / MODEL_SLUG
-GSM8K_OUTPUT_ROOT = REPO_ROOT / "result" / "GMS8K" / "regional_cultural_persona"
+GSM8K_OUTPUT_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main" / "regional_cultural_persona"
 GSM8K_MODEL_ROOT = GSM8K_OUTPUT_ROOT / MODEL_SLUG
 
 REGIONAL_PERSONAS = [

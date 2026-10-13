@@ -16,20 +16,26 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
-#: Root of the authoritative v9 result tree. The folder name contains spaces
-#: and brackets on purpose - it is the directory the experiments actually wrote
-#: to. Do not "clean up" this name without migrating the data.
-RESULT_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
+#: Root of the authoritative v9 result tree.
+RESULT_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
 
 #: Intermediate per-persona parse cache (one JSON object per line).
-PARSE_CACHE_ROOT = REPO_ROOT / "result" / "parsing" / "v9_main"
+PARSE_CACHE_ROOT = (
+    REPO_ROOT
+    / "result"
+    / "benchmarks"
+    / "ethics"
+    / "parsed"
+    / "legacy_parsing"
+    / "v9_main"
+)
 
 #: Final CSV reports. Deliberately a NEW path: the old reports under
 #: result/archive/reports_mixed_legacy/v9_pilot/ must stay intact for comparison (AGENT.md 2.7).
-REPORT_ROOT = REPO_ROOT / "result" / "reports" / "v9_main"
+REPORT_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "reports" / "v9_main"
 
 #: Benchmark items with their reference labels.
-SAMPLES_FILE = REPO_ROOT / "data" / "ETHICS_test_4subsets_10percent_from200.json"
+SAMPLES_FILE = REPO_ROOT / "data" / "ethics" / "ETHICS_test_4subsets_10percent_from200.json"
 
 
 # --------------------------------------------------------------------------

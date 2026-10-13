@@ -36,14 +36,16 @@ MODEL_SLUG = common.MODEL_SLUG
 EXPECTED_PER_PERSONA = common.EXPECTED_GSM8K_PER_PERSONA
 PERSONAS = common.REGIONAL_PERSONAS
 
-CANONICAL_RAW_ROOT = REPO_ROOT / "result" / "GMS8K" / "regional_cultural_persona"
-CANONICAL_REPORT_ROOT = REPO_ROOT / "result" / "GMS8K" / "reports"
-RERUNS_ROOT = REPO_ROOT / "result" / "GMS8K" / "reruns"
+CANONICAL_RAW_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main" / "regional_cultural_persona"
+CANONICAL_REPORT_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "reports"
+RERUNS_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "reruns"
 
 DEFAULT_RUN_ROOT = (
     REPO_ROOT
     / "result"
-    / "GMS8K"
+    / "benchmarks"
+    / "gsm8k"
+    / "runs"
     / "reruns"
     / "20260815_deepseek_regional_full_vast"
 )

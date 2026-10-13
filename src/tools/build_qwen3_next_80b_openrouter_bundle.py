@@ -25,8 +25,8 @@ MANIFESTS = (
     MANIFEST_ROOT / "qwen_nonregional_infra_all.csv",
 )
 COMBINED_MANIFEST = MANIFESTS[-1]
-ETHICS_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
-GSM8K_ROOT = REPO_ROOT / "result" / "GMS8K"
+ETHICS_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
+GSM8K_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main"
 STATIC_FILES = (
     REPO_ROOT / "src" / "tools" / "rerun_qwen3_next_80b_openrouter.py",
     REPO_ROOT / "src" / "tools" / "rerun_qwen3_next_80b_nonregional_openrouter.py",
@@ -126,9 +126,9 @@ def collect_files() -> tuple[dict[str, Path], dict[str, Any]]:
             )
         root = ETHICS_ROOT if dataset == "ETHICS" else GSM8K_ROOT
         archive_root = (
-            PurePosixPath("result/benchmarks/ethics/runs/v9_main")
+            PurePosixPath("result/benchmarks/ethics/runs/main/v9")
             if dataset == "ETHICS"
-            else PurePosixPath("result/benchmarks/gsm8k")
+            else PurePosixPath("result/benchmarks/gsm8k/runs/main")
         )
         target = root.joinpath(*relative.parts)
         if target.is_file():
@@ -146,9 +146,9 @@ def collect_files() -> tuple[dict[str, Path], dict[str, Any]]:
     for dataset, relative in recovery_sources:
         root = ETHICS_ROOT if dataset == "ETHICS" else GSM8K_ROOT
         archive_root = (
-            PurePosixPath("result/benchmarks/ethics/runs/v9_main")
+            PurePosixPath("result/benchmarks/ethics/runs/main/v9")
             if dataset == "ETHICS"
-            else PurePosixPath("result/benchmarks/gsm8k")
+            else PurePosixPath("result/benchmarks/gsm8k/runs/main")
         )
         include(root.joinpath(*relative.parts), (archive_root / relative).as_posix())
 

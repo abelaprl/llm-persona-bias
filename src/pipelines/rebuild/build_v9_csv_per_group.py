@@ -1,7 +1,7 @@
 """Build one CSV per (model, persona-group) from the v9_pilot result tree (Path B).
 
 Layout read:
-    result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/<persona>/*.json
+    result/benchmarks/ethics/runs/pilot/v9/<Group Persona>/<model_slug>/<persona>/*.json
 
 Output per model+group:
     result/benchmarks/ethics/runs/<model_slug>/result_ethics_v9_<group>_<model_slug>.csv
@@ -40,7 +40,7 @@ sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rebuild_ethics_csv_reparse import build_row, CSV_FIELDNAMES, RESULT_ROOT  # noqa: E402
 
-BASE = Path("result/benchmarks/ethics/runs/v9_pilot")
+BASE = Path("result/benchmarks/ethics/runs/pilot/v9")
 GROUP_SLUG = {
     "Gender Persona": "gender",
     "Neutral Persona": "neutral",

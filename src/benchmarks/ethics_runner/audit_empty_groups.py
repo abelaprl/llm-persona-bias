@@ -9,7 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 
-RESULT_ROOT = Path("result/benchmarks/ethics/runs/v9_pilot")
+RESULT_ROOT = Path("result/benchmarks/ethics/runs/pilot/v9")
 REPORT_ROOT = Path("result/archive/reports_mixed_legacy/v9_pilot")
 
 

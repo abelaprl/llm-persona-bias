@@ -194,7 +194,7 @@ errors = [
 ]
 
 # Base path for results
-BASE_PATH = Path(r"E:\Tugas Akhir\TugasAkhir\result/benchmarks/gsm8k\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b")
+BASE_PATH = Path(r"result/benchmarks/gsm8k\runs\main\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b")
 
 # Collect analysis results
 analysis_by_pattern = defaultdict(list)

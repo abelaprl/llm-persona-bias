@@ -23,7 +23,7 @@ RULE_PACK_BY_MODEL = {
     'qwen_qwen3-next-80b-a3b-thinking': 'rules_qwen3_next_80b',
 }
 
-DEFAULT_INPUT = r'result/benchmarks/gsm8k\Religion_Persona'
+DEFAULT_INPUT = r'result/benchmarks/gsm8k\runs\main\Religion_Persona'
 DEFAULT_OUT = r'result/benchmarks/gsm8k\reports_parser_v2'
 
 

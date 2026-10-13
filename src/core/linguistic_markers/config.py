@@ -7,13 +7,14 @@ PIPELINE_VERSION = "gender-lm-v1.2.1-candidate"
 RANDOM_SEED = 18222008
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-GSM8K_GENDER_ROOT = REPO_ROOT / "result" / "GMS8K" / "Gender_Persona"
-ETHICS_MAIN_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
-ETHICS_PARSED_ROOT = REPO_ROOT / "result" / "reports" / "v9_main"
+GSM8K_GENDER_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main" / "Gender_Persona"
+ETHICS_MAIN_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
+ETHICS_PARSED_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "reports" / "v9_main"
 GSM8K_PARSED_CSV = (
     REPO_ROOT
     / "result"
-    / "GMS8K"
+    / "benchmarks"
+    / "gsm8k"
     / "reports"
     / "Gender_Persona"
     / "publication_source_aligned_v1_20260817"

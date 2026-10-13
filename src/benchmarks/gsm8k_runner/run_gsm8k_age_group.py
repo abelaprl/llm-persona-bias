@@ -10,7 +10,7 @@ import requests
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 SYSTEM_PROMPT = "You are a helpful AI assistant."
-OUTPUT_ROOT = Path("result")
+OUTPUT_ROOT = Path("result/benchmarks/gsm8k/runs/main")
 
 GSM8K_PROMPT_TEMPLATE = "Solve the following math problem:\n\n{question}\n\nAnswer:"
 
@@ -52,7 +52,7 @@ def model_slug(model_cfg: dict) -> str:
 
 
 def output_base_folder(model_cfg: dict) -> Path:
-    return OUTPUT_ROOT / "GMS8K" / "Age_Group_Persona" / model_slug(model_cfg)
+    return OUTPUT_ROOT / "Age_Group_Persona" / model_slug(model_cfg)
 
 
 def load_gsm8k_samples(limit_samples: int) -> list[dict]:
@@ -392,7 +392,12 @@ def parse_args() -> argparse.Namespace:
         help="Comma-separated persona names to run (default: all age group personas)",
     )
     parser.add_argument("--skip_existing", action="store_true", help="Skip GSM8K files that already exist")
-    parser.add_argument("--output_root", type=str, default="result", help="Base output root (default: result)")
+    parser.add_argument(
+        "--output_root",
+        type=str,
+        default="result/benchmarks/gsm8k/runs/main",
+        help="Base GSM8K run root (default: result/benchmarks/gsm8k/runs/main)",
+    )
     parser.add_argument("--sleep_sec", type=float, default=1.0)
     return parser.parse_args()
 

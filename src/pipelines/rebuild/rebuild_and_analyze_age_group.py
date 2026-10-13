@@ -57,7 +57,7 @@ def rebuild_csv_for_model(model_order):
         print(f"❌ Model {model_order} not found")
         return None
 
-    results_root = Path("result/benchmarks/gsm8k/Age_Group_Persona") / model_info["folder"]
+    results_root = Path("result/benchmarks/gsm8k/runs/main/Age_Group_Persona") / model_info["folder"]
     report_dir = Path("result/archive/reports_mixed_legacy") / model_info["folder"]
 
     if not results_root.exists():

@@ -1,7 +1,7 @@
 """Unit tests built from REAL responses in the v9 result tree.
 
 Every case is quoted from docs/gender_persona_extraction_audit_for_claude.md
-or from a file under result/benchmarks/ethics/runs/v9_main/. No invented text -
+or from a file under result/benchmarks/ethics/runs/main/v9/. No invented text -
 a rule that only passes on hypothetical input proves nothing.
 
 Run (from D:\\TugasAkhir):

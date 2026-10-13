@@ -82,12 +82,12 @@ DEFAULT_EXTRA_MANIFEST = (
     / "ethics_v9"
     / "deepseek_non_http_local_connection.csv"
 )
-DEFAULT_OUTPUT_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
 DEFAULT_BACKUP_ROOT = (
-    REPO_ROOT / "result" / "ETHICS" / "_rerun_backup" / "v9_http_errors_deepseek"
+    REPO_ROOT / "result" / "benchmarks" / "ethics" / "archive" / "rerun_backup" / "v9_http_errors_deepseek"
 )
 DEFAULT_ATTEMPT_ROOT = (
-    REPO_ROOT / "result" / "ETHICS" / "_rerun_attempts" / "v9_http_errors_deepseek"
+    REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "reruns" / "v9_http_errors_deepseek"
 )
 REQUIRED_COLUMNS = {
     "model_slug",

@@ -132,7 +132,7 @@ if __name__ == '__main__':
     ap.add_argument('--v2', action='store_true')
     ap.add_argument('--v3', action='store_true')
     ap.add_argument('--limit', type=int, default=200)
-    ap.add_argument('--input_root', default=r'result/benchmarks/gsm8k\Religion_Persona')
+    ap.add_argument('--input_root', default=r'result/benchmarks/gsm8k\runs\main\Religion_Persona')
     ap.add_argument('--out_root', default=r'result/benchmarks/gsm8k\reports')
     args = ap.parse_args()
 

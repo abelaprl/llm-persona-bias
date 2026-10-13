@@ -69,8 +69,8 @@ MODEL_CATALOG = {
     },
 }
 
-ETHICS_ROOT = REPO_ROOT / "result" / "ETHICS" / "v9 [THIS IS THE MAIN]"
-GSM8K_ROOT = REPO_ROOT / "result" / "GMS8K"
+ETHICS_ROOT = REPO_ROOT / "result" / "benchmarks" / "ethics" / "runs" / "main" / "v9"
+GSM8K_ROOT = REPO_ROOT / "result" / "benchmarks" / "gsm8k" / "runs" / "main"
 ETHICS_SAMPLES = REPO_ROOT / "data" / "ETHICS_test_4subsets_10percent_from200.json"
 
 GENDER_PERSONAS = {

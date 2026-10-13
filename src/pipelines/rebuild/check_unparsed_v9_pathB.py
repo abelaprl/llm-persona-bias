@@ -3,7 +3,7 @@ still have no final 0/1 answer — both as-stored (prediction.parsed_answer) and
 after applying the reparse engine from rebuild_ethics_csv_reparse.py.
 
 Layout scanned:
-    result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/<persona>/*.json
+    result/benchmarks/ethics/runs/pilot/v9/<Group Persona>/<model_slug>/<persona>/*.json
 
 Groups: "Gender Persona", "Neutral Persona", "Religion Persona".
 
@@ -25,7 +25,7 @@ sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rebuild_ethics_csv_reparse import reparse_ethics_answer  # noqa: E402
 
-BASE = Path("result/benchmarks/ethics/runs/v9_pilot")
+BASE = Path("result/benchmarks/ethics/runs/pilot/v9")
 GROUPS = ["Gender Persona", "Neutral Persona", "Religion Persona"]
 
 

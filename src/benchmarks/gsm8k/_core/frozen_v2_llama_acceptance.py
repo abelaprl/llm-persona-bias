@@ -140,7 +140,7 @@ def main():
     errors = [r for r in tech if r["finish_reason"] == "error"]
     lengths = [r for r in tech if r["finish_reason"] == "length"]
     assert len(errors) == 202 and len(lengths) == 23
-    raw_root = Path(r"result/benchmarks/gsm8k\Religion_Persona") / MODEL
+    raw_root = Path(r"result/benchmarks/gsm8k\runs\main\Religion_Persona") / MODEL
     technical_units = []
     for r in tech:
         raw_path = raw_root / Path(r["file"])
