@@ -1,19 +1,11 @@
-"""Build Gender-style accuracy and status visualizations for ETHICS domains.
+"""Legacy ETHICS parity generator.
 
-The figures are derived from the validated response tables. Commonsense and
-Justice are the only subsets used for accuracy outcomes. Deontology and
-Virtue are shown as answer/stance distributions and stance-wrong effects;
-they are never treated as moral ground-truth accuracy.
-
-The script writes new domain-specific files and refuses to overwrite an
-existing file unless --overwrite is supplied explicitly. It does not call an
-API, parse model responses, or use ground truth in an extraction rule.
-
-Run from the repository root:
-
-    python src/benchmarks/ethics/build_ethics_domain_accuracy_parity_v1.py --domain religion
-    python src/benchmarks/ethics/build_ethics_domain_accuracy_parity_v1.py --domain regional
-    python src/benchmarks/ethics/build_ethics_domain_accuracy_parity_v1.py --domain all
+The active two-metric outputs are built by
+``build_two_metrics_all_subsets.py``. That generator writes, for every domain
+and all four subsets, accuracy_full (n_correct / total) and
+prop_wrong_committed (n_answer_wrong / committed). This older generator is
+kept for reproducing historical component figures and is not the source for
+the active two-metric figure.
 """
 
 from __future__ import annotations
