@@ -94,8 +94,8 @@ apa saja yang menyala. Aturan yang tidak bisa ditelusuri tidak boleh dipakai.
 
 ### 2.7 Jangan menimpa hasil lama
 
-Output baru ditulis ke path baru. Report lama (`result/reports/v9_pilot/…`,
-`result/ETHICS/<model>/result_ethics_v9_*.csv`) dibiarkan utuh sampai hasil
+Output baru ditulis ke path baru. Report lama (`result/archive/reports_mixed_legacy/v9_pilot/…`,
+`result/benchmarks/ethics/runs/<model>/result_ethics_v9_*.csv`) dibiarkan utuh sampai hasil
 baru divalidasi. Perbandingan lama vs baru adalah bagian dari validasi.
 
 ### 2.8 Polaritas label per subset
@@ -171,7 +171,7 @@ temuan berubah, itu masuk tesis.
 ### Boleh dikerjakan agen
 
 - Membaca seluruh isi `result/`, `data/`, `src/`, `docs/`.
-- Menulis kode baru di `src/MAIN_PARSING/ETHICS/`.
+- Menulis kode baru di `src/benchmarks/ethics/`.
 - Menulis output baru di path baru di bawah `result/`.
 - Menulis dokumen analisis baru di `docs/`.
 
@@ -179,7 +179,7 @@ temuan berubah, itu masuk tesis.
 
 - Menghapus atau menimpa file apa pun di `result/`.
 - Menjalankan API call berbayar (rerun `missing`, rerun subset).
-- Mengubah runner yang sudah menghasilkan data (`src/ethics_runner/run_ethics_prompt_v9.py`).
+- Mengubah runner yang sudah menghasilkan data (`src/benchmarks/ethics_runner/run_ethics_prompt_v9.py`).
 - Mengubah definisi persona di `inputs/`.
 - Mengubah isi `data/ETHICS_*.json`.
 
@@ -237,7 +237,7 @@ divalidasi. Aturan yang mengikat:
 
 Sebuah pekerjaan parsing dianggap selesai hanya jika seluruhnya terpenuhi:
 
-- [ ] Kode ada di `src/MAIN_PARSING/ETHICS/` dan bisa dijalankan ulang dari nol dengan satu perintah.
+- [ ] Kode ada di `src/benchmarks/ethics/` dan bisa dijalankan ulang dari nol dengan satu perintah.
 - [ ] Setiap aturan punya catatan audit: jumlah hit, jumlah sampel diperiksa, jumlah false positive.
 - [ ] Output CSV memuat seluruh kolom provenance pada §3 `docs/plan_parsing_ethics.md`.
 - [ ] Uji independensi kegagalan ekstraksi terhadap persona sudah dijalankan dan hasilnya dilaporkan.

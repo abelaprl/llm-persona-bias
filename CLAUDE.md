@@ -35,23 +35,22 @@ D:\TugasAkhir\
 │   └── instruction.md          # Spec-driven methodology for Claude Code
 │
 ├── src/                        # All source code
-│   ├── runners/                # Generic batch runners (OpenRouter API)
-│   ├── ethics_runner/          # ETHICS benchmark runners
-│   ├── gsm8k_runner/           # GSM8K runners (gender, age, religion personas)
-│   ├── eli5_runner/            # ELI5 runners
-│   ├── squad_runner/           # SQuAD v1/v2 runners
-│   ├── truthfulqa_runner/      # TruthfulQA runners
-│   ├── analysis/               # Accuracy calculation, error analysis, reporting
-│   ├── extract/                # Answer extraction from free-form LLM responses
-│   ├── parse/                  # Result parsing and checkpoint monitoring
-│   ├── rebuild/                # Per-model CSV reconstruction from JSON results
-│   ├── reports/                # CSV/Excel aggregation scripts
-│   ├── notebook/               # Jupyter notebooks for analysis and visualization
-│   ├── data_builder/           # Stratified sampling and dataset preparation
-│   ├── debug/                  # Debugging utilities for extraction issues
-│   ├── inspect/                # Result inspection and audit tools
-│   ├── test/                   # Unit tests for extraction logic
-│   └── rerun/                  # Re-execution handlers for failed runs
+│   ├── benchmarks/             # Benchmark-specific generation and parsing
+│   │   ├── ethics/             # ETHICS parsing, audits, and marker analyses
+│   │   ├── ethics_runner/      # ETHICS generation runners
+│   │   ├── gsm8k/              # GSM8K parsing and persona modules
+│   │   ├── gsm8k_runner/       # GSM8K generation runners
+│   │   └── gsm8k_legacy/       # Retained one-off GSM8K runners
+│   ├── core/                   # Reusable data and extraction components
+│   │   ├── data_builder/       # Dataset construction utilities
+│   │   ├── extract/            # Legacy and experimental extractors
+│   │   └── linguistic_markers/ # Marker registry, extraction, and statistics
+│   └── pipelines/              # Rebuilding, analysis, and reporting
+│       ├── analysis/           # Accuracy calculation and visualization
+│       ├── rebuild/            # Per-model CSV reconstruction
+│       └── reports/            # Report aggregation scripts
+├── notebooks/                  # Active notebooks and presentation assets
+├── archive/                    # Moved legacy notebooks and past experiments
 │
 ├── result/                     # All experimental outputs (main output directory)
 │   ├── ETHICS/                 # Ethics benchmark results
@@ -131,7 +130,7 @@ Age-group personas defined in `inputs/age_group_persona.json`.
 Results are organized hierarchically: **Benchmark → Model → Persona**
 
 ```
-result/ETHICS/
+result/benchmarks/ethics/runs/
 └── google_gemini-2.5-flash/
     ├── result_ethics_google_gemini-2.5-flash.csv   # All personas aggregated
     ├── reports_accuracy_google_gemini-2.5-flash.csv # Accuracy summary
@@ -236,14 +235,14 @@ Each individual question result is saved as a JSON file:
 
 | Script | Location | Purpose |
 |---|---|---|
-| Main ETHICS runner | `src/ethics_runner/run_ethics_5subsets_persona.py` | Run all 5 ETHICS subsets × all personas |
-| ETHICS age group | `src/ethics_runner/run_ethics_age_group.py` | Age persona variant |
-| GSM8K gender runner | `src/gsm8k_runner/run_gsm8k_9_personas.py` | 9-persona gender experiment |
-| GSM8K age runner | `src/gsm8k_runner/run_gsm8k_age_group.py` | Age group variant |
-| Answer extractor | `src/extract/extractor34.py` | Parse answers from raw LLM responses |
-| CSV rebuilder | `src/extract/rebuild_results_csv_root.py` | Rebuild CSV from JSON results |
-| Accuracy calculator | `src/analysis/calc_accuracy.py` | Compute per-persona accuracy |
-| Report generator | `src/reports/generate_results_csv.py` | Aggregate to Excel/CSV |
+| Main ETHICS runner | `src/benchmarks/ethics_runner/run_ethics_5subsets_persona.py` | Run all 5 ETHICS subsets × all personas |
+| ETHICS age group | `src/benchmarks/ethics_runner/run_ethics_age_group.py` | Age persona variant |
+| GSM8K gender runner | `src/benchmarks/gsm8k_runner/run_gsm8k_9_personas.py` | 9-persona gender experiment |
+| GSM8K age runner | `src/benchmarks/gsm8k_runner/run_gsm8k_age_group.py` | Age group variant |
+| Answer extractor | `src/core/extract/extractor34.py` | Parse answers from raw LLM responses |
+| CSV rebuilder | `src/core/extract/rebuild_results_csv_root.py` | Rebuild CSV from JSON results |
+| Accuracy calculator | `src/pipelines/analysis/calc_accuracy.py` | Compute per-persona accuracy |
+| Report generator | `src/pipelines/reports/generate_results_csv.py` | Aggregate to Excel/CSV |
 | CoT analysis | `src/notebook/CoT_linguistic_marker_GSM8K.ipynb` | Linguistic marker analysis |
 
 ---
@@ -272,10 +271,10 @@ Each individual question result is saved as a JSON file:
 
 1. Add model to `config/model_keys.json`
 2. Add persona to the relevant file in `inputs/`
-3. Run the appropriate runner script in `src/ethics_runner/` or `src/gsm8k_runner/`
+3. Run the appropriate runner script in `src/benchmarks/ethics_runner/` or `src/benchmarks/gsm8k_runner/`
 4. Results auto-save to `result/{BENCHMARK}/{model_slug}/{persona}/`
-5. Run `src/extract/rebuild_results_csv_root.py` to regenerate the aggregated CSV
-6. Run `src/reports/generate_results_csv.py` to update the master Excel report
+5. Run `src/core/extract/rebuild_results_csv_root.py` to regenerate the aggregated CSV
+6. Run `src/pipelines/reports/generate_results_csv.py` to update the master Excel report
 
 ---
 

@@ -3,7 +3,7 @@
 **Status**: terimplementasi; menunggu audit manual per aturan dan review kode.
 **Tanggal**: 2026-08-13
 **Lingkup dokumen ini**: penilaian benar/salah jawaban ETHICS saja. *Linguistic marker* dibahas terpisah setelah tahap ini selesai.
-**Kode**: `src/MAIN_PARSING/ETHICS/`
+**Kode**: `src/benchmarks/ethics/`
 **Aturan kerja mengikat**: `AGENT.md` (akar repo).
 
 ---
@@ -47,7 +47,7 @@ yang:
 
 1. Mengekstrak sikap moral model dari respons bebas, dengan provenance penuh.
 2. Membandingkannya dengan label acuan menggunakan pemetaan yang benar per subset.
-3. Menghasilkan CSV per model per kelompok persona, mengikuti bentuk yang sudah ada di `result/reports/v9_pilot/`.
+3. Menghasilkan CSV per model per kelompok persona, mengikuti bentuk yang sudah ada di `result/archive/reports_mixed_legacy/v9_pilot/`.
 4. Mengurangi kebutuhan pemeriksaan manual per jawaban, tanpa menyembunyikan kasus yang memang tidak bisa diputuskan.
 
 Poin 4 perlu dijelaskan supaya tidak salah harap: tujuannya **bukan** membuat
@@ -59,9 +59,9 @@ sampel audit per aturan, bukan pada setiap jawaban salah.
 
 | Sumber | Isi | Jumlah |
 |---|---|---|
-| `result/ETHICS/v9 [THIS IS THE MAIN]/<Group>/<model>/<persona>/*.json` | respons per soal | 372.624 file total; **Gender Persona 72.672** |
+| `result/benchmarks/ethics/runs/v9_main/<Group>/<model>/<persona>/*.json` | respons per soal | 372.624 file total; **Gender Persona 72.672** |
 | `data/ETHICS_test_4subsets_10percent_from200.json` | 1.514 soal + label + kolom `excuse` | 1.514 |
-| `src/ethics_runner/run_ethics_prompt_v9.py` | definisi prompt & parser lama | — |
+| `src/benchmarks/ethics_runner/run_ethics_prompt_v9.py` | definisi prompt & parser lama | — |
 | `docs/gender_persona_extraction_audit_for_claude.md` | katalog pola respons hasil audit sebelumnya | — |
 | `docs/gender_persona_extraction_claude_recommendations.md` | keputusan desain yang sudah disepakati | — |
 | `docs/ethics_v9_parse_failure_analysis.md` | analisis kegagalan parse DeepSeek | — |
@@ -76,16 +76,16 @@ Empat kelompok persona: Gender (8 persona), Religion (16), Regional Cultural (16
 
 | Artefak | Lokasi | Bentuk |
 |---|---|---|
-| Cache parsing per persona | `result/parsing/v9_main/<Group>/<model>/<persona>.jsonl` | satu baris JSON per soal (hasil antara) |
-| **CSV utama — 1 file per model** | `result/reports/v9_main/<group>/<model>/results_<group>_<model>.csv` | seluruh persona pada kelompok itu disatukan; Gender = 8 × 1.514 = **12.112 baris** |
-| Ringkasan akurasi | `result/reports/v9_main/<group>/<model>/summary_<group>_<model>.csv` | satu baris per (persona × subset) |
-| Ringkasan lintas model | `result/reports/v9_main/summary_all_models.csv` | gabungan seluruh model |
+| Cache parsing per persona | `result/benchmarks/ethics/parsed/legacy_parsing/v9_main/<Group>/<model>/<persona>.jsonl` | satu baris JSON per soal (hasil antara) |
+| **CSV utama — 1 file per model** | `result/archive/reports_mixed_legacy/v9_main/<group>/<model>/results_<group>_<model>.csv` | seluruh persona pada kelompok itu disatukan; Gender = 8 × 1.514 = **12.112 baris** |
+| Ringkasan akurasi | `result/archive/reports_mixed_legacy/v9_main/<group>/<model>/summary_<group>_<model>.csv` | satu baris per (persona × subset) |
+| Ringkasan lintas model | `result/archive/reports_mixed_legacy/v9_main/summary_all_models.csv` | gabungan seluruh model |
 | Catatan audit per aturan | `docs/audit_parsing_ethics_rules.md` | jumlah hit, sampel diperiksa, false positive |
 
 Urutan eksekusi mengikuti permintaan pengguna: **proses per folder persona dulu**
 (menghasilkan `.jsonl` per persona), lalu **disatukan menjadi satu CSV per
 model** setelah seluruh persona pada model itu selesai. Bentuk dan nama kolom
-mengikuti `result/reports/v9_pilot/` yang sudah ada, ditambah kolom provenance.
+mengikuti `result/archive/reports_mixed_legacy/v9_pilot/` yang sudah ada, ditambah kolom provenance.
 
 Kelompok yang dikerjakan pertama: **Gender Persona**. Setelah keempat kelompok
 selesai, tersedia opsi menggabungkan menjadi satu CSV per model berisi seluruh
@@ -410,7 +410,7 @@ Bagian ini mengikuti keputusan K1–K6 pada FASE 3.
 ### 4.1 Struktur folder kode
 
 ```
-src/MAIN_PARSING/ETHICS/
+src/benchmarks/ethics/
 ├── README.md                  # cara pakai + ringkasan aturan
 ├── config.py                  # path, daftar model, daftar persona, pemetaan subset
 ├── normalize.py               # Tahap 0: pembersihan teks
@@ -506,7 +506,7 @@ Aturan tambahan:
 
 ### 4.5 Skema kolom keluaran
 
-Kolom yang sudah ada di `result/reports/v9_pilot/` dipertahankan supaya notebook
+Kolom yang sudah ada di `result/archive/reports_mixed_legacy/v9_pilot/` dipertahankan supaya notebook
 lama tetap jalan:
 
 `model`, `persona_folder`, `file`, `question_id`, `dataset`, `ground_truth`,
@@ -586,7 +586,7 @@ Satu false positive → perbaiki aturan, sampel ulang dari nol.
 
 ### 5.2 Uji regresi terhadap report lama
 
-Bandingkan hasil baru dengan `result/reports/v9_pilot/gender/`:
+Bandingkan hasil baru dengan `result/archive/reports_mixed_legacy/v9_pilot/gender/`:
 
 - Berapa baris berubah dari `abstain` → `committed`? Sampel 50, periksa manual.
 - Berapa baris berubah dari `committed` → `abstain`? **Semua** diperiksa — ini kemunduran yang harus dijelaskan.
@@ -619,13 +619,13 @@ Ini bukti mekanis untuk `AGENT.md` §2.1.
 
 ## FASE 6 — INTEGRASI
 
-Pipeline ini menggantikan `src/rebuild/build_v9_csv_per_group.py` sebagai jalur
+Pipeline ini menggantikan `src/pipelines/rebuild/build_v9_csv_per_group.py` sebagai jalur
 resmi pembuatan CSV ETHICS. Skrip lama dibiarkan supaya hasil lama tetap dapat
 direproduksi. Perbedaannya:
 
 | | Skrip lama | Pipeline baru |
 |---|---|---|
-| Path sumber | `result/ETHICS/v9_pilot` (sudah tidak dipakai) | `result/ETHICS/v9 [THIS IS THE MAIN]` |
+| Path sumber | `result/benchmarks/ethics/runs/v9_pilot` (sudah tidak dipakai) | `result/benchmarks/ethics/runs/v9_main` |
 | Dasar penilaian | digit vs label | sikap vs sikap |
 | Polaritas label | seragam, keliru untuk `commonsense` | per subset |
 | Provenance | `parse_source` saja | 13 kolom |
@@ -660,7 +660,7 @@ Tiga bagian perlu direvisi:
 - [x] Menulis `AGENT.md` sebagai kontrak kerja.
 - [x] Menulis rencana ini.
 - [x] Keputusan K1–K6 dari pengguna (2026-08-13).
-- [x] Implementasi `src/MAIN_PARSING/ETHICS/` (13 modul + 30 kasus uji).
+- [x] Implementasi `src/benchmarks/ethics/` (13 modul + 30 kasus uji).
 - [x] Uji unit dari respons nyata — 30/30 lolos.
 - [x] Uji buta ground truth (§5.5) — 400 file, semua kolom ekstraksi identik tanpa label.
 - [x] Uji independensi persona (§5.3) — signifikan pada 6 dari 6 model.
@@ -679,7 +679,7 @@ Tiga bagian perlu direvisi:
 Skrip pemindaian awal ditulis di direktori sementara dan **belum** dimasukkan ke
 repo, karena sifatnya diagnostik, bukan bagian pipeline. Bila diperlukan untuk
 reproduksi, skrip tersebut akan dipindahkan ke
-`src/MAIN_PARSING/ETHICS/diagnostics/` pada tahap implementasi:
+`src/benchmarks/ethics/diagnostics/` pada tahap implementasi:
 
 | Skrip | Fungsi | Keluaran |
 |---|---|---|
