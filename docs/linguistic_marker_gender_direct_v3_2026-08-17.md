@@ -22,11 +22,11 @@ Man minus Woman. I1, I2, dan I3 tidak diagregasi.
 
 Source run:
 
-`result/linguistic_markers/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
 
 Bundle final:
 
-`result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v3_direct_gender_r2_20260817/`
 
 Notebook executed:
 
@@ -39,7 +39,7 @@ Notebook suplemen kata gender:
 Folder berikut adalah percobaan build yang berhenti saat plotting dan **bukan
 hasil final**:
 
-`result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v3_direct_gender_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v3_direct_gender_20260817/`
 
 Folder gagal tidak ditimpa atau dihapus untuk menjaga provenance. Hasil final
 selalu memakai path dengan penanda `r2`.
@@ -135,7 +135,7 @@ ini.
 
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/statistics.py`
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/tests/test_loaders_and_statistics.py`
-- `scripts/build_gender_lm_visual_revision_v2.py`
-- `scripts/build_gender_lm_visual_revision_v3.py`
-- `scripts/build_gendered_lexicon_analysis.py`
-- `scripts/create_gender_lm_visual_notebook_v3.py`
+- `src/tools/build_gender_lm_visual_revision_v2.py`
+- `src/tools/build_gender_lm_visual_revision_v3.py`
+- `src/tools/build_gendered_lexicon_analysis.py`
+- `src/tools/create_gender_lm_visual_notebook_v3.py`

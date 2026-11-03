@@ -1,6 +1,6 @@
 # Menjalankan rerun Ministral 8B melalui OpenRouter
 
-Runner: `scripts/rerun_ministral_8b_openrouter.py`  
+Runner: `src/tools/rerun_ministral_8b_openrouter.py`  
 Model: `mistralai/ministral-8b-2512` (order 41)  
 Total manifest: **10.461 JSON**
 
@@ -24,13 +24,13 @@ Runner memprioritaskan `OPENROUTER_API_KEY` dan tidak mencetak nilai key.
 Nonregional, 6.336 target:
 
 ```powershell
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope nonregional
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope nonregional
 ```
 
 Regional Cultural, 4.125 target:
 
 ```powershell
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope regional
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope regional
 ```
 
 Validasi yang benar menampilkan `Validation complete` dan tidak menulis file.
@@ -38,11 +38,11 @@ Validasi yang benar menampilkan `Validation complete` dan tidak menulis file.
 ## 3. Smoke test satu target
 
 ```powershell
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope regional --execute --limit 1 --concurrency 1
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope regional --execute --limit 1 --concurrency 1
 ```
 
 ```powershell
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope nonregional --execute --limit 1 --concurrency 1
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope nonregional --execute --limit 1 --concurrency 1
 ```
 
 Lanjutkan hanya jika target berstatus `SAVED` atau sudah `SKIPPED` karena sukses.
@@ -52,13 +52,13 @@ Lanjutkan hanya jika target berstatus `SAVED` atau sudah `SKIPPED` karena sukses
 Regional Cultural:
 
 ```powershell
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope regional --execute --concurrency 4
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope regional --execute --concurrency 4
 ```
 
 Nonregional:
 
 ```powershell
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope nonregional --execute --concurrency 4
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope nonregional --execute --concurrency 4
 ```
 
 Itulah dua perintah utama yang mencakup seluruh 10.461 target. Pastikan limit
@@ -68,22 +68,22 @@ akun OpenRouter mencukupi sebelum menjalankan seluruh manifest.
 
 ```powershell
 # Nonregional ETHICS: 2.308
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope nonregional --dataset ethics --execute --concurrency 4
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope nonregional --dataset ethics --execute --concurrency 4
 ```
 
 ```powershell
 # Nonregional GSM8K: 4.028
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope nonregional --dataset gsm8k --execute --concurrency 4
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope nonregional --dataset gsm8k --execute --concurrency 4
 ```
 
 ```powershell
 # Regional ETHICS: 3.847
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope regional --dataset ethics --execute --concurrency 4
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope regional --dataset ethics --execute --concurrency 4
 ```
 
 ```powershell
 # Regional GSM8K: 278
-python ".\scripts\rerun_ministral_8b_openrouter.py" --scope regional --dataset gsm8k --execute --concurrency 4
+python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope regional --dataset gsm8k --execute --concurrency 4
 ```
 
 ## Tidak perlu menghapus JSON lama

@@ -3,21 +3,21 @@
 Dokumen ini khusus untuk mengulang seluruh 21.104 respons yang membentuk:
 
 ```text
-result/GMS8K/reports/Regional_Cultural_Persona/
+result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/
   deepseek_deepseek-r1-distill-qwen-32b/results.csv
 ```
 
 Hasil lama tidak ditimpa. Raw JSON dan `results.csv` baru ditulis ke:
 
 ```text
-result/GMS8K/reruns/20260815_deepseek_regional_full_vast/raw/
-result/GMS8K/reruns/20260815_deepseek_regional_full_vast/reports/
+result/benchmarks/gsm8k/reruns/20260815_deepseek_regional_full_vast/raw/
+result/benchmarks/gsm8k/reruns/20260815_deepseek_regional_full_vast/reports/
 ```
 
 Launcher:
 
 ```text
-scripts/rerun_gsm8k_regional_deepseek_full_vast.py
+src/tools/rerun_gsm8k_regional_deepseek_full_vast.py
 ```
 
 ## Kondisi Vast.ai yang sudah diverifikasi
@@ -43,7 +43,7 @@ Semua perintah dijalankan dari `D:\TugasAkhir`.
 ### 1. Plan lokal, tanpa API call
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py --mode plan
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py --mode plan
 ```
 
 ### 2. Rent setelah saldo cukup
@@ -65,7 +65,7 @@ ulang.
 Salin target dan port dari tombol SSH instance:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py `
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py `
   --mode preflight `
   --ssh-target "root@IP_INSTANCE" `
   --ssh-port PORT_SSH `
@@ -78,7 +78,7 @@ dimuat. Tidak ada generation call pada tahap ini.
 ### 4. Smoke: maksimum 3 call
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py `
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py `
   --mode smoke `
   --ssh-target "root@IP_INSTANCE" `
   --ssh-port PORT_SSH `
@@ -91,7 +91,7 @@ satu implicit. Jangan lanjut bila audit akhir smoke tidak bersih.
 ### 5. Pilot: maksimum 140 call
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py `
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py `
   --mode pilot `
   --pilot-samples 8 `
   --ssh-target "root@IP_INSTANCE" `
@@ -105,7 +105,7 @@ File smoke yang sudah lengkap dilewati.
 ### 6. Full/resume: 21.104 respons utama
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py `
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py `
   --mode full `
   --confirm-full `
   --ssh-target "root@IP_INSTANCE" `
@@ -125,7 +125,7 @@ bila JSON valid, `response.success=true`, final content tidak kosong, dan
 ### 7. Verify tanpa Vast
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py --mode verify
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py --mode verify
 ```
 
 Harus menunjukkan 1.319/1.319 file lengkap untuk setiap persona.
@@ -133,13 +133,13 @@ Harus menunjukkan 1.319/1.319 file lengkap untuk setiap persona.
 ### 8. Bangun `results.csv` baru
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\rerun_gsm8k_regional_deepseek_full_vast.py --mode report
+.\.venv\Scripts\python.exe src\tools\rerun_gsm8k_regional_deepseek_full_vast.py --mode report
 ```
 
 Output utama:
 
 ```text
-result/GMS8K/reruns/20260815_deepseek_regional_full_vast/reports/
+result/benchmarks/gsm8k/reruns/20260815_deepseek_regional_full_vast/reports/
   Regional_Cultural_Persona/
   deepseek_deepseek-r1-distill-qwen-32b/results.csv
 ```

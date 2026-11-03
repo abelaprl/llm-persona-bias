@@ -61,9 +61,9 @@ Dry-run runner berhasil merekonstruksi payload keduanya tanpa menulis file.
 
 Manifest lama `result/rerun_manifests/gender_v9/`
 `meta-llama_llama-3.1-8b-instruct_all_missing.csv` berisi 573 baris, tetapi
-menunjuk `result/ETHICS/v9_pilot`, yang sudah tidak ada. Sampel target dari
+menunjuk `result/benchmarks/ethics/runs/v9_pilot`, yang sudah tidak ada. Sampel target dari
 manifest itu sekarang mempunyai respons sukses dan final content pada
-`result/ETHICS/v9 [THIS IS THE MAIN]`. Karena itu manifest lama tidak digunakan.
+`result/benchmarks/ethics/runs/v9_main`. Karena itu manifest lama tidak digunakan.
 
 ## Metode audit
 
@@ -83,7 +83,7 @@ Masing-masing tersedia pula dalam varian `model_ethics_failures.csv` dan
 
 ## Keamanan rerun
 
-Runner `scripts/rerun_llama31_8b_openrouter.py`:
+Runner `src/tools/rerun_llama31_8b_openrouter.py`:
 
 - hanya membuka path yang tercantum dalam manifest;
 - memisahkan Regional dan nonregional;

@@ -1,8 +1,8 @@
 # Parsing GSM8K — Regional Cultural Persona
 
 **Tanggal status:** 14 Agustus 2026  
-**Input mentah:** `result/GMS8K/regional_cultural_persona/`  
-**Laporan kanonik:** `result/GMS8K/reports/Regional_Cultural_Persona/`  
+**Input mentah:** `result/benchmarks/gsm8k/regional_cultural_persona/`  
+**Laporan kanonik:** `result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/`  
 **Manifest rerun:** `result/rerun_manifests/gsm8k_regional_cultural/`  
 **Perintah rerun:** `docs/run_gsm8k_regional_cultural_rerun.md`
 
@@ -90,8 +90,8 @@ Parser Regional Cultural berada di:
   pack terpisah untuk setiap model;
 - `src/MAIN_PARSING/GSM8K/_core/` — ekstraksi, normalisasi, scoring, agregasi,
   dan validasi bersama;
-- `scripts/run_gsm8k_regional_parsing_all.py` — menjalankan enam parser;
-- `scripts/build_gsm8k_religion_coverage_manifest.py` — builder generik
+- `src/tools/run_gsm8k_regional_parsing_all.py` — menjalankan enam parser;
+- `src/tools/build_gsm8k_religion_coverage_manifest.py` — builder generik
   Religion/Regional melalui `--group` dan `--raw-group`.
 
 Rule pack Regional mewarisi aturan model Religion sebagai baseline, lalu hanya
@@ -113,7 +113,7 @@ Jalankan semua model. Default sengaja satu model pada satu waktu agar tidak
 berebut disk; pembacaan 64 JSON dilakukan paralel di dalam model.
 
 ```powershell
-python scripts\run_gsm8k_regional_parsing_all.py
+python src\tools\run_gsm8k_regional_parsing_all.py
 ```
 
 Jalankan satu model:
@@ -126,7 +126,7 @@ python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
 Jalankan baseline core yang identik untuk analisis sensitivitas:
 
 ```powershell
-python scripts\run_gsm8k_regional_parsing_all.py --rules core
+python src\tools\run_gsm8k_regional_parsing_all.py --rules core
 ```
 
 Gabungkan enam model:
@@ -142,7 +142,7 @@ manifest lalu hitung ulang CSV. Contoh Llama 3.1:
 ```powershell
 python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
   --model meta-llama_llama-3.1-8b-instruct `
-  --reparse_results result\GMS8K\reports\Regional_Cultural_Persona\meta-llama_llama-3.1-8b-instruct\results.csv `
+  --reparse_results result/benchmarks/gsm8k\reports\Regional_Cultural_Persona\meta-llama_llama-3.1-8b-instruct\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_regional_cultural\pending\meta-llama_llama-3.1-8b-instruct.csv
 ```
 

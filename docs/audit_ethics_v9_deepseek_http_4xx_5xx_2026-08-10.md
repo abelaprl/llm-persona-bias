@@ -23,10 +23,10 @@ Hal berikut sengaja **tidak** dihitung sebagai error HTTP dalam laporan ini:
 Sumber pemeriksaan:
 
 ```text
-result/ETHICS/deepseek_deepseek-r1-distill-qwen-32b/v9_infra_rerun_files.txt
-result/ETHICS/v9 [THIS IS THE MAIN]/Religion Persona/
+result/benchmarks/ethics/runs/deepseek_deepseek-r1-distill-qwen-32b/v9_infra_rerun_files.txt
+result/benchmarks/ethics/runs/v9_main/Religion Persona/
   deepseek_deepseek-r1-distill-qwen-32b/
-result/ETHICS/v9_pilot/{Religion,Gender,Neutral} Persona/
+result/benchmarks/ethics/runs/v9_pilot/{Religion,Gender,Neutral} Persona/
   deepseek_deepseek-r1-distill-qwen-32b/
 ```
 
@@ -87,7 +87,7 @@ Temuan penting:
 ## Daftar lengkap file
 
 Path pada tabel dipersingkat relatif terhadap direktori model di bawah
-`result/ETHICS/v9_pilot/`.
+`result/benchmarks/ethics/runs/v9_pilot/`.
 
 | HTTP | File | Pesan error |
 |---:|---|---|
@@ -304,7 +304,7 @@ ketiganya merupakan kategori audit yang berbeda.
 Daftar mesin-baca lengkap tersedia di
 [`deepseek_http_4xx_5xx.csv`](../result/rerun_manifests/ethics_v9/deepseek_http_4xx_5xx.csv).
 Runner selektifnya adalah
-[`rerun_ethics_v9_http_errors_vast.py`](../scripts/rerun_ethics_v9_http_errors_vast.py).
+[`rerun_ethics_v9_http_errors_vast.py`](../src/tools/rerun_ethics_v9_http_errors_vast.py).
 
 Manifest di atas tetap berisi **51 kegagalan HTTP historis**. Akan tetapi,
 default runner per 10 Agustus 2026 juga memuat manifest tambahan delapan
@@ -316,19 +316,19 @@ memanggil model.
 Validasi tanpa API dan tanpa menulis file:
 
 ```powershell
-python scripts/rerun_ethics_v9_http_errors_vast.py
+python src/tools/rerun_ethics_v9_http_errors_vast.py
 ```
 
 Smoke test tiga file, lalu resume seluruh manifest:
 
 ```powershell
-python scripts/rerun_ethics_v9_http_errors_vast.py `
+python src/tools/rerun_ethics_v9_http_errors_vast.py `
   --execute `
   --limit 3 `
   --endpoint-url http://127.0.0.1:8000/v1/chat/completions `
   --concurrency 1
 
-python scripts/rerun_ethics_v9_http_errors_vast.py `
+python src/tools/rerun_ethics_v9_http_errors_vast.py `
   --execute `
   --endpoint-url http://127.0.0.1:8000/v1/chat/completions `
   --concurrency 4
@@ -341,7 +341,7 @@ Untuk mereproduksi audit HTTP ketat 51 file saja, nonaktifkan manifest tambahan
 dan perbaikan cache warm-up:
 
 ```powershell
-python scripts/rerun_ethics_v9_http_errors_vast.py `
+python src/tools/rerun_ethics_v9_http_errors_vast.py `
   --no-extra-manifest `
   --no-warmup-cache-repair
 ```

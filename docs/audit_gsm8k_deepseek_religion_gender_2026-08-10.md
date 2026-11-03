@@ -237,18 +237,18 @@ Manifest yang tersedia:
 | [`deepseek_infra_all.csv`](../result/rerun_manifests/gsm8k_deepseek/deepseek_infra_all.csv) | **684** | gabungan target rerun |
 
 Runner:
-[`rerun_gsm8k_deepseek_errors_vast.py`](../scripts/rerun_gsm8k_deepseek_errors_vast.py)
+[`rerun_gsm8k_deepseek_errors_vast.py`](../src/tools/rerun_gsm8k_deepseek_errors_vast.py)
 
 Validasi lokal, tanpa API dan tanpa menulis file:
 
 ```powershell
-python scripts/rerun_gsm8k_deepseek_errors_vast.py
+python src/tools/rerun_gsm8k_deepseek_errors_vast.py
 ```
 
 Smoke test tiga target melalui tunnel lokal:
 
 ```powershell
-python scripts/rerun_gsm8k_deepseek_errors_vast.py `
+python src/tools/rerun_gsm8k_deepseek_errors_vast.py `
   --execute `
   --limit 3 `
   --endpoint-url http://127.0.0.1:8000/v1/chat/completions `
@@ -259,7 +259,7 @@ Setelah smoke test sukses, jalankan seluruh target. Perintah yang sama aman
 untuk resume karena JSON yang sudah berhasil otomatis dilewati:
 
 ```powershell
-python scripts/rerun_gsm8k_deepseek_errors_vast.py `
+python src/tools/rerun_gsm8k_deepseek_errors_vast.py `
   --execute `
   --endpoint-url http://127.0.0.1:8000/v1/chat/completions `
   --concurrency 4
@@ -268,7 +268,7 @@ python scripts/rerun_gsm8k_deepseek_errors_vast.py `
 Jika hanya ingin 203 error HTTP:
 
 ```powershell
-python scripts/rerun_gsm8k_deepseek_errors_vast.py `
+python src/tools/rerun_gsm8k_deepseek_errors_vast.py `
   --manifest result/rerun_manifests/gsm8k_deepseek/deepseek_http_4xx_5xx.csv `
   --expected-count 203 `
   --execute `
@@ -284,7 +284,7 @@ merusak source JSON.
 ## Cara mereproduksi audit
 
 ```powershell
-python scripts/audit_gsm8k_deepseek_personas.py `
+python src/tools/audit_gsm8k_deepseek_personas.py `
   --source git-head `
   --detail-limit 0 `
   --manifest-dir result/rerun_manifests/gsm8k_deepseek `

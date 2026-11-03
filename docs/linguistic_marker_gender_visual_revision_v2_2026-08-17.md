@@ -46,9 +46,9 @@ File yang berubah:
 
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/statistics.py`
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/tests/test_loaders_and_statistics.py`
-- `scripts/build_gender_lm_visual_revision_v2.py`
-- `scripts/create_gender_lm_visual_notebook_v2.py`
-- `scripts/build_gendered_lexicon_analysis.py`
+- `src/tools/build_gender_lm_visual_revision_v2.py`
+- `src/tools/create_gender_lm_visual_notebook_v2.py`
+- `src/tools/build_gendered_lexicon_analysis.py`
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/tests/test_gendered_lexicon_analysis.py`
 
 Tambahan utama:
@@ -79,11 +79,11 @@ utama opening menggunakan komposisi dan uji joint ini.
 
 Source run:
 
-`result/linguistic_markers/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
 
 Bundle visual baru:
 
-`result/linguistic_markers/gender_gsm8k_bab4_visual_revision_v2_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_visual_revision_v2_20260817/`
 
 Notebook executed:
 
@@ -203,9 +203,9 @@ Validasi final:
 Command utama:
 
 ```powershell
-python scripts\build_gender_lm_visual_revision_v2.py `
-  --run-dir result\linguistic_markers\gender_gsm8k_full_source_aligned_v1_2_1_20260817 `
-  --output-dir result\linguistic_markers\gender_gsm8k_bab4_visual_revision_v2_20260817
+python src\tools\build_gender_lm_visual_revision_v2.py `
+  --run-dir result/analyses/linguistic_markers/runs\gender_gsm8k_full_source_aligned_v1_2_1_20260817 `
+  --output-dir result/analyses/linguistic_markers/runs\gender_gsm8k_bab4_visual_revision_v2_20260817
 
 jupyter nbconvert --to notebook --execute --inplace `
   notebooks\linguistic_marker_gender_gsm8k_bab4_visual_revision_v2.ipynb `

@@ -36,10 +36,10 @@ deepseek/deepseek-r1-distill-qwen-32b
 ### Outputs
 
 ```text
-result/ETHICS/v9 [THIS IS THE MAIN]/Regional Cultural Persona/
+result/benchmarks/ethics/runs/v9_main/Regional Cultural Persona/
   deepseek_deepseek-r1-distill-qwen-32b/<persona>/*.json
 
-result/GMS8K/regional_cultural_persona/
+result/benchmarks/gsm8k/regional_cultural_persona/
   deepseek_deepseek-r1-distill-qwen-32b/<persona>/gsm8k_*.json
 ```
 
@@ -94,7 +94,7 @@ cd D:\TugasAkhir
 Jalankan:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py --mode plan
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py --mode plan
 ```
 
 Harus muncul:
@@ -245,7 +245,7 @@ Jangan mengirim `OPEN_BUTTON_TOKEN`, API key, atau private key kepada siapa pun.
 Ganti contoh target dan port dengan milik instance:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py `
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py `
   --mode preflight `
   --ssh_target "root@142.214.185.187" `
   --ssh_port 20544
@@ -268,7 +268,7 @@ Preflight complete: model is ready; no generation calls or files were written.
 Jika private key tidak berada di lokasi default:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py `
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py `
   --mode preflight `
   --ssh_target "root@142.214.185.187" `
   --ssh_port 20544 `
@@ -280,7 +280,7 @@ Jika private key tidak berada di lokasi default:
 Setelah preflight lulus:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py `
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py `
   --mode smoke `
   --ssh_target "root@142.214.185.187" `
   --ssh_port 20544
@@ -298,8 +298,8 @@ Smoke test memakai:
 Cek jumlah JSON:
 
 ```powershell
-$ethicsSmoke = "result\ETHICS\v9 [THIS IS THE MAIN]\Regional Cultural Persona\deepseek_deepseek-r1-distill-qwen-32b"
-$gsmSmoke = "result\GMS8K\regional_cultural_persona\deepseek_deepseek-r1-distill-qwen-32b"
+$ethicsSmoke = "result\benchmarks\ethics\runs\v9_main\Regional Cultural Persona\deepseek_deepseek-r1-distill-qwen-32b"
+$gsmSmoke = "result\benchmarks\gsm8k\regional_cultural_persona\deepseek_deepseek-r1-distill-qwen-32b"
 
 (Get-ChildItem -LiteralPath $ethicsSmoke -Recurse -Filter "*.json").Count
 (Get-ChildItem -LiteralPath $gsmSmoke -Recurse -Filter "*.json").Count
@@ -332,7 +332,7 @@ Tidak boleh ada path yang keluar. Buka minimal satu JSON explicit, satu JSON imp
 Hanya jalankan bila smoke bersih:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py `
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py `
   --mode pilot `
   --ssh_target "root@142.214.185.187" `
   --ssh_port 20544
@@ -361,7 +361,7 @@ Ini hanya perkiraan karena panjang reasoning berbeda antarsoal. Jangan menjalank
 Full hanya bisa dimulai dengan acknowledgement eksplisit:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py `
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py `
   --mode full `
   --confirm_full `
   --ssh_target "root@142.214.185.187" `
@@ -377,7 +377,7 @@ Menekan `Ctrl+C` menghentikan kedua runner lokal dan menutup tunnel sementara.
 Verifikasi tidak membutuhkan Vast atau SSH:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_deepseek_regional_vast.py --mode verify
+.\.venv\Scripts\python.exe src\tools\run_deepseek_regional_vast.py --mode verify
 ```
 
 Hasil lengkap harus menunjukkan:

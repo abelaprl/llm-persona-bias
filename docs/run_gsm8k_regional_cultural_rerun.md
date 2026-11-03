@@ -48,7 +48,7 @@ Jalankan smoke satu target:
 
 ```powershell
 Set-Location D:\TugasAkhir
-python scripts\rerun_llama31_8b_openrouter.py `
+python src\tools\rerun_llama31_8b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\meta-llama_llama-3.1-8b-instruct.csv `
   --expected-count 134 --temperature 0 --max-tokens 4096 `
@@ -59,7 +59,7 @@ Jika smoke berstatus `SAVED`, lanjutkan seluruh target. Target smoke akan
 otomatis dilewati:
 
 ```powershell
-python scripts\rerun_llama31_8b_openrouter.py `
+python src\tools\rerun_llama31_8b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\meta-llama_llama-3.1-8b-instruct.csv `
   --expected-count 134 --temperature 0 --max-tokens 4096 `
@@ -71,7 +71,7 @@ Refresh CSV kanonik:
 ```powershell
 python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
   --model meta-llama_llama-3.1-8b-instruct `
-  --reparse_results result\GMS8K\reports\Regional_Cultural_Persona\meta-llama_llama-3.1-8b-instruct\results.csv `
+  --reparse_results result/benchmarks/gsm8k\reports\Regional_Cultural_Persona\meta-llama_llama-3.1-8b-instruct\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\meta-llama_llama-3.1-8b-instruct.csv
 ```
 
@@ -79,14 +79,14 @@ python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
 
 ```powershell
 # Smoke satu target.
-python scripts\rerun_llama33_70b_openrouter.py `
+python src\tools\rerun_llama33_70b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\meta-llama_llama-3.3-70b-instruct.csv `
   --expected-count 301 --temperature 0 --max-tokens 4096 `
   --execute --limit 1 --concurrency 1
 
 # Full/resume setelah smoke SAVED.
-python scripts\rerun_llama33_70b_openrouter.py `
+python src\tools\rerun_llama33_70b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\meta-llama_llama-3.3-70b-instruct.csv `
   --expected-count 301 --temperature 0 --max-tokens 4096 `
@@ -95,7 +95,7 @@ python scripts\rerun_llama33_70b_openrouter.py `
 # Refresh CSV kanonik.
 python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
   --model meta-llama_llama-3.3-70b-instruct `
-  --reparse_results result\GMS8K\reports\Regional_Cultural_Persona\meta-llama_llama-3.3-70b-instruct\results.csv `
+  --reparse_results result/benchmarks/gsm8k\reports\Regional_Cultural_Persona\meta-llama_llama-3.3-70b-instruct\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\meta-llama_llama-3.3-70b-instruct.csv
 ```
 
@@ -103,14 +103,14 @@ python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
 
 ```powershell
 # Smoke satu target.
-python scripts\rerun_qwen3_next_80b_openrouter.py `
+python src\tools\rerun_qwen3_next_80b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\history\qwen_reasoning1024_round_108.csv `
   --expected-count 108 --temperature 0 --max-tokens 4096 `
   --execute --limit 1 --concurrency 1
 
 # Full/resume setelah smoke SAVED.
-python scripts\rerun_qwen3_next_80b_openrouter.py `
+python src\tools\rerun_qwen3_next_80b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\history\qwen_reasoning1024_round_108.csv `
   --expected-count 108 --temperature 0 --max-tokens 4096 `
@@ -119,7 +119,7 @@ python scripts\rerun_qwen3_next_80b_openrouter.py `
 # Refresh CSV kanonik.
 python -m src.MAIN_PARSING.GSM8K.Regional_Cultural_Persona.run `
   --model qwen_qwen3-next-80b-a3b-thinking `
-  --reparse_results result\GMS8K\reports\Regional_Cultural_Persona\qwen_qwen3-next-80b-a3b-thinking\results.csv `
+  --reparse_results result/benchmarks/gsm8k\reports\Regional_Cultural_Persona\qwen_qwen3-next-80b-a3b-thinking\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_regional_cultural\history\qwen_initial_1039.csv
 ```
 
@@ -129,7 +129,7 @@ menghabiskan mayoritas 4.096 token untuk reasoning, resume hanya target gagal
 dengan reasoning dibatasi 1.024 token:
 
 ```powershell
-python scripts\rerun_qwen3_next_80b_openrouter.py `
+python src\tools\rerun_qwen3_next_80b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\history\qwen_reasoning1024_round_108.csv `
   --expected-count 108 --temperature 0 --max-tokens 4096 `
@@ -144,7 +144,7 @@ rata-rata 3.458 reasoning token walaupun diminta maksimal 1.024. Karena hard
 cap diabaikan, uji satu target residual dengan effort rendah sebelum full:
 
 ```powershell
-python -u scripts\rerun_qwen3_next_80b_openrouter.py `
+python -u src\tools\rerun_qwen3_next_80b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\qwen_unresolved_after_retries_63.csv `
   --expected-count 63 --temperature 0 --max-tokens 4096 `
@@ -154,7 +154,7 @@ python -u scripts\rerun_qwen3_next_80b_openrouter.py `
 Hanya bila smoke berstatus `SAVED`, jalankan full/resume:
 
 ```powershell
-python -u scripts\rerun_qwen3_next_80b_openrouter.py `
+python -u src\tools\rerun_qwen3_next_80b_openrouter.py `
   --scope regional --dataset gsm8k `
   --manifest result\rerun_manifests\gsm8k_regional_cultural\closed_audit\qwen_unresolved_after_retries_63.csv `
   --expected-count 63 --temperature 0 --max-tokens 4096 `

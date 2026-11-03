@@ -9,9 +9,9 @@ ditimpa. Manifest tidak memuat ground truth.
 Bangun ulang manifest dari report kanonik:
 
 ```powershell
-python scripts\build_gsm8k_religion_coverage_manifest.py `
+python src\tools\build_gsm8k_religion_coverage_manifest.py `
   --model deepseek_deepseek-r1-distill-qwen-32b `
-  --results result\GMS8K\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
+  --results result/benchmarks/gsm8k\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
   --output result\rerun_manifests\gsm8k_deepseek\deepseek_religion_provider_errors.csv `
   --only-provider-errors
 ```
@@ -19,17 +19,17 @@ python scripts\build_gsm8k_religion_coverage_manifest.py `
 Validasi tanpa API call atau perubahan raw JSON:
 
 ```powershell
-python scripts\rerun_deepseek_32b_vast.py
+python src\tools\rerun_deepseek_32b_vast.py
 ```
 
 Setelah vLLM siap dan tunnel lokal `127.0.0.1:8000` mengarah ke port internal
 vLLM, jalankan smoke test lalu resume semua target:
 
 ```powershell
-python -u scripts\rerun_deepseek_32b_vast.py `
+python -u src\tools\rerun_deepseek_32b_vast.py `
   --execute --limit 3 --concurrency 1
 
-python -u scripts\rerun_deepseek_32b_vast.py `
+python -u src\tools\rerun_deepseek_32b_vast.py `
   --execute --concurrency 16
 ```
 
@@ -45,9 +45,9 @@ Re-parse ke report baru:
 ```powershell
 python -u -m src.MAIN_PARSING.GSM8K.Religion_Persona.run `
   --model deepseek_deepseek-r1-distill-qwen-32b `
-  --reparse_results result\GMS8K\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
+  --reparse_results result/benchmarks/gsm8k\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_deepseek\deepseek_religion_provider_errors.csv `
-  --out_root result\GMS8K\reports_vast_rerun_20260814
+  --out_root result/benchmarks/gsm8k\reports_vast_rerun_20260814
 ```
 
 ## Hasil 14 Agustus 2026
@@ -63,4 +63,4 @@ python -u -m src.MAIN_PARSING.GSM8K.Religion_Persona.run `
 - Instance Vast `47656080` sudah di-destroy dan daftar instance kembali kosong.
 
 Receipt lengkap beserta hash SHA-256 ada di
-`result/GMS8K/reports_vast_rerun_20260814/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/rerun_validation.json`.
+`result/benchmarks/gsm8k/reports_vast_rerun_20260814/Religion_Persona/deepseek_deepseek-r1-distill-qwen-32b/rerun_validation.json`.

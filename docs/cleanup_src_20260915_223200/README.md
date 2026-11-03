@@ -73,7 +73,7 @@ file yang diperlukan ke path asal yang belum ada. Jangan menimpa versi baru.
 
 Pencarian referensi adalah pencarian statis nama file/modul, bukan bukti
 berapa kali program pernah dijalankan. Scan mencakup ekstensi `.py`, `.ps1`,
-`.sh`, `.md`, `.ipynb`, `.json`, dan `.cjs` di `src/`, `scripts/`, `docs/`,
+`.sh`, `.md`, `.ipynb`, `.json`, dan `.cjs` di `src/`, `src/tools/`, `docs/`,
 dan `notebooks/`; isi output notebook tidak dipakai sebagai dependensi.
 Inventaris Git lama dikecualikan. File lebih dari 20 MB dilewati; rincian
 file yang dilewati dan pesan akses tersedia di [audit.json](audit.json).

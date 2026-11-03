@@ -36,20 +36,20 @@ Pengguna meminta:
 
 Input utama Gender GSM8K:
 
-`result/GMS8K/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
+`result/benchmarks/gsm8k/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
 
 CSV tersebut dibangun dari source manifest publikasi v5, memakai path dan
 SHA-256 sumber yang ditetapkan di:
 
-`result/GMS8K/reports/persona_publication_analysis_v5_paired_significance_six_models/tables/source_manifest.csv`
+`result/benchmarks/gsm8k/reports/persona_publication_analysis_v5_paired_significance_six_models/tables/source_manifest.csv`
 
 Builder sumber:
 
-`scripts/build_gsm8k_source_aligned_combined.py`
+`src/tools/build_gsm8k_source_aligned_combined.py`
 
 Keputusan penting:
 
-- `result/reports/all_results_combined.csv` **tidak dipakai** sebagai sumber
+- `result/archive/reports_mixed_legacy/all_results_combined.csv` **tidak dipakai** sebagai sumber
   linguistic marker karena response text lima model banyak yang kosong dan key
   kondisi tidak stabil.
 - `is_correct` dipertahankan hanya sebagai metadata QC; tidak pernah dipakai
@@ -84,11 +84,11 @@ File utama:
 
 Builder ringkasan kandidat Bab IV:
 
-`scripts/build_gender_lm_candidate_summary.py`
+`src/tools/build_gender_lm_candidate_summary.py`
 
 Builder contrastive word clouds:
 
-`scripts/build_gender_contrastive_wordclouds.py`
+`src/tools/build_gender_contrastive_wordclouds.py`
 
 ## 4. Marker registry v1.2.1
 
@@ -154,15 +154,15 @@ Perbandingan total v1.1 ke v1.2.1 pada key data yang sama:
 
 Pilot audit final, 2.700 respons:
 
-`result/linguistic_markers/gender_gsm8k_source_aligned_pilot_v1_2_1_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_source_aligned_pilot_v1_2_1_20260817/`
 
 Full result final, 71.215 respons:
 
-`result/linguistic_markers/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_full_source_aligned_v1_2_1_20260817/`
 
 Ringkasan tabel kandidat Bab IV:
 
-`result/linguistic_markers/gender_gsm8k_bab4_candidate_summary_v1_2_1_20260817/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_candidate_summary_v1_2_1_20260817/`
 
 Ringkasan tersebut mempertahankan seluruh planned test di source run. File
 bernama `holm_significant` hanyalah view `p_holm < 0.05` dan tidak menggantikan
@@ -201,7 +201,7 @@ Notebook eksplorasi hasil:
 Notebook tersebut sudah dieksekusi penuh: 10 dari 10 code cell selesai tanpa
 error output. Output grafik tersimpan di:
 
-`result/linguistic_markers/gender_gsm8k_bab4_candidate_summary_v1_2_1_20260817/images/`
+`result/analyses/linguistic_markers/runs/gender_gsm8k_bab4_candidate_summary_v1_2_1_20260817/images/`
 
 - `01_text_coverage_by_model.png`: available, technical-only, dan missing per
   model;

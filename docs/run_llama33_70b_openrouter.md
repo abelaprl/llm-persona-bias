@@ -1,6 +1,6 @@
 # Menjalankan rerun Llama 3.3 70B melalui OpenRouter
 
-Runner: `scripts/rerun_llama33_70b_openrouter.py`  
+Runner: `src/tools/rerun_llama33_70b_openrouter.py`  
 Model: `meta-llama/llama-3.3-70b-instruct` (order 35)  
 Total manifest: **8.252 JSON**
 
@@ -24,13 +24,13 @@ Runner memprioritaskan `OPENROUTER_API_KEY` dan tidak mencetak nilai key.
 Nonregional, 7.658 target:
 
 ```powershell
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope nonregional
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope nonregional
 ```
 
 Regional Cultural, 594 target:
 
 ```powershell
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope regional
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional
 ```
 
 Validasi yang benar menampilkan `Validation complete` dan tidak menulis file.
@@ -40,13 +40,13 @@ Validasi yang benar menampilkan `Validation complete` dan tidak menulis file.
 Mulai dari regional yang manifest-nya lebih kecil:
 
 ```powershell
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope regional --execute --limit 1 --concurrency 1
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional --execute --limit 1 --concurrency 1
 ```
 
 Kemudian nonregional:
 
 ```powershell
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope nonregional --execute --limit 1 --concurrency 1
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope nonregional --execute --limit 1 --concurrency 1
 ```
 
 Lanjutkan hanya jika target berstatus `SAVED` atau sudah `SKIPPED` karena sukses.
@@ -56,13 +56,13 @@ Lanjutkan hanya jika target berstatus `SAVED` atau sudah `SKIPPED` karena sukses
 Nonregional:
 
 ```powershell
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope nonregional --execute --concurrency 4
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope nonregional --execute --concurrency 4
 ```
 
 Regional Cultural:
 
 ```powershell
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope regional --execute --concurrency 4
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional --execute --concurrency 4
 ```
 
 Itulah dua perintah utama yang mencakup seluruh 8.252 target. Model 70B ini dapat
@@ -73,22 +73,22 @@ menjalankan seluruh manifest.
 
 ```powershell
 # Nonregional ETHICS: 2.249
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope nonregional --dataset ethics --execute --concurrency 4
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope nonregional --dataset ethics --execute --concurrency 4
 ```
 
 ```powershell
 # Nonregional GSM8K: 5.409
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope nonregional --dataset gsm8k --execute --concurrency 4
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope nonregional --dataset gsm8k --execute --concurrency 4
 ```
 
 ```powershell
 # Regional ETHICS: 32
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope regional --dataset ethics --execute --concurrency 4
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional --dataset ethics --execute --concurrency 4
 ```
 
 ```powershell
 # Regional GSM8K: 562
-python ".\scripts\rerun_llama33_70b_openrouter.py" --scope regional --dataset gsm8k --execute --concurrency 4
+python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional --dataset gsm8k --execute --concurrency 4
 ```
 
 ## Tidak perlu menghapus JSON lama

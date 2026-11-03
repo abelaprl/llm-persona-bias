@@ -1,6 +1,6 @@
 # Menjalankan rerun Llama 3.1 8B melalui OpenRouter
 
-Runner: `scripts/rerun_llama31_8b_openrouter.py`  
+Runner: `src/tools/rerun_llama31_8b_openrouter.py`  
 Model: `meta-llama/llama-3.1-8b-instruct` (order 40)  
 Total manifest: **11.447 JSON**
 
@@ -24,13 +24,13 @@ Runner memprioritaskan `OPENROUTER_API_KEY` dan tidak mencetak nilai key.
 Nonregional, 6.445 target:
 
 ```powershell
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope nonregional
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope nonregional
 ```
 
 Regional Cultural, 5.002 target:
 
 ```powershell
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope regional
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope regional
 ```
 
 Validasi yang benar menampilkan `Validation complete` dan tidak menulis file.
@@ -38,11 +38,11 @@ Validasi yang benar menampilkan `Validation complete` dan tidak menulis file.
 ## 3. Smoke test satu target
 
 ```powershell
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope nonregional --execute --limit 1 --concurrency 1
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope nonregional --execute --limit 1 --concurrency 1
 ```
 
 ```powershell
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope regional --execute --limit 1 --concurrency 1
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope regional --execute --limit 1 --concurrency 1
 ```
 
 Lanjutkan hanya jika target berstatus `SAVED` atau sudah `SKIPPED` karena sukses.
@@ -52,13 +52,13 @@ Lanjutkan hanya jika target berstatus `SAVED` atau sudah `SKIPPED` karena sukses
 Nonregional:
 
 ```powershell
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope nonregional --execute --concurrency 4
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope nonregional --execute --concurrency 4
 ```
 
 Regional Cultural:
 
 ```powershell
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope regional --execute --concurrency 4
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope regional --execute --concurrency 4
 ```
 
 Itulah dua perintah utama yang mencakup seluruh 11.447 target.
@@ -67,22 +67,22 @@ Itulah dua perintah utama yang mencakup seluruh 11.447 target.
 
 ```powershell
 # Nonregional ETHICS: 2.279
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope nonregional --dataset ethics --execute --concurrency 4
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope nonregional --dataset ethics --execute --concurrency 4
 ```
 
 ```powershell
 # Nonregional GSM8K: 4.166
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope nonregional --dataset gsm8k --execute --concurrency 4
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope nonregional --dataset gsm8k --execute --concurrency 4
 ```
 
 ```powershell
 # Regional ETHICS: 4.499
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope regional --dataset ethics --execute --concurrency 4
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope regional --dataset ethics --execute --concurrency 4
 ```
 
 ```powershell
 # Regional GSM8K: 503
-python ".\scripts\rerun_llama31_8b_openrouter.py" --scope regional --dataset gsm8k --execute --concurrency 4
+python ".\src\tools\rerun_llama31_8b_openrouter.py" --scope regional --dataset gsm8k --execute --concurrency 4
 ```
 
 ## Resume dan kegagalan baru

@@ -118,7 +118,7 @@ Manifest keluaran:
 
 ## Keamanan rerun
 
-Runner `scripts/rerun_gpt_oss_20b_openrouter.py`:
+Runner `src/tools/rerun_gpt_oss_20b_openrouter.py`:
 
 - hanya membuka path manifest rerun, bukan `model_review_only.csv`;
 - memisahkan Regional dan nonregional;

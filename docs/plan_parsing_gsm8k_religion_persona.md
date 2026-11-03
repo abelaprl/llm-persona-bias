@@ -1,11 +1,11 @@
 # Rencana Perbaikan Parsing GSM8K — Religion Persona
 
 **Tanggal**: 2026-08-13 (revisi 2 — arsitektur per-model dipertahankan)
-**Ruang lingkup**: `result/GMS8K/Religion_Persona` — 6 model × 16 persona × 1319 soal
+**Ruang lingkup**: `result/benchmarks/gsm8k/Religion_Persona` — 6 model × 16 persona × 1319 soal
 **Status data**: 6 model sudah diparse penuh ke CSV kanonik; 5 model ditutup,
 DeepSeek masih menunggu selective rerun generasi (§1.6)
 **Lokasi kode**: `src/MAIN_PARSING/GSM8K/<grup_persona>/`
-**Lokasi output CSV**: `result/GMS8K/reports/<grup_persona>/<model>/`
+**Lokasi output CSV**: `result/benchmarks/gsm8k/reports/<grup_persona>/<model>/`
 **Fase berikutnya (dokumen terpisah)**: penanda linguistik
 
 ---
@@ -17,7 +17,7 @@ DeepSeek masih menunggu selective rerun generasi (§1.6)
 | K1 | **Aturan parsing boleh berbeda per model**, menyesuaikan cara tiap model menutup jawaban | Keputusan pengguna, ditegaskan 2× |
 | K2 | **Hapus total forced-rescue ke ground truth** (`ministrail` 48 QID, `gemma` 10 QID) | Keputusan pengguna |
 | K3 | Kode parsing di `src/MAIN_PARSING/GSM8K/<grup_persona>/`, satu berkas rule per model | Keputusan pengguna |
-| K4 | Output CSV di `result/GMS8K/reports/<grup_persona>/<model>/` | Keputusan pengguna |
+| K4 | Output CSV di `result/benchmarks/gsm8k/reports/<grup_persona>/<model>/` | Keputusan pengguna |
 | K5 | Kerjakan per model dulu; gabungan 6 model belakangan | Keputusan pengguna |
 
 ### Catatan teknis atas K3
@@ -53,7 +53,7 @@ Membangun ulang parsing GSM8K Religion Persona sebagai **rangka bersama + rule p
 
 | Item | Nilai |
 |---|---|
-| Root data | `result/GMS8K/Religion_Persona/<model>/<persona>/gsm8k_XXXXX.json` |
+| Root data | `result/benchmarks/gsm8k/Religion_Persona/<model>/<persona>/gsm8k_XXXXX.json` |
 | Model | `deepseek_deepseek-r1-distill-qwen-32b`, `meta-llama_llama-3.1-8b-instruct`, `meta-llama_llama-3.3-70b-instruct`, `mistralai_ministral-8b-2512`, `openai_gpt-oss-20b`, `qwen_qwen3-next-80b-a3b-thinking` |
 | Persona | 16 (4 agama × {explicit, implicit_1, implicit_2, implicit_3}) |
 | Soal | 1319 per persona (GSM8K test split penuh) |
@@ -64,7 +64,7 @@ Membangun ulang parsing GSM8K Religion Persona sebagai **rangka bersama + rule p
 ### 1.3 Keluaran
 
 ```
-result/GMS8K/reports/Religion_Persona/<model>/
+result/benchmarks/gsm8k/reports/Religion_Persona/<model>/
 ├── results.csv               # 1 baris per unit (21.104 baris)
 ├── accuracy.csv              # per persona + OVERALL, rule pack model
 ├── accuracy_core.csv         # hasil core-only, untuk sensitivitas antar-model (§3.4)
@@ -74,7 +74,7 @@ result/GMS8K/reports/Religion_Persona/<model>/
 ```
 
 ```
-result/GMS8K/reports/Religion_Persona/_combined/
+result/benchmarks/gsm8k/reports/Religion_Persona/_combined/
 ├── all_models_results.csv
 ├── all_models_accuracy.csv        # rule pack per model
 ├── all_models_accuracy_core.csv   # core-only, semua model identik
@@ -112,7 +112,7 @@ result/GMS8K/reports/Religion_Persona/_combined/
 ### 1.6 Status eksekusi kanonik (13 Agustus 2026)
 
 Angka berikut dibaca langsung dari
-`result/GMS8K/reports/Religion_Persona/<model>/results.csv` dan
+`result/benchmarks/gsm8k/reports/Religion_Persona/<model>/results.csv` dan
 `accuracy.csv`, masing-masing 21.104 baris.
 
 | Model | Akurasi | Coverage | Technical failure | Persona ≥99% | Status |
@@ -140,18 +140,18 @@ siap, perintah aman untuk terminal lain adalah:
 
 ```powershell
 # Validasi saja; 0 API call dan 0 perubahan berkas.
-python scripts\rerun_deepseek_32b_vast.py
+python src\tools\rerun_deepseek_32b_vast.py
 
 # Jalankan/resume selective rerun. Wrapper mengunci temperature=0 dan
 # max_tokens=4096 serta hanya mengganti JSON setelah content final valid.
-python scripts\rerun_deepseek_32b_vast.py --execute --concurrency 4
+python src\tools\rerun_deepseek_32b_vast.py --execute --concurrency 4
 
 # Segarkan hanya 647 target manifest lalu hitung ulang CSV kanonik.
 python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run `
   --model deepseek_deepseek-r1-distill-qwen-32b `
-  --reparse_results result\GMS8K\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
+  --reparse_results result\benchmarks\gsm8k\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_deepseek\deepseek_religion_coverage_failures.csv `
-  --out_root result\GMS8K\reports
+  --out_root result\benchmarks\gsm8k\reports
 ```
 
 Perintah `--execute` bersifat resume-safe: respons sukses/stop/nonkosong
@@ -413,8 +413,8 @@ Perintah per model:
 ```powershell
 .venv\Scripts\python.exe -m src.MAIN_PARSING.GSM8K.Religion_Persona.run `
   --model mistralai_ministral-8b-2512 `
-  --input_root "result\GMS8K\Religion_Persona" `
-  --out_root   "result\GMS8K\reports"
+  --input_root "result\benchmarks\gsm8k\Religion_Persona" `
+  --out_root   "result\benchmarks\gsm8k\reports"
 ```
 
 ---

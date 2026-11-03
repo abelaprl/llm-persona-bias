@@ -5,7 +5,7 @@ Persona file: `inputs/regional_cultural_persona.json` (sudah otomatis di-load ru
 Samples: `data/ethics/ETHICS_test_4subsets_10percent_from200.json` (1514 soal: commonsense + deontology + justice + virtue)
 
 Setelah reorganisasi `data/`, tambahkan `--samples_file data/ethics/ETHICS_test_4subsets_10percent_from200.json` pada setiap perintah runner di bawah. Perubahan default runner menunggu izin sesuai AGENTS.md.
-Output: `result/ETHICS/v9_pilot/Regional Cultural Persona/{model_slug}/{persona}/{sample_id}.json`
+Output: `result/benchmarks/ethics/runs/v9_pilot/Regional Cultural Persona/{model_slug}/{persona}/{sample_id}.json`
 
 > Jalankan semua perintah dari folder `D:\TugasAkhir`.
 
@@ -94,7 +94,7 @@ python src/ethics_runner/run_ethics_prompt_v9.py --model_order 32 --personas nor
 
 Jalankan hanya setelah API key order 32 yang sempat terekspos sudah dicabut dan
 diganti. Runner ini membaca key dari `config/model_keys.json`. Jangan mengarahkan
-`--output_root` ke `result/ETHICS/v9 [THIS IS THE MAIN]`, karena runner eksperimen
+`--output_root` ke `result/benchmarks/ethics/runs/v9_main`, karena runner eksperimen
 asli tetap dapat menulis JSON berisi kegagalan ketika request gagal.
 
 Setelah health-check berhasil, rerun hanya file audit yang gagal dengan panduan
@@ -143,7 +143,13 @@ foreach ($p in $personas) {
     --skip_existing
 }
 ```
-
+  python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional --execute  --concurrency 4
+  python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional --execute --concurrency 4
+    python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope nonregional --execute --concurrency 4
+      python ".\src\tools\rerun_llama33_70b_openrouter.py" --scope regional  --execute  --concurrency 4
+        python ".\src\tools\rerun_ministral_8b_openrouter.py" --scope nonregional --execute --concurrency 4
+  python ".\src\tools\rerun_llama33_70b_openrouter.py"  --scope nonregional --execute  --concurrency 4
+    python ".\src\tools\rerun_gpt_oss_20b_openrouter.py" --scope nonregional  --execute  --concurrency 4
 ---
 
 ## Cara 3 — Manual, satu per satu
@@ -212,7 +218,7 @@ python src/ethics_runner/run_ethics_prompt_v9.py --all_pipeline --group regional
 ## Struktur Output
 
 ```
-result/ETHICS/v9_pilot/Regional Cultural Persona/
+result/benchmarks/ethics/runs/v9_pilot/Regional Cultural Persona/
 └── {model_slug}/                       # e.g. deepseek_deepseek-r1-distill-qwen-32b
     ├── north_american_explicit/
     │   ├── ethics_commonsense_0001.json
@@ -226,7 +232,7 @@ result/ETHICS/v9_pilot/Regional Cultural Persona/
 ```
 
 CSV per-model otomatis di-rebuild ke:
-`result/ETHICS/{model_slug}/result_ethics_v9_pilot_{model_slug}.csv`
+`result/benchmarks/ethics/runs/{model_slug}/result_ethics_v9_pilot_{model_slug}.csv`
 
 ---
 

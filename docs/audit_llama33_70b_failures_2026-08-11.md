@@ -103,7 +103,7 @@ Masing-masing tersedia pula dalam varian `model_ethics_failures.csv` dan
 
 ## Keamanan rerun
 
-Runner `scripts/rerun_llama33_70b_openrouter.py`:
+Runner `src/tools/rerun_llama33_70b_openrouter.py`:
 
 - hanya membuka path yang tercantum dalam manifest;
 - memisahkan Regional dan nonregional;

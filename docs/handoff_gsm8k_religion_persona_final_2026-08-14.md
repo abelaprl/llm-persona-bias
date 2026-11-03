@@ -1,8 +1,8 @@
 # Handoff Final Parsing GSM8K — Religion Persona
 
 **Tanggal status:** 14 Agustus 2026  
-**Input:** `result/GMS8K/Religion_Persona/`  
-**Laporan kanonik:** `result/GMS8K/reports/Religion_Persona/`  
+**Input:** `result/benchmarks/gsm8k/Religion_Persona/`  
+**Laporan kanonik:** `result/benchmarks/gsm8k/reports/Religion_Persona/`  
 **Jumlah unit:** 6 model × 16 persona × 1.319 soal = 126.624 baris
 
 ## 1. Keputusan metodologis yang dipakai
@@ -69,9 +69,9 @@ Kode utama:
   penulisan CSV, dan validasi bersama;
 - `src/MAIN_PARSING/GSM8K/Religion_Persona/rules_*.py` — rule pack per model;
 - `src/MAIN_PARSING/GSM8K/Religion_Persona/run.py` — CLI;
-- `scripts/build_gsm8k_religion_coverage_manifest.py` — manifest selective
+- `src/tools/build_gsm8k_religion_coverage_manifest.py` — manifest selective
   rerun;
-- `scripts/rerun_deepseek_32b_vast.py` — runner DeepSeek melalui vLLM lokal.
+- `src/tools/rerun_deepseek_32b_vast.py` — runner DeepSeek melalui vLLM lokal.
 
 ## 5. Validasi yang sudah lulus
 
@@ -90,17 +90,17 @@ Syarat awal: server vLLM tersedia di
 
 ```powershell
 # Validasi manifest saja.
-python scripts\rerun_deepseek_32b_vast.py
+python src\tools\rerun_deepseek_32b_vast.py
 
 # Jalankan/resume; temperature dan max_tokens dikunci oleh wrapper.
-python scripts\rerun_deepseek_32b_vast.py --execute --concurrency 4
+python src\tools\rerun_deepseek_32b_vast.py --execute --concurrency 4
 
 # Refresh target manifest dan hitung ulang laporan kanonik.
 python -m src.MAIN_PARSING.GSM8K.Religion_Persona.run `
   --model deepseek_deepseek-r1-distill-qwen-32b `
-  --reparse_results result\GMS8K\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
+  --reparse_results result/benchmarks/gsm8k\reports\Religion_Persona\deepseek_deepseek-r1-distill-qwen-32b\results.csv `
   --refresh_manifest result\rerun_manifests\gsm8k_deepseek\deepseek_religion_coverage_failures.csv `
-  --out_root result\GMS8K\reports
+  --out_root result/benchmarks/gsm8k\reports
 ```
 
 ## 7. Aturan untuk persona berikutnya

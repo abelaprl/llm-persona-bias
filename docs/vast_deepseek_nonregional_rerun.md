@@ -41,13 +41,13 @@ vllm serve deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
 Validate all paths without API calls or writes:
 
 ```bash
-python scripts/rerun_deepseek_nonregional_vast.py
+python src/tools/rerun_deepseek_nonregional_vast.py
 ```
 
 Run a smoke test. `--limit 3` means three ETHICS and three GSM8K targets:
 
 ```bash
-python scripts/rerun_deepseek_nonregional_vast.py \
+python src/tools/rerun_deepseek_nonregional_vast.py \
   --execute --limit 3 --concurrency 1
 ```
 
@@ -55,7 +55,7 @@ After the smoke test succeeds, resume the complete rerun. The six completed
 files are skipped automatically:
 
 ```bash
-python scripts/rerun_deepseek_nonregional_vast.py \
+python src/tools/rerun_deepseek_nonregional_vast.py \
   --execute --concurrency 4
 ```
 

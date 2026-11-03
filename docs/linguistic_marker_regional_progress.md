@@ -50,7 +50,7 @@ Prinsip Bab IV yang dipertahankan:
 
 Seluruh sumber Regional/Cultural disatukan ke:
 
-`result/GMS8K/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv`
+`result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/_combined/all_models_results_full.csv`
 
 Ringkasan:
 
@@ -66,7 +66,7 @@ Ringkasan:
 
 Neutral tidak dibuat ulang atau difabrikasi. Sumber Neutral bersama diambil dari source-aligned combined Gender Persona:
 
-`result/GMS8K/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
+`result/benchmarks/gsm8k/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
 
 Setelah Neutral ditambahkan, full run berisi:
 
@@ -76,7 +76,7 @@ Setelah Neutral ditambahkan, full run berisi:
 
 File pembangun combined:
 
-`scripts/build_gsm8k_regional_combined_full.py`
+`src/tools/build_gsm8k_regional_combined_full.py`
 
 Manifest sumber:
 
@@ -174,9 +174,9 @@ File baru atau yang disiapkan untuk Regional/Cultural:
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/regional_statistics.py`
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/run_regional.py`
 - `src/MAIN_PARSING/LINGUISTIC_MARKERS/tests/test_regional_pipeline.py`
-- `scripts/build_regional_lm_visual_v1.py`
-- `scripts/finalize_regional_lm_audit_v1_1.py`
-- `scripts/create_regional_lm_visual_notebook_v1.py`
+- `src/tools/build_regional_lm_visual_v1.py`
+- `src/tools/finalize_regional_lm_audit_v1_1.py`
+- `src/tools/create_regional_lm_visual_notebook_v1.py`
 
 Versi pipeline final:
 
@@ -199,7 +199,7 @@ Pipeline menghitung:
 
 Direktori run final:
 
-`result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818`
+`result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818`
 
 Parameter:
 
@@ -234,7 +234,7 @@ File statistik yang dihasilkan:
 
 Direktori audit:
 
-`result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818/audit_codex_contextual_review_20260818`
+`result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818/audit_codex_contextual_review_20260818`
 
 Precision:
 
@@ -270,7 +270,7 @@ Reviewer dicatat sebagai AI contextual review, bukan human annotation.
 
 Direktori visual final:
 
-`result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/visual/regional_gsm8k_bab4_visual_v1_1_0_20260818`
+`result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/visual/regional_gsm8k_bab4_visual_v1_1_0_20260818`
 
 Jumlah PNG: 22.
 
@@ -413,14 +413,14 @@ Tes mencakup extractor umum, surface handling, pairing, McNemar, Stuart–Maxwel
 Membangun combined source:
 
 ```powershell
-python scripts/build_gsm8k_regional_combined_full.py
+python src/tools/build_gsm8k_regional_combined_full.py
 ```
 
 Menjalankan full pipeline:
 
 ```powershell
 python -m src.MAIN_PARSING.LINGUISTIC_MARKERS.run_regional `
-  --output-dir result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818 `
+  --output-dir result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818 `
   --bootstrap-resamples 10000 `
   --audit-per-marker 50 `
   --audit-recall-per-condition 2
@@ -429,21 +429,21 @@ python -m src.MAIN_PARSING.LINGUISTIC_MARKERS.run_regional `
 Membangun visual:
 
 ```powershell
-python scripts/build_regional_lm_visual_v1.py `
-  --run-dir result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818 `
-  --output-dir result/GMS8K/reports/Regional_Cultural_Persona/linguistic_markers/visual/regional_gsm8k_bab4_visual_v1_1_0_20260818
+python src/tools/build_regional_lm_visual_v1.py `
+  --run-dir result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/regional_gsm8k_full_source_aligned_v1_1_20260818 `
+  --output-dir result/benchmarks/gsm8k/reports/Regional_Cultural_Persona/linguistic_markers/visual/regional_gsm8k_bab4_visual_v1_1_0_20260818
 ```
 
 Menyelesaikan audit:
 
 ```powershell
-python scripts/finalize_regional_lm_audit_v1_1.py
+python src/tools/finalize_regional_lm_audit_v1_1.py
 ```
 
 Membuat dan mengeksekusi notebook:
 
 ```powershell
-python scripts/create_regional_lm_visual_notebook_v1.py
+python src/tools/create_regional_lm_visual_notebook_v1.py
 jupyter nbconvert --to notebook --execute --inplace `
   --ExecutePreprocessor.timeout=1200 `
   notebooks/linguistic_marker_regional_cultural_gsm8k_bab4_visual_v1.ipynb

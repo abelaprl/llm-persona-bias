@@ -85,27 +85,27 @@ tidak disertakan dalam bundle dan tidak boleh di-push karena berisi secret.
 Validasi manifest tanpa API call dan tanpa menulis file:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py
+python src/tools/rerun_qwen3_next_80b_openrouter.py
 ```
 
 Smoke test satu target terlebih dahulu:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --execute --limit 1 --concurrency 1
 ```
 
 Lanjutkan batch kecil. Target yang sukses pada smoke test otomatis dilewati:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --execute --limit 10 --concurrency 2
 ```
 
 Jika hasil batch kecil benar, jalankan seluruh target tersisa:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --execute --concurrency 4
 ```
 
@@ -113,7 +113,7 @@ Regional Cultural memakai runner yang sama tetapi manifest dan folder backup
 terpisah. Validasi dahulu:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py --scope regional
+python src/tools/rerun_qwen3_next_80b_openrouter.py --scope regional
 ```
 
 ### Health-check memakai skenario asli ETHICS v9 Regional Persona
@@ -138,7 +138,7 @@ python src/ethics_runner/run_ethics_prompt_v9.py --model_order 32 --personas nor
 
 Runner asli membutuhkan repo lengkap, termasuk data, input persona, dan
 `config/model_keys.json` dengan key order 32 yang sudah dirotasi. Jangan arahkan
-`--output_root` ke `result/ETHICS/v9 [THIS IS THE MAIN]`: runner asli tetap
+`--output_root` ke `result/benchmarks/ethics/runs/v9_main`: runner asli tetap
 menulis JSON kegagalan jika request ulang gagal.
 
 Setelah 8 hasil smoke valid, kembali ke runner selektif di bawah. Runner selektif
@@ -148,14 +148,14 @@ dan tidak mengganti JSON sumber ketika respons baru gagal atau kosong.
 Smoke test Regional Cultural:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --scope regional --execute --limit 1 --concurrency 1
 ```
 
 Full Regional Cultural setelah smoke test berhasil:
 
 ```bash
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --scope regional --execute --concurrency 4
 ```
 
@@ -163,19 +163,19 @@ Menjalankan per dataset juga bisa:
 
 ```bash
 # ETHICS saja: 2.949 target
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --dataset ethics --execute --concurrency 4
 
 # GSM8K saja: 5.341 target
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --dataset gsm8k --execute --concurrency 4
 
 # Regional ETHICS saja: 5.085 target
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --scope regional --dataset ethics --execute --concurrency 4
 
 # Regional GSM8K saja: 546 target
-python scripts/rerun_qwen3_next_80b_openrouter.py \
+python src/tools/rerun_qwen3_next_80b_openrouter.py \
   --scope regional --dataset gsm8k --execute --concurrency 4
 ```
 
@@ -197,8 +197,8 @@ final content dianggap gagal; file JSON utama tidak akan ditimpa.
 
 ## File yang digunakan
 
-- `scripts/rerun_qwen3_next_80b_openrouter.py`
-- `scripts/rerun_qwen3_next_80b_nonregional_openrouter.py` (implementasi)
+- `src/tools/rerun_qwen3_next_80b_openrouter.py`
+- `src/tools/rerun_qwen3_next_80b_nonregional_openrouter.py` (implementasi)
 - `result/rerun_manifests/qwen3_next_80b_nonregional/qwen_nonregional_infra_all.csv`
 - `result/rerun_manifests/qwen3_next_80b_regional/qwen_regional_infra_all.csv`
 - `src/ethics_runner/run_ethics_prompt_v9.py`

@@ -11,11 +11,11 @@ Analisis linguistic marker Religion Persona pada GSM8K sudah dibangun ulang untu
 
 Run final:
 
-`result/GMS8K/reports/Religion_Persona/linguistic_markers/religion_gsm8k_full_source_aligned_v1_3_20260818`
+`result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/religion_gsm8k_full_source_aligned_v1_3_20260818`
 
 Visual final:
 
-`result/GMS8K/reports/Religion_Persona/linguistic_markers/visual/religion_gsm8k_bab4_visual_v1_3_0_20260818`
+`result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/visual/religion_gsm8k_bab4_visual_v1_3_0_20260818`
 
 Notebook final yang sudah dieksekusi:
 
@@ -23,7 +23,7 @@ Notebook final yang sudah dieksekusi:
 
 Audit final:
 
-`result/GMS8K/reports/Religion_Persona/linguistic_markers/religion_gsm8k_full_source_aligned_v1_3_20260818/audit_codex_contextual_review_20260818`
+`result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/religion_gsm8k_full_source_aligned_v1_3_20260818/audit_codex_contextual_review_20260818`
 
 Hasil lama tidak ditimpa. Run v1.1 dan v1.2 sengaja dipertahankan sebagai audit trail karena dari kedua run itulah dua recall miss ditemukan.
 
@@ -61,7 +61,7 @@ Versi baru tidak menyalin kelemahan utama notebook lama: analisis tidak dibatasi
 
 Sumber:
 
-`result/GMS8K/reports/Religion_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
+`result/benchmarks/gsm8k/reports/Religion_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
 
 - 126.624 baris;
 - 6 model;
@@ -77,7 +77,7 @@ SHA-256:
 
 Sumber:
 
-`result/GMS8K/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
+`result/benchmarks/gsm8k/reports/Gender_Persona/publication_source_aligned_v1_20260817/_combined/all_models_results_full.csv`
 
 Hanya baris `persona_folder == neutral` yang digunakan.
 
@@ -101,7 +101,7 @@ SHA-256:
 - Tidak ada kunci respons duplikat.
 - `ground_truth` tidak digunakan oleh ekstraktor.
 - Hidden reasoning tidak digunakan.
-- File lama `result/reports/all_results_combined.csv` tidak digunakan untuk analisis ini.
+- File lama `result/archive/reports_mixed_legacy/all_results_combined.csv` tidak digunakan untuk analisis ini.
 
 ## 4. Desain analisis
 
@@ -332,15 +332,15 @@ Pipeline utama:
 
 Visual dan notebook:
 
-- `scripts/build_religion_lm_visual_v1.py`;
-- `scripts/create_religion_lm_visual_notebook_v1.py`.
+- `src/tools/build_religion_lm_visual_v1.py`;
+- `src/tools/create_religion_lm_visual_notebook_v1.py`.
 
 Audit baru:
 
-- `scripts/audit_religion_formula_candidates.py`;
-- `scripts/audit_religion_recall_screen.py`;
-- `scripts/audit_religion_scripture_citations.py`;
-- `scripts/finalize_religion_lm_audit_v1_3.py`.
+- `src/tools/audit_religion_formula_candidates.py`;
+- `src/tools/audit_religion_recall_screen.py`;
+- `src/tools/audit_religion_scripture_citations.py`;
+- `src/tools/finalize_religion_lm_audit_v1_3.py`.
 
 ## 11. Isi run final
 
@@ -429,7 +429,7 @@ Gunakan path output baru karena pipeline write-once:
 
 ```powershell
 python -m src.MAIN_PARSING.LINGUISTIC_MARKERS.run_religion `
-  --output-dir result/GMS8K/reports/Religion_Persona/linguistic_markers/<nama_run_baru> `
+  --output-dir result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/<nama_run_baru> `
   --bootstrap-resamples 10000 `
   --audit-per-marker 50 `
   --audit-recall-per-condition 2
@@ -438,9 +438,9 @@ python -m src.MAIN_PARSING.LINGUISTIC_MARKERS.run_religion `
 Bangun visual ke folder baru:
 
 ```powershell
-python scripts/build_religion_lm_visual_v1.py `
-  --run-dir result/GMS8K/reports/Religion_Persona/linguistic_markers/<nama_run_baru> `
-  --output-dir result/GMS8K/reports/Religion_Persona/linguistic_markers/visual/<nama_visual_baru>
+python src/tools/build_religion_lm_visual_v1.py `
+  --run-dir result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/<nama_run_baru> `
+  --output-dir result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/visual/<nama_visual_baru>
 ```
 
 ## 15. Tambahan yang disarankan untuk Bab IV
