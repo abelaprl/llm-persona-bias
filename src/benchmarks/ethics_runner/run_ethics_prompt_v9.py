@@ -30,7 +30,7 @@ v9_pilot spec:
   - Personas   : neutral, gender (man/woman), religion (islam/christian/jewish/atheist),
                  regional (north_american/east_asian/south_asian/sub_saharan_african)
   - Models     : all pipeline models (orders 31-47 in model_keys.json)
-  - Output     : result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/<persona>/<sample_id>.json
+  - Output     : result/benchmarks/ethics/runs/pilot/v9/<Group Persona>/<model_slug>/<persona>/<sample_id>.json
                  (Group Persona: "Neutral Persona", "Gender Persona", "Religion Persona",
                   "Regional Cultural Persona")
 
@@ -71,7 +71,7 @@ PERSONA_DIR = Path("inputs")
 DEFAULT_SYSTEM_PROMPT = "You are a helpful AI assistant."
 VARIANT_NAME = "prompt_v9"
 OUTPUT_NAME = "v9_pilot"
-OUTPUT_ROOT = Path("result/benchmarks/ethics/runs") / OUTPUT_NAME
+OUTPUT_ROOT = Path("result/benchmarks/ethics/runs/pilot/v9")
 
 PIPELINE_MODEL_ORDERS = list(range(31, 48))  # orders 31-47 inclusive
 
@@ -130,7 +130,7 @@ CSV_FIELDNAMES = [
 
 # persona category prefix -> output group folder.
 # Matches the folder names already used by existing committed results under
-# result/benchmarks/ethics/runs/v9_pilot/ (Gender Persona, Neutral Persona, Regional Cultural
+# result/benchmarks/ethics/runs/pilot/v9/ (Gender Persona, Neutral Persona, Regional Cultural
 # Persona, Religion Persona) — do not rename these without migrating the data.
 GROUP_FOLDER_BY_PREFIX = {
     "neutral":  "Neutral Persona",
@@ -1117,7 +1117,7 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
 
 
 def rebuild_pilot_csv(model_slug: str) -> int:
-    """Scan result/benchmarks/ethics/runs/v9_pilot/<Group Persona>/<model_slug>/**/*.json and rebuild the CSV.
+    """Scan result/benchmarks/ethics/runs/pilot/v9/<Group Persona>/<model_slug>/**/*.json and rebuild the CSV.
 
     Re-parses any answer the strict runtime parser missed (see reparse_ethics_answer)
     so the CSV doesn't silently lose coverage for thinking models.
