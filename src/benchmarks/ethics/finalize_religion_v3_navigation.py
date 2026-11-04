@@ -56,11 +56,11 @@ def finalize(report):
     content+='[PDF A4 — 24 panel per model]('+prefix+'religion_ethics_marker_publication_panels.pdf) · [Semua 52 kontras/model]('+prefix+'evidence/all_contrasts_explorer.html) · [37 PNG/SVG]('+prefix+'figures/)\n\n'
     content+='59 marker mencakup delapan keluarga. Semua marker masih candidate; anotasi dua reviewer dan precision/recall empiris belum tersedia. Baca denominator, status CI dan gap pada laporan sebelum menarik kesimpulan.\n\n'
     content+='## Pembanding dan analisis lain\n\n| Kebutuhan | Buka |\n|---|---|\n'
-    content+='| Marker ETHICS sebelumnya | [Notebook v2.0.2](linguistic_marker_religion_ethics_thesis_v2_0_2_candidate_20260827.ipynb) |\n'
-    content+='| Atlas sumber v2.0.2 | [Atlas](linguistic_marker_religion_ethics_atlas_v2_0_2_candidate_20260827.ipynb) |\n'
+    content+='| Marker ETHICS sebelumnya | [Notebook v2.0.2](<../../archive/notebooks/religion/root/legacy_notebooks/linguistic_marker_religion_ethics_thesis_v2_0_2_candidate_20260827.ipynb>) |\n'
+    content+='| Atlas sumber v2.0.2 | [Atlas](<../../archive/notebooks/religion/root/legacy_notebooks/linguistic_marker_religion_ethics_atlas_v2_0_2_candidate_20260827.ipynb>) |\n'
     content+='| Akurasi ETHICS | [Notebook akurasi](<ethics accuracy analysis/ETHICS_Religion_Accuracy_Analysis_Lengkap.ipynb>) |\n'
     content+='| Akurasi GSM8K | [Notebook akurasi](<akurasi analysis/GSM8K_Religion_Accuracy_Analysis_Lengkap.ipynb>) |\n\n'
-    content+='Notebook GSM8K dan hasil marker lama dipertahankan. Penyajian September sebelumnya juga sudah overall; v3 memperluas deteksi dan audit. `img/ethics/` tetap aset historis; gambar kandidat baru berada pada folder hasil v3 yang ditautkan di atas.\n'
+    content+='Notebook GSM8K dan hasil marker lama dipertahankan di `archive/notebooks/religion/`. Penyajian September sebelumnya juga sudah overall; v3 memperluas deteksi dan audit. Aset historis berada di `archive/notebooks/religion/root/img/ethics/`; gambar kandidat baru berada pada folder hasil v3 yang ditautkan di atas.\n'
     readme.write_text(content,encoding='utf-8')
     write_json(report/'presentation_review_manifest.json',dict(preferred_report_notebook=reviewed.name,workspace_notebook=str(destination),
         report_notebook_sha256=sha256(reviewed),workspace_notebook_sha256=sha256(destination),readme_sha256=sha256(readme),

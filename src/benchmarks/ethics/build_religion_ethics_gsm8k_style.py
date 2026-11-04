@@ -43,7 +43,7 @@ def source_files():
                 'occurrences/hits.csv.gz', 'registry/markers.json', 'inventory/coverage.csv']
     files = [SOURCE / name for name in relative]
     files += sorted((SOURCE / 'figures').rglob('*.png')) + sorted((SOURCE / 'figures').rglob('*.svg'))
-    files += [ROOT / 'notebooks/religion/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb',
+    files += [ROOT / 'archive/notebooks/religion/root/legacy_notebooks/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb',
               ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1/targeted_full_responses.json',
               ROOT / 'result/benchmarks/ethics/reports/religion_lm_v3_preparation_20260915_r1/open_discovery_round_1.json']
     return files
@@ -112,7 +112,7 @@ def build(run_id, output):
                        for p in sorted(output.rglob('*')) if p.is_file()}
     manifest = dict(status='candidate_pending_independent_human_validation',
                     source_bundle=str(SOURCE.relative_to(ROOT)).replace('\\', '/'), run_id=run_id,
-                    presentation_reference='notebooks/religion/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb',
+                    presentation_reference='archive/notebooks/religion/root/legacy_notebooks/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb',
                     responses=len(data['rows']), markers=len(data['registry']), models=6, personas=17,
                     figures=len(figures), hidden_reasoning_used=False, scoring_changed=False,
                     inference_recomputed=False, source_hashes=hashes, artifact_hashes=artifact_hashes,

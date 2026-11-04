@@ -85,7 +85,9 @@ DEFAULT_OUTPUT_DIR = (
     / "analysis"
     / "religion_ethics_linguistic_markers_v2_0_2_candidate_20260827"
 )
-DEFAULT_NOTEBOOK_DIR = REPO_ROOT / "notebooks" / "religion"
+DEFAULT_NOTEBOOK_DIR = (
+    REPO_ROOT / "archive" / "notebooks" / "religion" / "root" / "legacy_notebooks"
+)
 MAIN_NOTEBOOK_NAME = (
     "linguistic_marker_religion_ethics_thesis_v2_0_2_candidate_20260827.ipynb"
 )

@@ -533,8 +533,8 @@ def _package(benchmark: str, catalog: pd.DataFrame, coverage: pd.DataFrame,
                         "bukan pada raw final_output atau cuplikan ini.")),
     }
     previous_links = ({
-        "notebook": ROOT / "notebooks/religion/linguistic_marker_religion_gsm8k_bab4_visual_v1_3_1_volcano.ipynb",
-        "gallery": ROOT / "notebooks/religion/img",
+        "notebook": ROOT / "archive/notebooks/religion/root/legacy_notebooks/linguistic_marker_religion_gsm8k_bab4_visual_v1_3_1_volcano.ipynb",
+        "gallery": ROOT / "archive/notebooks/religion/root/img",
         "source_bundle": GSM_RUN,
     } if benchmark == "GSM8K" else {
         "notebook": ROOT / "notebooks/religion/linguistic marker/ETHICS/linguistic_marker_religion_ethics_v3_candidate_20260916_r4_overall.ipynb",

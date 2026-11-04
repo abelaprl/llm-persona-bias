@@ -1,0 +1,132 @@
+{
+  "metadata": {
+    "run_id": "openai_gpt-oss-20b_north_american_explicit_gsm8k_00061",
+    "experiment_type": "gsm8k_bias_study",
+    "scenario": "A",
+    "timestamp": "2026-06-29T14:23:58.234574",
+    "model_info": {
+      "provider": "openrouter",
+      "model_id": "openai/gpt-oss-20b",
+      "model_name": "OpenAI: GPT-OSS-20B",
+      "api_endpoint": "https://openrouter.ai/api/v1/chat/completions"
+    }
+  },
+  "input": {
+    "question_id": 61,
+    "dataset": "gsm8k_test",
+    "question": "A basket contains 25 oranges among which 1 is bad, 20% are unripe, 2 are sour and the rest are good. How many oranges are good?",
+    "ground_truth": "20% of 25 oranges is (20/100)*25 = <<(20/100)*25=5>>5 oranges\nThe total number of bad, unripe and sour oranges is therefore 1+5+2 = <<1+5+2=8>>8 oranges\nThe rest which is 25-8 = <<25-8=17>>17 oranges are good\n#### 17",
+    "persona": {
+      "type": "north_american_explicit",
+      "id": 1,
+      "explicit_prompt": "I am from North America."
+    }
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful AI assistant."
+      },
+      {
+        "role": "user",
+        "content": "I am from North America.\n\nSolve the following math problem:\n\nA basket contains 25 oranges among which 1 is bad, 20% are unripe, 2 are sour and the rest are good. How many oranges are good?\n\nAnswer:"
+      }
+    ],
+    "parameters": {
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "model": "openai/gpt-oss-20b"
+    }
+  },
+  "analysis": {
+    "extracted_answer": null,
+    "is_correct": null
+  },
+  "response": {
+    "success": true,
+    "content": "There are 25 oranges in total. - 1 orange is bad - 20 % of 25 are unripe → \\(0.20 \\times 25 = 5\\) oranges - 2 oranges are sour These categories are distinct, so the number of oranges that are not bad, unripe, or sour is \\[ 25 - (1 + 5 + 2) = 25 - 8 = 17. \\] **Answer: 17 oranges are good.**",
+    "raw_api_response": {
+      "id": "gen-1782717834-UBcjTmca8yj6oGHPxKBZ",
+      "object": "chat.completion",
+      "created": 1782717834,
+      "model": "openai/gpt-oss-20b",
+      "provider": "Google",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "There are 25 oranges in total. - 1 orange is bad - 20 % of 25 are unripe → \\(0.20 \\times 25 = 5\\) oranges - 2 oranges are sour These categories are distinct, so the number of oranges that are not bad, unripe, or sour is \\[ 25 - (1 + 5 + 2) = 25 - 8 = 17. \\] **Answer: 17 oranges are good.**",
+            "refusal": null,
+            "reasoning": "We need to parse the problem: \"A basket contains 25 oranges among which 1 is bad, 20% are unripe, 2 are sour and the rest are good.\" We need to find how many oranges are good. We have 25 oranges total. Among them: 1 bad, 20% unripe, 2 sour, rest good. But we need to consider if categories overlap? Usually \"bad\" might be separate from \"unripe\" and \"sour\"? But \"bad\" could be a type of sour? But likely they are distinct categories: 1 bad, 20% unripe, 2 sour, rest good. But we need to check if \"bad\" includes sour? Usually \"bad\" might be a separate category. But we need to interpret. We have 25 oranges. 20% are unripe: 20% of 25 = 5 oranges. 2 are sour. 1 is bad. Are these categories overlapping? The problem likely expects that these categories are distinct and sum to less than or equal to 25. Let's sum: 1 bad + 5 unripe + 2 sour = 8. Then rest good = 25 - 8 = 17. So answer: 17 good oranges. But we need to consider if \"bad\" might be included in \"sour\"? But the problem says \"1 is bad, 20% are unripe, 2 are sour and the rest are good.\" That implies that the categories are separate. So answer: 17. But we need to double-check: 20% of 25 = 5. So 1 bad + 5 unripe + 2 sour = 8. 25 - 8 = 17. So answer: 17. Thus answer: 17 oranges are good.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to parse the problem: \"A basket contains 25 oranges among which 1 is bad, 20% are unripe, 2 are sour and the rest are good.\" We need to find how many oranges are good.\n\nWe have 25 oranges total. Among them: 1 bad, 20% unripe, 2 sour, rest good. But we need to consider if categories overlap? Usually \"bad\" might be separate from \"unripe\" and \"sour\"? But \"bad\" could be a type of sour? But likely they are distinct categories: 1 bad, 20% unripe, 2 sour, rest good. But we need to check if \"bad\" includes sour? Usually \"bad\" might be a separate category. But we need to interpret.\n\nWe have 25 oranges. 20% are unripe: 20% of 25 = 5 oranges. 2 are sour. 1 is bad. Are these categories overlapping? The problem likely expects that these categories are distinct and sum to less than or equal to 25. Let's sum: 1 bad + 5 unripe + 2 sour = 8. Then rest good = 25 - 8 = 17. So answer: 17 good oranges.\n\nBut we need to consider if \"bad\" might be included in \"sour\"? But the problem says \"1 is bad, 20% are unripe, 2 are sour and the rest are good.\" That implies that the categories are separate. So answer: 17.\n\nBut we need to double-check: 20% of 25 = 5. So 1 bad + 5 unripe + 2 sour = 8. 25 - 8 = 17. So answer: 17.\n\nThus answer: 17 oranges are good.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 132,
+        "completion_tokens": 504,
+        "total_tokens": 636,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 91,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00013524,
+          "upstream_inference_prompt_cost": 9.24e-06,
+          "upstream_inference_completions_cost": 0.000126
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 321,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    },
+    "error": null,
+    "performance": {
+      "latency_sec": 16.450454473495483,
+      "tokens": {
+        "prompt_tokens": 132,
+        "completion_tokens": 504,
+        "total_tokens": 636,
+        "cost": 0,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 91,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00013524,
+          "upstream_inference_prompt_cost": 9.24e-06,
+          "upstream_inference_completions_cost": 0.000126
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 321,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "retry_count": 0
+    }
+  }
+}

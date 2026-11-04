@@ -114,9 +114,9 @@ SPECS = (
         / "result/benchmarks/gsm8k/reports/Religion_Persona/linguistic_markers/visual/"
         "religion_gsm8k_bab4_visual_v1_3_1_volcano_20260825",
         source_notebook=REPO_ROOT
-        / "notebooks/religion/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb",
+        / "archive/notebooks/religion/root/legacy_notebooks/linguistic_marker_religion_gsm8k_bab4_visual_v1.ipynb",
         output_notebook=REPO_ROOT
-        / "notebooks/religion/"
+        / "notebooks/religion/linguistic marker/GSM8K/"
         "linguistic_marker_religion_gsm8k_bab4_visual_v1_3_1_volcano.ipynb",
         bundle_version="religion-gsm8k-bab4-visual-v1.3.1-volcano",
         identities=("islam", "christian", "jewish", "atheist"),
